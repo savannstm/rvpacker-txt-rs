@@ -62,7 +62,13 @@ function jsonWrite(files, transfileog, transfile) {
 
 	for (const [f, file] of files.entries()) {
 		const newjson = file;
-		const outputPath = path.join(__dirname, "./output", filenames[f]);
+		const outputFolderPath = path.join(__dirname, "./output");
+
+		if (!fs.existsSync(outputFolderPath)) {
+			fs.mkdirSync(outputFolderPath, { recursive: true });
+		}
+
+		const outputPath = path.join(outputFolderPath, filenames[f]);
 		const locationName = newjson?.displayName;
 
 		for (let i = 0; i < locnames.length; i++) {
