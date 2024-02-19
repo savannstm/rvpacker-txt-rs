@@ -2,77 +2,154 @@ import { ensureDirSync } from "https://deno.land/std@0.216.0/fs/mod.ts";
 import { join } from "https://deno.land/std@0.216.0/path/mod.ts";
 
 const start = Date.now();
-const decoder = new TextDecoder("utf-8");
-const encoder = new TextEncoder();
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function removeConsequent401(file) {
-	function mergeConsequent401Objects(array) {
-		let first = undefined;
-		let number = -1;
-		let newString = "";
+function merge401(array) {
+	let first = undefined;
+	let number = -1;
+	let newString = "";
 
-		for (let i = 0; i < array.length; i++) {
-			const object = array[i];
-			const code = object.code;
-			if (code === 401 && first === undefined) {
-				first = i;
-				number++;
-				newString += object.parameters[0] + "\n";
-			} else if (code === 401 && first !== undefined) {
-				number++;
-				newString += object.parameters[0] + "\n";
-			}
-			if (i > 0 && array[i - 1].code === 401 && code !== 401 && first !== undefined) {
-				array[first].parameters[0] = newString.slice(0, -1);
-				array.splice(first + 1, number);
-				i -= number;
-				newString = "";
-				number = -1;
-				first = undefined;
-			}
+	for (let i = 0; i < array.length; i++) {
+		const object = array[i];
+		const code = object.code;
+		if (code === 401 && first === undefined) {
+			first = i;
+			number++;
+			newString += object.parameters[0] + "\n";
+		} else if (code === 401 && first !== undefined) {
+			number++;
+			newString += object.parameters[0] + "\n";
 		}
-		return array;
-	}
-
-	const newJSONData = JSON.parse(decoder.decode(Deno.readFileSync(file)));
-
-	for (const [ev, event] of newJSONData?.events?.entries() || []) {
-		for (const [pg, page] of event?.pages?.entries() || []) {
-			const newArray = mergeConsequent401Objects(page.list);
-			newJSONData.events[ev].pages[pg].list = newArray;
+		if (i > 0 && array[i - 1].code === 401 && code !== 401 && first !== undefined) {
+			array[first].parameters[0] = newString.slice(0, -1);
+			array.splice(first + 1, number);
+			i -= number;
+			newString = "";
+			number = -1;
+			first = undefined;
 		}
 	}
-
-	return newJSONData;
+	return array;
 }
 
-const jsonObjects = [...Deno.readDirSync(join(import.meta.dirname, "./original"))]
+function rmConMap401(file) {
+	const newjson = JSON.parse(Deno.readTextFileSync(file));
+
+	for (const [ev, event] of newjson?.events?.entries() || []) {
+		for (const [pg, page] of event?.pages?.entries() || []) {
+			const newArray = merge401(page.list);
+			newjson.events[ev].pages[pg].list = newArray;
+		}
+	}
+	return newjson;
+}
+function rmConOther401(file) {
+	const newjson = JSON.parse(Deno.readTextFileSync(file));
+
+	for (const element of newjson) {
+		if (element?.pages) {
+			for (const [pg, page] of element.pages.entries()) {
+				const newArray = merge401(page.list);
+				element.pages[pg].list = newArray;
+			}
+		} else if (!element?.pages) {
+			if (element?.list) {
+				const newArray = merge401(element.list);
+				element.list = newArray;
+			}
+		}
+	}
+
+	return newjson;
+}
+
+const dirs = {
+	original: join(Deno.cwd(), "./original"),
+	output: join(Deno.cwd(), "./data"),
+	maps: join(Deno.cwd(), "./maps/maps.txt"),
+	maps_trans: join(Deno.cwd(), "./maps/maps_trans.txt"),
+	names: join(Deno.cwd(), "./maps/names.txt"),
+	names_trans: join(Deno.cwd(), "./maps/names_trans.txt"),
+	other: join(Deno.cwd(), "./other"),
+};
+
+const jsonMaps = [...Deno.readDirSync(dirs.original)]
 	.map((entry) => entry.name)
 	.filter((file) => {
 		return file.startsWith("Map");
 	})
 	.map((file) => {
-		return removeConsequent401(join(import.meta.dirname, "./original", file));
-	})
-	.slice(0, -1);
+		return rmConMap401(join(dirs.original, file));
+	});
 
-function jsonWrite(files, transfileog, transfile) {
-	const filenames = [...Deno.readDirSync(join(import.meta.dirname, "./original"))]
+const jsonOther = [...Deno.readDirSync(dirs.original)]
+	.map((entry) => entry.name)
+	.filter((file) => {
+		return (
+			!file.startsWith("Map") &&
+			!file.startsWith("Tilesets") &&
+			!file.startsWith("Animations") &&
+			!file.startsWith("States") &&
+			!file.startsWith("System")
+		);
+	})
+	.map((file) => {
+		return rmConOther401(join(dirs.original, file));
+	});
+
+function isUselessLine(line) {
+	return (
+		line.includes("_") ||
+		line.includes("---") ||
+		line.startsWith("//") ||
+		/\d$/.test(line) ||
+		/^[A-Z\s]+$/.test(line) ||
+		/^[A-Z]+$/.test(line) ||
+		[
+			"gfx",
+			"WakeUP",
+			"LegHURT",
+			"smokePipe",
+			"DEFAULT CHARACTER",
+			"RITUAL CIRCLE",
+			"GameOver",
+			"deathCheck",
+			"REMOVEmembers",
+			"Beartrap",
+			"TransferSTATStoFUSION",
+			"PartyREARRANGE",
+			"SKILLSdemonSeedAVAILABLE",
+			"TransferSKILLStoMARRIAGE",
+			"counter-magic Available?",
+			"greater magic Available?",
+			"Blood sacrifice Available?",
+			"Back from Mahabre",
+			"BLINDNESS?",
+			"Crippled?",
+			"WhileBackstab",
+		].includes(line) ||
+		line.startsWith("??") ||
+		line.startsWith("RANDOM") ||
+		line.startsWith("Empty scroll") ||
+		line.startsWith("TALK")
+	);
+}
+
+function jsonWriteMaps(files, ogfile, transfile) {
+	const filenames = [...Deno.readDirSync(dirs.original)]
 		.map((entry) => entry.name)
 		.filter((file) => {
 			return file.startsWith("Map");
 		});
 
-	const transog = decoder.decode(Deno.readFileSync(transfileog)).split("\n");
-	const trans = decoder.decode(Deno.readFileSync(transfile)).split("\n");
+	const transog = Deno.readTextFileSync(ogfile).split("\n");
+	const trans = Deno.readTextFileSync(transfile).split("\n");
 	const translationHashmap = new Map();
 	for (let i = 0; i < transog.length; i++) {
 		translationHashmap.set(transog[i].trim(), trans[i].replaceAll("\\n", "\n").trim());
 	}
 
-	const locnames = decoder.decode(Deno.readFileSync(join(import.meta.dirname, "./names.txt"))).split("\n");
-	const locnamestrans = decoder.decode(Deno.readFileSync(join(import.meta.dirname, "./names_trans.txt"))).split("\n");
+	const locnames = Deno.readTextFileSync(dirs.names).split("\n");
+	const locnamestrans = Deno.readTextFileSync(dirs.names_trans).split("\n");
 	const namesHashmap = new Map();
 	for (let i = 0; i < locnames.length; i++) {
 		namesHashmap.set(locnames[i].trim(), locnamestrans[i].trim());
@@ -80,11 +157,9 @@ function jsonWrite(files, transfileog, transfile) {
 
 	for (const [f, file] of files.entries()) {
 		const newjson = file;
-		const outputFolderPath = join(import.meta.dirname, "./data");
+		const outputFolderPath = dirs.output;
 
-		if (!ensureDirSync(outputFolderPath)) {
-			Deno.mkdirSync(outputFolderPath, { recursive: true });
-		}
+		ensureDirSync(outputFolderPath);
 
 		const outputPath = join(outputFolderPath, filenames[f]);
 		const locationName = newjson?.displayName;
@@ -167,14 +242,203 @@ function jsonWrite(files, transfileog, transfile) {
 				}
 			}
 		}
-		Deno.writeFileSync(outputPath, encoder.encode(JSON.stringify(newjson)));
+		Deno.writeTextFileSync(outputPath, JSON.stringify(newjson));
 		console.log(`Записан файл ${filenames[f]}.`);
 	}
+	return;
+}
+function jsonWriteOther(files, ogfile, transfile) {
+	const filenames = [...Deno.readDirSync(dirs.original)]
+		.map((entry) => entry.name)
+		.filter((file) => {
+			return (
+				!file.startsWith("Map") &&
+				!file.startsWith("Tilesets") &&
+				!file.startsWith("Animations") &&
+				!file.startsWith("States") &&
+				!file.startsWith("System")
+			);
+		});
+
+	const transog = [];
+	for (const entry of Deno.readDirSync(ogfile)) {
+		if (entry.name.endsWith("_trans.txt")) continue;
+		transog.push(entry.name);
+	}
+	for (let i = 0; i < transog.length; i++) {
+		const element = transog[i];
+		transog[i] = Deno.readTextFileSync(join(ogfile, element)).split("\n");
+	}
+
+	const trans = [];
+	for (const entry of Deno.readDirSync(transfile)) {
+		if (!entry.name.endsWith("_trans.txt")) continue;
+		trans.push(entry.name);
+	}
+	for (let i = 0; i < trans.length; i++) {
+		const element = trans[i];
+		trans[i] = Deno.readTextFileSync(join(transfile, element)).split("\n");
+	}
+
+	for (const [f, file] of files.entries()) {
+		const newjson = file;
+		const outputFolderPath = dirs.output;
+
+		const hashmap = new Map();
+		for (let i = 0; i < transog[f].length; i++) {
+			hashmap.set(transog[f][i].replaceAll("\\n", "\n"), trans[f][i].replaceAll("\\n", "\n"));
+		}
+
+		ensureDirSync(outputFolderPath);
+
+		const outputPath = join(outputFolderPath, filenames[f]);
+
+		for (const element of newjson) {
+			if (!element) continue;
+
+			if (!element.pages) {
+				if (!element.list) {
+					const attributes = ["name", "description", "note"];
+					for (const attr of attributes) {
+						if (element[attr] && (!isUselessLine(element[attr]) || attr === "note")) {
+							if (hashmap.has(element[attr])) {
+								element[attr] = hashmap.get(element[attr]);
+							} else {
+								console.log(element[attr]);
+							}
+						}
+					}
+				} else if (element.list) {
+					if (element.name && !isUselessLine(element.name)) {
+						if (hashmap.has(element.name)) {
+							element.name = hashmap.get(element.name);
+						} else {
+							console.log(element.name);
+						}
+					}
+
+					for (const list of element.list || []) {
+						const code = list.code;
+
+						for (const parameter of list.parameters) {
+							if (code === 102 && Array.isArray(parameter)) {
+								for (const param of parameter) {
+									if (typeof param === "string") {
+										if (hashmap.has(param.replaceAll("\\n[", "\\N["))) {
+											list.parameters[parameter.indexOf(param)] = hashmap.get(
+												param.replaceAll("\\n[", "\\N[")
+											);
+										} else {
+											console.log(param);
+										}
+									}
+								}
+							} else if (code !== 102) {
+								if (code === 401) {
+									if (typeof parameter === "string") {
+										if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+											list.parameters[0] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
+										} else {
+											console.log(parameter);
+										}
+									}
+								} else if (code !== 401) {
+									if (typeof parameter === "string") {
+										if (code === 402) {
+											if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+												list.parameters[1] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
+											} else {
+												console.log(parameter);
+											}
+										} else if (code === 356) {
+											if (
+												(parameter.startsWith("choice_text") ||
+													parameter.startsWith("GabText")) &&
+												!parameter.endsWith("????")
+											) {
+												if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+													list.parameters[0] = hashmap.get(
+														parameter.replaceAll("\\n[", "\\N[")
+													);
+												} else {
+													console.log(parameter);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			} else if (element.pages) {
+				for (const page of element.pages) {
+					for (const list of page.list || []) {
+						const code = list.code;
+
+						for (const [pr, parameter] of list.parameters.entries()) {
+							if (code === 102 && Array.isArray(parameter)) {
+								for (const [p, param] of parameter.entries()) {
+									if (typeof param === "string") {
+										if (hashmap.has(param.replaceAll("\\n[", "\\N["))) {
+											list.parameters[pr][p] = hashmap.get(param.replaceAll("\\n[", "\\N["));
+										} else {
+											console.log(param);
+										}
+									}
+								}
+							} else if (code !== 102) {
+								if (code === 401) {
+									if (typeof parameter === "string") {
+										if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+											list.parameters[0] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
+										} else {
+											console.log(parameter);
+										}
+									}
+								} else if (code !== 401) {
+									if (typeof parameter === "string") {
+										if (code === 402) {
+											if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+												list.parameters[1] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
+											} else {
+												console.log(parameter);
+											}
+										} else if (code === 356) {
+											if (
+												(parameter.startsWith("choice_text") ||
+													parameter.startsWith("GabText")) &&
+												!parameter.endsWith("????")
+											) {
+												if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
+													list.parameters[0] = hashmap.get(
+														parameter.replaceAll("\\n[", "\\N[")
+													);
+												} else {
+													console.log(parameter);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		Deno.writeTextFileSync(outputPath, JSON.stringify(newjson));
+		console.log(`Записан файл ${filenames[f]}.`);
+	}
+	return;
 }
 
-jsonWrite(jsonObjects, join(import.meta.dirname, "./maps.txt"), join(import.meta.dirname, "./maps_trans.txt"));
+jsonWriteMaps(jsonMaps, dirs.maps, dirs.maps_trans);
+jsonWriteOther(jsonOther, dirs.other, dirs.other);
 
 console.log("Все файлы успешно записаны.");
 console.log("Потрачено времени: " + (Date.now() - start) / 1000 + " секунд.");
 
-await sleep(3000);
+setTimeout(() => {
+	Deno.exit();
+}, 3000);
