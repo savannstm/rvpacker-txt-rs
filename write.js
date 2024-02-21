@@ -11,6 +11,7 @@ function merge401(array) {
 	for (let i = 0; i < array.length; i++) {
 		const object = array[i];
 		const code = object.code;
+
 		if (code === 401 && first === undefined) {
 			first = i;
 			number++;
@@ -19,6 +20,7 @@ function merge401(array) {
 			number++;
 			newString += object.parameters[0] + "\n";
 		}
+
 		if (i > 0 && array[i - 1].code === 401 && code !== 401 && first !== undefined) {
 			array[first].parameters[0] = newString.slice(0, -1);
 			array.splice(first + 1, number);
@@ -31,27 +33,28 @@ function merge401(array) {
 	return array;
 }
 
-function rmConMap401(file) {
-	const newjson = JSON.parse(Deno.readTextFileSync(file));
+function mergeMap401(file) {
+	const outputJSON = JSON.parse(Deno.readTextFileSync(file));
 
-	for (const [ev, event] of newjson?.events?.entries() || []) {
+	for (const [ev, event] of outputJSON?.events?.entries() || []) {
 		for (const [pg, page] of event?.pages?.entries() || []) {
-			const newArray = merge401(page.list);
-			newjson.events[ev].pages[pg].list = newArray;
+			const newList = merge401(page.list);
+			outputJSON.events[ev].pages[pg].list = newList;
 		}
 	}
-	return newjson;
+	return outputJSON;
 }
-function rmConOther401(file) {
-	const newjson = JSON.parse(Deno.readTextFileSync(file));
 
-	for (const element of newjson) {
+function mergeOther401(file) {
+	const outputJSON = JSON.parse(Deno.readTextFileSync(file));
+
+	for (const element of outputJSON) {
 		if (element?.pages) {
 			for (const [pg, page] of element.pages.entries()) {
 				const newArray = merge401(page.list);
 				element.pages[pg].list = newArray;
 			}
-		} else if (!element?.pages) {
+		} else {
 			if (element?.list) {
 				const newArray = merge401(element.list);
 				element.list = newArray;
@@ -59,29 +62,29 @@ function rmConOther401(file) {
 		}
 	}
 
-	return newjson;
+	return outputJSON;
 }
 
-const dirs = {
+const dirPaths = {
 	original: join(Deno.cwd(), "./original"),
 	output: join(Deno.cwd(), "./data"),
 	maps: join(Deno.cwd(), "./maps/maps.txt"),
-	maps_trans: join(Deno.cwd(), "./maps/maps_trans.txt"),
+	mapsTrans: join(Deno.cwd(), "./maps/maps_trans.txt"),
 	names: join(Deno.cwd(), "./maps/names.txt"),
-	names_trans: join(Deno.cwd(), "./maps/names_trans.txt"),
+	namesTrans: join(Deno.cwd(), "./maps/names_trans.txt"),
 	other: join(Deno.cwd(), "./other"),
 };
 
-const jsonMaps = [...Deno.readDirSync(dirs.original)]
+const mapsJSON = [...Deno.readDirSync(dirPaths.original)]
 	.map((entry) => entry.name)
 	.filter((file) => {
 		return file.startsWith("Map");
 	})
 	.map((file) => {
-		return rmConMap401(join(dirs.original, file));
+		return mergeMap401(join(dirPaths.original, file));
 	});
 
-const jsonOther = [...Deno.readDirSync(dirs.original)]
+const otherJSON = [...Deno.readDirSync(dirPaths.original)]
 	.map((entry) => entry.name)
 	.filter((file) => {
 		return (
@@ -93,7 +96,7 @@ const jsonOther = [...Deno.readDirSync(dirs.original)]
 		);
 	})
 	.map((file) => {
-		return rmConOther401(join(dirs.original, file));
+		return mergeOther401(join(dirPaths.original, file));
 	});
 
 function isUselessLine(line) {
@@ -126,6 +129,7 @@ function isUselessLine(line) {
 			"BLINDNESS?",
 			"Crippled?",
 			"WhileBackstab",
+			"TransferSTATStoMARRIAGE",
 		].includes(line) ||
 		line.startsWith("??") ||
 		line.startsWith("RANDOM") ||
@@ -134,121 +138,99 @@ function isUselessLine(line) {
 	);
 }
 
-function jsonWriteMaps(files, ogfile, transfile) {
-	const filenames = [...Deno.readDirSync(dirs.original)]
+function writeMaps(files, originalTextFile, translatedTextFile) {
+	const filenames = [...Deno.readDirSync(dirPaths.original)]
 		.map((entry) => entry.name)
 		.filter((file) => {
 			return file.startsWith("Map");
 		});
 
-	const transog = Deno.readTextFileSync(ogfile).split("\n");
-	const trans = Deno.readTextFileSync(transfile).split("\n");
-	const translationHashmap = new Map();
-	for (let i = 0; i < transog.length; i++) {
-		translationHashmap.set(transog[i].trim(), trans[i].replaceAll("\\n", "\n").trim());
-	}
+	const originalText = Deno.readTextFileSync(originalTextFile).split("\n");
+	const translatedText = Deno.readTextFileSync(translatedTextFile).split("\n");
+	const textHashMap = new Map(
+		originalText.map((item, i) => [
+			item.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n"),
+			translatedText[i].replaceAll("\\n", "\n").trim(),
+		])
+	);
 
-	const locnames = Deno.readTextFileSync(dirs.names).split("\n");
-	const locnamestrans = Deno.readTextFileSync(dirs.names_trans).split("\n");
-	const namesHashmap = new Map();
-	for (let i = 0; i < locnames.length; i++) {
-		namesHashmap.set(locnames[i].trim(), locnamestrans[i].trim());
-	}
+	const originalNames = Deno.readTextFileSync(dirPaths.names).split("\n");
+	const translatedNames = Deno.readTextFileSync(dirPaths.namesTrans).split("\n");
+	const namesHashMap = new Map(originalNames.map((item, i) => [item.trim(), translatedNames[i].trim()]));
 
 	for (const [f, file] of files.entries()) {
-		const newjson = file;
-		const outputFolderPath = dirs.output;
+		const outputJSON = file;
+		const outputDir = dirPaths.output;
 
-		ensureDirSync(outputFolderPath);
+		ensureDirSync(outputDir);
 
-		const outputPath = join(outputFolderPath, filenames[f]);
-		const locationName = newjson?.displayName;
+		const outputPath = join(outputDir, filenames[f]);
+		const locationName = outputJSON?.displayName;
 
-		if (namesHashmap.has(locationName)) {
-			newjson.displayName = namesHashmap.get(locationName);
+		if (namesHashMap.has(locationName)) {
+			outputJSON.displayName = namesHashMap.get(locationName);
 		}
 
-		for (const event of newjson?.events || []) {
+		for (const event of outputJSON?.events || []) {
 			for (const page of event?.pages || []) {
 				for (const item of page.list) {
 					const code = item.code;
 
 					for (const [pr, parameter] of item.parameters.entries()) {
-						if (code === 102) {
-							if (Array.isArray(parameter)) {
+						switch (code) {
+							case 102 && Array.isArray(parameter):
 								for (const [p, param] of parameter.entries()) {
 									if (typeof param === "string") {
-										if (translationHashmap.has(param.replaceAll("\n", "\\n").trim())) {
-											item.parameters[pr][p] = translationHashmap.get(
-												param.replaceAll("\n", "\\n").trim()
-											);
+										if (textHashMap.has(param.replaceAll("\\n[", "\\N["))) {
+											item.parameters[pr][p] = textHashMap.get(param.replaceAll("\\n[", "\\N["));
 										} else {
-											console.log(
-												param,
-												translationHashmap.get(param.replaceAll("\n", "\\n").trim())
-											);
+											console.warn("102", param);
 										}
 									}
 								}
-							}
-						} else if ([401, 402, 356].includes(code)) {
-							if (code === 401) {
-								if (translationHashmap.has(parameter.replaceAll("\n", "\\n").trim())) {
-									item.parameters[0] = translationHashmap.get(
-										parameter.replaceAll("\n", "\\n").trim()
-									);
+								break;
+							case 401:
+								if (textHashMap.has(parameter.replaceAll("\\n[", "\\N["))) {
+									item.parameters[0] = textHashMap.get(parameter.replaceAll("\\n[", "\\N["));
 								} else {
-									console.log("401");
-									console.log(
-										parameter.replaceAll("\n", "\\n").trim(),
-										translationHashmap.get(parameter.replaceAll("\n", "\\n").trim())
-									);
+									console.warn("401", parameter);
 								}
-							} else if (code === 402) {
+								break;
+							case 402:
 								if (
 									typeof parameter === "string" &&
-									translationHashmap.has(parameter.replaceAll("\n", "\\n").trim())
+									textHashMap.has(parameter.replaceAll("\\n[", "\\N["))
 								) {
-									item.parameters[1] = translationHashmap.get(
-										parameter.replaceAll("\n", "\\n").trim()
-									);
+									item.parameters[1] = textHashMap.get(parameter.replaceAll("\\n[", "\\N["));
 								} else if (typeof parameter === "string") {
-									console.log("402");
-									console.log(
-										parameter.replaceAll("\n", "\\n").trim(),
-										translationHashmap.get(parameter.replaceAll("\n", "\\n").trim())
-									);
+									console.warn("402", parameter);
 								}
-							} else if (code === 356) {
+								break;
+							case 356:
 								if (
 									parameter.startsWith("GabText") ||
 									(parameter.startsWith("choice_text") && !parameter.endsWith("????"))
 								) {
-									if (translationHashmap.has(parameter.replaceAll("\n", "\\n").trim())) {
-										item.parameters[0] = translationHashmap.get(
-											parameter.replaceAll("\n", "\\n").trim()
-										);
+									if (textHashMap.has(parameter.replaceAll("\\n[", "\\N["))) {
+										item.parameters[0] = textHashMap.get(parameter.replaceAll("\\n[", "\\N["));
 									} else {
-										console.log("356");
-										console.log(
-											parameter.replaceAll("\n", "\\n").trim(),
-											translationHashmap.get(parameter.replaceAll("\n", "\\n").trim())
-										);
+										console.warn("356", parameter);
 									}
 								}
-							}
+								break;
 						}
 					}
 				}
 			}
 		}
-		Deno.writeTextFileSync(outputPath, JSON.stringify(newjson));
+		Deno.writeTextFileSync(outputPath, JSON.stringify(outputJSON));
 		console.log(`Записан файл ${filenames[f]}.`);
 	}
 	return;
 }
-function jsonWriteOther(files, ogfile, transfile) {
-	const filenames = [...Deno.readDirSync(dirs.original)]
+
+function writeOther(files, originalTextFile, translatedTextFile) {
+	const filenames = [...Deno.readDirSync(dirPaths.original)]
 		.map((entry) => entry.name)
 		.filter((file) => {
 			return (
@@ -260,40 +242,36 @@ function jsonWriteOther(files, ogfile, transfile) {
 			);
 		});
 
-	const transog = [];
-	for (const entry of Deno.readDirSync(ogfile)) {
-		if (entry.name.endsWith("_trans.txt")) continue;
-		transog.push(entry.name);
-	}
-	for (let i = 0; i < transog.length; i++) {
-		const element = transog[i];
-		transog[i] = Deno.readTextFileSync(join(ogfile, element)).split("\n");
-	}
+	const originalText = [...Deno.readDirSync(originalTextFile)]
+		.map((entry) => {
+			if (entry.name.endsWith("_trans.txt")) return undefined;
+			return Deno.readTextFileSync(join(originalTextFile, entry.name)).split("\n");
+		})
+		.filter((element) => element !== undefined);
 
-	const trans = [];
-	for (const entry of Deno.readDirSync(transfile)) {
-		if (!entry.name.endsWith("_trans.txt")) continue;
-		trans.push(entry.name);
-	}
-	for (let i = 0; i < trans.length; i++) {
-		const element = trans[i];
-		trans[i] = Deno.readTextFileSync(join(transfile, element)).split("\n");
-	}
+	const translatedText = [...Deno.readDirSync(translatedTextFile)]
+		.map((entry) => {
+			if (!entry.name.endsWith("_trans.txt")) return undefined;
+			return Deno.readTextFileSync(join(translatedTextFile, entry.name)).split("\n");
+		})
+		.filter((element) => element !== undefined);
 
 	for (const [f, file] of files.entries()) {
-		const newjson = file;
-		const outputFolderPath = dirs.output;
+		const outputJSON = file;
+		const outputDir = dirPaths.output;
 
-		const hashmap = new Map();
-		for (let i = 0; i < transog[f].length; i++) {
-			hashmap.set(transog[f][i].replaceAll("\\n", "\n"), trans[f][i].replaceAll("\\n", "\n"));
-		}
+		const hashMap = new Map(
+			originalText[f].map((item, i) => [
+				item.replaceAll("\\n", "\n"),
+				translatedText[f][i].replaceAll("\\n", "\n"),
+			])
+		);
 
-		ensureDirSync(outputFolderPath);
+		ensureDirSync(outputDir);
 
-		const outputPath = join(outputFolderPath, filenames[f]);
+		const outputPath = join(outputDir, filenames[f]);
 
-		for (const element of newjson) {
+		for (const element of outputJSON) {
 			if (!element) continue;
 
 			if (!element.pages) {
@@ -301,140 +279,88 @@ function jsonWriteOther(files, ogfile, transfile) {
 					const attributes = ["name", "description", "note"];
 					for (const attr of attributes) {
 						if (element[attr] && (!isUselessLine(element[attr]) || attr === "note")) {
-							if (hashmap.has(element[attr])) {
-								element[attr] = hashmap.get(element[attr]);
+							if (hashMap.has(element[attr])) {
+								element[attr] = hashMap.get(element[attr]);
 							} else {
-								console.log(element[attr]);
+								console.warn(element[attr]);
 							}
 						}
 					}
-				} else if (element.list) {
-					if (element.name && !isUselessLine(element.name)) {
-						if (hashmap.has(element.name)) {
-							element.name = hashmap.get(element.name);
+				} else {
+					const name = element.name;
+					if (name && !isUselessLine(name)) {
+						if (hashMap.has(name)) {
+							element.name = hashMap.get(name);
 						} else {
-							console.log(element.name);
-						}
-					}
-
-					for (const list of element.list || []) {
-						const code = list.code;
-
-						for (const parameter of list.parameters) {
-							if (code === 102 && Array.isArray(parameter)) {
-								for (const param of parameter) {
-									if (typeof param === "string") {
-										if (hashmap.has(param.replaceAll("\\n[", "\\N["))) {
-											list.parameters[parameter.indexOf(param)] = hashmap.get(
-												param.replaceAll("\\n[", "\\N[")
-											);
-										} else {
-											console.log(param);
-										}
-									}
-								}
-							} else if (code !== 102) {
-								if (code === 401) {
-									if (typeof parameter === "string") {
-										if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-											list.parameters[0] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
-										} else {
-											console.log(parameter);
-										}
-									}
-								} else if (code !== 401) {
-									if (typeof parameter === "string") {
-										if (code === 402) {
-											if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-												list.parameters[1] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
-											} else {
-												console.log(parameter);
-											}
-										} else if (code === 356) {
-											if (
-												(parameter.startsWith("choice_text") ||
-													parameter.startsWith("GabText")) &&
-												!parameter.endsWith("????")
-											) {
-												if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-													list.parameters[0] = hashmap.get(
-														parameter.replaceAll("\\n[", "\\N[")
-													);
-												} else {
-													console.log(parameter);
-												}
-											}
-										}
-									}
-								}
-							}
+							console.warn(name);
 						}
 					}
 				}
-			} else if (element.pages) {
-				for (const page of element.pages) {
-					for (const list of page.list || []) {
-						const code = list.code;
+			}
 
-						for (const [pr, parameter] of list.parameters.entries()) {
-							if (code === 102 && Array.isArray(parameter)) {
+			const pagesLength = element.pages !== undefined ? element.pages.length : 1;
+			for (let i = 0; i < pagesLength; i++) {
+				const iterableObj = pagesLength !== 1 ? element.pages[i] : element;
+
+				for (const list of iterableObj.list || []) {
+					const code = list.code;
+
+					for (const [pr, parameter] of list.parameters.entries()) {
+						switch (code) {
+							case 102 && Array.isArray(parameter):
 								for (const [p, param] of parameter.entries()) {
 									if (typeof param === "string") {
-										if (hashmap.has(param.replaceAll("\\n[", "\\N["))) {
-											list.parameters[pr][p] = hashmap.get(param.replaceAll("\\n[", "\\N["));
+										if (hashMap.has(param.replaceAll("\\n[", "\\N["))) {
+											list.parameters[pr][p] = hashMap.get(param.replaceAll("\\n[", "\\N["));
 										} else {
-											console.log(param);
+											console.warn(param);
 										}
 									}
 								}
-							} else if (code !== 102) {
-								if (code === 401) {
-									if (typeof parameter === "string") {
-										if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-											list.parameters[0] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
-										} else {
-											console.log(parameter);
-										}
-									}
-								} else if (code !== 401) {
-									if (typeof parameter === "string") {
-										if (code === 402) {
-											if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-												list.parameters[1] = hashmap.get(parameter.replaceAll("\\n[", "\\N["));
-											} else {
-												console.log(parameter);
-											}
-										} else if (code === 356) {
-											if (
-												(parameter.startsWith("choice_text") ||
-													parameter.startsWith("GabText")) &&
-												!parameter.endsWith("????")
-											) {
-												if (hashmap.has(parameter.replaceAll("\\n[", "\\N["))) {
-													list.parameters[0] = hashmap.get(
-														parameter.replaceAll("\\n[", "\\N[")
-													);
-												} else {
-													console.log(parameter);
-												}
-											}
-										}
+								break;
+							case 401:
+								if (typeof parameter === "string") {
+									if (hashMap.has(parameter.replaceAll("\\n[", "\\N["))) {
+										list.parameters[0] = hashMap.get(parameter.replaceAll("\\n[", "\\N["));
+									} else {
+										console.warn(parameter);
 									}
 								}
-							}
+								break;
+							case 402:
+								if (typeof parameter === "string") {
+									if (hashMap.has(parameter.replaceAll("\\n[", "\\N["))) {
+										list.parameters[1] = hashMap.get(parameter.replaceAll("\\n[", "\\N["));
+									} else {
+										console.warn(parameter);
+									}
+								}
+								break;
+							case 356:
+								if (
+									(parameter.startsWith("choice_text") || parameter.startsWith("GabText")) &&
+									!parameter.endsWith("????")
+								) {
+									if (hashMap.has(parameter.replaceAll("\\n[", "\\N["))) {
+										list.parameters[0] = hashMap.get(parameter.replaceAll("\\n[", "\\N["));
+									} else {
+										console.warn(parameter);
+									}
+								}
+								break;
 						}
 					}
 				}
 			}
 		}
-		Deno.writeTextFileSync(outputPath, JSON.stringify(newjson));
+		Deno.writeTextFileSync(outputPath, JSON.stringify(outputJSON));
 		console.log(`Записан файл ${filenames[f]}.`);
 	}
 	return;
 }
 
-jsonWriteMaps(jsonMaps, dirs.maps, dirs.maps_trans);
-jsonWriteOther(jsonOther, dirs.other, dirs.other);
+writeMaps(mapsJSON, dirPaths.maps, dirPaths.mapsTrans);
+writeOther(otherJSON, dirPaths.other, dirPaths.other);
 
 console.log("Все файлы успешно записаны.");
 console.log("Потрачено времени: " + (Date.now() - start) / 1000 + " секунд.");
