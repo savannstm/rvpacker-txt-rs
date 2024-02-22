@@ -4,6 +4,7 @@
 Фотоальбом
 Скромный маленький альбом, содержащий все фотографии, которые\nвы собрали на протяжении многих лет.
 \n\n\n\n\n\n\n<Picture: icon_blank_book>
+Рецепты 15-го века, том 1
 Первый том серии кулинарных книг. Содержит рецепты мясного\nи овощного пирогов.
 \n\n\n\n\n\n<Item Recipe: 14>\n<Item Recipe: 41>\n<Picture: icon_blank_book>
 Четыре Века Истории
@@ -29,6 +30,7 @@
 \n\n\n\n\n<Picture: icon_blackvial>\n<Menu Category: Предметы>
 Масло
 Флакон, полный масла.
+Алхемилия, том 2
 Книга со знаниями о среднем уровне алхимии.\nСодержит рецепты мутной, белой и желтой жидкостей.
 \n\n\n\n\n<Item Recipe: 10>\n<Item Recipe: 52>\n<Item Recipe: 33>\n<Picture: icon_blank_book>
 Мясной пирог
@@ -190,6 +192,7 @@ A book about the older god Sylvian.
 Перо сокола. Идеально подходит для использования в качестве ручки.
 Пустой свиток, ожидающий, пока кто-нибудь напишет в нем.
 \n\n\n\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Предметы>
+Алхемилия, том 3
 Книга со знаниями о высоком уровне алхимии.\nСодержит рецепты голубого и коричневого флакона.
 \n\n\n\n\n<Item Recipe: 67>\n<Item Recipe: 90>\n<Picture: icon_blank_book>
 Коричневый флакон
@@ -257,6 +260,7 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 Красная трава
 Красная трава с нейтральным запахом. Усиливает эффект от\nдругих трав.
 \n\n\n\n\n<Picture: icon_red_herb>\n<Menu Category: Исцеление>
+Алхемилия, том 1
 Книга с основами алхимии для начинающих.\nСодержит рецепты синего флакона и травяных смесей.
 \n\n\n\n\n<Item Recipe: 134>\n<Item Recipe: 135>\n<Item Recipe: 28>\n<Picture: icon_blank_book>
 Смешанные травы
@@ -413,6 +417,7 @@ Coded letter #1 - UNUSED
 \n\n\n\n\n<Picture: icon_broomstick>\n<Menu Category: Предметы>
 Ключи от канализации
 Набор грязных и ржавых ключей. На одном из ключей вырезана\nнадпись - "Канализация".
+Рецепты 15-го века, том 2
 Второй том серии кулинарных книг. Содержит рецепты мясного\nи овощного пирогов.
 \n\n\n\n\n<Item Recipe: 63>\n<Item Recipe: 168>\n<Picture: icon_blank_book>
 Кожаная библия - Алл-мер

@@ -73,6 +73,7 @@ const dirPaths = {
 	names: join(Deno.cwd(), "./maps/names.txt"),
 	namesTrans: join(Deno.cwd(), "./maps/names_trans.txt"),
 	other: join(Deno.cwd(), "./other"),
+	plugins: join(Deno.cwd(), "./plugins"),
 };
 
 const mapsJSON = [...Deno.readDirSync(dirPaths.original)]
@@ -98,6 +99,21 @@ const otherJSON = [...Deno.readDirSync(dirPaths.original)]
 	.map((file) => {
 		return mergeOther401(join(dirPaths.original, file));
 	});
+
+const systemJSON = JSON.parse(Deno.readTextFileSync(join(dirPaths.original, "System.json")));
+
+function extractPluginsJSON() {
+	const pluginsPath = join(Deno.cwd(), "./plugins/plugins.js");
+	const fileContent = Deno.readTextFileSync(pluginsPath).split("\n");
+	let newString = "";
+	for (let i = 3; i < fileContent.length - 1; i++) {
+		newString += fileContent[i];
+	}
+	newString = newString.slice(0, -1);
+	return newString;
+}
+
+const pluginsJSON = JSON.parse(extractPluginsJSON());
 
 function isUselessLine(line) {
 	return (
@@ -244,14 +260,14 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 
 	const originalText = [...Deno.readDirSync(originalTextFile)]
 		.map((entry) => {
-			if (entry.name.endsWith("_trans.txt")) return undefined;
+			if (entry.name.endsWith("_trans.txt") || entry.name.startsWith("System")) return undefined;
 			return Deno.readTextFileSync(join(originalTextFile, entry.name)).split("\n");
 		})
 		.filter((element) => element !== undefined);
 
 	const translatedText = [...Deno.readDirSync(translatedTextFile)]
 		.map((entry) => {
-			if (!entry.name.endsWith("_trans.txt")) return undefined;
+			if (!entry.name.endsWith("_trans.txt") || entry.name.startsWith("System")) return undefined;
 			return Deno.readTextFileSync(join(translatedTextFile, entry.name)).split("\n");
 		})
 		.filter((element) => element !== undefined);
@@ -266,7 +282,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 				translatedText[f][i].replaceAll("\\n", "\n"),
 			])
 		);
-
 		ensureDirSync(outputDir);
 
 		const outputPath = join(outputDir, filenames[f]);
@@ -278,7 +293,13 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 				if (!element.list) {
 					const attributes = ["name", "description", "note"];
 					for (const attr of attributes) {
-						if (element[attr] && (!isUselessLine(element[attr]) || attr === "note")) {
+						if (
+							element[attr] &&
+							(!isUselessLine(element[attr]) ||
+								element[attr].startsWith("Alchem") ||
+								element[attr].startsWith("Recipes") ||
+								attr === "note")
+						) {
 							if (hashMap.has(element[attr])) {
 								element[attr] = hashMap.get(element[attr]);
 							} else {
@@ -359,8 +380,88 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 	return;
 }
 
+function writeSystem(file, originalTextFile, translatedTextFile) {
+	const outputJSON = file;
+	const originalText = Deno.readTextFileSync(originalTextFile).split("\n");
+	const translatedText = Deno.readTextFileSync(translatedTextFile).split("\n");
+	const hashMap = new Map(originalText.map((item, i) => [item, translatedText[i]]));
+
+	for (const [el, element] of outputJSON.equipTypes.entries()) {
+		if (element && hashMap.has(element)) {
+			outputJSON.equipTypes[el] = hashMap.get(element);
+		}
+	}
+
+	for (const [el, element] of outputJSON.skillTypes.entries()) {
+		if (element && hashMap.has(element)) {
+			outputJSON.skillTypes[el] = hashMap.get(element);
+		}
+	}
+
+	for (const key in outputJSON.terms) {
+		if (key !== "messages") {
+			for (const [i, str] of outputJSON.terms[key].entries()) {
+				if (str && hashMap.has(str)) {
+					outputJSON.terms[key][i] = hashMap.get(str);
+				}
+			}
+		} else {
+			for (const messageKey in outputJSON.terms.messages) {
+				const message = outputJSON.terms.messages[messageKey];
+				if (message && hashMap.has(message)) {
+					outputJSON.terms.messages[messageKey] = hashMap.get(message);
+				}
+			}
+		}
+	}
+
+	Deno.writeTextFileSync(join(dirPaths.output, "System.json"), JSON.stringify(outputJSON));
+	console.log("Записан файл System.json.");
+	return;
+}
+
+function writePlugins(file, originalTextFile, translatedTextFile) {
+	const outputJSON = file;
+	const originalText = Array.from(new Set(Deno.readTextFileSync(originalTextFile).split("\n")));
+	const translatedText = Array.from(new Set(Deno.readTextFileSync(translatedTextFile).split("\n")));
+	const hashMap = new Map(originalText.map((item, i) => [item, translatedText[i]]));
+
+	for (const obj of outputJSON) {
+		const name = obj.name;
+		if (
+			[
+				"YEP_BattleEngineCore",
+				"YEP_OptionsCore",
+				"SRD_NameInputUpgrade",
+				"YEP_KeyboardConfig",
+				"YEP_ItemCore",
+				"YEP_X_ItemDiscard",
+				"YEP_EquipCore",
+				"YEP_ItemSynthesis",
+				"ARP_CommandIcons",
+				"YEP_X_ItemCategories",
+				"Olivia_OctoBattle",
+			].includes(name)
+		) {
+			for (const key in obj.parameters) {
+				const param = obj.parameters[key];
+				if (hashMap.has(param)) {
+					obj.parameters[key] = hashMap.get(param);
+				}
+			}
+		}
+	}
+
+	const prefix = "// Generated by RPG Maker.\n// Do not edit this file directly.\nvar $plugins =\n";
+	Deno.writeTextFileSync(join("./js", "plugins.js"), prefix + JSON.stringify(outputJSON));
+	console.log("Записан файл plugins.js.");
+	return;
+}
+
 writeMaps(mapsJSON, dirPaths.maps, dirPaths.mapsTrans);
 writeOther(otherJSON, dirPaths.other, dirPaths.other);
+writeSystem(systemJSON, join(dirPaths.other, "System.txt"), join(dirPaths.other, "System_trans.txt"));
+writePlugins(pluginsJSON, join(dirPaths.plugins, "plugins.txt"), join(dirPaths.plugins, "plugins_trans.txt"));
 
 console.log("Все файлы успешно записаны.");
 console.log("Потрачено времени: " + (Date.now() - start) / 1000 + " секунд.");

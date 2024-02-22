@@ -4,6 +4,7 @@ A map of Prehevil.
 Photo album
 A humble little album containing all the photos you've collected\nthrough the years.
 \n\n\n\n\n\n\n<Picture: icon_blank_book>
+Recipes of the 15th Century vol.1
 The first volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
 \n\n\n\n\n\n<Item Recipe: 14>\n<Item Recipe: 41>\n<Picture: icon_blank_book>
 The Four Ages of History
@@ -29,6 +30,7 @@ A vial full of mysterious black liquid.
 \n\n\n\n\n<Picture: icon_blackvial>\n<Menu Category: Items>
 Oil
 A vial full of oil that is somewhat flammable.
+Alchemillia vol.2
 A book for intermediate level alchemy. Contains recipes for\nthe murky vial, the white vial and the yellow vial.
 \n\n\n\n\n<Item Recipe: 10>\n<Item Recipe: 52>\n<Item Recipe: 33>\n<Picture: icon_blank_book>
 Meatpie
@@ -190,6 +192,7 @@ Quill
 A feather of a falcon. Perfectly suited for use as a quill.
 An empty scroll waiting for someone to write in it.
 \n\n\n\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+Alchemillia vol.3
 A book for experienced level alchemy. Contains recipes for\nthe light blue vial and the brown vial.
 \n\n\n\n\n<Item Recipe: 67>\n<Item Recipe: 90>\n<Picture: icon_blank_book>
 Brown vial
@@ -257,6 +260,7 @@ A white key.
 Red herb
 A red herb with a neutral smell. Intensifies the effect of\nother herbs.
 \n\n\n\n\n<Picture: icon_red_herb>\n<Menu Category: Healing>
+Alchemillia vol.1
 A book for beginner level alchemy. Contains recipes for the\nblue vial and simple mixed herbs.
 \n\n\n\n\n<Item Recipe: 134>\n<Item Recipe: 135>\n<Item Recipe: 28>\n<Picture: icon_blank_book>
 Mixed herbs
@@ -413,6 +417,7 @@ A simple wooden broomstick. It doesn't feel sturdy enough\nto be used as a weapo
 \n\n\n\n\n<Picture: icon_broomstick>\n<Menu Category: Items>
 Sewer keys
 A set of dirty and rusty keys. One of the keys got carved\ntext saying "Sewers".
+Recipes of the 15th Century vol.2
 The second volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
 \n\n\n\n\n<Item Recipe: 63>\n<Item Recipe: 168>\n<Picture: icon_blank_book>
 Skin bible - Alll-mer
