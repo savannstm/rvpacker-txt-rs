@@ -194,13 +194,17 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
 
 					for (const [pr, parameter] of item.parameters.entries()) {
 						switch (code) {
-							case 102 && Array.isArray(parameter):
-								for (const [p, param] of parameter.entries()) {
-									if (typeof param === "string") {
-										if (textHashMap.has(param.replaceAll("\\n[", "\\N["))) {
-											item.parameters[pr][p] = textHashMap.get(param.replaceAll("\\n[", "\\N["));
-										} else {
-											console.warn("102", param);
+							case 102:
+								if (Array.isArray(parameter)) {
+									for (const [p, param] of parameter.entries()) {
+										if (typeof param === "string") {
+											if (textHashMap.has(param.replaceAll("\\n[", "\\N["))) {
+												item.parameters[pr][p] = textHashMap.get(
+													param.replaceAll("\\n[", "\\N[")
+												);
+											} else {
+												console.warn("102", param);
+											}
 										}
 									}
 								}
@@ -328,13 +332,15 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 
 					for (const [pr, parameter] of list.parameters.entries()) {
 						switch (code) {
-							case 102 && Array.isArray(parameter):
-								for (const [p, param] of parameter.entries()) {
-									if (typeof param === "string") {
-										if (hashMap.has(param.replaceAll("\\n[", "\\N["))) {
-											list.parameters[pr][p] = hashMap.get(param.replaceAll("\\n[", "\\N["));
-										} else {
-											console.warn(param);
+							case 102:
+								if (Array.isArray(parameter)) {
+									for (const [p, param] of parameter.entries()) {
+										if (typeof param === "string") {
+											if (hashMap.has(param.replaceAll("\\n[", "\\N["))) {
+												list.parameters[pr][p] = hashMap.get(param.replaceAll("\\n[", "\\N["));
+											} else {
+												console.warn(param);
+											}
 										}
 									}
 								}
