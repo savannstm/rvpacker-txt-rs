@@ -1,7 +1,8 @@
 import { ensureDirSync } from "https://deno.land/std@0.216.0/fs/mod.ts";
 import { join } from "https://deno.land/std@0.216.0/path/mod.ts";
 
-const start = Date.now();
+const start = performance.now();
+const DEBUG = false;
 
 function merge401(array) {
 	let first = undefined;
@@ -82,13 +83,8 @@ const mapsJSON = [...Deno.readDirSync(dirPaths.original)]
 const otherJSON = [...Deno.readDirSync(dirPaths.original)]
 	.map((entry) => entry.name)
 	.filter((file) => {
-		return (
-			!file.startsWith("Map") &&
-			!file.startsWith("Tilesets") &&
-			!file.startsWith("Animations") &&
-			!file.startsWith("States") &&
-			!file.startsWith("System")
-		);
+		const prefixes = ["Map", "Tilesets", "Animations", "States", "System"];
+		return !prefixes.some((prefix) => file.startsWith(prefix));
 	})
 	.map((file) => {
 		return mergeOther401(join(dirPaths.original, file));
@@ -135,17 +131,14 @@ function isUselessLine(line) {
 		"WhileBackstab",
 		"TransferSTATStoMARRIAGE",
 	];
+	const prefixes = ["//", "??", "RANDOM", "Empty scroll", "TALK"];
 
 	return (
 		line.includes("_") ||
 		line.includes("---") ||
-		line.startsWith("//") ||
 		/\d$|[A-Z\s]+$|[A-Z]+$/.test(line) ||
 		uselessLines.includes(line) ||
-		line.startsWith("??") ||
-		line.startsWith("RANDOM") ||
-		line.startsWith("Empty scroll") ||
-		line.startsWith("TALK")
+		prefixes.some((prefix) => line.startsWith(prefix))
 	);
 }
 
@@ -193,53 +186,57 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
 								? parameter.replaceAll("\\n[", "\\N[")
 								: undefined;
 
-						switch (code) {
-							case 102:
-								if (Array.isArray(parameter)) {
+						switch (parameterText) {
+							case undefined:
+								if (code === 102 && Array.isArray(parameter)) {
 									for (const [p, param] of parameter.entries()) {
 										if (typeof param === "string") {
 											const paramText = param.replaceAll("\\n[", "\\N[");
 
 											if (textHashMap.has(paramText)) {
 												item.parameters[pr][p] = textHashMap.get(paramText);
-											} else {
-												//console.warn("102", param);
+											} else if (DEBUG) {
+												console.log(`Текст не найден: ${paramText}`);
 											}
 										}
 									}
 								}
 								break;
-							case 401:
-								if (textHashMap.has(parameterText)) {
-									item.parameters[0] = textHashMap.get(parameterText);
-								} else {
-									//console.warn("401", parameter);
-								}
-								break;
-							case 402:
-								if (typeof parameter === "string" && textHashMap.has(parameterText)) {
-									item.parameters[1] = textHashMap.get(parameterText);
-								} else if (typeof parameter === "string") {
-									//console.warn("402", parameter);
-								}
-								break;
-							case 356:
-								if (
-									parameter.startsWith("GabText") ||
-									(parameter.startsWith("choice_text") && !parameter.endsWith("????"))
-								) {
-									if (textHashMap.has(parameterText)) {
-										item.parameters[0] = textHashMap.get(parameterText);
-									} else {
-										//console.warn("356", parameter);
-									}
-								}
-								break;
-							case 324:
-								if (textHashMap.has(parameterText)) {
-									item.parameters[1] = textHashMap.get(parameterText);
-								} else {
-									//console.warn("324", parameter);
+							default:
+								switch (code) {
+									case 401:
+										if (textHashMap.has(parameterText)) {
+											item.parameters[pr] = textHashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
+									case 402:
+										if (textHashMap.has(parameterText)) {
+											item.parameters[pr] = textHashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
+									case 356:
+										if (
+											parameterText.startsWith("GabText") ||
+											(parameterText.startsWith("choice_text") && !parameterText.endsWith("????"))
+										) {
+											if (textHashMap.has(parameterText)) {
+												item.parameters[pr] = textHashMap.get(parameterText);
+											} else if (DEBUG) {
+												console.log(`Текст не найден: ${parameterText}`);
+											}
+										}
+										break;
+									case 324:
+										if (textHashMap.has(parameterText)) {
+											item.parameters[pr] = textHashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
 								}
 								break;
 						}
@@ -257,13 +254,8 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 	const filenames = [...Deno.readDirSync(dirPaths.original)]
 		.map((entry) => entry.name)
 		.filter((file) => {
-			return (
-				!file.startsWith("Map") &&
-				!file.startsWith("Tilesets") &&
-				!file.startsWith("Animations") &&
-				!file.startsWith("States") &&
-				!file.startsWith("System")
-			);
+			const prefixes = ["Map", "Tilesets", "Animations", "States", "System"];
+			return !prefixes.some((prefix) => file.startsWith(prefix));
 		});
 
 	const originalText = [...Deno.readDirSync(originalTextFile)]
@@ -300,36 +292,38 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 			if (!element.pages) {
 				if (!element.list) {
 					const attributes = ["name", "description", "note"];
+					const prefixes = ["Alchem", "Recipes", "Rifle"];
+
 					for (const attr of attributes) {
 						if (
 							element[attr] &&
-							(element[attr].startsWith("Alchem") ||
-								element[attr].startsWith("Recipes") ||
-								element[attr].startsWith("Rifle") ||
+							(prefixes.some((prefix) => element[attr].startsWith(prefix)) ||
 								element[attr].endsWith("phobia") ||
 								attr === "note" ||
 								!isUselessLine(element[attr]))
 						) {
 							if (hashMap.has(element[attr])) {
 								element[attr] = hashMap.get(element[attr]);
-							} else {
-								//console.warn(element[attr]);
+							} else if (DEBUG) {
+								console.log(`Текст не найден: ${element[attr]}`);
 							}
 						}
 					}
 				} else {
 					const name = element.name;
+
 					if (name && !isUselessLine(name)) {
 						if (hashMap.has(name)) {
 							element.name = hashMap.get(name);
-						} else {
-							//console.warn(name);
+						} else if (DEBUG) {
+							console.log(`Текст не найден: ${name}`);
 						}
 					}
 				}
 			}
 
 			const pagesLength = element.pages !== undefined ? element.pages.length : 1;
+
 			for (let i = 0; i < pagesLength; i++) {
 				const iterableObj = pagesLength !== 1 ? element.pages[i] : element;
 
@@ -342,56 +336,58 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 								? parameter.replaceAll("\\n[", "\\N[")
 								: undefined;
 
-						switch (code) {
-							case 102:
-								if (Array.isArray(parameter)) {
+						switch (parameterText) {
+							case undefined:
+								if (code === 102 && Array.isArray(parameter)) {
 									for (const [p, param] of parameter.entries()) {
 										if (typeof param === "string") {
 											const paramText = param.replaceAll("\\n[", "\\N[");
+
 											if (hashMap.has(paramText)) {
 												list.parameters[pr][p] = hashMap.get(paramText);
-											} else {
-												//console.warn(param);
+											} else if (DEBUG) {
+												console.log(`Текст не найден: ${paramText}`);
 											}
 										}
 									}
 								}
 								break;
-							case 401:
-								if (typeof parameter === "string") {
-									if (hashMap.has(parameterText)) {
-										list.parameters[0] = hashMap.get(parameterText);
-									} else {
-										//console.warn(parameter);
-									}
-								}
-								break;
-							case 402:
-								if (typeof parameter === "string") {
-									if (hashMap.has(parameterText)) {
-										list.parameters[1] = hashMap.get(parameterText);
-									} else {
-										//console.warn(parameter);
-									}
-								}
-								break;
-							case 356:
-								if (
-									(parameter.startsWith("choice_text") || parameter.startsWith("GabText")) &&
-									!parameter.endsWith("????")
-								) {
-									if (hashMap.has(parameterText)) {
-										list.parameters[0] = hashMap.get(parameterText);
-									} else {
-										//console.warn(parameter);
-									}
-								}
-								break;
-							case 108:
-								if (typeof parameter === "string") {
-									if (hashMap.has(parameterText)) {
-										list.parameters[0] = hashMap.get(parameterText);
-									}
+							default:
+								switch (code) {
+									case 401:
+										if (hashMap.has(parameterText)) {
+											list.parameters[pr] = hashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
+									case 402:
+										if (hashMap.has(parameterText)) {
+											list.parameters[pr] = hashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
+									case 356:
+										if (
+											(parameterText.startsWith("choice_text") ||
+												parameterText.startsWith("GabText")) &&
+											!parameterText.endsWith("????")
+										) {
+											if (hashMap.has(parameterText)) {
+												list.parameters[pr] = hashMap.get(parameterText);
+											} else if (DEBUG) {
+												console.log(`Текст не найден: ${parameterText}`);
+											}
+										}
+										break;
+									case 108:
+										if (hashMap.has(parameterText)) {
+											list.parameters[pr] = hashMap.get(parameterText);
+										} else if (DEBUG) {
+											console.log(`Текст не найден: ${parameterText}`);
+										}
+										break;
 								}
 								break;
 						}
@@ -444,6 +440,7 @@ function writeSystem(file, originalTextFile, translatedTextFile) {
 		} else {
 			for (const messageKey in outputJSON.terms.messages) {
 				const message = outputJSON.terms.messages[messageKey];
+
 				if (message && hashMap.has(message)) {
 					outputJSON.terms.messages[messageKey] = hashMap.get(message);
 				}
@@ -502,7 +499,7 @@ writeSystem(systemJSON, join(dirPaths.other, "System.txt"), join(dirPaths.other,
 writePlugins(pluginsJSON, join(dirPaths.plugins, "plugins.txt"), join(dirPaths.plugins, "plugins_trans.txt"));
 
 console.log("Все файлы успешно записаны.");
-console.log(`Потрачено ${(Date.now() - start) / 1000} секунд.`);
+console.log(`Потрачено ${(performance.now() - start) / 1000} секунд.`);
 
 setTimeout(() => {
 	Deno.exit();

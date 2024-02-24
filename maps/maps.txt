@@ -3010,6 +3010,13 @@ A wall of suitcases... Something feels off...
 GabText The mist here carries the same odor as the dungeon air...
 All these suitcases... Something feels off...
 \>\i[85]\}OMAN WITH A SCARF\{\<\n"..."
+Zoophobia
+Nosophobia
+Phasmophobia
+Rhabdophobia
+Teratophobia
+Erotophobia
+Panophobia
 Skip The Character History?
 The soothing sound of the railtracks... You are not used to such\npeaceful and tranquil atmosphere.
 You can't help but let your mind wander. You reminisce what has\nlead you to this point in life...

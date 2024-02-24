@@ -2414,6 +2414,12 @@ GabText \N[15] summons the Longinus, but she cannot wield it!
 \>\i[76]\}ARINA\{\<\n"I don't feel good about this... Do we really have to fight?"
 \>\i[75]\}EVI\{\<\n"Do we really have to do this?"
 \>\i[78]\}'SAA\{\<\n"I have no interest in your quarrel."
+Zoophobia
+Nosophobia
+Teratophobia
+Phasmophobia
+Erotophobia
+Rhabdophobia
 "It has come to our knowledge that there are sinister forces at play\nand they have their eyes set on Prehevil, Bohemia for whatever wicked \nreason."
 harmony of the world"
 GabText IT BURNS!
