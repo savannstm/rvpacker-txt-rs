@@ -203,40 +203,20 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
 								}
 								break;
 							default:
-								switch (code) {
-									case 401:
-										if (textHashMap.has(parameterText)) {
-											item.parameters[pr] = textHashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
-									case 402:
-										if (textHashMap.has(parameterText)) {
-											item.parameters[pr] = textHashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
-									case 356:
-										if (
-											parameterText.startsWith("GabText") ||
-											(parameterText.startsWith("choice_text") && !parameterText.endsWith("????"))
-										) {
-											if (textHashMap.has(parameterText)) {
-												item.parameters[pr] = textHashMap.get(parameterText);
-											} else if (DEBUG) {
-												console.log(`Текст не найден: ${parameterText}`);
-											}
-										}
-										break;
-									case 324:
-										if (textHashMap.has(parameterText)) {
-											item.parameters[pr] = textHashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
+								if (
+									code === 401 ||
+									code === 402 ||
+									code === 324 ||
+									(code === 356 &&
+										(parameterText.startsWith("GabText") ||
+											(parameterText.startsWith("choice_text") &&
+												!parameterText.endsWith("????"))))
+								) {
+									if (textHashMap.has(parameterText)) {
+										item.parameters[pr] = textHashMap.get(parameterText);
+									} else if (DEBUG) {
+										console.log(`Текст не найден: ${parameterText}`);
+									}
 								}
 								break;
 						}
@@ -353,41 +333,20 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 								}
 								break;
 							default:
-								switch (code) {
-									case 401:
-										if (hashMap.has(parameterText)) {
-											list.parameters[pr] = hashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
-									case 402:
-										if (hashMap.has(parameterText)) {
-											list.parameters[pr] = hashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
-									case 356:
-										if (
-											(parameterText.startsWith("choice_text") ||
-												parameterText.startsWith("GabText")) &&
-											!parameterText.endsWith("????")
-										) {
-											if (hashMap.has(parameterText)) {
-												list.parameters[pr] = hashMap.get(parameterText);
-											} else if (DEBUG) {
-												console.log(`Текст не найден: ${parameterText}`);
-											}
-										}
-										break;
-									case 108:
-										if (hashMap.has(parameterText)) {
-											list.parameters[pr] = hashMap.get(parameterText);
-										} else if (DEBUG) {
-											console.log(`Текст не найден: ${parameterText}`);
-										}
-										break;
+								if (
+									code === 401 ||
+									code === 402 ||
+									code === 108 ||
+									(code === 356 &&
+										(parameterText.startsWith("choice_text") ||
+											parameterText.startsWith("GabText")) &&
+										!parameterText.endsWith("????"))
+								) {
+									if (hashMap.has(parameterText)) {
+										list.parameters[pr] = hashMap.get(parameterText);
+									} else if (DEBUG) {
+										console.log(`Текст не найден: ${parameterText}`);
+									}
 								}
 								break;
 						}
