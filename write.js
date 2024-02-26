@@ -277,10 +277,10 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 					for (const attr of attributes) {
 						if (
 							element[attr] &&
-							(prefixes.some((prefix) => element[attr].startsWith(prefix)) ||
+							(attr === "note" ||
+								!isUselessLine(element[attr]) ||
 								element[attr].endsWith("phobia") ||
-								attr === "note" ||
-								!isUselessLine(element[attr]))
+								prefixes.some((prefix) => element[attr].startsWith(prefix)))
 						) {
 							if (hashMap.has(element[attr])) {
 								element[attr] = hashMap.get(element[attr]);
