@@ -81,7 +81,7 @@ The soul of the Black witch gives its owner occult\npowers that poison the oppon
 Наручи
 Пара наручей, предотвращающих тяжелые травмы.\nРеж. 88% Кол. 88% Дроб. 88%
 \n\n\n\n\n\n\n<Picture: icon_armguards>
-Ожерелье пожирания душ
+Ожерелье поглощения душ
 Серебряное ожерелье с вкрапленным камнем душ.\nОно защищает от потусторонних сил.\nМагия 82%
 \n\n\n\n\n\n<Picture: icon_souldevour>
 Камео

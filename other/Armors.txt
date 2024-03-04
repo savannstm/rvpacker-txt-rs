@@ -82,7 +82,7 @@ Arm guards
 A pair of arm guards that prevent serious injuries.
 \nSlash 88%  Pierce 88%  Blunt 88%\n\n\n\n\n\n<Picture: icon_armguards>
 Soul devour necklace
-A silver necklace with a soul stone embedded on it. The stone\nprotects against otherwordly powers. 
+A silver necklace with a soul stone embedded on it. The stone\nprotects against otherwordly powers.
 \nOtherworldly 82%\n\n\n\n\n<Picture: icon_souldevour>
 Cameo
 A cameo carving of a beautiful woman from a bygone era. The \njewel emits strange aura...

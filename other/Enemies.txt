@@ -62,6 +62,8 @@ Gentleman [right leg]
 Gentleman [left leg]
 Gasoline canister
 Rifleman
+Half-cocooned 7
+Half-cocooned 8
 Meat grinder
 Rifleman [torso]
 Rifleman [head]
@@ -113,6 +115,9 @@ Dysmorphia [right arm]
 Dysmorphia [left arm]
 Dysmorphia [legs]
 Ghoul
+Cancer 1
+Cancer 2
+Cancer 3
 Spank Tank
 Owl cultist [arms]
 Owl cultist [torso]
@@ -328,6 +333,13 @@ Samarie [right arm]
 Samarie [left arm]
 Samarie [right leg]
 Samarie [left leg]
+Logic 1
+Tank 1
+Tank 2
+Tank 3
+Tank 4
+Tank 5
+Tank 6
 Hand of creation
 Hand of destruction
 Per'kele [torso]
@@ -388,6 +400,12 @@ Father Hugo [left arm]
 Father Hugo [right leg]
 Father Hugo [left leg]
 Father Hugo [penis]
+Ratkin 1
+Ratkin 2
+Ratkin 3
+Ratkin 4
+Ratkin 5
+Ratkin 6
 Rher
 Rher [eye 1]
 Rher [eye 2]

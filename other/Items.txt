@@ -64,6 +64,7 @@ A book about the ancient city Mahavre.
 Studies of Gro-goroth I
 A book about the older god Gro-goroth.
 This book tells the tale of the legendary fellowship\nthat would be known in this day as the new gods.
+Soldier's diary 1
 A diary of a Bremen soldier that arrived to this area \nrecently.
 Stick
 A cut tree branch. It might be useful in some\nsituations.
@@ -377,6 +378,7 @@ A sought-after edible mushroom. Its delicious taste is often\nreferenced "Chante
 Glass shards
 A fistful of glass shards. Better handle them with care so\nyou won't cut yourself!
 \n\n\n\n\n<Picture: icon_glass>\n<Menu Category: Items>
+The Last Frontier ch.1
 A brief history of the dark continent Vinland.
 Bolt cutters
 A tool used for cutting chains, padlocks, bolts and wire.\nThe handles are positioned with the best leverage in mind.
@@ -584,8 +586,10 @@ Skin bible - Sylvian
 A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Sylvian.
 Prehevil document
 The truth under the moonlight
+NLU Reconnaissance Report #1
 A brief report about a partisan organization called NLU - Nameless \nLiberty Underground. Distributed to all mid-level Bremen officers
 \nassigned to Bohemia.\n\n\n\n\n\n\n\n\n<Picture: icon_document1>
+NLU Reconnaissance Report #2
 A brief report about NLU member Haas Reila Audrey. Distributed to \nall mid-level Bremen officers assigned to Bohemia.
 \n\n\n\n\n\n\n\n<Picture: icon_document1>
 Telelectroscope and Logic

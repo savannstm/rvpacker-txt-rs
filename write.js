@@ -272,7 +272,17 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 			if (!element.pages) {
 				if (!element.list) {
 					const attributes = ["name", "description", "note"];
-					const prefixes = ["Alchem", "Recipes", "Rifle"];
+					const prefixes = [
+						"Alchem",
+						"Recipes",
+						"Rifle",
+						"NLU",
+						"The Last",
+						"Soldier's",
+						"The Tale",
+						"Half-Cocooned",
+						"Ratkin",
+					];
 
 					for (const attr of attributes) {
 						if (
