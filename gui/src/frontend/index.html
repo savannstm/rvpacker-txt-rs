@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+			rel="stylesheet"
+		/>
+		<meta
+			http-equiv="Content-Security-Policy"
+			content="script-src 'self'"
+		/>
+		<link rel="stylesheet" href="output.css" />
+		<title>F&H2 Text Editor</title>
+	</head>
+	<body
+		class="overflow-x-hidden invisible p-0 m-0 text-2xl text-white bg-gray-900"
+	>
+		<div
+			id="top-panel"
+			class="flex sticky top-0 z-30 items-center w-full h-16 bg-gray-800"
+		>
+			<div id="top-panel-buttons" class="flex items-center w-full h-16">
+				<div
+					id="menu-button"
+					class="material-symbols-outlined"
+					title="Вкладки"
+				>
+					menu
+				</div>
+				<div
+					id="save"
+					class="material-symbols-outlined"
+					title="Сохранить файлы перевода"
+				>
+					save
+				</div>
+				<div
+					id="compile"
+					class="material-symbols-outlined"
+					title="Скомпилировать в JSON файлы"
+				>
+					upload
+				</div>
+				<div
+					id="options"
+					class="material-symbols-outlined"
+					title="Настройки"
+				>
+					settings
+				</div>
+				<div class="w-16"></div>
+				<div
+					id="search"
+					class="material-symbols-outlined"
+					title="Поиск"
+				>
+					search
+				</div>
+				<div id="search-field" class="flex flex-row items-center p-4">
+					<textarea
+						id="search-input"
+						rows="1"
+						cols="50"
+						title="Найти"
+						class="p-2 w-64 h-auto text-base text-white bg-gray-700 rounded-sm resize-none focus:outline-none"
+					></textarea>
+				</div>
+				<div
+					id="replace"
+					class="material-symbols-outlined"
+					title="Заменить на"
+				>
+					arrow_right_alt
+				</div>
+				<div id="replace-field" class="flex flex-row items-center p-4">
+					<textarea
+						id="replace-input"
+						rows="1"
+						cols="50"
+						title="Найти"
+						class="p-2 w-64 h-auto text-base text-white bg-gray-700 rounded-sm resize-none focus:outline-none"
+					></textarea>
+				</div>
+				<div
+					id="case"
+					class="material-symbols-outlined"
+					title="Учитывать регистр"
+				>
+					match_case
+				</div>
+				<div
+					id="whole"
+					class="material-symbols-outlined"
+					title="Искать слова целиком"
+				>
+					match_word
+				</div>
+				<div
+					id="regex"
+					class="material-symbols-outlined"
+					title="Поиск по регулярным выражениям"
+				>
+					regular_expression
+				</div>
+				<div
+					id="translate"
+					class="material-symbols-outlined"
+					title="Искать по переводу"
+				>
+					translate
+				</div>
+				<div class="w-16"></div>
+
+				<div id="is-loaded" class="material-symbols-outlined">
+					check_indeterminate_small
+				</div>
+				<div id="current-state" class="p-4"></div>
+			</div>
+		</div>
+
+		<div id="main" class="flex flex-row justify-start">
+			<div
+				id="left-panel"
+				class="flex fixed flex-col justify-center items-center w-16 h-[93.333vh] text-sm bg-gray-700 transition-all duration-500 -translate-x-full z-30"
+			>
+				<div id="maps" class="left-panel-element">Maps</div>
+				<div id="maps-names" class="left-panel-element">Maps names</div>
+				<div id="actors" class="left-panel-element">Actors</div>
+				<div id="armors" class="left-panel-element">Armors</div>
+				<div id="classes" class="left-panel-element">Classes</div>
+				<div id="common-events" class="left-panel-element">
+					Common Events
+				</div>
+				<div id="enemies" class="left-panel-element">Enemies</div>
+				<div id="items" class="left-panel-element">Items</div>
+				<div id="skills" class="left-panel-element">Skills</div>
+				<div id="system" class="left-panel-element">System</div>
+				<div id="troops" class="left-panel-element">Troops</div>
+				<div id="weapons" class="left-panel-element">Weapons</div>
+			</div>
+
+			<div
+				id="options-menu"
+				class="hidden fixed top-16 z-50 p-8 w-full h-full bg-gray-900"
+			>
+				<div class="flex flex-col">
+					<div class="flex flex-row items-center mb-2">
+						<div>
+							<div
+								id="backup-check"
+								class="flex justify-center items-center mr-2 bg-gray-600 rounded-md border-2 border-gray-700 cursor-pointer select-none size-8 font-material"
+							>
+								check
+							</div>
+						</div>
+						<div>Создание резервных копий</div>
+					</div>
+
+					<div id="backup-settings">
+						<div
+							id="backup-period"
+							class="flex flex-row items-center mb-2 h-10"
+						>
+							<div class="mr-2">
+								Создавать резервные копии каждые:
+							</div>
+							<input
+								type="number"
+								id="backup-period-input"
+								class="p-2 w-auto h-8 bg-gray-700 rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mr-2 text-xl"
+							/>
+							<div>секунд (минимум 60, максимум 3600)</div>
+						</div>
+						<div
+							id="backup-max"
+							class="flex flex-row items-center mb-2 h-10"
+						>
+							<div class="mr-2">
+								Максимальное кол-во резервных копий:
+							</div>
+							<input
+								type="number"
+								id="backup-max-input"
+								class="p-2 w-auto h-8 bg-gray-700 rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-xl mr-2"
+							/>
+							<div>(минимум 1, максимум 99)</div>
+						</div>
+					</div>
+
+					<div class="flex flex-row items-center mb-2">
+						<div>
+							<div
+								id="edit-orig-check"
+								class="flex justify-center items-center mr-2 bg-gray-600 rounded-md border-2 border-gray-700 cursor-pointer select-none size-8 font-material"
+							>
+								check
+							</div>
+						</div>
+						<div>Возможность редактирования оригинальных строк</div>
+					</div>
+				</div>
+			</div>
+			<div
+				id="content-container"
+				class="flex flex-col justify-start p-8 w-full"
+			></div>
+
+			<div
+				id="search-results"
+				class="flex overflow-y-auto fixed top-0 right-0 z-40 flex-col p-4 w-64 h-screen bg-gray-800 transition-transform duration-500 translate-x-full outline-2 outline outline-gray-600"
+			></div>
+		</div>
+	</body>
+</html>

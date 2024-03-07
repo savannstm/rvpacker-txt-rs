@@ -1,0 +1,9 @@
+{
+	"workingDir": "copies",
+	"backup": {
+		"enabled": true,
+		"period": 60,
+		"max": 99
+	},
+	"editOrig": false
+}

@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.left-panel-element {
+	@apply flex justify-center items-center flex-col p-2 w-16 h-full bg-gray-800 outline outline-2 outline-gray-700 cursor-pointer hover:bg-gray-600 mt-[-2px] mb-[-2px];
+}
+
+.material-symbols-outlined {
+	@apply p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600;
+}
+
+.text-field {
+	@apply p-1 w-full h-auto text-xl bg-gray-800 resize-none outline outline-2 outline-gray-700;
+}
+
+.row-field {
+	@apply p-1 w-36 h-auto text-xl bg-gray-800 cursor-default outline-none resize-none;
+}
