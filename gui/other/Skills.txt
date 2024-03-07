@@ -1,0 +1,802 @@
+Attack
+<Target Action>\nperform action\naction animation\nwait for animation\naction effect\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
+Guard
+Skill #2 will be used when you select\nthe Guard command.
+Hatchet
+The appendage skitters away...
+The appendage is pulsating...
+Tackle
+Face grab
+Party talk
+Check up on your party.
+Hack
+Pinecone pig
+Animated figure of a pinecone pig. A loyal companion\nuntil it's very end.
+Talk
+Talking can sometimes get you out of uncomfortable situations.
+\n\n\n\n\n<Target Action>\nmotion swing: user\n</Target Action>
+Hurting
+Create a devastating vortex out of your concentrated feelings \nof hurting and hatred. Requires 1 Rev Point.
+\n\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
+Scratch
+Stump arm
+Slam
+ghoul tackle
+Pesticide
+Lantern
+Small fire attack with lantern.
+Sickle
+Manic stab
+Necromancy
+Bring back life to where it once lingered. The bond between\nthe body and the soul must still be relatively fresh for the
+\nnecromancy to work.
+Pipe smash
+The moonscorched is tearing his face apart...
+The moonscorched is shaking uncontrollably.
+The moonscorched is tearing her face apart...
+Steal
+Pickpocket valuables from the enemy pockets.
+Explosion
+Poison tongue
+Suicide
+There are worse fates than death. Sometimes it's\ngood to go on your own terms...
+Low sweep
+Run
+There is no shame in running away from battles. Live to see\nanother day.
+Critical slash
+Pyromancy trick
+A simple pyromancy trick to cause burns to your opponent.
+\n\n\n\n\n\nPlayer pyromancy!
+\n\n\n\n\n\n
+\n\n\n\n\n
+The priest grins widely...
+Vertical sweep
+Locust swarm
+Summon a swarm of crickets to disrupt the enemy.
+Mischief of rats
+Summon a swarm of rats to disrupt the enemy.
+Guard break
+Break through the defence of the opponent.
+Blood golem
+Sacrifice blood to summon a golem that fights by your side \ntemporarily. The golem only takes orders from the one that
+\ngave birth to it. Requires 1 Rev Point.\n\n\n\n\n\n<Require 1 BP>
+Shivering touch
+Mumbler's head explodes on you!
+Demon seed
+Insert your seed into a fresh corpse, the most fertile \nof growing grounds.
+Pheromones
+Release of pheromones that makes the opponent divert all\nattention to the target.
+Mastery over insects
+Understanding of insects. You can hear and talk with insects\nof all sizes.
+Rock smash
+The guard loads an arrow to ballista...
+Smash
+Snatch
+<Bypass Taunt>
+Salmonsnake is uncertain of your position...
+Fast attack
+With swift movements - you gain an additional\nturn.
+Counter
+Stay alert for enemy attacks to parry them the instant\nthey land.
+Defence stance
+A special combat stance to prevent severe physical trauma. \nA skill taught to all the squires at the Rondon military.
+Steal from the rich and give to yourself.
+Dash
+Your movement speed increases greatly. Running can prove\nout to be a really valuable skill.
+Lockpicking
+An ability to open any simple lock with your trusty \nlockpick.
+Greater blood magic
+Years spent studying blood magic has given you an ability\nto use magic more efficiently.
+Blood sacrifice
+Sacrifice blood for gods.
+Pray
+Since your affection to gods is higher than average human\nbeing, you can try to reach out to them in need.
+Devour
+A barbaric trait of devouring the carcass of your\nenemies to ease hunger.
+Marksmanship
+High level archery skill. Use your accurate shots to\nfinish off opponents from distance.
+Bloodlust
+Hype yourself into a state of aggression and trance. An old\ntraditional Oldegård folk skill.
+Soul binding
+Mumblers head is pulsating...
+Peck
+Talk(old)
+Talking can sometimes get you out of uncomformtable\nsituations.
+Bite
+A vicious bite that leaves the opponent bleeding.
+Howl
+A melancholy moonless howl.
+Jagged jaw
+A stronger and more vicious bite that leaves the \nopponent bleeding.
+Grim jaw
+A terrifying bite that leaves the opponent helpless.
+Maul
+Crow Mauler is staring you with it's empty eyes...
+Harvestman gently pets you.
+Harvestman whistles...
+Harvestman smiles at you.
+Harvestman wraps you gently with his arms.
+Greater Hurting
+Concentrated feelings of hurting create a\ndevastating vortex.
+Greater Blood golem
+Sacrifice your own blood to summon a golem to fight by\nyour side temporarily.
+Greater Necromancy
+Try to bring back life to where it once lingered...
+The spectre tilts it's sword sideways...
+Lantern smash
+Skeleton kick
+Skeleton hatchet
+Whip
+Manebas tentacle is swinging around.
+Counter-magic
+Undo the effects of any lesser magic by your superior\nknowledge in the greater scheme of things.
+Nasty bite
+The ghoul stares at you with it's dead fish eyes...
+Cinder
+<Target Action>\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
+Needle worms
+Harness the strength of a hundred leeches. The price is\nthat you have to carry them inside you as parasites...
+Needle worm
+Enemy
+The yellow mage forms magical hand signs...
+yellow mage attack - legs
+yellow mage attack - arms
+Revolution tear
+3rd circle swings around it's axis.
+2nd circle swings around it's axis.
+1st circle swings around it's axis.
+The red man reaches for you...
+Shivering scream
+Leg sweep
+A high finesse arcing attack that can only be performed\nwith light bladed weapons.
+<CCPS_weapon:true>
+Check
+Check the status.
+Red grasp
+Red man breathes heavily...
+Red man is tapping its fingers.
+Pummel
+<Target Action>\nperform action\naction animation\naction effect\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
+Chains of torment
+Summon the chains that tormented Chambara for hundreds\nof years.
+enemy
+En garde
+Long combat experience has prepared you for fights.\nPrepare for an attack to gain advantage by pressing [E].
+Ritual spear
+Blood portal
+A magic that enables one to create portals between ritual\ncircles.
+Flock of crows
+Black orb
+A concentrated negative energy that can be hurled at your \nopponent multiple times. The orb maintains its form only
+\ntemporarily before the ill will disperses.\n\n\n\n\n\n<Boost Damage>
+Healing whispers
+Whispers carried by the older god Sylvian heal wounds\nand mend injuries.
+\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
+Marriage of flesh
+Insect armor
+Hairy palm
+Bad breath
+The snatcher tilts it heads curiously...
+The fur of the creature attracts flies.
+The creature reaches out for you...
+Inject
+Maneba stares at you without expression...
+Poke
+Scarab's shell bursts open!
+Acid spills out
+Ritual knife
+The beast wants to manhandle you...
+Arm of the beast twitches...
+Helmbreaker
+The monster takes a step closer...
+The heart is beating slowly...
+Blade dance
+Single blade
+The arm is twitching restlessly...
+Axe kick
+Rusty claw
+The embryo tries to grab onto you!
+Dislocating joints
+The embryo is gnawing your feet!
+Headbutt
+Left-brain is calculating the situation...
+Right-brain tries to come up with creative ways to combat...
+Whispers of Gro-goroth
+Combustion
+A talented wizard can control the heat in the atmosphere\nand create a large combustion of fire and flames to devour
+\ntheir opponents. Requires 1 Rev Point.\n\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
+Dodge roll
+<Target Action>\nmotion evade: user\n</Target Action>
+Kick
+Face rip
+Sking granny slowly stumbles forward......
+The leg is hanging loose.
+Cutlass
+Molten gold
+A simple pyromancy trick to burn your opponents.
+\n\n\n\n\n\nPlayer pyromancy!\n<Boost Damage>
+A large combustion of fire and flames. Requires 1 Rev\nPoint.
+<Require 1 BP>\n<Boost Damage>
+The golden body of Francóis is shining bright.
+Francóis takes a step forward...
+Suckerpunch
+D'arce enemy
+Shield bash
+Light blue vial
+The outlander aims carefully...
+Gaping mouth
+Summon Asterisk
+Salvation
+Concentrated whispers carried by the older god Sylvian. Heals\na considerable amount of health of all the party members.
+Purifying ember
+Purifying black flames
+Stampede of arms
+The creature is wriggling in pain...
+Toxic mist
+Body needles
+Blank stare
+Double-arm smash
+Disable necromancy
+Disable the magic that is keeping this ghoul standing.
+Disable the magic that is keeping this skeleton standing.
+Plague touch
+Punch
+Loving whispers
+Concentrated whispers carried out by the older god Sylvian.\nHeals a considerable amount of health. Precariously the whisper's
+\neffects are solely based on Sylvian's whims.\n\n\n\n\n
+Summon the deity of the good luck. The pinecone pig.
+You cause headache to the enlightened one.
+<Target Action>\nmotion swing: user\n</Target Action>
+Gauntlet punch
+Spider bite
+The asterisk is floating idle in the air...
+The newborn god is trembling in pain...
+Pure fear
+Pure hunger
+The newborn god glances at you...
+Self-mutilation
+Claw of a god
+Death
+Burning gaze
+Gro-goroth is breathing heavily...
+Poisoned dart
+Paralysis dart
+<Target Action>\nperform action\naction animation\nwait for animation\nmotion wait: user\naction effect\naction effect\naction effect\ndeath break\n</Target Action>
+Mad rush
+Cross-slash
+The guardian hurls a boulder at you!
+Francóis spits a molten from his mouth!
+The golden god smirks at you.
+The god squirts molten from its eye!
+Ruin
+The molded squirms in pain...
+Ejaculation
+pistol_attack\n<Boost Repeats>\n<Boost Damage>
+rifle_attack\n<Boost Repeats>\n<Boost Damage>
+shotgun_attack\n<Boost Repeats>\n<Boost Damage>
+War cry
+Provoke the enemy into attacking you.
+<Target Action>\nmotion swing: user\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
+Chomp
+Rebirth of the beloved
+A hidden love magic that is said to bring back the one\nyou loved the most.
+Escape plan
+A skill that greatly enhances your chances of running away\nfrom fights. Planning for an escape in advance pays off.
+\nA passive skill.
+Stomp
+Rot
+Rot the victim from inside out to make them vulnerable to \nattacks. Requires 1 Rev Point.
+\n\n\n\n\n\n<Require 1 BP>
+Janitor
+The villager sets up a bear trap
+Bear trap
+Pesticide spray
+Toothless bite
+Black vomit
+The headless is panting...
+The left pendulum picks up momentum...
+The right pendulum picks up momentum...
+The pedulum swings in a great arc...
+Guillotine swing
+Pendulum swing
+Idle swing...
+Mastery over vermin
+Gain the ability to talk to those who are often left unseen.
+Flesh puppetry
+Puppeteer severed limbs at your disposal to attack the enemy.\nYou need sawed off limbs to do this.
+\n\n\n\n\n\n\n\nflesh puppetry 0
+Mind read
+A moon magic that reveal the inner thoughts of your\nfellow humans.
+Grasp of a giant
+The monster grabs you by the face!
+\n\n\n\n\n\n\n\nflesh puppetry 1\n
+\n\n\n\n\n\n\n\n\nflesh puppetry 2\n
+\n\n\n\n\n\n\n\nflesh puppetry 3\n
+\n\n\n\n\n\n\n\n\n\nflesh puppetry 4\n
+Gun proficiency
+Proficiency with firearms gives you greater accuracy while\nshooting. A passive skill.
+Gunslinger
+Advanced use of pistols. Precise shots can occasionally \ndismember opponents. Used on field.
+Executioner
+Advanced use of trenchguns. You are able to execute a stunned\nenemy by shooting it again on the field.
+Advanced use of rifles. You are able to one-shot enemies\nwith the rifle every now and then. Used on field.
+Giant fork
+Giant knife
+The gentleman makes gurggling sounds...
+The vomit burns!
+Canister smash
+Gas is leaking from Vile's canister...
+Doomsday trumpet
+Engrave
+Engrave a sigil on a party member. The benefit of the sigil varies\ndepeding on the god it belongs to. Historically sigils were carved
+\non the body, but modern practition prefers face sigils.
+Rampage
+A vicious ramming attack.
+Advanced occultism
+Your advanced knowledge in occult arts enables you to start \na battle with an extra Rev point. A passive skill.
+\n\n\n\n\n\n<BP Battle Start: +1>
+Meditation
+Reach a higher state of awareness. Meditate while guarding to gain \nextra Rev points on that turn.
+\n\n\n\n\n\n<BP Regen: +1>
+Mucus and slime drips from the trout...
+Shoot
+Critical shot
+The rifleman is aiming wildly...
+Hammerhead
+Clawing
+The crimson father is focusing its attention...
+Mind control
+The crimson father began trembling furiously...
+Tentacles
+Occult dagger
+Gaping bite
+Point blank
+Needle whip
+Mystery injection
+Baton
+Organ harvest
+Harvest organs from fallen foes to sacrifice them with your \nmedicinal skills. The desecration of bodies used to be a taboo
+\nsubject, but it is now widely used among medical practitioners.
+Medicinal
+Sacrifice harvested organs to Vitruvia, the architect of the human\nbody. A sacrifice will cure a corresponding status ailment. Medicinal
+\nis based on the law where every action has an equal reaction.
+Magna-medicinal
+A greater form of medicinal where the surgeon will sacrifice\ntheir own limbs in exhange for human life. The procedure must be
+\nperformed on the spot during an encounter to work properly.
+Analyze
+Study the anatomy of your opponent to quickly find the biggest\nweaknesses it their physique.
+Trapcraft
+Craft bear traps and booby traps from different utility items.\nUsed in the Crafting menu.
+Weaponcraft
+Use your imagination to craft unique weapons from different\nutility items. Used in the Crafting menu.
+Short circuit
+Short circuit an electric lock to open locked doors.\nRelatively simple in practice, but short circuiting the wrong
+\nconductors might lock the door for good.
+Remedial poison
+Sacrifice a kidney to Vitruvia to cure poison.
+Remedial toxic
+Sacrifice a liver to Vitruvia to cure toxic.
+Remedial infection
+Sacrifice a thymus to Vitruvia to cure infections.
+Remedial bleeding
+Sacrifice a heart to Vitruvia to cure bleeding.
+Remedial fracture
+Sacrifice parathyroid glands to Vitruvia to cure fractures.
+Remedial blindness
+Sacrifice an eye to Vitruvia to cure blindness.
+Greater analyze
+Analyze the enemy behaviour and find the weak points. You can\nuse the acquired information against similar type enemies.
+Wrench toss
+Throw your pipe wrench at the enemy with devastating force.\nA chance of stun. Requires pipe wrench to be equipped first.
+\n\n\n\n\n\n\n<Boost Damage>
+\n\n\n\n\n<Boost Damage>
+\n\n\n\n\n\nex-soldier\n<Boost Damage>
+\n\n\n\n\n\n\noccultist\n<Boost Damage>
+\n\n\n\n\n\n\n\n\ndoctor\n<Boost Damage>
+Bulldozer
+The pillarman starts to jog...
+The dysmorphia's arm is spasming violently...
+The dysmorphia is radiating!
+flesh puppetry 1\n<Boost Damage>
+flesh puppetry 2\n<Boost Damage>
+flesh puppetry 3\n<Boost Damage>
+flesh puppetry 4\n<Boost Damage>
+Needles readies his syringe...
+The platoon is aiming its canon...
+Distraught melody
+The Neighbour whips its tongue out
+The Neighbour is smelling the air with its tongue...
+Suction tongue
+Spear poke
+Javelin
+Choke
+Harden
+The soldier is swinging his pistol wildly
+Judgement bell
+The inquisitor is chanting blood magic...
+<Require 1 BP>
+Revel in feces
+Infected bite
+Stinger top
+Carousel of claws
+Tender bite
+Tender bite 2x
+Tender bite 3x
+Crescent claw
+Body throw
+<Target Action>\nperform action\naction animation\nwait for animation\naction effect\nmotion wait: user\ndeath break\n</Target Action>
+Bribe
+The mallet is hanging loose...
+Greater occultism
+Your greater knowledge in occult arts enables you to start \na battle with 2 extra Rev points. A passive skill.
+\n\n\n\n\n\n\n<BP Battle Start: +2>
+Warding sigil
+Draw a warding sigil on the ground to fend off malice and\ncreatures with ill intent. Originally created by the Virgin
+\nMages of the Eastern Sanctuaries.
+\n\n\n\n\n\n\n<BP Battle Start: +1>
+La Danse Macabre
+A ritual dance used to channel otherwordly powers to be used\nby the performer. Raises otherwordly powers gradually over the
+\ncourse of a fight. A passive skill.
+Premonitions
+Greater meditation
+Reach a greater state of awareness. Meditate while guarding to gain \neven more Rev points on that turn.
+\n\n\n\n\n\n\n<BP Regen: +2>
+Spice forge
+Spice forges were widely used by magick practitioners of the\nMiddle East back in the day. Spices make it possible to customize
+\nthe properties of your otherwordly skills.
+Sacrifice your own blood for Gro-goroth, the god of destruction.\nA blood sacrifice will enhance your affinity with the said god.
+\nSacrifices like these were everyday occurences back in the day.
+Masturbation
+An act of self-love enhances your affinity with Sylvian when\nperformed on a ritual circle. This act is widely popular among
+\nthe priests of Vatican when mixed with blood sacrifice.\n
+Slow metabolism
+Slowing down your breath and concentrating on the matters at\nhand. You don't need to eat quite as often. You only need few
+\ngood meals a day.
+Masterchef
+Greater culinary skills enable you to cook meals that have\nspecial nutritional properties. These include various stat boosts.
+Melee proficiency
+Proficiency with melee weapons gives you greater accuracy when\nfighting with a weapon you can swing. A passive skill.
+Toxicology
+The skill to condense the effective properties of different\npoisonous plants to maximize their potential. Teaches you the
+\nrecipes for condensed nettle and condensed hemlock.
+Undergrowth awareness
+You can harvest irritable and poisonous plants safely and also\ntell apart the plants that have potential use in your situation.
+\nA passive skill useful on the field.
+Advanced botanism
+The skill to condense the effective properties of herbs and\nplants to maximize their potential. Teaches you the recipes for
+\ncondensed blue and green herbs as well as lavender.
+Poison tip
+Coat your weapon in poison extracted from the local plantlife.\nThe poison tip takes a small toll on your sanity because of the
+\nconstant stress of handling a poison coated weapon.
+Fast stance
+Raise your speed with swift footwork. In most cases you get\nand extra turn between enemy attacks.
+Bob and weave
+A defensive technique where one bobs their head laterally to an\nincoming attack while shifting balance to either left or right.
+\nRaises evasion greatly.
+Counter stance
+Stay alert for enemy attacks and counter when possible.
+Adrenaline rush
+The longer the combat goes on, the stronger you get as your\nblood boils ever hotter.
+Bare-fisted proficiency
+Proficiency with your bare fists gives you greater accuracy when\nfighting without a weapon. A passive skill.
+Intimidate
+Intimidation tactics in battle work on those mentally weak.\nThe effects vary case by case. Used while initiating Talk
+\nduring combat.
+Killing intent
+You killing intent eminates strong. This will scare away the\nweaker opponent so you don't need to bother with them.
+Explosives
+Getting creative in a wartorn times is a must. Craft explosives\nto be used in combat from simple everyday ingredients.
+Try to pickpocket goods from your opponents. You never know\nwhat you might find.
+Bury the trauma
+Bury your trauma and fears. This reduces your sanity decline while \nexploring. You can deal with the psychiatric collapse and the combat
+\nfatigue once you're in a safer place. After all this...
+Order, Charge!
+Give orders to your team to charge and attack the enemy without\nwasting their turns.
+Order, Defend!
+An ability to open any simple lock with your trusty lockpick.
+Persuade
+Persuade your opponents with greater intellect and wit. The effects\nvary between enemy to enemy depending on their persona. Used with
+\nTalk skill.
+Diplomacy
+Start the fight by talking to the opponent without wasting a\nturn. Maybe you can find a diplomatic resolution before any
+\nviolence takes place?
+Reverse-healing
+remove own organs to cause serious damage
+Precision stance
+A special stance to raise your accuracy greatly. Often used\nduring medical surgeries to prevent one's arm from shaking.
+Diagnosis
+Study fallen enemies and their anatomy to gain knowledge of\nthem. Diagnosis also reveals what strategies might work the
+\nbest when facing similar foes in the future.
+Rugged handsome looks
+The skill doesn't necessarily translate to everyone. Beauty is in\nthe eye of beholder after all.
+stat increases
+A barbaric trait of devouring the carcass of your opponents \nto ease hunger.
+Hype yourself into a state of aggression and trance. An old\ntraditional Oldegårdian folk skill.
+Provoke the enemy into attacking you only, leaving others\nalone.
+\n\n\n\n\n<Target Action>\nmotion swing: user\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
+Long combat experience has prepared you for fights.\nPrepare for an attack to gain advantage with [SHIFT].
+Sisu
+Your will to live. You just grind your teeth together instead\nof dying. You're not ready just yet.
+Black smog
+Crystallize manmade darkness born from the industrial age\nto blind and suffocate your opponents. Requires 1 Rev Point.
+\n\n\n\n\n\n\n<Require 1 BP>
+Mark of Gro-goroth
+Scorched earth
+Scorch your surroundings completely to create an environment\nthat greatly enhances fire attacks. Requires 1 Rev Point.
+Roots that reap
+A talented wizard can generate a shockwave that travels\nunderground and forces sharp roots to push through the ground.
+\nAttacks all enemies. Requires 2 Rev Points.\n\n\n\n\n\n<Require 2 BP>
+Spontaneous combustion
+THe highest form of pyromancy. Becomes the flame itself.
+Photosynthesis
+The process in which you use sunlight to create oxygen and\nenergy to replenish your health gradually over time. Requires
+\nsunlight obviously. A passive skill.
+Greater photosynthesis
+Brain flower
+Plant your personal seeds of brain flower to a fertile ground.\nFreshly deceased corpses being the most fertile of grounds. A brain
+\nflower replenishes sanity and mind.
+Heart flower
+Plant your personal seeds of heart flower to a fertile ground.\nFreshly deceased corpses being the most fertile of grounds. A heart
+\nflower replenishes body and wounds.
+Golden gates
+A gift from the Moon God himself. Gain access to golden gates\nthat lead you out from madness and world of deceit. A passive ability.
+Reveal aura
+Reveal positions of the other contestants through examining a\nmap. To sense these positions, a spike of energy is required.
+\nYou can't sense a person without this.
+Blood sword
+The blood of Alll-mer boils and rages even ages after his death.\nJust a drop sends swords to the heart of his enemies. Summon a
+\nblood sword to wield in battle.
+Resurrection
+Longinus
+The blood of Alll-mer boils and rages even ages after his death.\nJust a drop thrusts spears to the torso of his enemies. Summon a
+\nblood spear to wield in battle.
+Inverse crown of thorns
+A glimpse of the pain and suffering Alll-mer the ascended one\nendured on the cross. Can you feel closer to the god this way?
+Summon a mischief of rats to disrupt the enemy. Rats spread\nconfusion and disease where ever they go.
+Mad sack smash
+Sack smash
+Double sack smash
+Cane smash
+The ratkin is scratching itself
+Rat bite
+Summon a rat
+Knife stab
+Knife slash
+Gut kick
+Abella sets up a bear trap
+\n\n\n\n\n\n\nthug\n<Boost Damage>
+\n\n\n\n\n\n\njournalist\n<Boost Damage>
+\n\n\n\n\n\n\nbotanist\n<Boost Damage>
+\n\n\n\n\n\nyellow_mage\n<Boost Damage>
+\n\n\n\n\n\n\nhunter\n<Boost Damage>
+\n\n\n\n\n\n\n\nmobster\n<Boost Damage>
+\n\n\n\n\n\n\nchef\n<Boost Damage>
+\n\n\n\n\n\n\n\nlieutenant\n<Boost Damage>
+\n\n\n\n\n\n\n\nsalaryman\n<Boost Damage>
+\n\n\n\n\n\n\napprentice\n<Boost Damage>
+\n\n\n\n\n\n\n\n\n\nmarriage\n<Boost Damage>
+\n\n\n\n\n\n\n\n\nenemy\n<Boost Damage>
+Quick jabs
+Right straight
+enemy\n\n\n
+Nettle mist
+Drift tackle
+Suitcase smash
+Rev up
+Flimsy kick
+Vent out
+The stage is engulfed with gas
+A nice rubbing
+Gentle dismember
+Scalpel balette
+Precision cut
+O'saa makes magical sigils with his hand...
+O'saa continues his ritual dance...
+Mastermind makes magical sigils with his hand...
+Rapid fire
+The weeping scope is weeping...
+Wire trap
+Cross stiching
+Concentrated whispers carried by the older god Sylvian\nheal a considerable amount of health.
+The floppy arm stays idle.
+empty_skill
+The neighbour is preparing for a devastating attack!
+The floppy arm is tensing up...
+Meat mallet
+Vomit
+Glass shards
+Glass ceiling
+Rage smash
+The giant takes a step forward...
+The muscles on the arm are contracting...
+Mechanical dance shrieks out of pain
+The giant is engulfed by rage!
+flesh puppetry 4\n
+flesh puppetry 2
+Hanky-panky
+1 arm
+2 arm
+3 arm
+4 arm
+5 arm
+6 arm
+Claws
+Claws 2x
+The bellend is aiming towards you...
+Helm splitter
+Arrow
+August takes a careful aim...
+Bayonet
+The elite trooper raises his shield for defence
+The trooper's arm twitches...
+The elite trooper lifts his rifle with a steady hand...
+Flamethrower
+The flame trooper readies his flamethrower...
+<User BP: +1>
+Low bayonet
+<Target Action>\nperform action\naction animation\naction effect\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
+Guard+
+Skill #2 will be used when you select\nthe Guard command.\n
+Perfect guard
+While guarding your damage is reduced even further and you\ncan evade the most drastic physical trauma.
+Red arc
+\n\n\n\n\n\nenemy
+Overheat
+Lunar meteorite
+Summon a small piece of the moon. Requires 1 Rev Point.
+Wing guard
+Phantom hands
+Asterisk
+Butterfly edge
+You stir up the hornet's nest!
+status
+Hornet sting
+Slap
+Double slap
+Curse of Light
+Pillar of Light
+Soul strike
+Spear swing
+Throwing spear
+Feather rain
+Heavy Mortar
+<Target Action>\nperform action\naction animation\naction effect\ndeath break\nwait for animation\nmotion wait: user\n</Target Action>
+"Move you fat fuck!"
+Platoon charge
+"Do your thing you idiot!"
+The platoon is taking an aim...
+The platoon is confused...
+The monster grabs you by the neck!
+Grasp of a genie
+\nperformed on the spot during an encounter to work properly.\n\n\n\n\n\n\ndoctor
+The hand of destruction appears...
+The hand of creation appears...
+First hurting
+\n\n\n\n<Require 1 BP>\n<Boost Damage>
+First black smog
+First blood golem
+\ngave birth to it.\n\n\n\n\n\n\n<Require 1 BP>
+First black orb
+First scorched earth
+First roots that reap
+First pyromancy trick
+\n\n\n\n\n\n\n\n<Boost Damage>
+First combustion
+\ntheir opponents.\n\n\n\n\n\n
+First blood sword
+First Longinus
+First rot
+\n\n\n\n\n\n\n\n\n<Require 1 BP>
+First flesh puppetry
+\n\n\n\n\n\n\n\n\n\nflesh puppetry 0
+\n\n\n\n\n\n\n\n\n\nflesh puppetry 3\n
+First mischief of rats
+First pheromones
+First loving whispers
+\neffects are solely based on Sylvian's whims.\n\n\n\n\n\n\n<Boost Damage>
+First healing whispers
+Double hurting
+Double black smog
+Double blood golem
+\ngave birth to it.\n\n\n\n\n\n<Require 1 BP>
+Double black orb
+Double scorched earth
+Double roots that reap
+Double pyromancy trick
+Double combustion
+\n\n\n\n\n\n\n\n<Require 1 BP>
+Double blood sword
+Double Longinus
+Double rot
+Double flesh puppetry
+Double mischief of rats
+Double pheromones
+Double loving whispers
+\neffects are solely based on Sylvian's whims.\n\n\n\n\n\n<Boost Damage>
+Double healing whispers
+Greater hurting
+Create a devastating vortex out of your concentrated feelings \nof hurting and hatred.
+\n\n\n\n\n\n<Boost Damage>
+Greater black smog
+Crystallize manmade darkness born from the industrial age\nto blind and suffocate your opponents.
+\n\n\n\n\n\n\n
+Greater blood golem
+\ngave birth to it.\n\n\n\n\n\n\n
+Greater black orb
+Greater scorched earth
+Scorch your surroundings completely to create an environment\nthat greatly enhances fire attacks.
+Greater roots that reap
+\nAttacks all enemies.\n\n\n\n\n
+Greater pyromancy trick
+\n\n\n\n\n\n\n\nPlayer pyromancy!\n<Boost Damage>
+Greater combustion
+Greater blood sword
+Greater Longinus
+Greater rot
+Rot the victim from inside out to make them vulnerable to \nattacks.
+Greater flesh puppetry
+\n\n\n\n\n\n\nflesh puppetry 1\n
+\n\n\n\n\n\n\nflesh puppetry 2\n
+\n\n\n\n\n\n\nflesh puppetry 3\n
+\n\n\n\n\n\n\nflesh puppetry 4\n
+Greater mischief of rats
+Greater pheromones
+Greater loving whispers
+Greater healing whispers
+Coat your weapon in poison extracted from the local plantlife.\nGives you 50% chance of inflicting the poison on your enemies when
+\nattacking. A passive skill initiated at the start of an encounter.
+The owl sprite takes a step forward...
+Poison dart
+The owl cultist is tilting its head...
+The owl sprite is tilting its head...
+2
+Double scratch
+Bone pike
+Rat scratch fever
+Moonscorch
+Dreamscape
+Lunar storm
+Gentle beheading
+Bloodrose assault
+All seeing eye
+The spilled blood attract the bloodrose vines...
+Miasma cloud
+Piercing howl
+Left paw
+Right paw
+Rotten meat
+High priest's fingers are twitching...
+Killing frenzy
+The sergal lowers his stance...
+<Target Action>\nperform action\naction animation\nwait for animation\naction effect\naction effect\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
+Slasher
+Death gurgle
+Meat grinder
+Hind legs
+Front legs
+Hind leg
+Front leg
+Stampede
+Ejaculate
+The ejaculation burns!
+The priest reaches out for you...
+Pocketcat's eyes light up...
+Strike your enemy with a concentrated bolt of electricity\nthat will stun weaker foes. 
+Summon the chains that tormented Chambara the Tormented One\nfor hundreds of years. Requires 2 Rev Points.
+\n\n\n\n\n\n\n\n\n<Require 2 BP>\n<Boost Damage>
+Moth swarm
+Summon a swarm of moths to aid you in combat. The moths are the\nvery same that leaked from the paradise, the artificial green, when
+\nthe door between the two worlds opened. Requires 1 Rev Point.\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
+Healing Link
+Requires 2 Rev Points.
+\n\n\n\n\n\n\n\n<Require 2 BP>\n<Boost Damage>
+\n\n\n\n\n\n\n\n\n<Boost Repeats>\n<Boost Damage>
+Left slam
+Right slam
+Mauler
+The gull brother is cackling and laughing...
+\n\n\n\n\n\n\n\nflesh puppetry 1\n<Boost Damage>
+Psycho stab
+The villager lunges at you!
+Meat tenderizer
+The half-cocooned lunges at you!

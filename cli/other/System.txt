@@ -1,0 +1,103 @@
+Weapon
+Shield
+Head
+Body
+Accessory
+Wheels
+Empty
+Skills
+Zoophobia
+Nosophobia
+Teratophobia
+Phasmophobia
+Erotophobia
+Rhabdophobia
+Panophobia
+Level
+Lv
+Body
+Mind
+TP
+Hunger
+Fight
+Run!
+Attack
+Guard
+Item
+kill
+Equip
+St
+Formation
+Save
+uit Game
+Options
+Weapon
+Armor
+Books
+Optimize
+Clear
+New Game
+ Continue
+To Title
+Cancel
+Buy
+Sell
+Max Body
+Max Mind
+Defense
+M.Attack
+M.Defense
+Agility
+Luck
+Accuracy
+Evasion
+There was no effect on %1!
+%1 took %2 damage!
+%1 was drained of %2 %3!
+%1 gained %2 %3!
+%1 lost %2 %3!
+%1 took no damage!
+Miss! %1 took no damage!
+%1 recovered %2 %3!
+Always Dash
+BGM Volume
+BGS Volume
+%1's %2 went up!
+%1's %2 returned to normal!
+Command Remember
+%1 counterattacked!
+A painful blow!!
+An excellent hit!!
+%1's %2 went down!
+%1 was defeated.
+%1 emerged!
+%1 took %2 damage!
+%1 was drained of %2 %3!
+%1 gained %2 %3!
+%1 lost %2 %3!
+%1 took no damage!
+Miss! %1 took no damage!
+%1 recovered %2 %3!
+However, it was unable to escape!
+%1 tries to escape...
+%1 evaded the attack!
+Current %1
+Current %1
+File
+%1 is now %2 %3!
+Load which file?
+%1 nullified the magic!
+ME Volume
+%1 %2 received!
+%1\G found!
+%1 found!
+%1 learned!
+%1's party
+Possession
+%1 got the upper hand!
+Save to which file?
+SE Volume
+%1 protected %2!
+%1 was surprised!
+%1 uses %2!
+%1 was victorious!

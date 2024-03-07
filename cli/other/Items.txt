@@ -1,0 +1,684 @@
+Prehevil map
+A map of Prehevil.
+\n\n\n\n\n<Picture: icon_map>
+Photo album
+A humble little album containing all the photos you've collected\nthrough the years.
+\n\n\n\n\n\n\n<Picture: icon_blank_book>
+Recipes of the 15th Century vol.1
+The first volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
+\n\n\n\n\n\n<Item Recipe: 14>\n<Item Recipe: 41>\n<Picture: icon_blank_book>
+The Four Ages of History
+A brief history book about the different ages of modern\nchronology.
+\n\n\n\n\n<Picture: icon_blank_book>
+Torch
+A torch
+Flashlight
+Matches
+Use to light a fire. Light brings warmth and safety and keeps\nfear in check.
+\n\n\n\n\n<Picture: icon_matches>\n<Menu Category: Items>
+Cloth fragment
+Cloth can be used to tie up small wounds and stop bleeding.
+\n\n\n\n\n<Picture: icon_cloth_piece>\n<Synthesis Ingredients>\narmor 7\n</Synthesis Ingredients>\n<Menu Category: Healing>
+Glass vial
+A small vial. Typically used with alchemy.
+\n\n\n\n\n<Picture: icon_emptyvial>\n<Menu Category: Items>
+Murky vial
+A vial full of murky liquid. Highly flammable.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 33\nitem 12\n</Synthesis Ingredients>\n<Picture: icon_blackvial>\n<Menu Category: Items>
+Black vial
+A vial full of mysterious black liquid.
+\n\n\n\n\n<Picture: icon_blackvial>\n<Menu Category: Items>
+Oil
+A vial full of oil that is somewhat flammable.
+Alchemillia vol.2
+A book for intermediate level alchemy. Contains recipes for\nthe murky vial, the white vial and the yellow vial.
+\n\n\n\n\n<Item Recipe: 10>\n<Item Recipe: 52>\n<Item Recipe: 33>\n<Picture: icon_blank_book>
+Meatpie
+Old fashioned meatpie. Rather easy to do.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 15\nitem 16\nitem 17\n</Synthesis Ingredients>\n<Picture: icon_meatpie>\n<Menu Category: Food>
+Egg
+An egg of bird or lizard origin. Who knows really?
+\n\n\n\n\n<Picture: icon_egg>\n<Menu Category: Food>
+Dried meat
+Strips of meat, dried to prevent spoiling.
+\n\n\n\n\n<Picture: icon_dried_meat>\n<Menu Category: Food>
+Wheat flour
+Grinded wheat. On its own it's not much of use, but can be\nused in bakery.
+\n\n\n\n\n<Picture: icon_flour>\n<Menu Category: Food>
+Woodsman's letter
+A single piece of paper with crude writing on it. It seems\nto have been written in a hurry.
+\n\n\n\n\n<Picture: icon_letter>
+Dirty toilet paper
+This paper can be used to tie up small wounds and stop bleeding.\nIt does look absolutely rancid though. It definitely isn't the
+\nmost hygienic way to patch up yourself...\n\n\n\n\n\n<Picture: icon_filthy_paper>\n<Synthesis Ingredients>\narmor 7\n</Synthesis Ingredients>\n<Menu Category: Healing>
+Small key
+A rusty worn-out key.
+\n\n\n\n\n<Picture: icon_small_key>\n<Menu Category: Items>
+Rotten meat
+Disgusting piece of meat. Its use is questionable...
+\n\n\n\n\n<Picture: icon_rotten_meat>\n<Menu Category: Food>
+New poems of love and torment
+A perfect collection of love letters written by the storied\nhero Ronn Chambara.
+Mahavre
+A book about the ancient city Mahavre.
+Studies of Gro-goroth I
+A book about the older god Gro-goroth.
+This book tells the tale of the legendary fellowship\nthat would be known in this day as the new gods.
+Soldier's diary 1
+A diary of a Bremen soldier that arrived to this area \nrecently.
+Stick
+A cut tree branch. It might be useful in some\nsituations.
+\n\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+Blue vial
+A vial full of blue liquid.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 95: 2\n</Synthesis Ingredients>\n<Picture: icon_bluevial>\n<Menu Category: Healing>
+Vodka
+A bottle of old vodka. Helps you keep sane in this crazy\nworld.
+\n\n\n\n\n<Picture: icon_vodka>\n<Menu Category: Healing>
+Moldy bread
+A dried up bread with some mold already growing on it.\nGives momentary ease against hunger.
+\n\n\n\n\n<Picture: icon_moldy_bread>\n<Menu Category: Food>
+Yellow vial
+A vial full of yellow colored mucus. The smell is very salty,\nbut it might just be edible...
+\n\n\n\n\n<Synthesis Ingredients>\nitem 219: 2\n</Synthesis Ingredients>\n<Picture: icon_yellowvial>\n<Menu Category: Items>
+Blood vial
+A vial full of blood.
+\n\n\n\n\n<Picture: icon_redvial>\n<Menu Category: Items>
+Notes written by a torturer.
+Studies of Alll-mer I
+A book about the older god Alll-mer.
+Cheese
+An old dried up cheese. It has a pretty bad smell to it.
+\n\n\n\n\n\n\n<Menu Category: Food>
+Beer
+A bottle of beer. The beer inside is murky. Helps you stay\nsane in the ever-pressing darkness.
+\n\n\n\n\n<Picture: icon_beer>\n<Menu Category: Healing>
+Studies of Sylvian I
+A book about the older god Sylvian.
+Book of enlightenment
+A mysterious ancient book radiating warm light. It's said\nto be written by the monks beyond the Eastern Sanctuaries.
+\n\n\n\n\n<Picture: icon_enlightenment>
+Vegetable pie
+Old fashioned pie made from various vegetables.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 43\nitem 42\nitem 17\n</Synthesis Ingredients>\n<Picture: icon_vegetable_pie>\n<Menu Category: Food>
+Carrot
+A perfectly edible carrot.
+\n\n\n\n\n<Picture: icon_carrot>\n<Menu Category: Food>
+Turnip
+A turnip that seems to be fresh from the ground. It even\ngot pieces of dirt in it still.
+\n\n\n\n\n<Picture: icon_turnip>\n<Menu Category: Food>
+Orders from Vatican
+A letter directed to father Domek of Prehevil.
+White vial
+A vial full of white colored liquid. Works as an antidote\nfor poisoning.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 28\nitem 218\n</Synthesis Ingredients>\n<Picture: icon_whitevial>\n<Menu Category: Healing>
+Purple vial
+A vial full of purple colored liquid. Slowly working, but\npotent poison.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 28\nitem 54\n</Synthesis Ingredients>\n<Picture: icon_purplevial>\n<Menu Category: Items>
+Red vial
+A vial full of red colored liquid. Highly corrosive. Can be\nused to melt certain objects.
+Devil's Grass
+Creates a relaxing and fear reducing effects when smoked.\nThe only negative effect is slight loss of accuracy.
+\n\n\n\n\n\n\n\n<Menu Category: Items>
+Heroin
+Highly addictive pain medication. The high creates an\neuphoric effect, but the withdrawal symptoms are severe.
+\n\n\n\n\n<Picture: icon_heroin>\n<Menu Category: Items>
+Pep pills
+A strong stimulant with performance-enhancing effects. The\nhigh raises your awareness, the withdrawal tires you out.
+\n\n\n\n\n<Picture: icon_pep_pills>\n<Menu Category: Items>
+Lucky coin
+Lucky coin to be used in dire situations. Hold [SHIFT]\nwhile choosing head or tails to boost your chances.
+\n\n\n\n\n<Picture: icon_thecoin>\n<Menu Category: Items>
+Green vial
+A vial full of green colored liquid. Just the smell makes\nyour muscles contract and heightens your senses.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 28\nitem 33\n</Synthesis Ingredients>\n<Picture: icon_greenvial>\n<Menu Category: Items>
+Bacon & eggs
+A great way to start new day - if not a little bit\nheavy on your stomach.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 16\nitem 15\n</Synthesis Ingredients>\n<Menu Category: Food>
+Goulash
+A local delicacy. A stew of meat and vegetables seasoned \nwith paprika.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 16\nitem 64\nitem 65\n</Synthesis Ingredients>\n<Picture: icon_goulash>\n<Menu Category: Food>
+Tomato
+The color of the tomato is a little pale, suggesting\nit hasn't seen much sun.
+\n\n\n\n\n<Picture: icon_tomato>\n<Menu Category: Food>
+Paprika
+The parika is already getting a little bit soft, but it's\nstill edible.
+\n\n\n\n\n<Picture: icon_paprika>\n<Menu Category: Food>
+Light blue vial
+A vial full of light blue liquid.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 28: 2\n</Synthesis Ingredients>\n<Picture: icon_lightbluevial>\n<Menu Category: Healing>
+Salami
+A Dry piece of salami. Made from horse meat.
+\n\n\n\n\n\n\n\n<Menu Category: Food>
+Blueberries
+Rather fresh pile of blue berries. They are very\nhealthy!
+Blueberry pie
+Old fashioned pie made of blueberries. Tasty and \nhealthy in same package!
+\n\n\n\n\n<Synthesis Ingredients>\nitem 69\nitem 17\n</Synthesis Ingredients>\n<Menu Category: Food>
+Nitroglycerin powder
+White powder of nitroglycerin. Mixed with right\nelements, you can get something out of this...
+\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+Opium powder
+If you had a pipe, you could smoke this. It has\ncalming and fear reducing effects.
+Pipe
+You could smoke something with this.
+\n\n\n\n\n<Picture: icon_pipe>\n<Menu Category: Items>
+Tobacco
+A rare luxury product from the new continent, the dark\nlands of Vinland. Can be smoked with a pipe.
+\n\n\n\n\n<Picture: icon_tobacco>\n<Menu Category: Healing>\n\n\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+9mm Bullet
+A 9mm handgun bullet. On the casing it says "Si vis pacem,\npara bellum". Use [SHIFT] to shoot.
+\n\n\n\n\n<Picture: icon_9mm>\n<Menu Category: Items>
+Bear trap
+A strong contraption that will cause severe damage if stepped\non.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 223: 2\nitem 225: 3\nitem 246\n</Synthesis Ingredients>\n<Picture: icon_beartrap>\n<Menu Category: Items>
+12-gauge shells
+A shell that is loaded with multiple lead shots. These shells\nare used with Trenchguns. Use [SHIFT] to shoot.
+\n\n\n\n\n<Picture: icon_shells>\n<Menu Category: Items>
+.303 Ammo
+Round-nosed, copper-nickel full-metal-jacketed bullet with\na lead core. Ammo meant for rifles. Shoot with [SHIFT].
+\n\n\n\n\n<Picture: icon_rifle_ammo>\n<Menu Category: Items>
+Explosive vial
+A vial full of explosive liquids. Can be used to clear\ncave-ins or other rocks and rubble.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 11\nitem 71\n</Synthesis Ingredients>\n<Picture: icon_blackvial>\n<Menu Category: Items>
+The Tale of the Pocketcat I
+A childrens fairy tale about the Pocketcat. It's the \nfirst chapter.
+Stone
+A small rock.
+\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+Water vial
+A vial full of water. The water looks and smells drinkable.
+\n\n\n\n\n<Picture: icon_bluevial>\n<Menu Category: Items>
+Quill
+A feather of a falcon. Perfectly suited for use as a quill.
+An empty scroll waiting for someone to write in it.
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Items>
+Alchemillia vol.3
+A book for experienced level alchemy. Contains recipes for\nthe light blue vial and the brown vial.
+\n\n\n\n\n<Item Recipe: 67>\n<Item Recipe: 90>\n<Picture: icon_blank_book>
+Brown vial
+A vial full of brown colored liquid. Just the smell makes\nyour muscles contract and heightens your senses.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 58\nitem 67\n</Synthesis Ingredients>\n<Picture: icon_brownvial>\n<Menu Category: Items>
+The Passages of Ma'habre
+A normal looking book that feels surprisingly heavy. It's\ncovers look very old.
+Green herb
+A green herb with a bitter smell. Used commonly to cure\ninfections by rubbing them with the herb.
+\n\n\n\n\n<Picture: icon_green_herb>\n<Menu Category: Healing>
+Blue herb
+A blue herb with a sweet smell.
+\n\n\n\n\n<Picture: icon_blue_herb>\n<Menu Category: Healing>
+Lavender
+Lavender petals that give off a lovely scent. The scent\nsoothes you and dilutes your fears.
+\n\n\n\n\n<Picture: icon_lavender>\n<Menu Category: Healing>
+Wine vial
+A vial of old murky wine. Drink it to dim your senses\nand fear.
+\n\n\n\n\n<Picture: icon_redvial>\n<Menu Category: Healing>
+Book of Fears
+A book written about different phobias.
+Woodsman head
+The severed head of a woodsman. The blank eyes stare to\nemptiness.
+\n\n\n\n\n<Picture: icon_burlap_sack>\n<Menu Category: Body bag>
+Booby trap
+A makeshift trap made from a case of a landmine. While not\nvery damaging, can be used to stun opponents momentarily.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 223: 2\nitem 225\nitem 246\nitem 247\n</Synthesis Ingredients>\n<Picture: icon_smoketrap>\n<Menu Category: Items>
+Lighter
+Use to light a fire. Light brings warmth and safety and keeps\nfear in check. There is still some gas left.
+\n\n\n\n\n<Picture: icon_lighter>\n<Menu Category: Items>
+Villager head
+The severed head of a villager. The blank eyes stare to\nemptiness.
+Vile head
+The severed head of a villager with his pig mask still on.\nYou couldn't get the mask off as if it's melted to the skin.
+Priest's head
+The severed head of a decrepit priest. There's something eerie\nabout the head. As if something lingers still inside...
+Gentleman's head
+The severed head of the Gentleman.
+Ronteal's head
+The severed head of a ronteal. The head is full of sharp teeth\nand muckus.
+Rifleman head
+The severed head of a rifleman. His eyes are in permanent squint\nnow.
+The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
+\n\n\n\n\n<Picture: icon_soul_stone>
+Soul stone
+The insides of the gemstone radiate faint light that slowly\nswirls around.
+\n\n\n\n\n<Picture: icon_lesser_soul>\n<Synthesis Ingredients>\nitem 118: 3\n</Synthesis Ingredients>\n<Menu Category: Items>
+Brain flower seed
+Small seeds that are soft and squishy.
+Soul stone shard
+A shard of a larger gemstone. You can feel magnetic pulse\nfrom the shard... Maybe if you had more of these...?
+\n\n\n\n\n<Item Recipe: 116>\n<Picture: icon_soul_stone_shard>\n<Menu Category: Items>
+Cube of depths
+The object is an ancient looking cube with ornaments\nand decorations twisting around.
+Endless soul
+One of the grand souls that work as the key to the\nascension.
+Enlightened soul
+Radiating soul
+Tormented soul
+Ancient One soul
+A surprisingly heavy gemstone. The insides radiate\nfaint blue light that slowly swirl around.
+White key
+A white key.
+\n\n\n\n\n<Picture: icon_test>\n<Menu Category: Items>
+Red herb
+A red herb with a neutral smell. Intensifies the effect of\nother herbs.
+\n\n\n\n\n<Picture: icon_red_herb>\n<Menu Category: Healing>
+Alchemillia vol.1
+A book for beginner level alchemy. Contains recipes for the\nblue vial and simple mixed herbs.
+\n\n\n\n\n<Item Recipe: 134>\n<Item Recipe: 135>\n<Item Recipe: 28>\n<Picture: icon_blank_book>
+Mixed herbs
+A mixture of blue and red herbs that is especially potent.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 95\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_blue_red>\n<Menu Category: Healing>
+A mixture of green and red herbs that is especially potent.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 94\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_green_red>\n<Menu Category: Healing>
+Anathomia
+The book of collected knowledge of medical science.
+\n\n\n\n\n<Item Recipe: 8>\n<Picture: icon_anathomia>
+The Fellowship ch.2 (Original)
+The Fellowship ch.1 (Original)
+Bonesaw
+A rusty old bonesaw. You can only imagine the cruelty this\nsaw has seen. Effective against infections.
+\n\n\n\n\n<Picture: icon_bonesaw>\n<Menu Category: Items>
+Arm
+An arm that's still relatively fresh.
+\n\n\n\n\n<Picture: icon_hand>\n<Menu Category: Body bag>
+Leg
+A leg that's still relatively fresh.
+\n\n\n\n\n<Picture: icon_leg>\n<Menu Category: Body bag>
+Skeletal leg
+A skeletal leg that's been cut off.
+Blueish arm
+Blueish leg
+Goat hoof
+A hoof of a goat. It's still relatively fresh.
+\n\n\n\n\n<Picture: icon_paw>\n<Menu Category: Body bag>
+Purifying talisman
+A paper talisman with markings that originate from\nEastern Sanctuaries.
+Raw meat
+A piece of raw meat. It's huge junk, but you don't know\nif it's healthy to eat it raw...
+\n\n\n\n\n\n\n\n\n<Menu Category: Food>
+Grilled meat
+A piece of grilled meat. It's huge junk that will surely\nsatisfy your hunger.
+Grilled salmonsnake meat
+Meat of the salmonsnake. It's greasy and smells delicious.\nIt has been grilled.
+\n\n\n\n\n\n\n\n\n\n\n<Menu Category: Food>
+Mushroom stew
+Mushroom stew made from local penny buns.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 217: 3\n</Synthesis Ingredients>\n<Picture: icon_mushroom_stew>\n<Menu Category: Food>
+Saw blade
+A saw blade that is used in table saws. The blade has been\ngathering a little bit rust.
+\n\n\n\n\n\n<Picture: icon_saw_blade>\n<Menu Category: Items>
+Pinecone pig instructions
+Instructions on how to craft your very own pinecone pig.\n
+\n\n\n\n\n<Armor Recipe: 32>
+Worm juice
+A vial full of mild poison that is said to kill parasites\nand worms inside the host body.
+\n\n\n\n\n<Picture: icon_orangevial>\n<Menu Category: Items>
+Ornament lantern
+A simple lantern with ornament decorations. Can be used to\nthrow at the enemies for a small fire attack.
+\n\n\n\n\n\n<Picture: icon_lantern>\n<Menu Category: Items>
+The Tale of the Pocketcat II
+A childrens fairy tale about the Pocketcat. It's the \nsecond chapter.
+Fallen cherub head
+The severed head of a fallen cherub. The head feels hollow and its\nskin feels crispy.
+Throwing dart
+Small darts designed for throwing. They are also dipped\nin poison.
+A letter with a coded message...
+\n\n\n\n\n\n\n<Picture: icon_codex_letter>
+Lion brass key
+A brass key with a crude insignia of the 2-tailed lion that\nis the old symbol of Prehevil.
+\n\n\n\n\n<Picture: icon_lion_key>\n<Menu Category: Items>
+Gasoline canister
+A canister with a good amount of gasoline still left inside.
+\n\n\n\n\n<Picture: icon_gasoline>\n<Menu Category: Items>
+Rust-coloured pearl
+A mysterious rust-coloured pearl found from inside a ronteal.\nThe shape is perfect, but there is something ominous about it...
+\n\n\n\n\n<Picture: icon_rusty_pearl>\n<Menu Category: Items>
+Soldier's letter
+A handwritten letter of a Bremen soldier. Seems like he\nnever got to send the letter...
+Shilling
+The common currency used in Prehevil. It's value is less\nthan that of its counter-parts in Europa.
+\n\n\n\n\n<Picture: icon_shilling>\n<Menu Category: Items>
+Eagle brass key
+A brass key with a crude insignia of the Bremen national\nanimal black eagle.
+\n\n\n\n\n<Picture: icon_eagle_key>\n<Menu Category: Items>
+Silver shilling
+A currency used in Prehevil by the higher class residents. They\nsay that there are certain things only silver can buy.
+\n\n\n\n\n<Picture: icon_silver_coin>\n<Menu Category: Items>
+Chalk
+A short piece of chalk. You can draw things with this.
+\n\n\n\n\n<Picture: icon_chalk>\n<Menu Category: Items>
+Occult Grimoires
+The book contains the basics of occult and magick. Information\nabout the ritual circles can be found here.
+Basement key
+A basement key found from the woodsman.
+Skin bible - Gro-goroth
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Gro-goroth.
+\n\n\n\n\n<Picture: icon_skin_bible>
+Skin bible - Rher
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Rher.
+Combat manual
+A beginner's guide to survival and combat on a battlefield.
+Black matter
+You cannot quite tell what you are looking at. You can\nrecognize pasta in there. It might be edible?
+\n\n\n\n\n<Picture: icon_black_stuff>\n<Menu Category: Food>
+\n\n\n\n\n<LanguagePrimer: m h>
+Newspaper article
+An article about the end of the Great War II.
+\n\n\n\n\n<Picture: icon_newspaper>
+Coded letter #1 - UNUSED
+\n\n\n\n\n\n\n<Picture: letter_codex1>
+Penny bun
+A mushroom commonly found throughout Europa. An edible mushroom.\nIt is used widely as an ingredient in various foods.
+\n\n\n\n\n<Picture: icon_penny_bun>\n<Menu Category: Food>
+Fly amanita
+One of the more iconic toadstool species. Its (relatively)\nmild poison is well known even by small children.
+\n\n\n\n\n<Picture: icon_fly_amanita>\n<Menu Category: Food>
+Golden chanterelle
+A sought-after edible mushroom. Its delicious taste is often\nreferenced "Chanterelle dreams, amanita nightmares."
+\n\n\n\n\n<Picture: icon_golden_chanterelle>\n<Menu Category: Food>
+Glass shards
+A fistful of glass shards. Better handle them with care so\nyou won't cut yourself!
+\n\n\n\n\n<Picture: icon_glass>\n<Menu Category: Items>
+The Last Frontier ch.1
+A brief history of the dark continent Vinland.
+Bolt cutters
+A tool used for cutting chains, padlocks, bolts and wire.\nThe handles are positioned with the best leverage in mind.
+\n\n\n\n\n<Picture: icon_bolt_cutters>\n<Menu Category: Items>
+Bolt
+Bolts are typically used in assembling different components\ntogether.
+\n\n\n\n\n<Picture: icon_bolt>\n<Menu Category: Items>
+Duct tape
+A special water resistant tape created recently in the second\ngreat war to seal ammunition cases in a durable manner.
+\n\n\n\n\n<Picture: icon_duct_tape>\n<Menu Category: Items>
+Scrap metal
+Pieces of scrap metal left seemingly with no purpose.
+\n\n\n\n\n<Picture: icon_scrap_metal>\n<Menu Category: Items>
+Craftman's notes
+Notes left behind by the craftman of the church.
+Moonscorched head
+The severed head of a moonscorched villager. The skin has\nburned and melted in an unusual way.
+Bobby's head
+The severed head of a bobby. The skin has taken exoskeleton-like\nqualities. The expression is in eternal grin.
+Head of Needles
+The severed head of the Needles. For some reason you get a\nfeeling that his presence still lingers in those eyes...
+Pillarman's head
+The severed head of a moonscorched villager. The skin seems\nburned in an unusual way.
+Head of the Tormented one
+Janitor head
+The severed head of the janitor from workshops. The face seems\nto be set in forever-grin.
+Dead crow
+A crow carcass that has recently started decomposing. It smells\nawful and even has few maggots in it.
+\n\n\n\n\n<Picture: icon_dead_crow>\n<Menu Category: Items>
+Church keys
+A set of keys found from the lower levels of the Church of\nAlll-mer. They look like typical prison keys.
+\n\n\n\n\n<Picture: icon_prison_keys>\n<Menu Category: Items>
+Crosswords puzzle
+A torn crosswords puzzle from an old newspaper. Looks like someone\nhas filled some of it already...
+\n\n\n\n\n<Picture: icon_crosswords>
+Broomstick
+A simple wooden broomstick. It doesn't feel sturdy enough\nto be used as a weapon.
+\n\n\n\n\n<Picture: icon_broomstick>\n<Menu Category: Items>
+Sewer keys
+A set of dirty and rusty keys. One of the keys got carved\ntext saying "Sewers".
+Recipes of the 15th Century vol.2
+The second volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
+\n\n\n\n\n<Item Recipe: 63>\n<Item Recipe: 168>\n<Picture: icon_blank_book>
+Skin bible - Alll-mer
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Alll-mer.
+C-ration
+A canned military food ration issued to the allied forces.\nConsists corned beef and hardtack biscuits.
+\n\n\n\n\n<Picture: icon_food_ration>\n<Menu Category: Food>
+Pressure plate
+A piece of scrap metal. This particular piece has been used\nas a pressure plate of sorts.
+\n\n\n\n\n<Picture: icon_pressure_plate>\n<Menu Category: Items>
+Gun powder
+Looks like the standard gun powder that is used with bullets\nand shells.
+\n\n\n\n\n<Picture: icon_gun_powder>\n<Menu Category: Items>
+Weapon schematics
+Schematics for custom weaponry.
+\n\n\n\n\n<Weapon Recipe: 16>\n<Weapon Recipe: 17>\n<Weapon Recipe: 18>\n<Weapon Recipe: 19>
+Trap schematics
+Schematics for custom traps.
+\n\n\n\n\n<Item Recipe: 76>\n<Item Recipe: 104>
+Explosive schematics
+Schematics for explosives
+\n\n\n\n\n\n<Item Recipe: 352>
+Liver
+The liver has a function in detoxication, the removal of\ntoxic substances from a living organism.
+\n\n\n\n\n<Picture: icon_liver>\n<Menu Category: Body bag>
+Kidney
+Kidney participates in the control of bodily fluids, acid-base\nbalance and removal of toxins from the body.
+\n\n\n\n\n<Picture: icon_kidney>\n<Menu Category: Body bag>
+Eye
+Eyes are organs of the visual system. They provide animals\nwith vision.
+\n\n\n\n\n<Picture: icon_eye>\n<Menu Category: Body bag>
+Heart
+The heart is a muscular organ which pumps blood through the\nblood vessels of the circulatory system.
+\n\n\n\n\n<Picture: icon_heart>\n<Menu Category: Body bag>
+Parathyroid glands
+The parathyroid glands are four tiny glands that control the\nbody's calcium levels.
+\n\n\n\n\n<Picture: icon_parathyroid_gland>\n<Menu Category: Body bag>
+Thymus
+The thymus is a critical organ to the adaptive immune system\nwhere the body adapts specifically to foreign invaders.
+\n\n\n\n\n<Picture: icon_thymus>\n<Menu Category: Body bag>
+Kaiser critique
+An article that talks against the Kaiser's army and Bremen.
+Kaiser's rise to power
+An article that talks against the Kaiser's rise to power.
+Master key
+Master key found from the landlord's office in the apartment\nbuilding on the residential neighbourhood. A special key designed
+\nto open all the apartments in the building when necessary.\n\n\n\n<Picture: icon_prison_keys>\n<Menu Category: Items>
+Fellatio Effigy
+A small effigy of man hunched over on a throne. It's carved \nfrom an unknown material. 
+\n\n\n\n\n<Picture: icon_fellatio_idol>\n<Menu Category: Items>
+Hunger Effigy
+A small effigy of an deity with its gaping mouth open. It's carved \nfrom an unknown material. 
+\n\n\n\n\n<Picture: icon_hunger_idol>\n<Menu Category: Items>
+Martyr Effigy
+A small effigy resembling crucified Alll-mer with a snake curled\nover him. It's carved from an unknown material.
+\n\n\n\n\n<Picture: icon_martyr_idol>\n<Menu Category: Items>
+Heart flower stigma
+The stigma of a blooming heart flower. Has restorative properties\nwhen ingested. Heart and brain flowers are said to be nature's
+\nway of mimicing and growing a full artificial human being.\n\n\n\n\n<Picture: icon_heartflower>\n<Menu Category: Healing>
+Brain flower stigma
+The stigma of a blooming brain flower. Has a sanity recovering\neffect when ingested. It is said that the pollen of a brain flower
+\nhas the opposite effect and often takes hold of its new host.\n\n\n\n\n\n<Picture: icon_brainflower>\n<Menu Category: Healing>
+Fecal hound head
+The severed head of a fecal hound. The smell this beast emits\neven in death is rancid.
+Neighbour head
+The severed head of a neighbour. A rancid smell is eminating\nfrom its mouth.
+Diary of a madman
+A diary of a person living in the apartment building in the\nbackstreets of central Prehevil.
+Headmaster's key
+A special key that belonged to the headmaster of the Prehevil \norphanage. After his execution, the key is yours to keep.
+\n\n\n\n\n<Picture: icon_courtyard_key>\n<Menu Category: Items>
+Ratkin head
+The severed head of a ratkin. The head seems to share characteristics\nof both human and rat.
+Rat hag head
+The severed head of a rat hag. The towering head is suprisingly\nheavy and left forever in a twisted grin.
+Henryk's head
+The severed head of Henryk.
+Manor key
+A key found from the mayor's manor in the Prehevil old town.\nThe key looks pretty plain with some light sratches here and there.
+\n\n\n\n\n<Picture: icon_manor_key>\n<Menu Category: Items>
+Abella's head
+The severed head of Abella.
+Marcoh's head
+The severed head of Marcoh.
+Olivia's head
+The severed head of Olivia.
+Poison hemlock
+A large and poisonous plant that emits unpleasant smell. When\ndigested it is very hazardous, but on touch it only causes mild
+\npoisoning.\n\n\n\n<Picture: icon_poison_hemlock>\n<Menu Category: Items>
+Nettle
+Also known as stinging nettle. The leaves and the stem have\nmany hollow stinging hairs that cause mild irritation.
+\n\n\n\n\n<Picture: icon_nettle>\n<Menu Category: Items>
+Tanaka's head
+The severed head of Tanaka.
+Pav's head
+The severed head of Pav.
+Foldable wheelchair
+A special lightweight foldable wheelchair meant. It is easy and\nfast to set up and feels surprisingly durable despite.
+\n\n\n\n\n<Picture: icon_wheelchair>\n<Menu Category: Items>
+Judgement's head
+The severed head of Judgement.
+Head of the Mechanical dance
+The severed head of the Mechanical dance.
+Wild dagga
+Also known as lion's tail. A rare plant to see growing in wild in\nEuropa. Someone must have planted it here. When smoked, the plant
+\nhas a calming and numbing effect. Great for relieving fear. \n\n\n\n<Picture: icon_wild_dagga>\n<Menu Category: Items>
+Daan's head
+The severed head of Daan.
+Caligura's head
+The severed head of Caligura.
+Sewer winch
+A special winch used for opening the sewer lids in Prehevil.
+\n\n\n\n\n<Picture: icon_sewer_winch>\n<Menu Category: Items>
+Head of the Pocketcat
+The severed head of the Pocketcat
+Karin's head
+The severed head of Karin.
+Levi's head
+The severed head of Levi.
+Half-cocooned head
+The severed head of a half-cocooned villager.
+Soldier head
+The severed head of an infantry trooper.
+Marina's head
+The severed head of Marina.
+Inquisitor head
+The severed head of an Inquisitor.
+Osaa's head
+The severed head of O'saa.
+Mastermind's head
+The severed head of the Mastermind.
+Bellend head
+The severed head of a Bellend.
+Head of the Stitches
+The severed head of the Stitches.
+August's head
+The severed head of August.
+Valkyrie's head
+The severed head of Valkyrie.
+Tanaka's notes
+Notes left behind by Tanaka. The notes look relatively fresh.
+Ancient book
+An ancient looking book with grotesque leather covers. You\nfeel great urge to read the book.
+Talking board
+\n\n\n\n\n<Picture: icon_spirit_board>\n<Menu Category: Items>
+Dysmorphia's head
+The severed head of Dysmorphia.
+Samarie's head
+The severed head of Samarie.
+Owl cultist head
+The severed head of an owl cultist.
+Elite trooper head
+The severed head of an elite trooper.
+Flame trooper head
+The severed head of a flame trooper.
+Skin bible - Vinushka (unedited)
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Vinushka. This
+\nparticular version hasn't been tampered and edited by the Vatican.\n\n\n\n\n<Picture: icon_skin_bible>
+Skin bible - God of Fear and Hunger
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the god of fear and hunger.
+Skin bible - Vinushka
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Vinushka.
+Skin bible - Sylvian
+A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Sylvian.
+Prehevil document
+The truth under the moonlight
+NLU Reconnaissance Report #1
+A brief report about a partisan organization called NLU - Nameless \nLiberty Underground. Distributed to all mid-level Bremen officers
+\nassigned to Bohemia.\n\n\n\n\n\n\n\n\n<Picture: icon_document1>
+NLU Reconnaissance Report #2
+A brief report about NLU member Haas Reila Audrey. Distributed to \nall mid-level Bremen officers assigned to Bohemia.
+\n\n\n\n\n\n\n\n<Picture: icon_document1>
+Telelectroscope and Logic
+A document giving you broad overview on Telelectroscope and Logic.
+\n\n\n\n\n\n\n<Picture: icon_document1>
+Brain diagram document
+A document about brain usage and technology.
+\n\n\n\n\n\n<Picture: icon_document_brain>
+Sylvian trooper head
+The severed head of a sylvian trooper.
+Per'kele's head
+The severed head of the Per'kele.
+Kaiser's head
+The severed head of the Kaiser.
+Head of the Heartless one
+The severed head of the Heartless one.
+Botanism schematics
+Schematics for botanism
+\n\n\n\n\n<Item Recipe: 333>\n<Item Recipe: 334>\n<Item Recipe: 335>\n<Item Recipe: 370>\n<Item Recipe: 371>
+Toxicology schematics
+Schematics for toxicology
+\n\n\n\n\n<Item Recipe: 338>\n<Item Recipe: 339>
+Condensed blue
+A condensed ball of blue herbs. Recovers great amount of\nhealth when digested.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 95: 2\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_condensed_blue>\n<Menu Category: Healing>
+Condensed green
+A condensed ball of green herbs. Offer protection against infections,\npoisoning and other mild status ailments in advance. The effect
+\ndoesn't last long though.\n\n\n\n\n<Synthesis Ingredients>\nitem 94: 2\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_condensed_green>\n<Menu Category: Healing>
+Condensed lavender
+A condensed ball of lavender. Recovers great amount of sanity\nwhen digested.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 96: 2\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_condensed_lavender>\n<Menu Category: Healing>
+Bench grinder
+A grinding machine used to drive abrasive wheels. Commonly used\nto hand grind various tools and perform other rough grinding.
+\nIt's very heavy and you wonder if it's worth carrying around.\n\n\n\n\n<Picture: icon_bench_grinder>\n<Menu Category: Items>
+Condensed nettle
+Also known as stinging nettle. The leaves and the stem have\nmany hollow stinging hairs that cause mild pain if touched.
+\nThe hairs won't cause any real damage, but they do irritate quite a bit.\n\n\n\n<Picture: icon_condensed_nettle>\n<Synthesis Ingredients>\nitem 281: 2\nitem 132\n</Synthesis Ingredients>\n<Menu Category: Items>
+Condensed hemlock
+A condensed ball of poison hemlock. Even just a small amount\nof any part of the plant can cause respiratory paralysis and
+\nand death.\n\n\n\n<Picture: icon_condensed_hemlock>\n<Synthesis Ingredients>\nitem 280: 2\nitem 132\n</Synthesis Ingredients>\n<Menu Category: Items>
+The Logic document
+Portrait of a young man
+An old portrait photograph of a young man. It looks like the photo\nwas taken in the late-1800s. The person's face has been scratched
+\nover and is beyond recognition.\n\n\n\n\n<Picture: icon_portrait>\n<Menu Category: Items>
+Rancid head
+The severed head of the Rancid sergal.
+Heart-shaped lock
+\n\n\n\n\n\n<Picture: icon_rusty_lock>\n<Menu Category: Items>
+Rusty key
+\n\n\n\n\n<Picture: icon_rusty_key>\n<Menu Category: Items>
+Meatpie+
+Vegetable pie+
+Mushroom stew+
+Goulash+
+Catnip
+\n\n\n\n\n\n<Picture: icon_catnip>\n<Menu Category: Healing>
+Pipe bomb
+\n\n\n\n\n<Synthesis Ingredients>\nitem 223: 2\nitem 225: 2\nitem 247: 4\n</Synthesis Ingredients>\n<Picture: icon_pipe_bomb>\n<Menu Category: Items>
+Schematics for custom foods.
+\n\n\n\n\n\n<Item Recipe: 346>\n<Item Recipe: 347>
+\n\n\n\n\n\n<Item Recipe: 348>\n<Item Recipe: 349>
+The talisman rises defence against otherwordly powers momentarily\nbut it might have some other uses as well...
+\n\n\n\n\n<Picture: icon_purifying_talisman>\n<Menu Category: Items>
+'Man in dreams' flyer
+A flyer with an eerily familiar face...
+\n\n\n\n\n<Picture: icon_flyer_perkele>
+Taking board instructions
+Instructions on how to operate a talking board to communicate\nwith spirits and others alike.
+\n\n\n\n\n\n<Picture: icon_blank_book>
+God manifesto
+A short manifesto on godhood. Written by renowned occultist\nDonnovan Hugo.
+The first chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the
+\noriginal, unlike the modern watered down versions of the story.\n\n\n\n\n\n\n<Picture: icon_blank_book>
+The second chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the
+Death mask head
+The severed head of a death mask.
+Meat grinder head
+The severed head of the meat grinder.
+Centaur head
+The severed head of the centaur.
+Film reel
+A regular 8mm film reel. The label has writing: "Slow Exposure/ \nSubject 17". Someone has written the following on top of the label:
+\n"What does fast exposure look like?"\n\n\n\n\n\n\n<Picture: icon_film_reel>\n<Menu Category: Items>
+Dark blue root
+Roots of a blue herb. The smell of the herb is even sweeter in\nits roots compared to the upper parts.
+\n\n\n\n\n<Picture: icon_dark_blue_roots>\n<Menu Category: Healing>
+A mixture of deep blue roots and red herbs that is especially \npotent.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 369\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_dark_blue_red>\n<Menu Category: Healing>
+A mixture of deep blue roots and blue herbs that is especially \npotent.
+\n\n\n\n\n<Synthesis Ingredients>\nitem 369\nitem 95\n</Synthesis Ingredients>\n<Picture: icon_dark_blue_blue>\n<Menu Category: Healing>
+Gull brother head
+The severed head of a gull brother.

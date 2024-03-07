@@ -1,0 +1,81 @@
+Knife
+A short kitchen knife. What it lacks in size it makes up\nin speed.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_knife>\n<Replace Attack: 1>
+Officer sword
+A sword of an army officer. Swords like these don't see much use\nthese days. They are kept around more because of tradition.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_sword>\n<Replace Attack: 1>
+Rusty pipe
+Rusty iron pipe with hefty weight. Can cause momentary stun.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_steel_pipe>\n<Replace Attack: 1>
+Mauler
+A long barbed and spiked rod. The weapon is very heavy and\nclumsy to wield but causes severe damage when hit.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_mauler>\n<Replace Attack: 1>
+Scalpel
+A sharp scalpel. It's very short, but very accurate in experienced \nhands.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_scalpel>\n<Replace Attack: 1>
+Axe
+A medium sized wood axe. Swinging this as a weapon is sure\nto scare away lesser foes.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_axe>\n<Replace Attack: 1>
+Kassara
+Originally a tool for cutting tree branches. It could be used\nfor things equal in size, like human limbs for example.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_kassara>\n<Replace Attack: 1>
+Sickle
+A tool used for harvesting crops. It also has a long history\nas a weapon of choice for civilians.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Picture: icon_sickle>\n<Replace Attack: 1>
+Bayonet
+A rifle with a knife attachment. You switch to close-range\ncombat easily with this one. Shoot on field with [SHIFT].
+\n\n\n\n\n<Random Variance: 10>\n<Picture: icon_bayonet>\n<Replace Attack: 1>
+Rifle .303 Mk I
+A bolt-action, magazine-fed repeating rifle. The most common\nused rifle in the First Great War. Shoot on field with [SHIFT].
+\n\n\n\n\n<skill_id:282>\n<Random Variance: 10>\n<Picture: icon_rifle>\n<Replace Attack: 1>
+12-gauge Trenchgun
+A powerful gun with a serious kick. Fires a number of small\npellets that stop even larger foes. Shoot on field with [SHIFT].
+\n\n\n\n\n<skill_id:283>\n<Random Variance: 10>\n<Picture: icon_trenchgun>\n<Replace Attack: 1>
+Lugr Pistol
+A toggle-locked, recoil-operated semi-automatic pistol. Typically\nused by the Bremen army officers as a secondary arm.
+\n\n\n\n\n<skill_id:281>\n<Random Variance: 5>\n<Picture: icon_pistol>\n<Replace Attack: 1>
+Pipe wrench
+A tool used for assembling wide variety of things. Can be used\nas a blunt weapons as well.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_pipe_wrench>\n<Replace Attack: 1>
+Sandman's kiss
+A syringe with neurotoxins attached to an officer sword.\nEach thrust of the sword releases some of the poison.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_the_kiss>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 224: 2\nitem 223\nweapon 2\nitem 57\n</Synthesis Ingredients>
+Reaper's rake
+Four sickles attached to a broomstick. A 2-handed slashing\nweapon that causes severe bleeding.
+\n\n\n\n\n<Random Variance: 10>\n<Picture: icon_the_rake>\n<Synthesis Ingredients>\n<Replace Attack: 1>\nitem 224: 2\nitem 223: 3\nweapon 8: 4\nitem 240\n</Synthesis Ingredients>
+Lantern flail
+A makeshift weapon that is a bit hard to wield, but hard to\nread properly as well making it an unpredictable weapon with
+\nheavy mass. Can cause burns as well.\n\n\n\n\n\n<Picture: icon_lantern_flail>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 224\nitem 240\nitem 172\n</Synthesis Ingredients>
+Meat grinder
+A violent and fierce weapon. A saw blade attached to a bench\ngrinder that is customized to work without being plugged in.
+\n\n\n\n\n\n\n<skill_id:806>\n<Picture: icon_meat_grinder>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 337\nitem 224\nitem 169\nitem 225\n</Synthesis Ingredients>
+Gaelian greatsword
+An old greatsword from the highlands north of Rondon. These\nswords were nicknamed 'the king's bane' because of how effective
+\nthey were against Rondon knights in the 12th century.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_gaelian_greatsword>\n<Replace Attack: 1>
+Meat mallet
+A tool used in kitchen that makes up one brutal weapon.\nSwinging this will surely score you critical hits every now
+\nand then.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_meat_mallet>\n<Replace Attack: 1>
+Iron spear
+An old iron spear that was still used by the cavalry of Bohemia\nfew decades ago. Up until firearms became more prevalent in this
+\nregion.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_javelin>\n<Replace Attack: 1>
+Sergal spear
+A finely decorated ornament spear from the warrior tribes\nof northern Vinland. The decoration suggests highly advanced
+\ncultures, but sergals remain largely unknown in the old continent.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_sergal_spear>\n<Replace Attack: 1>
+Red virtue
+A masterfully forged light sword. The sword is very light and\nso excels in finesse. It is said that Red virtue is one of the 
+\ntwo swords forged for the ancient king of Ma'habre.\n\n\n\n\n<skill_id:776>\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_red_virtue>\n<Replace Attack: 1>
+Briefcase
+Blood sword
+A sword forged from the blood of Alll-mer.
+\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_red_virtue>\n<Replace Attack: 1>
+Longinus
+The spear that punctured Alll-mer's side as he was chained and\ncrucified. A faint trace of the shadow that was cast away for
+\nAlll-mer to reach his ascension.\n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_javelin>\n<Replace Attack: 1>
+Miasma
+An otherwordly sword that oozes toxic gasses. The sword\nis said to house the strength of 6 men.
+Sabbath
+To counter the rising threats of the witch and vampire hunts of\nthe 1700s the Vatican city developed this otherwordly sword to be
+\nused by the penance knights as their new main weapon.\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_crucifix>\n<Replace Attack: 1>
+Black steel
+An eastern style sword that is delicate and sharp. Prone to\ncritical hits. The blade as ancient writing, it translates to:
+\n"The Black Steel of the East".\n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_black_steel>\n<Replace Attack: 1>
