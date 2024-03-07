@@ -110,7 +110,6 @@ Tunnel 4 - Level 2
 Tunnel 4 - Level 3
 Crypt
 Foundations of decay
-Pit
 Tunnel 4 - Level 1
 Donnovan's house
 Sewers - Western tunnels
