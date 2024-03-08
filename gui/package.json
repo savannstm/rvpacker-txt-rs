@@ -1,6 +1,6 @@
 {
 	"name": "json-writer-electron",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "",
 	"main": "./src/backend/main.js",
 	"scripts": {

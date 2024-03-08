@@ -8,7 +8,7 @@ const {
 } = require("fs-extra");
 const { spawn } = require("child_process");
 
-const production = false;
+const production = true;
 
 function render() {
 	const copiesRoot = production
@@ -98,7 +98,7 @@ function render() {
 	const searchRegexButton = document.getElementById("regex");
 	const searchTransButton = document.getElementById("translate");
 	const backupCheck = document.getElementById("backup-check");
-	const editOrigCheck = document.getElementById("edit-orig-check");
+	const originalEditableCheck = document.getElementById("edit-orig-check");
 	const backupSettings = document.getElementById("backup-settings");
 	const backupPeriodInput = document.getElementById("backup-period-input");
 	const backupMaxInput = document.getElementById("backup-max-input");
@@ -107,13 +107,13 @@ function render() {
 	);
 
 	/** @type {boolean} */
-	let backupState = appSettings.backup.enabled;
+	let backupEnabled = appSettings.backup.enabled;
 	/** @type {number} */
 	let backupPeriod = appSettings.backup.period;
 	/** @type {number} */
 	let backupMax = appSettings.backup.max;
 	/** @type {boolean} */
-	let editOrig = appSettings.editOrig;
+	let originalEditable = appSettings.editOrig;
 	/** @type {string} */
 	let searchRegex = false;
 	let searchWhole = false;
@@ -123,7 +123,7 @@ function render() {
 
 	let state = "main";
 
-	if (backupState) {
+	if (backupEnabled) {
 		backupCheck.innerHTML = "check";
 		backupSettings.classList.remove("hidden");
 	} else {
@@ -134,17 +134,17 @@ function render() {
 	backupPeriodInput.value = backupPeriod;
 	backupMaxInput.value = backupMax;
 
-	if (editOrig) {
-		editOrigCheck.innerHTML = "check";
+	if (originalEditable) {
+		originalEditableCheck.innerHTML = "check";
 	} else {
-		editOrigCheck.innerHTML = "close";
+		originalEditableCheck.innerHTML = "close";
 	}
 
 	let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
 
 	createContent();
 
-	if (backupState) backup(backupPeriod);
+	if (backupEnabled) backup(backupPeriod);
 
 	const contentYCoordinates = absolutize();
 
@@ -154,23 +154,26 @@ function render() {
 		window.scrollTo(0, 0);
 
 		requestAnimationFrame(() => {
-			for (const child of contentContainer.childNodes) {
+			for (const child of contentContainer.children) {
 				child.classList.remove("hidden");
 				child.classList.add("flex", "flex-col");
+
 				const nodeYCoordinates = new Map();
 				const nodeWidths = new Map();
-
 				let margin = 0;
-				for (const node of child.childNodes) {
+
+				for (const node of child.children) {
 					const nodeYCoordinate =
 						node.getBoundingClientRect().y + margin;
 					const nodeWidth = node.getBoundingClientRect().width;
+
 					nodeYCoordinates.set(node.id, nodeYCoordinate);
 					nodeWidths.set(node.id, nodeWidth);
+
 					margin += 8;
 				}
 
-				for (const node of child.childNodes) {
+				for (const node of child.children) {
 					node.classList.add("hidden");
 					node.classList.add("absolute");
 					node.style.top = `${nodeYCoordinates.get(node.id)}px`;
@@ -179,10 +182,10 @@ function render() {
 
 				childYCoordinates.set(child.id, nodeYCoordinates);
 				child.style.height = `${
-					nodeYCoordinates.get(
-						Array.from(child.childNodes).at(-1).id
-					) - 64
+					nodeYCoordinates.get(Array.from(child.children).at(-1).id) -
+					64
 				}px`;
+
 				child.classList.remove("flex", "flex-col");
 				child.classList.add("hidden");
 			}
@@ -193,7 +196,7 @@ function render() {
 	}
 
 	function determineLastBackupNumber() {
-		const backupDir = join(__dirname, "../backups");
+		const backupDir = backupRoot;
 
 		ensureDirSync(backupDir);
 
@@ -278,10 +281,10 @@ function render() {
 		/** @type { Map<HTMLElement, string> } */
 		const matches = new Map();
 
-		for (const child of contentContainer.childNodes) {
-			for (const grandChild of child.childNodes) {
-				const grandChildNodes = Array.from(grandChild.childNodes)[0]
-					.childNodes;
+		for (const child of contentContainer.children) {
+			for (const grandChild of child.children) {
+				const grandChildNodes = Array.from(grandChild.children)[0]
+					.children;
 
 				if (searchTranslate) {
 					setMatches(matches, text, grandChildNodes[2]);
@@ -300,7 +303,6 @@ function render() {
 	 * @param {string} id
 	 * @returns {HTMLElement | null}
 	 */
-	// ? This function is fine, i guess?
 	function findCounterpart(id) {
 		if (id.includes("original")) {
 			return document.getElementById(
@@ -334,9 +336,8 @@ function render() {
 					"hidden"
 				);
 
-				/** @type {HTMLElement} */
 				const grandGrandParent =
-					element.parentNode.parentNode.parentNode;
+					element.parentElement.parentElement.parentElement;
 
 				resultElement.addEventListener("click", () => {
 					const currentState = grandGrandParent.id.replace(
@@ -350,7 +351,7 @@ function render() {
 						top:
 							contentYCoordinates
 								.get(grandGrandParent.id)
-								.get(element.parentNode.parentNode.id) -
+								.get(element.parentElement.parentElement.id) -
 							window.innerHeight / 2,
 						behavior: "smooth"
 					});
@@ -375,10 +376,10 @@ function render() {
 
 				resultElement.innerHTML = `
 					<div class="text-base">${result}</div>
-					<div class="text-xs text-gray-400">${element.parentNode.parentNode.id} - ${elementParentId} - ${elementId}</div>
+					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id} - ${elementParentId} - ${elementId}</div>
 					<div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
 					<div class="text-base">${counterpart.value}</div>
-					<div class="text-xs text-gray-400">${counterpart.parentNode.parentNode.id} - ${counterpartParentId} - ${counterpartId}</div>
+					<div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id} - ${counterpartParentId} - ${counterpartId}</div>
 				`;
 
 				searchPanel.appendChild(resultElement);
@@ -390,7 +391,7 @@ function render() {
 		searchPanel.addEventListener(
 			"transitionend",
 			function handleTransitionEnd() {
-				for (const child of searchPanel.childNodes) {
+				for (const child of searchPanel.children) {
 					child.classList.remove("hidden");
 				}
 				searchPanel.removeEventListener(
@@ -476,11 +477,9 @@ function render() {
 				join(translationDirs.copiesOther, file)
 			);
 		}
-
 		return;
 	}
 
-	// ? Shorten and make more readable?
 	function save(backup = false) {
 		saveButton.classList.add("animate-spin");
 
@@ -506,9 +505,11 @@ function render() {
 				if (nextBackupNumber === 99) {
 					nextBackupNumber = 1;
 				}
+
 				const backupFolderName = `${Object.values(dateProperties).join(
 					"-"
 				)}_${nextBackupNumber.toString().padStart(2, "0")}`;
+
 				nextBackupNumber++;
 
 				dirName = join(backupRoot, backupFolderName);
@@ -522,30 +523,28 @@ function render() {
 				});
 			}
 
-			for (const child of contentContainer.childNodes) {
+			for (const contentElement of contentContainer.children) {
 				const outputArray = [];
 
-				for (const grandChild of child.childNodes) {
-					for (const grandGrandChild of grandChild.childNodes) {
-						for (const node of grandGrandChild.childNodes) {
-							if (!node.id.includes("translated")) continue;
-							else {
-								outputArray.push(
-									node.value.replaceAll("\n", "\\n")
-								);
-							}
+				for (const child of contentElement.children) {
+					for (const node of child.children[0].children) {
+						if (!node.id.includes("translated")) continue;
+						else {
+							outputArray.push(
+								node.value.replaceAll("\n", "\\n")
+							);
 						}
 					}
 				}
 
-				const filePath = fileMappings[child.id];
+				const filePath = fileMappings[contentElement.id];
 
 				if (filePath) {
 					const dir = join(dirName, filePath);
-
 					writeFileSync(dir, outputArray.join("\n"), "utf-8");
 				}
 			}
+
 			setTimeout(() => {
 				saveButton.classList.remove("animate-spin");
 			}, 1000);
@@ -554,7 +553,7 @@ function render() {
 	}
 
 	function backup(s) {
-		if (backupState) {
+		if (backupEnabled) {
 			setTimeout(() => {
 				save(true);
 				backup(s);
@@ -569,6 +568,7 @@ function render() {
 	 * @param {string} originalText
 	 * @param {string} translatedText
 	 */
+	// TODO: Rewrite this to implement IntersectionObserver scrolling
 	function createTextAreasChild(id, originalText, translatedText) {
 		const content = document.createElement("div");
 		content.id = id;
@@ -590,7 +590,7 @@ function render() {
 			originalTextInput.classList.add("text-field", "mr-2");
 
 			//* If original field is not editable, make it read-only and cursor-default
-			if (!editOrig) {
+			if (!originalEditable) {
 				originalTextInput.readOnly = true;
 				originalTextInput.classList.add("cursor-default");
 			}
@@ -618,6 +618,7 @@ function render() {
 			translatedTextInput.rows = maxRows;
 			row.rows = maxRows;
 
+			//* Append elements to containers
 			contentChild.appendChild(row);
 			contentChild.appendChild(originalTextInput);
 			contentChild.appendChild(translatedTextInput);
@@ -659,7 +660,7 @@ function render() {
 		contentParent.classList.remove("hidden");
 		contentParent.classList.add("flex", "flex-col");
 
-		for (const child of contentContainer.childNodes) {
+		for (const child of contentContainer.children) {
 			function handleScroll() {
 				handleElementRendering(contentYCoordinates.get(contentId));
 			}
@@ -691,18 +692,15 @@ function render() {
 	 * @param {boolean} slide
 	 * @returns {void}
 	 */
-	async function updateState(newState, contentId, slide = true) {
+	function updateState(newState, contentId, slide = true) {
 		pageLoadedDisplay.innerHTML = "refresh";
 		pageLoadedDisplay.classList.toggle("animate-spin");
 
 		currentState.innerHTML = newState;
 
-		if (pageLoadedDisplay.classList.contains("animate-spin")) {
-			updateStateCallback(newState, contentId, slide);
-		} else {
-			await sleep(100);
-			updateStateCallback(newState, contentId, slide);
-		}
+		requestAnimationFrame(() =>
+			updateStateCallback(newState, contentId, slide)
+		);
 		return;
 	}
 
@@ -722,7 +720,7 @@ function render() {
 				currentState.innerHTML = "";
 				pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
-				for (const node of contentContainer.childNodes) {
+				for (const node of contentContainer.children) {
 					node.classList.remove("flex", "flex-row", "justify-start");
 					node.classList.add("hidden");
 				}
@@ -751,7 +749,7 @@ function render() {
 				searchPanel.addEventListener(
 					"transitionend",
 					function handleTransitionEnd() {
-						for (const child of searchPanel.childNodes) {
+						for (const child of searchPanel.children) {
 							child.classList.toggle("hidden");
 						}
 						searchPanel.removeEventListener(
@@ -990,10 +988,10 @@ function render() {
 			document.body.classList.add("overflow-hidden");
 		} else {
 			document.body.classList.remove("overflow-hidden");
-			appSettings.backup.enabled = backupState;
+			appSettings.backup.enabled = backupEnabled;
 			appSettings.backup.period = backupPeriod;
 			appSettings.backup.max = backupMax;
-			appSettings.editOrig = editOrig;
+			appSettings.editOrig = originalEditable;
 			writeFileSync(
 				join(__dirname, "settings.json"),
 				JSON.stringify(appSettings, null, 4),
@@ -1060,14 +1058,17 @@ function render() {
 
 	searchRegexButton.addEventListener("click", () => {
 		searchRegex = !searchRegex;
+
 		if (searchCase) {
 			searchCase = false;
 			searchCaseButton.classList.remove("bg-gray-500");
 		}
+
 		if (searchWhole) {
 			searchWhole = false;
 			searchWholeButton.classList.remove("bg-gray-500");
 		}
+
 		searchRegexButton.classList.toggle("bg-gray-500");
 	});
 
@@ -1087,13 +1088,15 @@ function render() {
 	optionButton.addEventListener("click", showOptions);
 
 	backupCheck.addEventListener("click", () => {
-		backupState = !backupState;
-		if (backupState) {
+		backupEnabled = !backupEnabled;
+
+		if (backupEnabled) {
 			backupSettings.classList.remove("hidden");
 			backup(backupPeriod);
 		} else {
 			backupSettings.classList.add("hidden");
 		}
+
 		if (backupCheck.innerHTML === "check") {
 			backupCheck.innerHTML = "close";
 		} else {
@@ -1103,6 +1106,7 @@ function render() {
 
 	backupPeriodInput.addEventListener("change", () => {
 		backupPeriod = parseInt(backupPeriodInput.value);
+
 		if (backupPeriod < 60) {
 			backupPeriodInput.value = 60;
 		} else if (backupPeriod > 3600) {
@@ -1112,6 +1116,7 @@ function render() {
 
 	backupMaxInput.addEventListener("change", () => {
 		backupMax = parseInt(backupMaxInput.value);
+
 		if (backupMax < 1) {
 			backupMaxInput.value = 1;
 		} else if (backupMax > 100) {
@@ -1119,12 +1124,13 @@ function render() {
 		}
 	});
 
-	editOrigCheck.addEventListener("click", () => {
-		editOrig = !editOrig;
-		if (editOrigCheck.innerHTML === "check") {
-			editOrigCheck.innerHTML = "close";
+	originalEditableCheck.addEventListener("click", () => {
+		originalEditable = !originalEditable;
+
+		if (originalEditableCheck.innerHTML === "check") {
+			originalEditableCheck.innerHTML = "close";
 		} else {
-			editOrigCheck.innerHTML = "check";
+			originalEditableCheck.innerHTML = "check";
 		}
 	});
 }
