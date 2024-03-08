@@ -1,7 +1,12 @@
 const { app, BrowserWindow, Menu, screen } = require("electron");
+const { readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 
 const DEBUG = false;
+const firstLaunch = JSON.parse(
+	readFileSync(join(__dirname, "launch.json"), "utf8")
+).firstLaunch;
+
 app.on("ready", () => {
 	const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
@@ -23,7 +28,24 @@ app.on("ready", () => {
 		win.loadFile(join(__dirname, "../frontend/index.html"));
 	};
 
+	const createHelpWindow = () => {
+		const helpWin = new BrowserWindow({
+			width: 800,
+			height: 600,
+			titleBarStyle: "hiddenInset"
+		});
+
+		helpWin.loadFile(join(__dirname, "../frontend/help.html"));
+	};
+
 	createWindow();
+	if (firstLaunch) {
+		createHelpWindow();
+		writeFileSync(
+			join(__dirname, "launch.json"),
+			JSON.stringify({ firstLaunch: false }, null, 4)
+		);
+	}
 
 	app.on("activate", () => {
 		if (BrowserWindow.getAllWindows().length === 0) {
@@ -87,7 +109,7 @@ const menuTemplate = [
 		label: "Помощь",
 		submenu: [
 			{
-				label: "Горячие клавиши",
+				label: "Как пользоваться программой?",
 				click: () => {
 					const win = new BrowserWindow({
 						width: 640,
@@ -96,6 +118,18 @@ const menuTemplate = [
 						autoHideMenuBar: true
 					});
 					win.loadFile(join(__dirname, "../frontend/help.html"));
+				}
+			},
+			{
+				label: "Горячие клавиши",
+				click: () => {
+					const win = new BrowserWindow({
+						width: 640,
+						height: 480,
+						titleBarStyle: "hiddenInset",
+						autoHideMenuBar: true
+					});
+					win.loadFile(join(__dirname, "../frontend/hotkeys.html"));
 				}
 			}
 		]

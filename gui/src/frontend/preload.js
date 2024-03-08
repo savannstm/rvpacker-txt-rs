@@ -8,30 +8,95 @@ const {
 } = require("fs-extra");
 const { spawn } = require("child_process");
 
+const production = false;
+
 function render() {
+	const copiesRoot = production
+		? join(__dirname, "../../../../copies")
+		: join(__dirname, "../../copies");
+	const backupRoot = production
+		? join(__dirname, "../../../../backups")
+		: join(__dirname, "../../backups");
+	const translationRoot = production
+		? join(__dirname, "../../../../translation")
+		: join(__dirname, "../../../translation");
+
+	const fileMappings = {
+		"maps-content": "./maps/maps_trans.txt",
+		"maps-names-content": "./maps/names_trans.txt",
+		"actors-content": "./other/Actors_trans.txt",
+		"armors-content": "./other/Armors_trans.txt",
+		"classes-content": "./other/Classes_trans.txt",
+		"common-events-content": "./other/CommonEvents_trans.txt",
+		"enemies-content": "./other/Enemies_trans.txt",
+		"items-content": "./other/Items_trans.txt",
+		"skills-content": "./other/Skills_trans.txt",
+		"system-content": "./other/System_trans.txt",
+		"troops-content": "./other/Troops_trans.txt",
+		"weapons-content": "./other/Weapons_trans.txt"
+	};
+
+	const copiesDirs = {
+		originalMapText: join(copiesRoot, "maps/maps.txt"),
+		translatedMapText: join(copiesRoot, "maps/maps_trans.txt"),
+		originalMapNames: join(copiesRoot, "maps/names.txt"),
+		translatedMapNames: join(copiesRoot, "maps/names_trans.txt"),
+		originalActors: join(copiesRoot, "other/Actors.txt"),
+		translatedActors: join(copiesRoot, "other/Actors_trans.txt"),
+		originalArmors: join(copiesRoot, "other/Armors.txt"),
+		translatedArmors: join(copiesRoot, "other/Armors_trans.txt"),
+		originalClasses: join(copiesRoot, "other/Classes.txt"),
+		translatedClasses: join(copiesRoot, "other/Classes_trans.txt"),
+		originalCommonEvents: join(copiesRoot, "other/CommonEvents.txt"),
+		translatedCommonEvents: join(
+			copiesRoot,
+			"other/CommonEvents_trans.txt"
+		),
+		originalEnemies: join(copiesRoot, "other/Enemies.txt"),
+		translatedEnemies: join(copiesRoot, "other/Enemies_trans.txt"),
+		originalItems: join(copiesRoot, "other/Items.txt"),
+		translatedItems: join(copiesRoot, "other/Items_trans.txt"),
+		originalSkills: join(copiesRoot, "other/Skills.txt"),
+		translatedSkills: join(copiesRoot, "other/Skills_trans.txt"),
+		originalSystem: join(copiesRoot, "other/System.txt"),
+		translatedSystem: join(copiesRoot, "other/System_trans.txt"),
+		originalTroops: join(copiesRoot, "other/Troops.txt"),
+		translatedTroops: join(copiesRoot, "other/Troops_trans.txt"),
+		originalWeapons: join(copiesRoot, "other/Weapons.txt"),
+		translatedWeapons: join(copiesRoot, "other/Weapons_trans.txt")
+	};
+
+	const translationDirs = {
+		maps: join(translationRoot, "maps"),
+		other: join(translationRoot, "other"),
+		copies: join(copiesRoot),
+		copiesMaps: join(copiesRoot, "maps"),
+		copiesOther: join(copiesRoot, "other")
+	};
+
 	copy();
 
 	// TODO: Make variable names better
 	const contentContainer = document.getElementById("content-container");
 	const leftPanelElements =
 		document.getElementsByClassName("left-panel-element");
-	const searchBtn = document.getElementById("search");
+	const searchButton = document.getElementById("search-button");
 	const searchInput = document.getElementById("search-input");
-	const replaceBtn = document.getElementById("replace");
+	const replaceButton = document.getElementById("replace-button");
 	const replaceInput = document.getElementById("replace-input");
-	const menuBtn = document.getElementById("menu-button");
+	const menuButton = document.getElementById("menu-button");
 	const leftPanel = document.getElementById("left-panel");
-	const pageLoaded = document.getElementById("is-loaded");
+	const pageLoadedDisplay = document.getElementById("is-loaded");
 	const searchPanel = document.getElementById("search-results");
 	const currentState = document.getElementById("current-state");
-	const saveBtn = document.getElementById("save");
-	const compileBtn = document.getElementById("compile");
-	const optionsBtn = document.getElementById("options");
+	const saveButton = document.getElementById("save");
+	const compileButton = document.getElementById("compile");
+	const optionButton = document.getElementById("options");
 	const optionsMenu = document.getElementById("options-menu");
-	const searchCaseBtn = document.getElementById("case");
-	const searchWholeBtn = document.getElementById("whole");
-	const searchRegexBtn = document.getElementById("regex");
-	const searchTransBtn = document.getElementById("translate");
+	const searchCaseButton = document.getElementById("case");
+	const searchWholeButton = document.getElementById("whole");
+	const searchRegexButton = document.getElementById("regex");
+	const searchTransButton = document.getElementById("translate");
 	const backupCheck = document.getElementById("backup-check");
 	const editOrigCheck = document.getElementById("edit-orig-check");
 	const backupSettings = document.getElementById("backup-settings");
@@ -87,13 +152,13 @@ function render() {
 		const childYCoordinates = new Map();
 
 		window.scrollTo(0, 0);
-		setTimeout(() => {
+
+		requestAnimationFrame(() => {
 			for (const child of contentContainer.childNodes) {
 				child.classList.remove("hidden");
 				child.classList.add("flex", "flex-col");
 				const nodeYCoordinates = new Map();
 				const nodeWidths = new Map();
-				const pageLength = child.clientHeight;
 
 				let margin = 0;
 				for (const node of child.childNodes) {
@@ -113,7 +178,11 @@ function render() {
 				}
 
 				childYCoordinates.set(child.id, nodeYCoordinates);
-				child.style.height = `${pageLength}px`;
+				child.style.height = `${
+					nodeYCoordinates.get(
+						Array.from(child.childNodes).at(-1).id
+					) - 64
+				}px`;
 				child.classList.remove("flex", "flex-col");
 				child.classList.add("hidden");
 			}
@@ -154,14 +223,7 @@ function render() {
 		return resultMap;
 	}
 
-	/**
-	 * @param {Map<HTMLElement, string>} map
-	 * @param {string} text
-	 * @param {HTMLElement} node
-	 * @returns {void}
-	 */
-	function setMatches(map, text, node) {
-		// TODO: Refactor this into a function
+	function createRegularExpression(text) {
 		const regex = {
 			text: text,
 			attr: "i"
@@ -179,22 +241,32 @@ function render() {
 			}
 		}
 
-		for (const textarea of node.childNodes) {
-			const expr = new RegExp(regex.text, regex.attr);
-			const result = textarea.value.search(expr);
+		return regex;
+	}
 
-			if (result !== -1) {
-				const before = textarea.value.substring(0, result);
-				const after = textarea.value.substring(result + text.length);
+	/**
+	 * @param {Map<HTMLElement, string>} map
+	 * @param {string} text
+	 * @param {HTMLElement} node
+	 * @returns {void}
+	 */
+	function setMatches(map, text, node) {
+		const regex = createRegularExpression(text);
 
-				const output = [
-					`<div class="inline">${before}</div>`,
-					`<div class="inline bg-gray-500">${text}</div>`,
-					`<div class="inline">${after}</a>`
-				];
+		const expr = new RegExp(regex.text, regex.attr);
+		const result = node.value.search(expr);
 
-				map.set(textarea, output.join(""));
-			}
+		if (result !== -1) {
+			const before = node.value.substring(0, result);
+			const after = node.value.substring(result + text.length);
+
+			const output = [
+				`<div class="inline">${before}</div>`,
+				`<div class="inline bg-gray-500">${text}</div>`,
+				`<div class="inline">${after}</a>`
+			];
+
+			map.set(node, output.join(""));
 		}
 	}
 
@@ -203,20 +275,19 @@ function render() {
 	 * @returns {Map<HTMLElement, string>}
 	 */
 	function searchText(text) {
-		/**
-		 * @type { Map<HTMLElement, string> }
-		 */
+		/** @type { Map<HTMLElement, string> } */
 		const matches = new Map();
 
 		for (const child of contentContainer.childNodes) {
 			for (const grandChild of child.childNodes) {
-				for (const node of grandChild.childNodes) {
-					if (searchTranslate) {
-						if (grandChild.id.includes("translated")) {
-							setMatches(matches, text, node);
-						}
-					} else {
-						setMatches(matches, text, node);
+				const grandChildNodes = Array.from(grandChild.childNodes)[0]
+					.childNodes;
+
+				if (searchTranslate) {
+					setMatches(matches, text, grandChildNodes[2]);
+				} else {
+					for (let i = 1; i < grandChildNodes.length; i++) {
+						setMatches(matches, text, grandChildNodes[i]);
 					}
 				}
 			}
@@ -262,22 +333,27 @@ function render() {
 					"border-gray-600",
 					"hidden"
 				);
+
 				/** @type {HTMLElement} */
 				const grandGrandParent =
 					element.parentNode.parentNode.parentNode;
 
 				resultElement.addEventListener("click", () => {
-					if (state !== grandGrandParent.id.replace("-content", "")) {
-						changeState(
-							grandGrandParent.id.replace("-content", ""),
-							false
-						);
-						console.log("changed state");
-					}
+					const currentState = grandGrandParent.id.replace(
+						"-content",
+						""
+					);
 
-					element.classList.remove("hidden");
-					element.scrollIntoView({ behavior: "smooth" });
-					element.focus();
+					changeState(currentState, false);
+
+					window.scrollTo({
+						top:
+							contentYCoordinates
+								.get(grandGrandParent.id)
+								.get(element.parentNode.parentNode.id) -
+							window.innerHeight / 2,
+						behavior: "smooth"
+					});
 				});
 
 				const counterpart = findCounterpart(element.id);
@@ -334,23 +410,7 @@ function render() {
 	function replaceText(text) {
 		const results = searchText(text);
 
-		// TODO: Refactor into a function
-		const regex = {
-			text: text,
-			attr: "i"
-		};
-
-		if (searchRegex) {
-			regex.text = text;
-			regex.attr = "";
-		} else {
-			if (searchCase) {
-				regex.attr = "";
-			}
-			if (searchWhole) {
-				regex.text = `\\b${text}\\b`;
-			}
-		}
+		const regex = createRegularExpression(text);
 
 		if (results.size === 0) {
 			return;
@@ -375,14 +435,14 @@ function render() {
 	 * @returns {boolean}
 	 */
 	function isCopied(paths) {
-		ensureDirSync(paths.get("copies"));
-		ensureDirSync(paths.get("copiesMaps"));
-		ensureDirSync(paths.get("copiesOther"));
+		ensureDirSync(paths.copies);
+		ensureDirSync(paths.copiesMaps);
+		ensureDirSync(paths.copiesOther);
 
-		const copiesMapsLength = readdirSync(paths.get("copiesMaps")).length;
-		const mapsLength = readdirSync(paths.get("maps")).length;
-		const copiesOtherLength = readdirSync(paths.get("copiesOther")).length;
-		const otherLength = readdirSync(paths.get("other")).length;
+		const copiesMapsLength = readdirSync(paths.copiesMaps).length;
+		const mapsLength = readdirSync(paths.maps).length;
+		const copiesOtherLength = readdirSync(paths.copiesOther).length;
+		const otherLength = readdirSync(paths.other).length;
 
 		if (
 			copiesMapsLength === mapsLength &&
@@ -397,31 +457,23 @@ function render() {
 
 	// TODO: Make it more readable
 	function copy() {
-		const paths = new Map([
-			["maps", join(__dirname, "../resources/translation/maps")],
-			["other", join(__dirname, "../resources/translation/other")],
-			["copies", join(__dirname, "../resources/copies")],
-			["copiesMaps", join(__dirname, "../resources/copies/maps")],
-			["copiesOther", join(__dirname, "../resources/copies/other")]
-		]);
-
-		if (isCopied(paths)) {
+		if (isCopied(translationDirs)) {
 			console.log("Files are already copied.");
 			return;
 		}
 		console.log("Copying files...");
 
-		for (const file of readdirSync(paths.get("maps"))) {
+		for (const file of readdirSync(translationDirs.maps)) {
 			copyFileSync(
-				join(paths.get("maps"), file),
-				join(paths.get("copiesMaps"), file)
+				join(translationDirs.maps, file),
+				join(translationDirs.copiesMaps, file)
 			);
 		}
 
-		for (const file of readdirSync(paths.get("other"))) {
+		for (const file of readdirSync(translationDirs.other)) {
 			copyFileSync(
-				join(paths.get("other"), file),
-				join(paths.get("copiesOther"), file)
+				join(translationDirs.other, file),
+				join(translationDirs.copiesOther, file)
 			);
 		}
 
@@ -430,25 +482,10 @@ function render() {
 
 	// ? Shorten and make more readable?
 	function save(backup = false) {
-		saveBtn.classList.add("animate-spin");
+		saveButton.classList.add("animate-spin");
 
-		setTimeout(() => {
-			const fileMappings = {
-				"maps-content": "./maps/maps_trans.txt",
-				"maps-names-content": "./maps/names_trans.txt",
-				"actors-content": "./other/Actors_trans.txt",
-				"armors-content": "./other/Armors_trans.txt",
-				"classes-content": "./other/Classes_trans.txt",
-				"common-events-content": "./other/CommonEvents_trans.txt",
-				"enemies-content": "./other/Enemies_trans.txt",
-				"items-content": "./other/Items_trans.txt",
-				"skills-content": "./other/Skills_trans.txt",
-				"system-content": "./other/System_trans.txt",
-				"troops-content": "./other/Troops_trans.txt",
-				"weapons-content": "./other/Weapons_trans.txt"
-			};
-
-			let dirName = join(__dirname, "../resources/copies");
+		requestAnimationFrame(() => {
+			let dirName = copiesRoot;
 
 			if (backup) {
 				const date = new Date();
@@ -474,7 +511,7 @@ function render() {
 				)}_${nextBackupNumber.toString().padStart(2, "0")}`;
 				nextBackupNumber++;
 
-				dirName = join(__dirname, "../backups", backupFolderName);
+				dirName = join(backupRoot, backupFolderName);
 
 				ensureDirSync(join(dirName, "maps"), {
 					recursive: true
@@ -510,7 +547,7 @@ function render() {
 				}
 			}
 			setTimeout(() => {
-				saveBtn.classList.remove("animate-spin");
+				saveButton.classList.remove("animate-spin");
 			}, 1000);
 		});
 		return;
@@ -626,6 +663,7 @@ function render() {
 			function handleScroll() {
 				handleElementRendering(contentYCoordinates.get(contentId));
 			}
+
 			if (child.id !== contentId) {
 				child.classList.remove("flex", "flex-col");
 				child.classList.add("hidden");
@@ -641,8 +679,8 @@ function render() {
 			leftPanel.classList.toggle("-translate-x-full");
 		}
 
-		pageLoaded.innerHTML = "done";
-		pageLoaded.classList.toggle("animate-spin");
+		pageLoadedDisplay.innerHTML = "done";
+		pageLoadedDisplay.classList.toggle("animate-spin");
 		console.log(`Current state is ${newState}`);
 		return;
 	}
@@ -653,15 +691,18 @@ function render() {
 	 * @param {boolean} slide
 	 * @returns {void}
 	 */
-	function updateState(newState, contentId, slide = true) {
-		pageLoaded.innerHTML = "refresh";
-		pageLoaded.classList.toggle("animate-spin");
+	async function updateState(newState, contentId, slide = true) {
+		pageLoadedDisplay.innerHTML = "refresh";
+		pageLoadedDisplay.classList.toggle("animate-spin");
 
 		currentState.innerHTML = newState;
 
-		setTimeout(() => {
+		if (pageLoadedDisplay.classList.contains("animate-spin")) {
 			updateStateCallback(newState, contentId, slide);
-		});
+		} else {
+			await sleep(100);
+			updateStateCallback(newState, contentId, slide);
+		}
 		return;
 	}
 
@@ -671,11 +712,15 @@ function render() {
 	 * @returns {void}
 	 */
 	function changeState(newState, slide = true) {
+		if (state === newState) {
+			return;
+		}
+
 		switch (newState) {
 			case "main":
 				state = "main";
 				currentState.innerHTML = "";
-				pageLoaded.innerHTML = "check_indeterminate_small";
+				pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
 				for (const node of contentContainer.childNodes) {
 					node.classList.remove("flex", "flex-row", "justify-start");
@@ -840,105 +885,6 @@ function render() {
 	 */
 	// ! Single-call function
 	function createContent() {
-		const paths = {
-			originalMapText: join(
-				__dirname,
-				"../resources/copies/maps/maps.txt"
-			),
-			translatedMapText: join(
-				__dirname,
-				"../resources/copies/maps/maps_trans.txt"
-			),
-			originalMapNames: join(
-				__dirname,
-				"../resources/copies/maps/names.txt"
-			),
-			translatedMapNames: join(
-				__dirname,
-				"../resources/copies/maps/names_trans.txt"
-			),
-			originalActors: join(
-				__dirname,
-				"../resources/copies/other/Actors.txt"
-			),
-			translatedActors: join(
-				__dirname,
-				"../resources/copies/other/Actors_trans.txt"
-			),
-			originalArmors: join(
-				__dirname,
-				"../resources/copies/other/Armors.txt"
-			),
-			translatedArmors: join(
-				__dirname,
-				"../resources/copies/other/Armors_trans.txt"
-			),
-			originalClasses: join(
-				__dirname,
-				"../resources/copies/other/Classes.txt"
-			),
-			translatedClasses: join(
-				__dirname,
-				"../resources/copies/other/Classes_trans.txt"
-			),
-			originalCommonEvents: join(
-				__dirname,
-				"../resources/copies/other/CommonEvents.txt"
-			),
-			translatedCommonEvents: join(
-				__dirname,
-				"../resources/copies/other/CommonEvents_trans.txt"
-			),
-			originalEnemies: join(
-				__dirname,
-				"../resources/copies/other/Enemies.txt"
-			),
-			translatedEnemies: join(
-				__dirname,
-				"../resources/copies/other/Enemies_trans.txt"
-			),
-			originalItems: join(
-				__dirname,
-				"../resources/copies/other/Items.txt"
-			),
-			translatedItems: join(
-				__dirname,
-				"../resources/copies/other/Items_trans.txt"
-			),
-			originalSkills: join(
-				__dirname,
-				"../resources/copies/other/Skills.txt"
-			),
-			translatedSkills: join(
-				__dirname,
-				"../resources/copies/other/Skills_trans.txt"
-			),
-			originalSystem: join(
-				__dirname,
-				"../resources/copies/other/System.txt"
-			),
-			translatedSystem: join(
-				__dirname,
-				"../resources/copies/other/System_trans.txt"
-			),
-			originalTroops: join(
-				__dirname,
-				"../resources/copies/other/Troops.txt"
-			),
-			translatedTroops: join(
-				__dirname,
-				"../resources/copies/other/Troops_trans.txt"
-			),
-			originalWeapons: join(
-				__dirname,
-				"../resources/copies/other/Weapons.txt"
-			),
-			translatedWeapons: join(
-				__dirname,
-				"../resources/copies/other/Weapons_trans.txt"
-			)
-		};
-
 		const contentTypes = [
 			{
 				id: "maps-content",
@@ -1002,7 +948,7 @@ function render() {
 			}
 		];
 
-		const texts = readFiles(paths);
+		const texts = readFiles(copiesDirs);
 
 		for (const content of contentTypes) {
 			createTextAreasChild(
@@ -1014,7 +960,7 @@ function render() {
 	}
 
 	function compile() {
-		compileBtn.classList.add("animate-spin");
+		compileButton.classList.add("animate-spin");
 
 		save();
 		const writer = spawn(join(__dirname, "../resources/write.exe"), [], {
@@ -1029,7 +975,7 @@ function render() {
 		});
 
 		writer.on("close", () => {
-			compileBtn.classList.remove("animate-spin");
+			compileButton.classList.remove("animate-spin");
 			if (!error) alert("Все файлы записаны успешно.");
 			else alert("Файлы не были записаны.");
 		});
@@ -1076,12 +1022,12 @@ function render() {
 		});
 	}
 
-	menuBtn.addEventListener("click", () => {
+	menuButton.addEventListener("click", () => {
 		leftPanel.classList.toggle("translate-x-0");
 		leftPanel.classList.toggle("-translate-x-full");
 	});
 
-	searchBtn.addEventListener("click", () => {
+	searchButton.addEventListener("click", () => {
 		if (searchInput.value) {
 			searchPanel.innerHTML = "";
 			displaySearchResults(searchInput.value.trim());
@@ -1092,53 +1038,53 @@ function render() {
 		}
 	});
 
-	replaceBtn.addEventListener("click", () => {
+	replaceButton.addEventListener("click", () => {
 		if (searchInput.value && replaceInput.value) {
 			replaceText(searchInput.value.trim());
 		}
 	});
 
-	searchCaseBtn.addEventListener("click", () => {
+	searchCaseButton.addEventListener("click", () => {
 		if (!searchRegex) {
 			searchCase = !searchCase;
-			searchCaseBtn.classList.toggle("bg-gray-500");
+			searchCaseButton.classList.toggle("bg-gray-500");
 		}
 	});
 
-	searchWholeBtn.addEventListener("click", () => {
+	searchWholeButton.addEventListener("click", () => {
 		if (!searchRegex) {
 			searchWhole = !searchWhole;
-			searchWholeBtn.classList.toggle("bg-gray-500");
+			searchWholeButton.classList.toggle("bg-gray-500");
 		}
 	});
 
-	searchRegexBtn.addEventListener("click", () => {
+	searchRegexButton.addEventListener("click", () => {
 		searchRegex = !searchRegex;
 		if (searchCase) {
 			searchCase = false;
-			searchCaseBtn.classList.remove("bg-gray-500");
+			searchCaseButton.classList.remove("bg-gray-500");
 		}
 		if (searchWhole) {
 			searchWhole = false;
-			searchWholeBtn.classList.remove("bg-gray-500");
+			searchWholeButton.classList.remove("bg-gray-500");
 		}
-		searchRegexBtn.classList.toggle("bg-gray-500");
+		searchRegexButton.classList.toggle("bg-gray-500");
 	});
 
-	searchTransBtn.addEventListener("click", () => {
+	searchTransButton.addEventListener("click", () => {
 		searchTranslate = !searchTranslate;
-		searchTransBtn.classList.toggle("bg-gray-500");
+		searchTransButton.classList.toggle("bg-gray-500");
 	});
 
-	saveBtn.addEventListener("click", () => {
+	saveButton.addEventListener("click", () => {
 		save();
 	});
 
-	compileBtn.addEventListener("click", () => {
+	compileButton.addEventListener("click", () => {
 		compile();
 	});
 
-	optionsBtn.addEventListener("click", showOptions);
+	optionButton.addEventListener("click", showOptions);
 
 	backupCheck.addEventListener("click", () => {
 		backupState = !backupState;

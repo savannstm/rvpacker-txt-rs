@@ -63,12 +63,12 @@ function mergeOther401(file) {
 const dirPaths = {
 	original: join(Deno.cwd(), "./original"),
 	output: join(Deno.cwd(), "./data"),
-	maps: join(Deno.cwd(), "./maps/maps.txt"),
-	mapsTrans: join(Deno.cwd(), "./maps/maps_trans.txt"),
-	names: join(Deno.cwd(), "./maps/names.txt"),
-	namesTrans: join(Deno.cwd(), "./maps/names_trans.txt"),
-	other: join(Deno.cwd(), "./other"),
-	plugins: join(Deno.cwd(), "./plugins"),
+	maps: join(Deno.cwd(), "../translation/maps/maps.txt"),
+	mapsTrans: join(Deno.cwd(), "../translation/maps/maps_trans.txt"),
+	names: join(Deno.cwd(), "../translation/maps/names.txt"),
+	namesTrans: join(Deno.cwd(), "../translation/maps/names_trans.txt"),
+	other: join(Deno.cwd(), "../translation/other"),
+	plugins: join(Deno.cwd(), "../translation/plugins"),
 };
 
 const mapsJSON = [...Deno.readDirSync(dirPaths.original)]
@@ -93,7 +93,7 @@ const otherJSON = [...Deno.readDirSync(dirPaths.original)]
 const systemJSON = JSON.parse(Deno.readTextFileSync(join(dirPaths.original, "System.json")));
 
 function extractPluginsJSON() {
-	const pluginsPath = join(Deno.cwd(), "./plugins/plugins.js");
+	const pluginsPath = join(dirPaths.plugins, "plugins.js");
 	const fileContent = Deno.readTextFileSync(pluginsPath).split("\n");
 	const newString = [];
 
