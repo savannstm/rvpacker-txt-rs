@@ -1,12 +1,13 @@
 {
 	"name": "json-writer-electron",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "",
 	"main": "./src/backend/main.js",
 	"scripts": {
 		"start": "electron .",
 		"tw": "npx tailwindcss -i ./src/frontend/input.css -o ./src/frontend/output.css -w",
-		"build": "electron-packager . --platform=win32 --arch=x64 --out=dist --overwrite"
+		"build-dev": "electron-packager . --platform=win32 --arch=x64 --out=dist --overwrite",
+		"build": "electron-packager . --platform=win32 --arch=x64 --out=dist --overwrite && electron-packager . --platform=win32 --arch=ia32 --out=dist --overwrite && electron-packager . --platform=linux --arch=x64 --out=dist --overwrite"
 	},
 	"author": "",
 	"license": "WTFPL",

@@ -5,5 +5,5 @@
 		"period": 60,
 		"max": 99
 	},
-	"editOrig": false
+	"originalEditable": false
 }

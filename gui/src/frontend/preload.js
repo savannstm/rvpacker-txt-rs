@@ -1,14 +1,17 @@
-const { join } = require("path");
+const { ipcRenderer } = require("electron");
 const {
+	constants,
 	readFileSync,
 	writeFileSync,
 	readdirSync,
 	ensureDirSync,
-	copyFileSync
+	copyFileSync,
+	accessSync
 } = require("fs-extra");
 const { spawn } = require("child_process");
+const { join } = require("path");
 
-const production = true;
+const production = false;
 
 function render() {
 	const copiesRoot = production
@@ -21,20 +24,15 @@ function render() {
 		? join(__dirname, "../../../../translation")
 		: join(__dirname, "../../../translation");
 
-	const fileMappings = {
-		"maps-content": "./maps/maps_trans.txt",
-		"maps-names-content": "./maps/names_trans.txt",
-		"actors-content": "./other/Actors_trans.txt",
-		"armors-content": "./other/Armors_trans.txt",
-		"classes-content": "./other/Classes_trans.txt",
-		"common-events-content": "./other/CommonEvents_trans.txt",
-		"enemies-content": "./other/Enemies_trans.txt",
-		"items-content": "./other/Items_trans.txt",
-		"skills-content": "./other/Skills_trans.txt",
-		"system-content": "./other/System_trans.txt",
-		"troops-content": "./other/Troops_trans.txt",
-		"weapons-content": "./other/Weapons_trans.txt"
-	};
+	try {
+		accessSync(translationRoot, constants.F_OK);
+	} catch (err) {
+		alert(
+			"Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
+		);
+		ipcRenderer.send("quit");
+		throw err;
+	}
 
 	const copiesDirs = {
 		originalMapText: join(copiesRoot, "maps/maps.txt"),
@@ -74,9 +72,20 @@ function render() {
 		copiesOther: join(copiesRoot, "other")
 	};
 
+	try {
+		for (const dir of Object.values(translationDirs)) {
+			accessSync(dir, constants.F_OK);
+		}
+	} catch (err) {
+		alert(
+			"Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
+		);
+		ipcRenderer.send("quit");
+		throw err;
+	}
+
 	copy();
 
-	// TODO: Make variable names better
 	const contentContainer = document.getElementById("content-container");
 	const leftPanelElements =
 		document.getElementsByClassName("left-panel-element");
@@ -113,8 +122,8 @@ function render() {
 	/** @type {number} */
 	let backupMax = appSettings.backup.max;
 	/** @type {boolean} */
-	let originalEditable = appSettings.editOrig;
-	/** @type {string} */
+	let originalEditable = appSettings.originalEditable;
+
 	let searchRegex = false;
 	let searchWhole = false;
 	let searchCase = false;
@@ -142,9 +151,9 @@ function render() {
 
 	let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
 
-	createContent();
-
 	if (backupEnabled) backup(backupPeriod);
+
+	createContent();
 
 	const contentYCoordinates = absolutize();
 
@@ -196,11 +205,9 @@ function render() {
 	}
 
 	function determineLastBackupNumber() {
-		const backupDir = backupRoot;
+		ensureDirSync(backupRoot);
 
-		ensureDirSync(backupDir);
-
-		const backups = readdirSync(backupDir);
+		const backups = readdirSync(backupRoot);
 
 		if (backups.length === 0) {
 			return "00";
@@ -227,32 +234,20 @@ function render() {
 	}
 
 	function createRegularExpression(text) {
-		const regex = {
-			text: text,
-			attr: "i"
+		return {
+			text: searchRegex ? text : searchWhole ? `\\b${text}\\b` : text,
+			attr: searchRegex ? "" : searchCase ? "" : "i"
 		};
-
-		if (searchRegex) {
-			regex.text = text;
-			regex.attr = "";
-		} else {
-			if (searchCase) {
-				regex.attr = "";
-			}
-			if (searchWhole) {
-				regex.text = `\\b${text}\\b`;
-			}
-		}
-
-		return regex;
 	}
 
 	/**
 	 * @param {Map<HTMLElement, string>} map
 	 * @param {string} text
-	 * @param {HTMLElement} node
+	 * @param {HTMLTextAreaElement} node
 	 * @returns {void}
 	 */
+	// ! middle is INCORRECT
+	// ! this should be fixed
 	function setMatches(map, text, node) {
 		const regex = createRegularExpression(text);
 
@@ -261,11 +256,12 @@ function render() {
 
 		if (result !== -1) {
 			const before = node.value.substring(0, result);
+			const middle = node.value.substring(result, result + text.length);
 			const after = node.value.substring(result + text.length);
 
 			const output = [
 				`<div class="inline">${before}</div>`,
-				`<div class="inline bg-gray-500">${text}</div>`,
+				`<div class="inline bg-gray-500">${middle}</div>`,
 				`<div class="inline">${after}</a>`
 			];
 
@@ -278,13 +274,12 @@ function render() {
 	 * @returns {Map<HTMLElement, string>}
 	 */
 	function searchText(text) {
-		/** @type { Map<HTMLElement, string> } */
+		/** @type {Map<HTMLElement, string>} */
 		const matches = new Map();
 
 		for (const child of contentContainer.children) {
 			for (const grandChild of child.children) {
-				const grandChildNodes = Array.from(grandChild.children)[0]
-					.children;
+				const grandChildNodes = grandChild.children[0].children;
 
 				if (searchTranslate) {
 					setMatches(matches, text, grandChildNodes[2]);
@@ -315,7 +310,7 @@ function render() {
 		}
 	}
 
-	// TODO: Make something with this mess
+	// TODO: Maybe, implement single replacement in resultElement event listener?
 	function displaySearchResults(text) {
 		const results = searchText(text);
 
@@ -394,6 +389,7 @@ function render() {
 				for (const child of searchPanel.children) {
 					child.classList.remove("hidden");
 				}
+
 				searchPanel.removeEventListener(
 					"transitionend",
 					handleTransitionEnd
@@ -404,7 +400,6 @@ function render() {
 	}
 
 	/**
-	 *
 	 * @param {string} text
 	 * @returns {void}
 	 */
@@ -427,7 +422,6 @@ function render() {
 				}
 			}
 		}
-
 		return;
 	}
 
@@ -456,7 +450,6 @@ function render() {
 		return false;
 	}
 
-	// TODO: Make it more readable
 	function copy() {
 		if (isCopied(translationDirs)) {
 			console.log("Files are already copied.");
@@ -481,6 +474,21 @@ function render() {
 	}
 
 	function save(backup = false) {
+		const fileMappings = {
+			"maps-content": "./maps/maps_trans.txt",
+			"maps-names-content": "./maps/names_trans.txt",
+			"actors-content": "./other/Actors_trans.txt",
+			"armors-content": "./other/Armors_trans.txt",
+			"classes-content": "./other/Classes_trans.txt",
+			"common-events-content": "./other/CommonEvents_trans.txt",
+			"enemies-content": "./other/Enemies_trans.txt",
+			"items-content": "./other/Items_trans.txt",
+			"skills-content": "./other/Skills_trans.txt",
+			"system-content": "./other/System_trans.txt",
+			"troops-content": "./other/Troops_trans.txt",
+			"weapons-content": "./other/Weapons_trans.txt"
+		};
+
 		saveButton.classList.add("animate-spin");
 
 		requestAnimationFrame(() => {
@@ -569,7 +577,7 @@ function render() {
 	 * @param {string} translatedText
 	 */
 	// TODO: Rewrite this to implement IntersectionObserver scrolling
-	function createTextAreasChild(id, originalText, translatedText) {
+	function createContentChildren(id, originalText, translatedText) {
 		const content = document.createElement("div");
 		content.id = id;
 		content.classList.add("hidden");
@@ -655,52 +663,45 @@ function render() {
 	 * @param {boolean} slide
 	 * @returns {void}
 	 */
-	function updateStateCallback(newState, contentId, slide) {
-		const contentParent = document.getElementById(contentId);
-		contentParent.classList.remove("hidden");
-		contentParent.classList.add("flex", "flex-col");
-
-		for (const child of contentContainer.children) {
-			function handleScroll() {
-				handleElementRendering(contentYCoordinates.get(contentId));
-			}
-
-			if (child.id !== contentId) {
-				child.classList.remove("flex", "flex-col");
-				child.classList.add("hidden");
-				window.removeEventListener("scroll", handleScroll);
-			} else {
-				handleElementRendering(contentYCoordinates.get(contentId));
-				window.addEventListener("scroll", handleScroll);
-			}
-		}
-
-		if (slide) {
-			leftPanel.classList.toggle("translate-x-0");
-			leftPanel.classList.toggle("-translate-x-full");
-		}
-
-		pageLoadedDisplay.innerHTML = "done";
-		pageLoadedDisplay.classList.toggle("animate-spin");
-		console.log(`Current state is ${newState}`);
-		return;
-	}
-
-	/**
-	 * @param {string} newState
-	 * @param {string} contentId
-	 * @param {boolean} slide
-	 * @returns {void}
-	 */
+	// ! animate-spin doesn't work
+	// TODO: Replace requestAnimationFrame with setTimeout or come up with some fixes
+	// TODO: Maybe, implement previous variable, so that there's no need to create handleScroll function in a for loop?
 	function updateState(newState, contentId, slide = true) {
 		pageLoadedDisplay.innerHTML = "refresh";
 		pageLoadedDisplay.classList.toggle("animate-spin");
 
 		currentState.innerHTML = newState;
 
-		requestAnimationFrame(() =>
-			updateStateCallback(newState, contentId, slide)
-		);
+		requestAnimationFrame(() => {
+			const contentParent = document.getElementById(contentId);
+			contentParent.classList.remove("hidden");
+			contentParent.classList.add("flex", "flex-col");
+
+			for (const child of contentContainer.children) {
+				function handleScroll() {
+					handleElementRendering(contentYCoordinates.get(contentId));
+				}
+
+				if (child.id !== contentId) {
+					child.classList.remove("flex", "flex-col");
+					child.classList.add("hidden");
+					window.removeEventListener("scroll", handleScroll);
+				} else {
+					handleElementRendering(contentYCoordinates.get(contentId));
+					window.addEventListener("scroll", handleScroll);
+				}
+			}
+
+			if (slide) {
+				leftPanel.classList.toggle("translate-x-0");
+				leftPanel.classList.toggle("-translate-x-full");
+			}
+
+			pageLoadedDisplay.innerHTML = "done";
+			pageLoadedDisplay.classList.toggle("animate-spin");
+
+			console.log(`Current state is ${newState}`);
+		});
 		return;
 	}
 
@@ -720,9 +721,9 @@ function render() {
 				currentState.innerHTML = "";
 				pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
-				for (const node of contentContainer.children) {
-					node.classList.remove("flex", "flex-row", "justify-start");
-					node.classList.add("hidden");
+				for (const child of contentContainer.children) {
+					child.classList.remove("flex", "flex-col");
+					child.classList.add("hidden");
 				}
 				break;
 			default:
@@ -739,6 +740,9 @@ function render() {
 	 */
 	function handleKeypressBody(event) {
 		switch (event.code) {
+			case "Escape":
+				changeState("main", false);
+				break;
 			case "Tab":
 				leftPanel.classList.toggle("translate-x-0");
 				leftPanel.classList.toggle("-translate-x-full");
@@ -746,12 +750,14 @@ function render() {
 			case "KeyR":
 				searchPanel.classList.toggle("translate-x-full");
 				searchPanel.classList.toggle("translate-x-0");
+
 				searchPanel.addEventListener(
 					"transitionend",
 					function handleTransitionEnd() {
 						for (const child of searchPanel.children) {
 							child.classList.toggle("hidden");
 						}
+
 						searchPanel.removeEventListener(
 							"transitionend",
 							handleTransitionEnd
@@ -820,41 +826,37 @@ function render() {
 	function handleKeypressGlobal(event) {
 		switch (event.code) {
 			case "Escape":
-				if (document.activeElement !== document.body) {
-					document.activeElement.blur();
-				} else {
-					changeState("main");
-				}
+				document.activeElement.blur();
 				break;
 			case "Enter":
-				if (document.activeElement !== document.body) {
-					if (event.altKey) {
-						const focusedElement = document.activeElement;
-						const idParts = focusedElement.id.split("-");
-						const index = parseInt(idParts.pop()) + 1;
-						const elementToFocusId = document.getElementById(
-							`${idParts.join("-")}-${index}`
-						);
+				if (event.altKey) {
+					const focusedElement = document.activeElement;
+					const idParts = focusedElement.id.split("-");
+					const index = parseInt(idParts.pop()) + 1;
+					const elementToFocus = document.getElementById(
+						`${idParts.join("-")}-${index}`
+					);
 
-						if (elementToFocusId) {
-							focusedElement.blur();
-							elementToFocusId.focus();
-							elementToFocusId.setSelectionRange(0, 0);
-						}
+					if (elementToFocus) {
+						window.scrollBy(0, elementToFocus.clientHeight + 8);
+						focusedElement.blur();
+						elementToFocus.focus();
+						elementToFocus.setSelectionRange(0, 0);
 					}
-					if (event.ctrlKey) {
-						const focusedElement = document.activeElement;
-						const idParts = focusedElement.id.split("-");
-						const index = parseInt(idParts.pop()) - 1;
-						const elementToFocusId = document.getElementById(
-							`${idParts.join("-")}-${index}`
-						);
+				}
+				if (event.ctrlKey) {
+					const focusedElement = document.activeElement;
+					const idParts = focusedElement.id.split("-");
+					const index = parseInt(idParts.pop()) - 1;
+					const elementToFocus = document.getElementById(
+						`${idParts.join("-")}-${index}`
+					);
 
-						if (elementToFocusId) {
-							focusedElement.blur();
-							elementToFocusId.focus();
-							elementToFocusId.setSelectionRange(0, 0);
-						}
+					if (elementToFocus) {
+						window.scrollBy(0, -elementToFocus.clientHeight - 8);
+						focusedElement.blur();
+						elementToFocus.focus();
+						elementToFocus.setSelectionRange(0, 0);
 					}
 				}
 				break;
@@ -878,9 +880,6 @@ function render() {
 		return;
 	}
 
-	/**
-	 * @returns {void}
-	 */
 	// ! Single-call function
 	function createContent() {
 		const contentTypes = [
@@ -949,7 +948,7 @@ function render() {
 		const texts = readFiles(copiesDirs);
 
 		for (const content of contentTypes) {
-			createTextAreasChild(
+			createContentChildren(
 				content.id,
 				texts.get(content.original),
 				texts.get(content.translated)

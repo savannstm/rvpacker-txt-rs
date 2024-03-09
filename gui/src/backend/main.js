@@ -1,8 +1,15 @@
-const { app, BrowserWindow, Menu, screen } = require("electron");
+const {
+	app,
+	BrowserWindow,
+	Menu,
+	ipcMain,
+	shell,
+	screen
+} = require("electron");
 const { readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 
-const DEBUG = false;
+const DEBUG = true;
 const firstLaunch = JSON.parse(
 	readFileSync(join(__dirname, "launch.json"), "utf8")
 ).firstLaunch;
@@ -58,6 +65,14 @@ app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") {
 		app.quit();
 	}
+});
+
+ipcMain.on("quit", () => {
+	app.quit();
+});
+
+ipcMain.on("openLink", (event, link) => {
+	shell.openExternal(link);
 });
 
 const menuTemplate = [
@@ -141,7 +156,11 @@ const menuTemplate = [
 				width: 640,
 				height: 480,
 				titleBarStyle: "hiddenInset",
-				autoHideMenuBar: true
+				autoHideMenuBar: true,
+				webPreferences: {
+					preload: join(__dirname, "../frontend/about.js"),
+					nodeIntegration: true
+				}
 			});
 			win.loadFile(join(__dirname, "../frontend/about.html"));
 		}
