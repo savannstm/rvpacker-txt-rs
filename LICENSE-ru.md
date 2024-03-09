@@ -1,5 +1,5 @@
-        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
-                    Version 2, December 2004 
+        ПУБЛИЧНАЯ ЛИЦЕНЗИЯ "ДЕЛАЙ ЧТО НАХУЙ ХОЧЕШЬ" 
+                    Версия 2, Декабрь 2004 
 
  Авторское право (C) 2024 Данил Павлов <savannstm@gmail.com> 
 
