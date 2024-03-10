@@ -24,15 +24,18 @@ function render() {
 		? join(__dirname, "../../../../translation")
 		: join(__dirname, "../../../translation");
 
-	try {
-		accessSync(translationRoot, constants.F_OK);
-	} catch (err) {
-		alert(
-			"Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
-		);
-		ipcRenderer.send("quit");
-		throw err;
+	function ensureTranslationDir() {
+		try {
+			accessSync(translationRoot, constants.F_OK);
+		} catch (err) {
+			alert(
+				"Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
+			);
+			ipcRenderer.send("quit");
+			throw err;
+		}
 	}
+	ensureTranslationDir();
 
 	const copiesDirs = {
 		originalMapText: join(copiesRoot, "maps/maps.txt"),
@@ -72,17 +75,20 @@ function render() {
 		copiesOther: join(copiesRoot, "other")
 	};
 
-	try {
-		for (const dir of Object.values(translationDirs)) {
-			accessSync(dir, constants.F_OK);
+	function ensureTranslationDirs() {
+		try {
+			for (const dir of Object.values(translationDirs)) {
+				accessSync(dir, constants.F_OK);
+			}
+		} catch (err) {
+			alert(
+				"Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
+			);
+			ipcRenderer.send("quit");
+			throw err;
 		}
-	} catch (err) {
-		alert(
-			"Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
-		);
-		ipcRenderer.send("quit");
-		throw err;
 	}
+	ensureTranslationDirs();
 
 	copy();
 
@@ -98,19 +104,19 @@ function render() {
 	const pageLoadedDisplay = document.getElementById("is-loaded");
 	const searchPanel = document.getElementById("search-results");
 	const currentState = document.getElementById("current-state");
-	const saveButton = document.getElementById("save");
-	const compileButton = document.getElementById("compile");
-	const optionButton = document.getElementById("options");
+	const saveButton = document.getElementById("save-button");
+	const compileButton = document.getElementById("compile-button");
+	const optionButton = document.getElementById("options-button");
 	const optionsMenu = document.getElementById("options-menu");
-	const searchCaseButton = document.getElementById("case");
-	const searchWholeButton = document.getElementById("whole");
-	const searchRegexButton = document.getElementById("regex");
-	const searchTransButton = document.getElementById("translate");
+	const searchCaseButton = document.getElementById("case-button");
+	const searchWholeButton = document.getElementById("whole-button");
+	const searchRegexButton = document.getElementById("regex-button");
+	const searchTransButton = document.getElementById("translate-button");
 	const backupCheck = document.getElementById("backup-check");
-	const originalEditableCheck = document.getElementById("edit-orig-check");
 	const backupSettings = document.getElementById("backup-settings");
 	const backupPeriodInput = document.getElementById("backup-period-input");
 	const backupMaxInput = document.getElementById("backup-max-input");
+	const goToRowInput = document.getElementById("goto-row-input");
 	const appSettings = JSON.parse(
 		readFileSync(join(__dirname, "settings.json"), "utf-8")
 	);
@@ -121,8 +127,6 @@ function render() {
 	let backupPeriod = appSettings.backup.period;
 	/** @type {number} */
 	let backupMax = appSettings.backup.max;
-	/** @type {boolean} */
-	let originalEditable = appSettings.originalEditable;
 
 	let searchRegex = false;
 	let searchWhole = false;
@@ -131,6 +135,7 @@ function render() {
 	let optionsOpened = false;
 
 	let state = "main";
+	let previousState = "main";
 
 	if (backupEnabled) {
 		backupCheck.innerHTML = "check";
@@ -143,18 +148,16 @@ function render() {
 	backupPeriodInput.value = backupPeriod;
 	backupMaxInput.value = backupMax;
 
-	if (originalEditable) {
-		originalEditableCheck.innerHTML = "check";
-	} else {
-		originalEditableCheck.innerHTML = "close";
-	}
-
 	let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
 
 	if (backupEnabled) backup(backupPeriod);
 
 	createContent();
 
+	/**
+	 * @summary Map with keys of node ids and maps of node ids and y coordinates
+	 * @type {Map<string, Map<string, number>>}
+	 */
 	const contentYCoordinates = absolutize();
 
 	function absolutize() {
@@ -234,10 +237,29 @@ function render() {
 	}
 
 	function createRegularExpression(text) {
-		return {
-			text: searchRegex ? text : searchWhole ? `\\b${text}\\b` : text,
-			attr: searchRegex ? "" : searchCase ? "" : "i"
-		};
+		try {
+			if (text.startsWith("/")) {
+				const first = text.indexOf("/");
+				const last = text.lastIndexOf("/");
+
+				const expression = text.substring(first + 1, last);
+				const flags = text.substring(last + 1);
+
+				return new RegExp(expression, flags);
+			}
+
+			const expressionProperties = {
+				text: searchRegex ? text : searchWhole ? `\\b${text}\\b` : text,
+				attr: searchRegex ? "g" : searchCase ? "g" : "gi"
+			};
+
+			return new RegExp(
+				expressionProperties.text,
+				expressionProperties.attr
+			);
+		} catch (error) {
+			alert(`Неверное регулярное выражение: ${error}`);
+		}
 	}
 
 	/**
@@ -246,29 +268,37 @@ function render() {
 	 * @param {HTMLTextAreaElement} node
 	 * @returns {void}
 	 */
-	// ! middle is INCORRECT
-	// ! this should be fixed
 	function setMatches(map, text, node) {
-		const regex = createRegularExpression(text);
+		const expr = createRegularExpression(text);
+		const matches = node.value.match(expr) || [];
 
-		const expr = new RegExp(regex.text, regex.attr);
-		const result = node.value.search(expr);
+		if (matches.length > 0) {
+			const result = [];
+			let lastIndex = 0;
 
-		if (result !== -1) {
-			const before = node.value.substring(0, result);
-			const middle = node.value.substring(result, result + text.length);
-			const after = node.value.substring(result + text.length);
+			for (const match of matches) {
+				const start = node.value.indexOf(match, lastIndex);
+				const end = start + match.length;
 
-			const output = [
-				`<div class="inline">${before}</div>`,
-				`<div class="inline bg-gray-500">${middle}</div>`,
-				`<div class="inline">${after}</a>`
-			];
+				result.push(
+					`<div class="inline">${node.value.slice(
+						lastIndex,
+						start
+					)}</div>`
+				);
 
-			map.set(node, output.join(""));
+				result.push(`<div class="inline bg-gray-500">${match}</div>`);
+
+				lastIndex = end;
+			}
+
+			result.push(
+				`<div class="inline">${node.value.slice(lastIndex)}</div>`
+			);
+
+			map.set(node, result.join(""));
 		}
 	}
-
 	/**
 	 * @param {string} text
 	 * @returns {Map<HTMLElement, string>}
@@ -310,7 +340,6 @@ function render() {
 		}
 	}
 
-	// TODO: Maybe, implement single replacement in resultElement event listener?
 	function displaySearchResults(text) {
 		const results = searchText(text);
 
@@ -334,24 +363,6 @@ function render() {
 				const grandGrandParent =
 					element.parentElement.parentElement.parentElement;
 
-				resultElement.addEventListener("click", () => {
-					const currentState = grandGrandParent.id.replace(
-						"-content",
-						""
-					);
-
-					changeState(currentState, false);
-
-					window.scrollTo({
-						top:
-							contentYCoordinates
-								.get(grandGrandParent.id)
-								.get(element.parentElement.parentElement.id) -
-							window.innerHeight / 2,
-						behavior: "smooth"
-					});
-				});
-
 				const counterpart = findCounterpart(element.id);
 
 				/**
@@ -371,31 +382,95 @@ function render() {
 
 				resultElement.innerHTML = `
 					<div class="text-base">${result}</div>
-					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id} - ${elementParentId} - ${elementId}</div>
+					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id.slice(
+						0,
+						element.parentElement.parentElement.id.lastIndexOf("-")
+					)} - ${elementParentId} - ${elementId}</div>
 					<div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
 					<div class="text-base">${counterpart.value}</div>
-					<div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id} - ${counterpartParentId} - ${counterpartId}</div>
+					<div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id.slice(
+						0,
+						counterpart.parentElement.parentElement.id.lastIndexOf(
+							"-"
+						)
+					)} - ${counterpartParentId} - ${counterpartId}</div>
 				`;
 
-				searchPanel.appendChild(resultElement);
+				resultElement.addEventListener("mousedown", (event) => {
+					if (event.button === 0) {
+						const currentState = grandGrandParent.id.replace(
+							"-content",
+							""
+						);
+
+						changeState(currentState, false);
+
+						window.scrollTo({
+							top:
+								contentYCoordinates
+									.get(grandGrandParent.id)
+									.get(
+										element.parentElement.parentElement.id
+									) -
+								window.innerHeight / 2,
+							behavior: "smooth"
+						});
+					} else if (event.button === 2) {
+						if (element.id.includes("original")) {
+							alert(
+								"Оригинальные строки не могут быть заменены."
+							);
+						} else {
+							if (replaceInput.value.trim()) {
+								replaceText(element);
+							}
+						}
+					}
+				});
+
+				searchPanel.append(resultElement);
 			}
 		}
-		searchPanel.classList.remove("translate-x-full");
-		searchPanel.classList.add("translate-x-0");
 
-		searchPanel.addEventListener(
-			"transitionend",
-			function handleTransitionEnd() {
-				for (const child of searchPanel.children) {
-					child.classList.remove("hidden");
-				}
+		let showAfterTranslation = false;
+		if (!searchPanel.classList.contains("translate-x-0")) {
+			searchPanel.classList.remove("translate-x-full");
+			searchPanel.classList.add("translate-x-0");
+			showAfterTranslation = true;
+		}
 
-				searchPanel.removeEventListener(
-					"transitionend",
-					handleTransitionEnd
-				);
-			}
+		const loadingContainer = document.createElement("div");
+		loadingContainer.classList.add(
+			"flex",
+			"justify-center",
+			"items-center",
+			"h-full",
+			"w-full"
 		);
+		loadingContainer.innerHTML = `<div class="text-4xl animate-spin font-material">refresh</div>`;
+		searchPanel.appendChild(loadingContainer);
+
+		if (showAfterTranslation) {
+			searchPanel.addEventListener(
+				"transitionend",
+				function handleTransitionEnd() {
+					for (const child of searchPanel.children) {
+						child.classList.remove("hidden");
+					}
+					searchPanel.removeChild(loadingContainer);
+
+					searchPanel.removeEventListener(
+						"transitionend",
+						handleTransitionEnd
+					);
+				}
+			);
+		} else {
+			for (const child of searchPanel.children) {
+				child.classList.remove("hidden");
+			}
+			searchPanel.removeChild(loadingContainer);
+		}
 		return;
 	}
 
@@ -403,26 +478,35 @@ function render() {
 	 * @param {string} text
 	 * @returns {void}
 	 */
-	function replaceText(text) {
+	function replaceTextAll(text) {
 		const results = searchText(text);
-
-		const regex = createRegularExpression(text);
 
 		if (results.size === 0) {
 			return;
 		} else {
 			for (const textarea of results.keys()) {
-				const newValue = textarea.value.replaceAll(
-					new RegExp(regex.text, regex.attr + "g"),
+				if (textarea.id.includes("original")) continue;
+
+				const newText = textarea.value.replace(
+					createRegularExpression(text),
 					replaceInput.value
 				);
 
-				if (newValue) {
-					textarea.value = newValue;
+				if (newText) {
+					textarea.value = newText;
 				}
 			}
 		}
 		return;
+	}
+
+	function replaceText(textarea) {
+		const newText = textarea.value.replace(
+			createRegularExpression(searchInput.value),
+			replaceInput.value
+		);
+
+		textarea.value = newText;
 	}
 
 	/**
@@ -596,12 +680,8 @@ function render() {
 			originalTextInput.id = `${id}-original-${i}`;
 			originalTextInput.value = splittedText.join("\n");
 			originalTextInput.classList.add("text-field", "mr-2");
-
-			//* If original field is not editable, make it read-only and cursor-default
-			if (!originalEditable) {
-				originalTextInput.readOnly = true;
-				originalTextInput.classList.add("cursor-default");
-			}
+			originalTextInput.readOnly = true;
+			originalTextInput.classList.add("cursor-default");
 
 			//* Translated text field
 			const translatedTextInput = document.createElement("textarea");
@@ -677,20 +757,22 @@ function render() {
 			contentParent.classList.remove("hidden");
 			contentParent.classList.add("flex", "flex-col");
 
-			for (const child of contentContainer.children) {
-				function handleScroll() {
-					handleElementRendering(contentYCoordinates.get(contentId));
-				}
-
-				if (child.id !== contentId) {
-					child.classList.remove("flex", "flex-col");
-					child.classList.add("hidden");
-					window.removeEventListener("scroll", handleScroll);
-				} else {
-					handleElementRendering(contentYCoordinates.get(contentId));
-					window.addEventListener("scroll", handleScroll);
-				}
+			function handleScroll() {
+				handleElementRendering(contentYCoordinates.get(contentId));
 			}
+
+			if (previousState !== "main") {
+				document
+					.getElementById(`${previousState}-content`)
+					.classList.remove("flex", "flex-col");
+				document
+					.getElementById(`${previousState}-content`)
+					.classList.add("hidden");
+				document.removeEventListener("scroll", handleScroll);
+			}
+
+			handleElementRendering(contentYCoordinates.get(contentId));
+			document.addEventListener("scroll", handleScroll);
 
 			if (slide) {
 				leftPanel.classList.toggle("translate-x-0");
@@ -727,11 +809,57 @@ function render() {
 				}
 				break;
 			default:
+				previousState = state;
 				state = newState;
 				updateState(newState, `${newState}-content`, slide);
 				break;
 		}
 		return;
+	}
+
+	function goToRow() {
+		goToRowInput.classList.remove("hidden");
+		goToRowInput.focus();
+
+		const element = document.getElementById(`${state}-content`);
+		const lastChild = element.children[element.children.length - 1];
+		const lastRow = lastChild.id.slice(lastChild.id.lastIndexOf("-") + 1);
+
+		goToRowInput.placeholder = `Перейти к строке... от 0 до ${lastRow}`;
+
+		goToRowInput.addEventListener("keydown", function handleKeydown(event) {
+			if (event.code === "Enter") {
+				const rowNumber = goToRowInput.value;
+
+				const targetRow = document.getElementById(
+					`${state}-content-${rowNumber}`
+				);
+
+				if (targetRow) {
+					window.scrollTo({
+						top:
+							contentYCoordinates
+								.get(
+									document.getElementById(`${state}-content`)
+										.id
+								)
+								.get(targetRow.id) -
+							window.innerHeight / 2
+					});
+				}
+
+				goToRowInput.value = "";
+				goToRowInput.classList.add("hidden");
+
+				goToRowInput.removeEventListener("keydown", handleKeydown);
+			}
+			if (event.code === "Escape") {
+				goToRowInput.value = "";
+				goToRowInput.classList.add("hidden");
+
+				goToRowInput.removeEventListener("keydown", handleKeydown);
+			}
+		});
 	}
 
 	/**
@@ -751,6 +879,17 @@ function render() {
 				searchPanel.classList.toggle("translate-x-full");
 				searchPanel.classList.toggle("translate-x-0");
 
+				const loadingContainer = document.createElement("div");
+				loadingContainer.classList.add(
+					"flex",
+					"justify-center",
+					"items-center",
+					"h-full",
+					"w-full"
+				);
+				loadingContainer.innerHTML = `<div class="text-4xl animate-spin font-material">refresh</div>`;
+				searchPanel.appendChild(loadingContainer);
+
 				searchPanel.addEventListener(
 					"transitionend",
 					function handleTransitionEnd() {
@@ -758,6 +897,7 @@ function render() {
 							child.classList.toggle("hidden");
 						}
 
+						searchPanel.removeChild(loadingContainer);
 						searchPanel.removeEventListener(
 							"transitionend",
 							handleTransitionEnd
@@ -815,6 +955,15 @@ function render() {
 				if (event.altKey) {
 					compile();
 				}
+				break;
+			case "KeyG":
+				if (event.ctrlKey) {
+					event.preventDefault();
+					if (state !== "main") {
+						goToRow();
+					}
+				}
+				break;
 		}
 		return;
 	}
@@ -978,6 +1127,43 @@ function render() {
 		});
 	}
 
+	function handleBackupCheck() {
+		backupEnabled = !backupEnabled;
+
+		if (backupEnabled) {
+			backupSettings.classList.remove("hidden");
+			backup(backupPeriod);
+		} else {
+			backupSettings.classList.add("hidden");
+		}
+
+		if (backupCheck.innerHTML === "check") {
+			backupCheck.innerHTML = "close";
+		} else {
+			backupCheck.innerHTML = "check";
+		}
+	}
+
+	function handleBackupPeriod() {
+		backupPeriod = parseInt(backupPeriodInput.value);
+
+		if (backupPeriod < 60) {
+			backupPeriodInput.value = 60;
+		} else if (backupPeriod > 3600) {
+			backupPeriodInput.value = 3600;
+		}
+	}
+
+	function handleBackupMax() {
+		backupMax = parseInt(backupMaxInput.value);
+
+		if (backupMax < 1) {
+			backupMaxInput.value = 1;
+		} else if (backupMax > 100) {
+			backupMaxInput.value = 100;
+		}
+	}
+
 	// ? Better way of handling settings write?
 	function showOptions() {
 		optionsOpened = !optionsOpened;
@@ -985,12 +1171,20 @@ function render() {
 
 		if (optionsOpened) {
 			document.body.classList.add("overflow-hidden");
+
+			backupCheck.addEventListener("click", handleBackupCheck);
+			backupPeriodInput.addEventListener("change", handleBackupPeriod);
+			backupMaxInput.addEventListener("change", handleBackupMax);
 		} else {
 			document.body.classList.remove("overflow-hidden");
+
+			backupCheck.removeEventListener("click", handleBackupCheck);
+			backupPeriodInput.removeEventListener("change", handleBackupPeriod);
+			backupMaxInput.removeEventListener("change", handleBackupMax);
+
 			appSettings.backup.enabled = backupEnabled;
 			appSettings.backup.period = backupPeriod;
 			appSettings.backup.max = backupMax;
-			appSettings.editOrig = originalEditable;
 			writeFileSync(
 				join(__dirname, "settings.json"),
 				JSON.stringify(appSettings, null, 4),
@@ -1037,7 +1231,7 @@ function render() {
 
 	replaceButton.addEventListener("click", () => {
 		if (searchInput.value && replaceInput.value) {
-			replaceText(searchInput.value.trim());
+			replaceTextAll(searchInput.value.trim());
 		}
 	});
 
@@ -1085,53 +1279,15 @@ function render() {
 	});
 
 	optionButton.addEventListener("click", showOptions);
-
-	backupCheck.addEventListener("click", () => {
-		backupEnabled = !backupEnabled;
-
-		if (backupEnabled) {
-			backupSettings.classList.remove("hidden");
-			backup(backupPeriod);
-		} else {
-			backupSettings.classList.add("hidden");
-		}
-
-		if (backupCheck.innerHTML === "check") {
-			backupCheck.innerHTML = "close";
-		} else {
-			backupCheck.innerHTML = "check";
-		}
-	});
-
-	backupPeriodInput.addEventListener("change", () => {
-		backupPeriod = parseInt(backupPeriodInput.value);
-
-		if (backupPeriod < 60) {
-			backupPeriodInput.value = 60;
-		} else if (backupPeriod > 3600) {
-			backupPeriodInput.value = 3600;
-		}
-	});
-
-	backupMaxInput.addEventListener("change", () => {
-		backupMax = parseInt(backupMaxInput.value);
-
-		if (backupMax < 1) {
-			backupMaxInput.value = 1;
-		} else if (backupMax > 100) {
-			backupMaxInput.value = 100;
-		}
-	});
-
-	originalEditableCheck.addEventListener("click", () => {
-		originalEditable = !originalEditable;
-
-		if (originalEditableCheck.innerHTML === "check") {
-			originalEditableCheck.innerHTML = "close";
-		} else {
-			originalEditableCheck.innerHTML = "check";
-		}
-	});
 }
 
-window.addEventListener("DOMContentLoaded", render);
+document.addEventListener("DOMContentLoaded", render);
+document.addEventListener("keydown", (e) => {
+	if (e.key === "Tab") {
+		e.preventDefault();
+	}
+
+	if (e.altKey) {
+		e.preventDefault();
+	}
+});

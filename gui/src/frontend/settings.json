@@ -4,6 +4,5 @@
 		"enabled": true,
 		"period": 60,
 		"max": 99
-	},
-	"originalEditable": false
+	}
 }

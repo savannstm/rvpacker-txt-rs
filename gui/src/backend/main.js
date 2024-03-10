@@ -31,6 +31,7 @@ app.on("ready", () => {
 		if (DEBUG) {
 			win.webContents.openDevTools();
 		}
+
 		win.setMenu(Menu.buildFromTemplate(menuTemplate));
 		win.loadFile(join(__dirname, "../frontend/index.html"));
 	};
@@ -46,6 +47,7 @@ app.on("ready", () => {
 	};
 
 	createWindow();
+
 	if (firstLaunch) {
 		createHelpWindow();
 		writeFileSync(
