@@ -12,7 +12,7 @@
 			http-equiv="Content-Security-Policy"
 			content="script-src 'self'"
 		/>
-		<link rel="stylesheet" href="output.css" />
+		<link rel="stylesheet" href="style.css" />
 		<title>F&H2 Text Editor</title>
 	</head>
 	<body
@@ -25,28 +25,28 @@
 			<div id="top-panel-buttons" class="flex items-center w-full h-16">
 				<div
 					id="menu-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Вкладки"
 				>
 					menu
 				</div>
 				<div
 					id="save-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Сохранить файлы перевода"
 				>
 					save
 				</div>
 				<div
 					id="compile-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Скомпилировать в JSON файлы"
 				>
 					upload
 				</div>
 				<div
 					id="options-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Настройки"
 				>
 					settings
@@ -54,7 +54,7 @@
 				<div class="w-16"></div>
 				<div
 					id="search-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Поиск"
 				>
 					search
@@ -70,7 +70,7 @@
 				</div>
 				<div
 					id="replace-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Заменить все совпадения на"
 				>
 					arrow_right_alt
@@ -86,35 +86,38 @@
 				</div>
 				<div
 					id="case-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Учитывать регистр"
 				>
 					match_case
 				</div>
 				<div
 					id="whole-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Искать слова целиком"
 				>
 					match_word
 				</div>
 				<div
 					id="regex-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Поиск по регулярным выражениям"
 				>
 					regular_expression
 				</div>
 				<div
 					id="translate-button"
-					class="material-symbols-outlined"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
 					title="Искать по переводу"
 				>
 					translate
 				</div>
 				<div class="w-16"></div>
 
-				<div id="is-loaded" class="material-symbols-outlined">
+				<div
+					id="is-loaded"
+					class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
+				>
 					check_indeterminate_small
 				</div>
 				<div id="current-state" class="p-4"></div>
@@ -132,20 +135,78 @@
 				id="left-panel"
 				class="flex fixed flex-col justify-center items-center w-16 h-[93.333vh] text-sm bg-gray-700 transition-all duration-500 -translate-x-full z-30"
 			>
-				<div id="maps" class="left-panel-element">Maps</div>
-				<div id="maps-names" class="left-panel-element">Maps names</div>
-				<div id="actors" class="left-panel-element">Actors</div>
-				<div id="armors" class="left-panel-element">Armors</div>
-				<div id="classes" class="left-panel-element">Classes</div>
-				<div id="common-events" class="left-panel-element">
+				<div
+					id="maps"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Maps
+				</div>
+				<div
+					id="maps-names"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Maps names
+				</div>
+				<div
+					id="actors"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Actors
+				</div>
+				<div
+					id="armors"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Armors
+				</div>
+				<div
+					id="classes"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Classes
+				</div>
+				<div
+					id="common-events"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
 					Common Events
 				</div>
-				<div id="enemies" class="left-panel-element">Enemies</div>
-				<div id="items" class="left-panel-element">Items</div>
-				<div id="skills" class="left-panel-element">Skills</div>
-				<div id="system" class="left-panel-element">System</div>
-				<div id="troops" class="left-panel-element">Troops</div>
-				<div id="weapons" class="left-panel-element">Weapons</div>
+				<div
+					id="enemies"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Enemies
+				</div>
+				<div
+					id="items"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Items
+				</div>
+				<div
+					id="skills"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Skills
+				</div>
+				<div
+					id="system"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					System
+				</div>
+				<div
+					id="troops"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Troops
+				</div>
+				<div
+					id="weapons"
+					class="flex flex-col justify-center items-center p-2 w-16 h-full bg-gray-800 cursor-pointer outline outline-2 outline-gray-700 hover:bg-gray-600"
+				>
+					Weapons
+				</div>
 			</div>
 
 			<div

@@ -1,5 +1,4 @@
 {
-	"workingDir": "copies",
 	"backup": {
 		"enabled": true,
 		"period": 60,

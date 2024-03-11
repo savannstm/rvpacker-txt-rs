@@ -4,14 +4,14 @@ const {
 	Menu,
 	ipcMain,
 	shell,
-	screen
+	screen,
 } = require("electron");
 const { readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 
 const DEBUG = true;
 const firstLaunch = JSON.parse(
-	readFileSync(join(__dirname, "launch.json"), "utf8")
+	readFileSync(join(__dirname, "launch.json"), "utf8"),
 ).firstLaunch;
 
 app.on("ready", () => {
@@ -24,8 +24,8 @@ app.on("ready", () => {
 			titleBarStyle: "hiddenInset",
 			webPreferences: {
 				preload: join(__dirname, "../frontend/preload.js"),
-				nodeIntegration: true
-			}
+				nodeIntegration: true,
+			},
 		});
 
 		if (DEBUG) {
@@ -33,14 +33,14 @@ app.on("ready", () => {
 		}
 
 		win.setMenu(Menu.buildFromTemplate(menuTemplate));
-		win.loadFile(join(__dirname, "../frontend/index.html"));
+		win.loadFile(join(__dirname, "../frontend/main.html"));
 	};
 
 	const createHelpWindow = () => {
 		const helpWin = new BrowserWindow({
 			width: 800,
 			height: 600,
-			titleBarStyle: "hiddenInset"
+			titleBarStyle: "hiddenInset",
 		});
 
 		helpWin.loadFile(join(__dirname, "../frontend/help.html"));
@@ -52,7 +52,7 @@ app.on("ready", () => {
 		createHelpWindow();
 		writeFileSync(
 			join(__dirname, "launch.json"),
-			JSON.stringify({ firstLaunch: false }, null, 4)
+			JSON.stringify({ firstLaunch: false }, null, 4),
 		);
 	}
 
@@ -84,43 +84,43 @@ const menuTemplate = [
 			{
 				label: "Перегрузить",
 				accelerator: "F5",
-				role: "reload"
+				role: "reload",
 			},
 			{
 				label: "Закрыть",
 				click: () => {
 					app.quit();
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 	{
 		label: "Редактирование",
 		submenu: [
 			{
 				label: "Отменить",
-				role: "undo"
+				role: "undo",
 			},
 			{
 				label: "Повторить",
-				role: "redo"
+				role: "redo",
 			},
 			{
-				type: "separator"
+				type: "separator",
 			},
 			{
 				label: "Вырезать",
-				role: "cut"
+				role: "cut",
 			},
 			{
 				label: "Копировать",
-				role: "copy"
+				role: "copy",
 			},
 			{
 				label: "Вставить",
-				role: "paste"
-			}
-		]
+				role: "paste",
+			},
+		],
 	},
 	{
 		label: "Помощь",
@@ -132,10 +132,10 @@ const menuTemplate = [
 						width: 640,
 						height: 480,
 						titleBarStyle: "hiddenInset",
-						autoHideMenuBar: true
+						autoHideMenuBar: true,
 					});
 					win.loadFile(join(__dirname, "../frontend/help.html"));
-				}
+				},
 			},
 			{
 				label: "Горячие клавиши",
@@ -144,12 +144,12 @@ const menuTemplate = [
 						width: 640,
 						height: 480,
 						titleBarStyle: "hiddenInset",
-						autoHideMenuBar: true
+						autoHideMenuBar: true,
 					});
 					win.loadFile(join(__dirname, "../frontend/hotkeys.html"));
-				}
-			}
-		]
+				},
+			},
+		],
 	},
 	{
 		label: "О программе",
@@ -161,10 +161,10 @@ const menuTemplate = [
 				autoHideMenuBar: true,
 				webPreferences: {
 					preload: join(__dirname, "../frontend/about.js"),
-					nodeIntegration: true
-				}
+					nodeIntegration: true,
+				},
 			});
 			win.loadFile(join(__dirname, "../frontend/about.html"));
-		}
-	}
+		},
+	},
 ];

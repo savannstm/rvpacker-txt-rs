@@ -2,11 +2,11 @@ const { ipcRenderer } = require("electron");
 const {
 	constants,
 	readFileSync,
-	writeFileSync,
 	readdirSync,
 	ensureDirSync,
 	copyFileSync,
-	accessSync
+	accessSync,
+	writeFile,
 } = require("fs-extra");
 const { spawn } = require("child_process");
 const { join } = require("path");
@@ -14,6 +14,7 @@ const { join } = require("path");
 const production = false;
 
 function render() {
+	//#region Directories
 	const copiesRoot = production
 		? join(__dirname, "../../../../copies")
 		: join(__dirname, "../../copies");
@@ -24,18 +25,7 @@ function render() {
 		? join(__dirname, "../../../../translation")
 		: join(__dirname, "../../../translation");
 
-	function ensureTranslationDir() {
-		try {
-			accessSync(translationRoot, constants.F_OK);
-		} catch (err) {
-			alert(
-				"Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
-			);
-			ipcRenderer.send("quit");
-			throw err;
-		}
-	}
-	ensureTranslationDir();
+	ensureTranslationRoot();
 
 	const copiesDirs = {
 		originalMapText: join(copiesRoot, "maps/maps.txt"),
@@ -51,7 +41,7 @@ function render() {
 		originalCommonEvents: join(copiesRoot, "other/CommonEvents.txt"),
 		translatedCommonEvents: join(
 			copiesRoot,
-			"other/CommonEvents_trans.txt"
+			"other/CommonEvents_trans.txt",
 		),
 		originalEnemies: join(copiesRoot, "other/Enemies.txt"),
 		translatedEnemies: join(copiesRoot, "other/Enemies_trans.txt"),
@@ -64,7 +54,7 @@ function render() {
 		originalTroops: join(copiesRoot, "other/Troops.txt"),
 		translatedTroops: join(copiesRoot, "other/Troops_trans.txt"),
 		originalWeapons: join(copiesRoot, "other/Weapons.txt"),
-		translatedWeapons: join(copiesRoot, "other/Weapons_trans.txt")
+		translatedWeapons: join(copiesRoot, "other/Weapons_trans.txt"),
 	};
 
 	const translationDirs = {
@@ -72,24 +62,13 @@ function render() {
 		other: join(translationRoot, "other"),
 		copies: join(copiesRoot),
 		copiesMaps: join(copiesRoot, "maps"),
-		copiesOther: join(copiesRoot, "other")
+		copiesOther: join(copiesRoot, "other"),
 	};
 
-	function ensureTranslationDirs() {
-		try {
-			for (const dir of Object.values(translationDirs)) {
-				accessSync(dir, constants.F_OK);
-			}
-		} catch (err) {
-			alert(
-				"Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
-			);
-			ipcRenderer.send("quit");
-			throw err;
-		}
-	}
 	ensureTranslationDirs();
+	//#endregion
 
+	//#region Main logic
 	copy();
 
 	const contentContainer = document.getElementById("content-container");
@@ -118,7 +97,7 @@ function render() {
 	const backupMaxInput = document.getElementById("backup-max-input");
 	const goToRowInput = document.getElementById("goto-row-input");
 	const appSettings = JSON.parse(
-		readFileSync(join(__dirname, "settings.json"), "utf-8")
+		readFileSync(join(__dirname, "settings.json"), "utf-8"),
 	);
 
 	/** @type {boolean} */
@@ -149,21 +128,59 @@ function render() {
 	backupMaxInput.value = backupMax;
 
 	let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
-
 	if (backupEnabled) backup(backupPeriod);
 
 	createContent();
+	setIntersectionObserver();
 
 	/**
 	 * @summary Map with keys of node ids and maps of node ids and y coordinates
 	 * @type {Map<string, Map<string, number>>}
 	 */
-	const contentYCoordinates = absolutize();
+	function ensureTranslationRoot() {
+		try {
+			accessSync(translationRoot, constants.F_OK);
+		} catch (err) {
+			alert(
+				"Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы.",
+			);
+			ipcRenderer.send("quit");
+			throw err;
+		}
+	}
 
-	function absolutize() {
+	function ensureTranslationDirs() {
+		try {
+			for (const dir of Object.values(translationDirs)) {
+				accessSync(dir, constants.F_OK);
+			}
+		} catch (err) {
+			alert(
+				"Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other.",
+			);
+			ipcRenderer.send("quit");
+			throw err;
+		}
+	}
+
+	function setIntersectionObserver() {
 		const childYCoordinates = new Map();
 
 		window.scrollTo(0, 0);
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						entry.target.children[0].classList.remove("hidden");
+					} else {
+						entry.target.children[0].classList.add("hidden");
+					}
+				}
+			},
+			{
+				threshold: 0,
+			},
+		);
 
 		requestAnimationFrame(() => {
 			for (const child of contentContainer.children) {
@@ -171,25 +188,35 @@ function render() {
 				child.classList.add("flex", "flex-col");
 
 				const nodeYCoordinates = new Map();
+				const nodeXCoordinates = new Map();
 				const nodeWidths = new Map();
+				const nodeHeights = new Map();
 				let margin = 0;
 
 				for (const node of child.children) {
 					const nodeYCoordinate =
 						node.getBoundingClientRect().y + margin;
+					const nodeXCoordinate = node.getBoundingClientRect().x;
 					const nodeWidth = node.getBoundingClientRect().width;
+					const nodeHeight = node.getBoundingClientRect().height;
 
 					nodeYCoordinates.set(node.id, nodeYCoordinate);
+					nodeXCoordinates.set(node.id, nodeXCoordinate);
 					nodeWidths.set(node.id, nodeWidth);
+					nodeHeights.set(node.id, nodeHeight);
 
 					margin += 8;
 				}
 
 				for (const node of child.children) {
-					node.classList.add("hidden");
-					node.classList.add("absolute");
+					node.style.position = "absolute";
 					node.style.top = `${nodeYCoordinates.get(node.id)}px`;
+					node.style.left = `${nodeXCoordinates.get(node.id)}px`;
 					node.style.width = `${nodeWidths.get(node.id)}px`;
+					node.style.height = `${nodeHeights.get(node.id)}px`;
+
+					node.children[0].classList.add("hidden");
+					observer.observe(node);
 				}
 
 				childYCoordinates.set(child.id, nodeYCoordinates);
@@ -204,7 +231,6 @@ function render() {
 		});
 
 		document.body.classList.remove("invisible");
-		return childYCoordinates;
 	}
 
 	function determineLastBackupNumber() {
@@ -227,13 +253,13 @@ function render() {
 	 */
 	function readFiles(paths) {
 		const entries = Object.entries(paths);
-		const resultMap = new Map();
+		const result = new Map();
 
 		for (const [key, filePath] of entries) {
-			resultMap.set(key, readFileSync(filePath, "utf-8").split("\n"));
+			result.set(key, readFileSync(filePath, "utf-8").split("\n"));
 		}
 
-		return resultMap;
+		return result;
 	}
 
 	function createRegularExpression(text) {
@@ -250,12 +276,12 @@ function render() {
 
 			const expressionProperties = {
 				text: searchRegex ? text : searchWhole ? `\\b${text}\\b` : text,
-				attr: searchRegex ? "g" : searchCase ? "g" : "gi"
+				attr: searchRegex ? "g" : searchCase ? "g" : "gi",
 			};
 
 			return new RegExp(
 				expressionProperties.text,
-				expressionProperties.attr
+				expressionProperties.attr,
 			);
 		} catch (error) {
 			alert(`Неверное регулярное выражение: ${error}`);
@@ -283,8 +309,8 @@ function render() {
 				result.push(
 					`<div class="inline">${node.value.slice(
 						lastIndex,
-						start
-					)}</div>`
+						start,
+					)}</div>`,
 				);
 
 				result.push(`<div class="inline bg-gray-500">${match}</div>`);
@@ -293,7 +319,7 @@ function render() {
 			}
 
 			result.push(
-				`<div class="inline">${node.value.slice(lastIndex)}</div>`
+				`<div class="inline">${node.value.slice(lastIndex)}</div>`,
 			);
 
 			map.set(node, result.join(""));
@@ -331,11 +357,11 @@ function render() {
 	function findCounterpart(id) {
 		if (id.includes("original")) {
 			return document.getElementById(
-				id.replace("original", "translated")
+				id.replace("original", "translated"),
 			);
 		} else {
 			return document.getElementById(
-				id.replace("translated", "original")
+				id.replace("translated", "original"),
 			);
 		}
 	}
@@ -357,7 +383,7 @@ function render() {
 					"p-1",
 					"border-2",
 					"border-gray-600",
-					"hidden"
+					"hidden",
 				);
 
 				const grandGrandParent =
@@ -384,15 +410,15 @@ function render() {
 					<div class="text-base">${result}</div>
 					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id.slice(
 						0,
-						element.parentElement.parentElement.id.lastIndexOf("-")
+						element.parentElement.parentElement.id.lastIndexOf("-"),
 					)} - ${elementParentId} - ${elementId}</div>
 					<div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
 					<div class="text-base">${counterpart.value}</div>
 					<div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id.slice(
 						0,
 						counterpart.parentElement.parentElement.id.lastIndexOf(
-							"-"
-						)
+							"-",
+						),
 					)} - ${counterpartParentId} - ${counterpartId}</div>
 				`;
 
@@ -400,25 +426,20 @@ function render() {
 					if (event.button === 0) {
 						const currentState = grandGrandParent.id.replace(
 							"-content",
-							""
+							"",
 						);
 
 						changeState(currentState, false);
 
 						window.scrollTo({
 							top:
-								contentYCoordinates
-									.get(grandGrandParent.id)
-									.get(
-										element.parentElement.parentElement.id
-									) -
+								element.parentElement.parentElement.offsetTop -
 								window.innerHeight / 2,
-							behavior: "smooth"
 						});
 					} else if (event.button === 2) {
 						if (element.id.includes("original")) {
 							alert(
-								"Оригинальные строки не могут быть заменены."
+								"Оригинальные строки не могут быть заменены.",
 							);
 						} else {
 							if (replaceInput.value.trim()) {
@@ -445,7 +466,7 @@ function render() {
 			"justify-center",
 			"items-center",
 			"h-full",
-			"w-full"
+			"w-full",
 		);
 		loadingContainer.innerHTML = `<div class="text-4xl animate-spin font-material">refresh</div>`;
 		searchPanel.appendChild(loadingContainer);
@@ -461,9 +482,9 @@ function render() {
 
 					searchPanel.removeEventListener(
 						"transitionend",
-						handleTransitionEnd
+						handleTransitionEnd,
 					);
-				}
+				},
 			);
 		} else {
 			for (const child of searchPanel.children) {
@@ -489,7 +510,7 @@ function render() {
 
 				const newText = textarea.value.replace(
 					createRegularExpression(text),
-					replaceInput.value
+					replaceInput.value,
 				);
 
 				if (newText) {
@@ -503,7 +524,7 @@ function render() {
 	function replaceText(textarea) {
 		const newText = textarea.value.replace(
 			createRegularExpression(searchInput.value),
-			replaceInput.value
+			replaceInput.value,
 		);
 
 		textarea.value = newText;
@@ -544,14 +565,14 @@ function render() {
 		for (const file of readdirSync(translationDirs.maps)) {
 			copyFileSync(
 				join(translationDirs.maps, file),
-				join(translationDirs.copiesMaps, file)
+				join(translationDirs.copiesMaps, file),
 			);
 		}
 
 		for (const file of readdirSync(translationDirs.other)) {
 			copyFileSync(
 				join(translationDirs.other, file),
-				join(translationDirs.copiesOther, file)
+				join(translationDirs.copiesOther, file),
 			);
 		}
 		return;
@@ -570,7 +591,7 @@ function render() {
 			"skills-content": "./other/Skills_trans.txt",
 			"system-content": "./other/System_trans.txt",
 			"troops-content": "./other/Troops_trans.txt",
-			"weapons-content": "./other/Weapons_trans.txt"
+			"weapons-content": "./other/Weapons_trans.txt",
 		};
 
 		saveButton.classList.add("animate-spin");
@@ -587,7 +608,7 @@ function render() {
 					day: date.getDate(),
 					hour: date.getHours(),
 					minute: date.getMinutes(),
-					second: date.getSeconds()
+					second: date.getSeconds(),
 				};
 
 				for (const [key, value] of Object.entries(dateProperties)) {
@@ -599,7 +620,7 @@ function render() {
 				}
 
 				const backupFolderName = `${Object.values(dateProperties).join(
-					"-"
+					"-",
 				)}_${nextBackupNumber.toString().padStart(2, "0")}`;
 
 				nextBackupNumber++;
@@ -607,11 +628,11 @@ function render() {
 				dirName = join(backupRoot, backupFolderName);
 
 				ensureDirSync(join(dirName, "maps"), {
-					recursive: true
+					recursive: true,
 				});
 
 				ensureDirSync(join(dirName, "other"), {
-					recursive: true
+					recursive: true,
 				});
 			}
 
@@ -619,21 +640,16 @@ function render() {
 				const outputArray = [];
 
 				for (const child of contentElement.children) {
-					for (const node of child.children[0].children) {
-						if (!node.id.includes("translated")) continue;
-						else {
-							outputArray.push(
-								node.value.replaceAll("\n", "\\n")
-							);
-						}
-					}
+					const node = child.children[0].children[2];
+
+					outputArray.push(node.value.replaceAll("\n", "\\n"));
 				}
 
 				const filePath = fileMappings[contentElement.id];
 
 				if (filePath) {
 					const dir = join(dirName, filePath);
-					writeFileSync(dir, outputArray.join("\n"), "utf-8");
+					writeFile(dir, outputArray.join("\n"), "utf-8");
 				}
 			}
 
@@ -679,7 +695,11 @@ function render() {
 			const splittedText = text.split("\\n");
 			originalTextInput.id = `${id}-original-${i}`;
 			originalTextInput.value = splittedText.join("\n");
-			originalTextInput.classList.add("text-field", "mr-2");
+			originalTextInput.classList.add(
+				..."p-1 w-full h-auto text-xl bg-gray-800 resize-none outline outline-2 outline-gray-700 focus:outline-gray-400 mr-2".split(
+					" ",
+				),
+			);
 			originalTextInput.readOnly = true;
 			originalTextInput.classList.add("cursor-default");
 
@@ -688,19 +708,27 @@ function render() {
 			const splittedTranslatedText = translatedText[i].split("\\n");
 			translatedTextInput.id = `${id}-translated-${i}`;
 			translatedTextInput.value = splittedTranslatedText.join("\n");
-			translatedTextInput.classList.add("text-field");
+			translatedTextInput.classList.add(
+				..."p-1 w-full h-auto text-xl bg-gray-800 resize-none outline outline-2 outline-gray-700 focus:outline-gray-400".split(
+					" ",
+				),
+			);
 
 			//* Row field
 			const row = document.createElement("textarea");
 			row.id = `${id}-row-${i}`;
 			row.value = i;
 			row.readOnly = true;
-			row.classList.add("row-field");
+			row.classList.add(
+				..."p-1 w-36 h-auto text-xl bg-gray-800 cursor-default outline-none resize-none".split(
+					" ",
+				),
+			);
 
 			//* All textareas should have the same number of rows
 			const maxRows = Math.max(
 				splittedText.length,
-				splittedTranslatedText.length
+				splittedTranslatedText.length,
 			);
 			originalTextInput.rows = maxRows;
 			translatedTextInput.rows = maxRows;
@@ -718,34 +746,11 @@ function render() {
 	}
 
 	/**
-	 * @param {Map<string, number>} map
-	 * @returns {void}
-	 */
-	function handleElementRendering(map) {
-		for (const [node, y] of map) {
-			const element = document.getElementById(node);
-
-			if (
-				y >= window.scrollY &&
-				y < window.scrollY + window.innerHeight
-			) {
-				element.classList.remove("hidden");
-			} else {
-				element.classList.add("hidden");
-			}
-		}
-		return;
-	}
-
-	/**
 	 * @param {string} newState
 	 * @param {string} contentId
 	 * @param {boolean} slide
 	 * @returns {void}
 	 */
-	// ! animate-spin doesn't work
-	// TODO: Replace requestAnimationFrame with setTimeout or come up with some fixes
-	// TODO: Maybe, implement previous variable, so that there's no need to create handleScroll function in a for loop?
 	function updateState(newState, contentId, slide = true) {
 		pageLoadedDisplay.innerHTML = "refresh";
 		pageLoadedDisplay.classList.toggle("animate-spin");
@@ -753,36 +758,31 @@ function render() {
 		currentState.innerHTML = newState;
 
 		requestAnimationFrame(() => {
-			const contentParent = document.getElementById(contentId);
-			contentParent.classList.remove("hidden");
-			contentParent.classList.add("flex", "flex-col");
+			requestAnimationFrame(() => {
+				const contentParent = document.getElementById(contentId);
+				contentParent.classList.remove("hidden");
+				contentParent.classList.add("flex", "flex-col");
 
-			function handleScroll() {
-				handleElementRendering(contentYCoordinates.get(contentId));
-			}
+				if (previousState !== "main") {
+					document
+						.getElementById(`${previousState}-content`)
+						.classList.remove("flex", "flex-col");
 
-			if (previousState !== "main") {
-				document
-					.getElementById(`${previousState}-content`)
-					.classList.remove("flex", "flex-col");
-				document
-					.getElementById(`${previousState}-content`)
-					.classList.add("hidden");
-				document.removeEventListener("scroll", handleScroll);
-			}
+					document
+						.getElementById(`${previousState}-content`)
+						.classList.add("hidden");
+				}
 
-			handleElementRendering(contentYCoordinates.get(contentId));
-			document.addEventListener("scroll", handleScroll);
+				if (slide) {
+					leftPanel.classList.toggle("translate-x-0");
+					leftPanel.classList.toggle("-translate-x-full");
+				}
 
-			if (slide) {
-				leftPanel.classList.toggle("translate-x-0");
-				leftPanel.classList.toggle("-translate-x-full");
-			}
+				pageLoadedDisplay.innerHTML = "done";
+				pageLoadedDisplay.classList.toggle("animate-spin");
 
-			pageLoadedDisplay.innerHTML = "done";
-			pageLoadedDisplay.classList.toggle("animate-spin");
-
-			console.log(`Current state is ${newState}`);
+				console.log(`Current state is ${newState}`);
+			});
 		});
 		return;
 	}
@@ -832,19 +832,12 @@ function render() {
 				const rowNumber = goToRowInput.value;
 
 				const targetRow = document.getElementById(
-					`${state}-content-${rowNumber}`
+					`${state}-content-${rowNumber}`,
 				);
 
 				if (targetRow) {
 					window.scrollTo({
-						top:
-							contentYCoordinates
-								.get(
-									document.getElementById(`${state}-content`)
-										.id
-								)
-								.get(targetRow.id) -
-							window.innerHeight / 2
+						top: targetRow.offsetTop - window.innerHeight / 2,
 					});
 				}
 
@@ -885,7 +878,7 @@ function render() {
 					"justify-center",
 					"items-center",
 					"h-full",
-					"w-full"
+					"w-full",
 				);
 				loadingContainer.innerHTML = `<div class="text-4xl animate-spin font-material">refresh</div>`;
 				searchPanel.appendChild(loadingContainer);
@@ -900,9 +893,9 @@ function render() {
 						searchPanel.removeChild(loadingContainer);
 						searchPanel.removeEventListener(
 							"transitionend",
-							handleTransitionEnd
+							handleTransitionEnd,
 						);
-					}
+					},
 				);
 				break;
 			case "Digit1":
@@ -958,7 +951,6 @@ function render() {
 				break;
 			case "KeyG":
 				if (event.ctrlKey) {
-					event.preventDefault();
 					if (state !== "main") {
 						goToRow();
 					}
@@ -983,7 +975,7 @@ function render() {
 					const idParts = focusedElement.id.split("-");
 					const index = parseInt(idParts.pop()) + 1;
 					const elementToFocus = document.getElementById(
-						`${idParts.join("-")}-${index}`
+						`${idParts.join("-")}-${index}`,
 					);
 
 					if (elementToFocus) {
@@ -993,12 +985,13 @@ function render() {
 						elementToFocus.setSelectionRange(0, 0);
 					}
 				}
+
 				if (event.ctrlKey) {
 					const focusedElement = document.activeElement;
 					const idParts = focusedElement.id.split("-");
 					const index = parseInt(idParts.pop()) - 1;
 					const elementToFocus = document.getElementById(
-						`${idParts.join("-")}-${index}`
+						`${idParts.join("-")}-${index}`,
 					);
 
 					if (elementToFocus) {
@@ -1035,63 +1028,63 @@ function render() {
 			{
 				id: "maps-content",
 				original: "originalMapText",
-				translated: "translatedMapText"
+				translated: "translatedMapText",
 			},
 			{
 				id: "maps-names-content",
 				original: "originalMapNames",
-				translated: "translatedMapNames"
+				translated: "translatedMapNames",
 			},
 			{
 				id: "actors-content",
 				original: "originalActors",
-				translated: "translatedActors"
+				translated: "translatedActors",
 			},
 			{
 				id: "armors-content",
 				original: "originalArmors",
-				translated: "translatedArmors"
+				translated: "translatedArmors",
 			},
 			{
 				id: "classes-content",
 				original: "originalClasses",
-				translated: "translatedClasses"
+				translated: "translatedClasses",
 			},
 			{
 				id: "common-events-content",
 				original: "originalCommonEvents",
-				translated: "translatedCommonEvents"
+				translated: "translatedCommonEvents",
 			},
 			{
 				id: "enemies-content",
 				original: "originalEnemies",
-				translated: "translatedEnemies"
+				translated: "translatedEnemies",
 			},
 			{
 				id: "items-content",
 				original: "originalItems",
-				translated: "translatedItems"
+				translated: "translatedItems",
 			},
 			{
 				id: "skills-content",
 				original: "originalSkills",
-				translated: "translatedSkills"
+				translated: "translatedSkills",
 			},
 			{
 				id: "system-content",
 				original: "originalSystem",
-				translated: "translatedSystem"
+				translated: "translatedSystem",
 			},
 			{
 				id: "troops-content",
 				original: "originalTroops",
-				translated: "translatedTroops"
+				translated: "translatedTroops",
 			},
 			{
 				id: "weapons-content",
 				original: "originalWeapons",
-				translated: "translatedWeapons"
-			}
+				translated: "translatedWeapons",
+			},
 		];
 
 		const texts = readFiles(copiesDirs);
@@ -1100,7 +1093,7 @@ function render() {
 			createContentChildren(
 				content.id,
 				texts.get(content.original),
-				texts.get(content.translated)
+				texts.get(content.translated),
 			);
 		}
 	}
@@ -1110,7 +1103,7 @@ function render() {
 
 		save();
 		const writer = spawn(join(__dirname, "../resources/write.exe"), [], {
-			cwd: join(__dirname, "../resources")
+			cwd: join(__dirname, "../resources"),
 		});
 
 		let error = false;
@@ -1185,10 +1178,10 @@ function render() {
 			appSettings.backup.enabled = backupEnabled;
 			appSettings.backup.period = backupPeriod;
 			appSettings.backup.max = backupMax;
-			writeFileSync(
+			writeFile(
 				join(__dirname, "settings.json"),
 				JSON.stringify(appSettings, null, 4),
-				"utf-8"
+				"utf-8",
 			);
 		}
 	}
@@ -1279,6 +1272,8 @@ function render() {
 	});
 
 	optionButton.addEventListener("click", showOptions);
+
+	//#endregion
 }
 
 document.addEventListener("DOMContentLoaded", render);
