@@ -131,12 +131,18 @@ function render() {
 	if (backupEnabled) backup(backupPeriod);
 
 	createContent();
-	setIntersectionObserver();
+	arrangeElements();
 
-	/**
-	 * @summary Map with keys of node ids and maps of node ids and y coordinates
-	 * @type {Map<string, Map<string, number>>}
-	 */
+	const observer = new IntersectionObserver((entries) => {
+		for (const entry of entries) {
+			if (entry.isIntersecting) {
+				entry.target.children[0].classList.remove("hidden");
+			} else {
+				entry.target.children[0].classList.add("hidden");
+			}
+		}
+	});
+
 	function ensureTranslationRoot() {
 		try {
 			accessSync(translationRoot, constants.F_OK);
@@ -151,8 +157,8 @@ function render() {
 
 	function ensureTranslationDirs() {
 		try {
-			for (const dir of Object.values(translationDirs)) {
-				accessSync(dir, constants.F_OK);
+			for (let i = 0; i < 2; i++) {
+				ensureDirSync(Object.values(translationDirs)[i]);
 			}
 		} catch (err) {
 			alert(
@@ -163,24 +169,8 @@ function render() {
 		}
 	}
 
-	function setIntersectionObserver() {
-		const childYCoordinates = new Map();
-
+	function arrangeElements() {
 		window.scrollTo(0, 0);
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) {
-						entry.target.children[0].classList.remove("hidden");
-					} else {
-						entry.target.children[0].classList.add("hidden");
-					}
-				}
-			},
-			{
-				threshold: 0,
-			},
-		);
 
 		requestAnimationFrame(() => {
 			for (const child of contentContainer.children) {
@@ -216,10 +206,8 @@ function render() {
 					node.style.height = `${nodeHeights.get(node.id)}px`;
 
 					node.children[0].classList.add("hidden");
-					observer.observe(node);
 				}
 
-				childYCoordinates.set(child.id, nodeYCoordinates);
 				child.style.height = `${
 					nodeYCoordinates.get(Array.from(child.children).at(-1).id) -
 					64
@@ -431,10 +419,15 @@ function render() {
 
 						changeState(currentState, false);
 
-						window.scrollTo({
-							top:
-								element.parentElement.parentElement.offsetTop -
-								window.innerHeight / 2,
+						requestAnimationFrame(() => {
+							requestAnimationFrame(() => {
+								element.parentElement.parentElement.scrollIntoView(
+									{
+										block: "center",
+										inline: "center",
+									},
+								);
+							});
 						});
 					} else if (event.button === 2) {
 						if (element.id.includes("original")) {
@@ -771,6 +764,12 @@ function render() {
 					document
 						.getElementById(`${previousState}-content`)
 						.classList.add("hidden");
+
+					observer.disconnect();
+				}
+
+				for (const child of contentParent.children) {
+					observer.observe(child);
 				}
 
 				if (slide) {
@@ -836,8 +835,9 @@ function render() {
 				);
 
 				if (targetRow) {
-					window.scrollTo({
-						top: targetRow.offsetTop - window.innerHeight / 2,
+					targetRow.scrollIntoView({
+						block: "center",
+						inline: "center",
 					});
 				}
 
@@ -949,13 +949,6 @@ function render() {
 					compile();
 				}
 				break;
-			case "KeyG":
-				if (event.ctrlKey) {
-					if (state !== "main") {
-						goToRow();
-					}
-				}
-				break;
 		}
 		return;
 	}
@@ -999,6 +992,17 @@ function render() {
 						focusedElement.blur();
 						elementToFocus.focus();
 						elementToFocus.setSelectionRange(0, 0);
+					}
+				}
+				break;
+			case "KeyG":
+				if (event.ctrlKey) {
+					if (state !== "main") {
+						if (goToRowInput.classList.contains("hidden")) {
+							goToRow();
+						} else {
+							goToRowInput.classList.add("hidden");
+						}
 					}
 				}
 				break;
@@ -1188,12 +1192,11 @@ function render() {
 
 	// TODO: Refactor listeners callbacks into their own functions
 
-	document.body.addEventListener("keydown", (event) => {
+	document.addEventListener("keydown", (event) => {
 		if (document.activeElement === document.body) {
 			handleKeypressBody(event);
-		} else {
-			handleKeypressGlobal(event);
 		}
+		handleKeypressGlobal(event);
 	});
 
 	searchInput.addEventListener("keydown", (event) => {
