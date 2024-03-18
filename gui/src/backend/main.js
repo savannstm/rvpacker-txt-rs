@@ -2,7 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain, shell, screen } = require("electron")
 const { readFileSync, writeFileSync } = require("fs");
 const { join } = require("path");
 
-const DEBUG = false;
+const DEBUG = true;
 const firstLaunch = JSON.parse(readFileSync(join(__dirname, "launch.json"), "utf8")).firstLaunch;
 
 if (DEBUG && !firstLaunch) {

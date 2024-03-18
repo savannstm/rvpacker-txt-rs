@@ -11,7 +11,7 @@ const {
 const { spawn } = require("child_process");
 const { join } = require("path");
 
-const production = true;
+const production = false;
 
 function render() {
     //#region Directories
