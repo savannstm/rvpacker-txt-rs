@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="bg-gray-900">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,27 +9,27 @@
         <link rel="stylesheet" href="style.css" />
         <title>F&H2 Text Editor</title>
     </head>
-    <body class="overflow-x-hidden invisible p-0 m-0 text-2xl text-white bg-gray-900">
+    <body class="overflow-x-hidden invisible p-0 m-0 text-2xl text-white">
         <div id="top-panel" class="flex sticky top-0 z-30 items-center w-full h-16 bg-gray-800">
             <div id="top-panel-buttons" class="flex items-center w-full h-16">
                 <div
                     id="menu-button"
                     class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
-                    title="Вкладки"
+                    title="Вкладки (Tab)"
                 >
                     menu
                 </div>
                 <div
                     id="save-button"
                     class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
-                    title="Сохранить файлы перевода"
+                    title="Сохранить файлы перевода (Ctrl + S)"
                 >
                     save
                 </div>
                 <div
                     id="compile-button"
                     class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
-                    title="Скомпилировать в JSON файлы"
+                    title="Скомпилировать в JSON файлы (Alt + C)"
                 >
                     upload
                 </div>
@@ -44,7 +44,7 @@
                 <div
                     id="search-button"
                     class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
-                    title="Поиск"
+                    title="Поиск (Ctrl + F)"
                 >
                     search
                 </div>
@@ -101,12 +101,14 @@
                 >
                     translate
                 </div>
-                <div class="w-16"></div>
-
                 <div
-                    id="is-loaded"
+                    id="location-button"
                     class="p-4 text-3xl text-sky-400 cursor-pointer select-none font-material hover:bg-gray-600"
+                    title="Искать только в текущем файле"
                 >
+                    location_on
+                </div>
+                <div id="is-loaded" class="p-4 ml-16 text-3xl text-sky-400 select-none font-material">
                     check_indeterminate_small
                 </div>
                 <div id="current-state" class="flex justify-center items-center p-4"></div>
@@ -239,7 +241,18 @@
             <div
                 id="search-results"
                 class="flex overflow-y-auto fixed top-0 right-0 z-40 flex-col p-4 w-64 h-screen bg-gray-800 transition-transform duration-500 translate-x-full outline-2 outline outline-gray-600"
-            ></div>
+                shown="false"
+                moving="false"
+            >
+                <div
+                    id="switch-search-content"
+                    class="flex justify-center items-center w-full h-16 text-3xl cursor-pointer select-none font-material hover:bg-gray-600"
+                >
+                    search
+                </div>
+                <div id="search-content" class="flex flex-col w-full h-full"></div>
+                <div id="replace-content" class="hidden w-full h-full"></div>
+            </div>
         </div>
     </body>
 </html>

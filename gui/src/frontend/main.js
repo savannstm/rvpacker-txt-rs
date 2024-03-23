@@ -7,17 +7,18 @@ const {
     copyFileSync,
     accessSync,
     writeFileSync,
+    pathExistsSync,
 } = require("fs-extra");
 const { spawn } = require("child_process");
 const { join } = require("path");
 
-const production = false;
+const PRODUCTION = false;
 
 function render() {
     //#region Directories
-    const copiesRoot = production ? join(__dirname, "../../../../copies") : join(__dirname, "../../copies");
-    const backupRoot = production ? join(__dirname, "../../../../backups") : join(__dirname, "../../backups");
-    const translationRoot = production
+    const copiesRoot = PRODUCTION ? join(__dirname, "../../../../copies") : join(__dirname, "../../../copies");
+    const backupRoot = PRODUCTION ? join(__dirname, "../../../../backups") : join(__dirname, "../../../backups");
+    const translationRoot = PRODUCTION
         ? join(__dirname, "../../../../translation")
         : join(__dirname, "../../../translation");
 
@@ -28,22 +29,26 @@ function render() {
     copy();
 
     const contentContainer = document.getElementById("content-container");
-    const leftPanelElements = document.getElementsByClassName("left-panel-element");
     const searchInput = document.getElementById("search-input");
     const replaceInput = document.getElementById("replace-input");
     const leftPanel = document.getElementById("left-panel");
     const searchPanel = document.getElementById("search-results");
+    const searchPanelFound = document.getElementById("search-content");
+    const searchPanelReplaced = document.getElementById("replace-content");
     const saveButton = document.getElementById("save-button");
     const compileButton = document.getElementById("compile-button");
     const searchCaseButton = document.getElementById("case-button");
     const searchWholeButton = document.getElementById("whole-button");
     const searchRegexButton = document.getElementById("regex-button");
     const searchTranslationButton = document.getElementById("translate-button");
+    const searchLocationButton = document.getElementById("location-button");
     const backupCheck = document.getElementById("backup-check");
     const backupSettings = document.getElementById("backup-settings");
     const backupPeriodInput = document.getElementById("backup-period-input");
     const backupMaxInput = document.getElementById("backup-max-input");
     const goToRowInput = document.getElementById("goto-row-input");
+
+    const replaced = new Map();
 
     /** @type {boolean} */
     let backupEnabled;
@@ -58,16 +63,22 @@ function render() {
     let searchWhole = false;
     let searchCase = false;
     let searchTranslation = false;
+    let searchLocation = false;
     let optionsOpened = false;
 
     let state = "main";
     let previousState = "main";
+
+    let saved = true;
 
     backupCheck.innerHTML = backupEnabled ? "check" : "close";
     backupSettings.classList.toggle("hidden", !backupEnabled);
     backupPeriodInput.value = backupPeriod;
     backupMaxInput.value = backupMax;
 
+    if (!pathExistsSync(join(__dirname, "replacement-log.json"))) {
+        writeFileSync(join(__dirname, "replacement-log.json"), "{}", "utf8");
+    }
     ensureDirSync(backupRoot);
     let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
     if (backupEnabled) backup(backupPeriod);
@@ -86,9 +97,9 @@ function render() {
         return;
     });
 
-    function getSettings() {
+    async function getSettings() {
         try {
-            const settings = JSON.parse(readFileSync(join(__dirname, "settings.json"), "utf-8"));
+            const settings = JSON.parse(readFileSync(join(__dirname, "settings.json"), "utf8"));
 
             backupEnabled = settings.backup.enabled;
             backupPeriod = settings.backup.period;
@@ -96,7 +107,10 @@ function render() {
             return;
         } catch (err) {
             alert("Не удалось получить настройки.");
-            ipcRenderer.send("quit");
+            const response = await ipcRenderer.invoke("create-settings-file");
+            if (response) {
+                getSettings();
+            }
         }
     }
 
@@ -136,18 +150,19 @@ function render() {
                 let margin = 0;
 
                 for (const node of child.children) {
-                    const { y, x } = node.getBoundingClientRect();
+                    const { x, y } = node.getBoundingClientRect();
 
-                    nodeYCoordinates.set(node.id, y + margin);
                     nodeXCoordinates.set(node.id, x);
+                    nodeYCoordinates.set(node.id, y + margin);
                     margin += 8;
                 }
 
                 for (const node of child.children) {
-                    const { id } = node;
+                    const id = node.id;
+
                     node.style.position = "absolute";
-                    node.style.top = `${nodeYCoordinates.get(id)}px`;
                     node.style.left = `${nodeXCoordinates.get(id)}px`;
+                    node.style.top = `${nodeYCoordinates.get(id)}px`;
                     node.style.width = "1840px";
                     node.children[0].classList.add("hidden");
                 }
@@ -156,25 +171,22 @@ function render() {
                 child.style.height = `${nodeYCoordinates.get(lastChild.id) - 64}px`;
                 child.classList.remove("flex", "flex-col");
                 child.classList.add("hidden");
-            }
 
-            requestAnimationFrame(() => {
-                document.body.classList.remove("invisible");
-            });
+                requestAnimationFrame(() => {
+                    document.body.classList.remove("invisible");
+                });
+            }
         });
+        return;
     }
 
     function determineLastBackupNumber() {
         const backups = readdirSync(backupRoot);
-
-        if (backups.length === 0) {
-            return "00";
-        } else {
-            return backups.map((backup) => backup.slice(-2)).sort((a, b) => b - a)[0];
-        }
+        return backups.length === 0 ? "00" : backups.map((backup) => backup.slice(-2)).sort((a, b) => b - a)[0];
     }
 
     function createRegularExpression(text) {
+        text = text.trim();
         try {
             if (text.startsWith("/")) {
                 const first = text.indexOf("/");
@@ -204,53 +216,53 @@ function render() {
      * @param {HTMLTextAreaElement} node
      * @returns {void}
      */
+    // TODO: Replace nodeText constant with function argument
     function setMatches(map, text, node) {
         const expr = createRegularExpression(text);
         const nodeText = node.tagName === "TEXTAREA" ? node.value : node.innerHTML;
         const matches = nodeText.match(expr) || [];
 
-        if (matches.length === 0) {
-            return;
-        } else {
-            const result = [];
-            let lastIndex = 0;
+        if (matches.length === 0) return;
 
-            for (const match of matches) {
-                const start = nodeText.indexOf(match, lastIndex);
-                const end = start + match.length;
+        const result = [];
+        let lastIndex = 0;
 
-                result.push(`<div class="inline">${nodeText.slice(lastIndex, start)}</div>`);
-                result.push(`<div class="inline bg-gray-500">${match}</div>`);
+        for (const match of matches) {
+            const start = nodeText.indexOf(match, lastIndex);
+            const end = start + match.length;
 
-                lastIndex = end;
-            }
+            result.push(`<div class="inline">${nodeText.slice(lastIndex, start)}</div>`);
+            result.push(`<div class="inline bg-gray-500">${match}</div>`);
 
-            result.push(`<div class="inline">${nodeText.slice(lastIndex)}</div>`);
-
-            map.set(node, result.join(""));
+            lastIndex = end;
         }
+
+        result.push(`<div class="inline">${nodeText.slice(lastIndex)}</div>`);
+
+        map.set(node, result.join(""));
 
         return;
     }
+
     /**
      * @param {string} text
-     * @returns {Map<HTMLElement, string>}
+     * @returns {Map<HTMLDivElement|HTMLTextAreaElement, string>}
      */
     function searchText(text) {
-        /** @type {Map<HTMLElement, string>} */
+        text = text.trim();
+
+        /** @type {Map<HTMLDivElement|HTMLTextAreaElement, string>} */
         const matches = new Map();
+        const targetElements = searchLocation
+            ? [...document.getElementById(`${state}-content`).children]
+            : [...contentContainer.children].flatMap((parent) => [...parent.children]);
 
-        for (const parent of contentContainer.children) {
-            for (const child of parent.children) {
-                const node = child.children[0].children;
+        for (const child of targetElements) {
+            const node = child.children[0].children;
+            setMatches(matches, text, node[2]);
 
-                if (searchTranslation) {
-                    setMatches(matches, text, node[2]);
-                } else {
-                    for (let i = 1; i < 3; i++) {
-                        setMatches(matches, text, node[i]);
-                    }
-                }
+            if (!searchTranslation) {
+                setMatches(matches, text, node[1]);
             }
         }
 
@@ -261,8 +273,172 @@ function render() {
      * @param {string} id
      * @returns {[HTMLElement, number]}
      */
+    // TODO: Heavily refactor
+    function displaySearchResults(text = null, hide = true) {
+        function showSearchPanel(hide = true) {
+            if (hide) {
+                if (searchPanel.getAttribute("moving") === "false") {
+                    searchPanel.classList.toggle("translate-x-full");
+                    searchPanel.classList.toggle("translate-x-0");
+                    searchPanel.setAttribute("moving", true);
+                }
+            } else {
+                searchPanel.classList.remove("translate-x-full");
+                searchPanel.classList.add("translate-x-0");
+                searchPanel.setAttribute("moving", true);
+            }
 
-    function displaySearchResults(text) {
+            const searchSwitch = document.getElementById("switch-search-content");
+
+            function handleSearchSwitch() {
+                searchPanelFound.classList.toggle("hidden");
+                searchPanelFound.classList.toggle("flex");
+                searchPanelFound.classList.toggle("flex-col");
+
+                searchPanelReplaced.classList.toggle("hidden");
+                searchPanelReplaced.classList.toggle("flex");
+                searchPanelReplaced.classList.toggle("flex-col");
+
+                if (searchSwitch.innerHTML.trim() === "search") {
+                    searchSwitch.innerHTML = "menu_book";
+
+                    const replacementLogContent = JSON.parse(
+                        readFileSync(join(__dirname, "replacement-log.json"), "utf8")
+                    );
+
+                    for (const [key, value] of Object.entries(replacementLogContent)) {
+                        const replacedElement = document.createElement("div");
+                        replacedElement.classList.add(
+                            "text-white",
+                            "text-xl",
+                            "cursor-pointer",
+                            "bg-gray-700",
+                            "my-1",
+                            "p-1",
+                            "border-2",
+                            "border-gray-600"
+                        );
+
+                        replacedElement.innerHTML = `<div class="text-base text-gray-400">${key}</div>
+                            <div class="text-base">${value.original}</div>
+                            <div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
+                            <div class="text-base">${value.translated}</div>`;
+
+                        searchPanelReplaced.appendChild(replacedElement);
+                    }
+
+                    function handleReplacedClick(event) {
+                        for (const element of searchPanelReplaced.children) {
+                            const { x, y, width: w, height: h } = element.getBoundingClientRect();
+
+                            if (event.x > x && event.x < x + w && event.y > y && event.y < y + h) {
+                                const clicked = document.getElementById(element.children[0].textContent);
+
+                                if (event.button === 0) {
+                                    changeState(
+                                        clicked.parentElement.parentElement.parentElement.id.replace("-content", ""),
+                                        false
+                                    );
+
+                                    requestAnimationFrame(() => {
+                                        clicked.parentElement.parentElement.scrollIntoView({
+                                            block: "center",
+                                            inline: "center",
+                                        });
+                                    });
+                                } else if (event.button === 2) {
+                                    clicked.value = element.children[3].textContent;
+
+                                    element.innerHTML = `<div class="text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code>${element.children[3].textContent}</code></div>`;
+                                    delete replacementLogContent[clicked.id];
+
+                                    writeFileSync(
+                                        join(__dirname, "replacement-log.json"),
+                                        JSON.stringify(replacementLogContent, null, 4),
+                                        "utf8"
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    searchPanelReplaced.addEventListener("mousedown", (event) => {
+                        handleReplacedClick(event);
+                    });
+                } else {
+                    searchSwitch.innerHTML = "search";
+                    searchPanelReplaced.innerHTML = "";
+                    searchPanelReplaced.removeEventListener("mousedown", (event) => {
+                        handleReplacedClick(event);
+                    });
+                }
+
+                return;
+            }
+
+            let loadingContainer;
+            if (searchPanelFound.children.length > 0) {
+                loadingContainer = document.createElement("div");
+                loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
+                loadingContainer.innerHTML = searchPanel.classList.contains("translate-x-0")
+                    ? `<div class="text-4xl animate-spin font-material">refresh</div>`
+                    : "";
+
+                searchPanelFound.appendChild(loadingContainer);
+            }
+
+            if (searchPanel.getAttribute("shown") === "false") {
+                searchPanel.addEventListener(
+                    "transitionend",
+                    () => {
+                        for (const child of searchPanelFound.children) {
+                            child.classList.toggle("hidden");
+                        }
+
+                        if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
+                        searchSwitch.addEventListener("click", handleSearchSwitch);
+                        searchPanel.setAttribute("shown", "true");
+                        searchPanel.setAttribute("moving", false);
+                        return;
+                    },
+                    { once: true }
+                );
+            } else {
+                if (searchPanel.classList.contains("translate-x-full")) {
+                    searchPanel.setAttribute("shown", "false");
+                    searchPanel.setAttribute("moving", true);
+
+                    searchSwitch.removeEventListener("click", handleSearchSwitch);
+                    searchPanel.addEventListener(
+                        "transitionend",
+                        () => {
+                            searchPanel.setAttribute("moving", false);
+                        },
+                        { once: true }
+                    );
+                    return;
+                }
+
+                for (const child of searchPanelFound.children) {
+                    child.classList.toggle("hidden");
+                }
+
+                if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
+                searchPanel.setAttribute("moving", false);
+            }
+        }
+
+        if (!text) {
+            showSearchPanel(hide);
+            return;
+        }
+
+        /**
+         * Finds the counterpart element based on the given id.
+         *
+         * @param {string} id - The id of the element to search for.
+         * @return {[HTMLElement, number]} - An array containing the counterpart element and a flag indicating type of match.
+         */
         function findCounterpart(id) {
             if (id.includes("original")) {
                 return [document.getElementById(id.replace("original", "translated")), 1];
@@ -271,44 +447,74 @@ function render() {
             }
         }
 
+        function extractInfo(element) {
+            const parts = element.id.split("-");
+            const parentId = parts[parts.length - 2];
+            const id = parts[parts.length - 1];
+            return [parentId, id];
+        }
+
+        function handleResultClick(event, currentState, element, resultElement, counterpartIndex) {
+            if (event.button === 0) {
+                changeState(currentState.id.replace("-content", ""), false);
+
+                requestAnimationFrame(() => {
+                    element.parentElement.parentElement.scrollIntoView({
+                        block: "center",
+                        inline: "center",
+                    });
+                });
+            } else if (event.button === 2) {
+                if (element.id.includes("original")) {
+                    alert("Оригинальные строки не могут быть заменены.");
+                    return;
+                } else {
+                    if (replaceInput.value.trim()) {
+                        const newText = replaceText(element);
+
+                        if (newText) {
+                            const index = counterpartIndex === 1 ? 3 : 0;
+                            resultElement.children[index].innerHTML = newText;
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        text = text.trim();
+
+        if (!text) return;
+
         const results = searchText(text);
 
         if (results.size === 0) {
-            searchPanel.innerHTML = `<div class="flex justify-center items-center h-full">Нет совпадений</div>`;
-        } else {
-            for (const [element, result] of results) {
-                const resultElement = document.createElement("div");
-                resultElement.classList.add(
-                    "text-white",
-                    "text-xl",
-                    "cursor-pointer",
-                    "bg-gray-700",
-                    "my-1",
-                    "p-1",
-                    "border-2",
-                    "border-gray-600",
-                    "hidden"
-                );
+            searchPanelFound.innerHTML = `<div class="flex justify-center items-center h-full">Нет совпадений</div>`;
+            showSearchPanel(hide);
+            return;
+        }
 
-                const grandGrandParent = element.parentElement.parentElement.parentElement;
+        for (const [element, result] of results) {
+            const resultElement = document.createElement("div");
+            resultElement.classList.add(
+                "text-white",
+                "text-xl",
+                "cursor-pointer",
+                "bg-gray-700",
+                "my-1",
+                "p-1",
+                "border-2",
+                "border-gray-600",
+                "hidden"
+            );
 
-                const [counterpart, counterpartIndex] = findCounterpart(element.id);
+            const thirdParent = element.parentElement.parentElement.parentElement;
 
-                /**
-                 * @param {HTMLElement} element
-                 * @returns {[parentId: string, id: string]}
-                 */
-                function extractInfo(element) {
-                    const parts = element.id.split("-");
-                    const parentId = parts[parts.length - 2];
-                    const id = parts[parts.length - 1];
-                    return [parentId, id];
-                }
+            const [counterpart, counterpartIndex] = findCounterpart(element.id);
+            const [elementParentId, elementId] = extractInfo(element);
+            const [counterpartParentId, counterpartId] = extractInfo(counterpart);
 
-                const [elementParentId, elementId] = extractInfo(element);
-                const [counterpartParentId, counterpartId] = extractInfo(counterpart);
-
-                resultElement.innerHTML = `
+            resultElement.innerHTML = `
 					<div class="text-base">${result}</div>
 					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id.slice(
                         0,
@@ -322,66 +528,45 @@ function render() {
                     )} - ${counterpartParentId} - ${counterpartId}</div>
 				`;
 
-                resultElement.addEventListener("mousedown", (event) => {
-                    if (event.button === 0) {
-                        const currentState = grandGrandParent.id.replace("-content", "");
-
-                        changeState(currentState, false);
-
-                        requestAnimationFrame(() => {
-                            requestAnimationFrame(() => {
-                                element.parentElement.parentElement.scrollIntoView({
-                                    block: "center",
-                                    inline: "center",
-                                });
-                            });
-                        });
-                    } else if (event.button === 2) {
-                        if (element.id.includes("original")) {
-                            alert("Оригинальные строки не могут быть заменены.");
-                        } else {
-                            if (replaceInput.value.trim()) {
-                                const newText = replaceText(element);
-
-                                if (newText) {
-                                    const index = counterpartIndex === 1 ? 3 : 0;
-                                    resultElement.children[index].innerHTML = newText;
-                                }
-                            }
-                        }
-                    }
-                });
-
-                searchPanel.append(resultElement);
-            }
+            resultElement.setAttribute("data", `${thirdParent.id},${element.id},${counterpartIndex}`);
+            searchPanelFound.appendChild(resultElement);
         }
 
-        let showAfterTranslation = false;
-        if (!searchPanel.classList.contains("translate-x-0")) {
-            searchPanel.classList.remove("translate-x-full");
-            searchPanel.classList.add("translate-x-0");
-            showAfterTranslation = true;
-        }
+        showSearchPanel(hide);
 
-        const loadingContainer = document.createElement("div");
-        loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
-        loadingContainer.innerHTML = `<div class="text-4xl animate-spin font-material">refresh</div>`;
-        searchPanel.appendChild(loadingContainer);
+        /**
+         * A function that handles result selection based on the event coordinates.
+         *
+         * @param {MouseEvent} event - the event object containing the coordinates
+         * @return {void}
+         */
+        function handleResultSelecting(event) {
+            for (const resultElement of searchPanelFound.children) {
+                const { x, y, width: w, height: h } = resultElement.getBoundingClientRect();
 
-        if (showAfterTranslation) {
-            searchPanel.addEventListener("transitionend", function handleTransitionEnd() {
-                for (const child of searchPanel.children) {
-                    child.classList.remove("hidden");
+                if (event.x > x && event.x < x + w && event.y > y && event.y < y + h) {
+                    const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data").split(",");
+
+                    handleResultClick(
+                        event,
+                        document.getElementById(thirdParent),
+                        document.getElementById(element),
+                        resultElement,
+                        parseInt(counterpartIndex)
+                    );
+                    return;
                 }
-                searchPanel.removeChild(loadingContainer);
-                searchPanel.removeEventListener("transitionend", handleTransitionEnd);
-            });
-        } else {
-            for (const child of searchPanel.children) {
-                child.classList.remove("hidden");
             }
-            searchPanel.removeChild(loadingContainer);
+            return;
         }
+
+        searchPanelFound.removeEventListener("mousedown", (event) => {
+            handleResultSelecting(event);
+        });
+
+        searchPanelFound.addEventListener("mousedown", (event) => {
+            handleResultSelecting(event);
+        });
         return;
     }
 
@@ -401,18 +586,46 @@ function render() {
                 i < newText.length - 1 ? highlightedReplacement : "",
             ]);
 
-            text.value = newText.join(replacementValue);
+            const newValue = newText.join(replacementValue);
+
+            replaced.set(text.id, { original: text.value, translated: newValue });
+            const prevFile = JSON.parse(readFileSync(join(__dirname, "replacement-log.json"), "utf8"));
+            const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
+
+            writeFileSync(join(__dirname, "replacement-log.json"), JSON.stringify(newObject, null, 4), "utf8");
+            replaced.clear();
+
+            text.value = newValue;
             return newTextParts.join("");
         }
+
+        text = text.trim();
+        if (!text) return;
 
         const results = searchText(text);
         if (results.size === 0) return;
 
         const regex = createRegularExpression(text);
+        if (!regex) return;
 
         for (const textarea of results.keys()) {
-            if (!textarea.id.includes("original")) textarea.value = textarea.value.replace(regex, replaceInput.value);
+            if (!textarea.id.includes("original")) {
+                const newValue = textarea.value.replace(regex, replaceInput.value);
+
+                replaced.set(textarea.id, {
+                    original: textarea.value,
+                    translated: newValue,
+                });
+
+                textarea.value = newValue;
+            }
         }
+
+        const prevFile = JSON.parse(readFileSync(join(__dirname, "replacement-log.json"), "utf8"));
+        const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
+
+        writeFileSync(join(__dirname, "replacement-log.json"), JSON.stringify(newObject, null, 4), "utf8");
+        replaced.clear();
 
         return;
     }
@@ -429,17 +642,13 @@ function render() {
             const copiesOtherLength = readdirSync(join(copiesRoot, "other")).length;
 
             if (copiesMapsLength === mapsLength && copiesOtherLength === otherLength) {
-                console.log("Files are already copied.");
                 return true;
             }
 
-            console.log("Files are not copied yet.");
             return false;
         }
 
         if (isCopied()) return;
-
-        console.log("Copying files...");
 
         for (const file of readdirSync(join(translationRoot, "maps"))) {
             copyFileSync(join(translationRoot, "maps", file), join(copiesRoot, "maps", file));
@@ -488,9 +697,7 @@ function render() {
                     dateProperties[key] = value.toString().padStart(2, "0");
                 }
 
-                if (nextBackupNumber === 99) {
-                    nextBackupNumber = 1;
-                }
+                if (nextBackupNumber === 99) nextBackupNumber = 1;
 
                 const backupFolderName = `${Object.values(dateProperties).join("-")}_${nextBackupNumber
                     .toString()
@@ -522,7 +729,8 @@ function render() {
 
                 if (filePath) {
                     const dir = join(dirName, filePath);
-                    writeFileSync(dir, outputArray.join("\n"), "utf-8");
+                    writeFileSync(dir, outputArray.join("\n"), "utf8");
+                    if (!backup) saved = true;
                 }
             }
 
@@ -534,14 +742,16 @@ function render() {
     }
 
     function backup(s) {
-        if (backupEnabled) {
-            setTimeout(() => {
+        if (!backupEnabled) return;
+
+        setTimeout(() => {
+            if (backupEnabled) {
                 save(true);
                 backup(s);
-            }, s * 1000);
-        } else {
+            }
             return;
-        }
+        }, s * 1000);
+        return;
     }
 
     /**
@@ -612,12 +822,12 @@ function render() {
         const currentState = document.getElementById("current-state");
         const pageLoadedDisplay = document.getElementById("is-loaded");
 
-        pageLoadedDisplay.innerHTML = "refresh";
-        pageLoadedDisplay.classList.toggle("animate-spin");
-
-        currentState.innerHTML = newState;
-
         requestAnimationFrame(() => {
+            pageLoadedDisplay.innerHTML = "refresh";
+            pageLoadedDisplay.classList.toggle("animate-spin");
+
+            currentState.innerHTML = newState;
+
             requestAnimationFrame(() => {
                 const contentParent = document.getElementById(contentId);
                 contentParent.classList.remove("hidden");
@@ -625,9 +835,7 @@ function render() {
 
                 if (previousState !== "main") {
                     document.getElementById(`${previousState}-content`).classList.remove("flex", "flex-col");
-
                     document.getElementById(`${previousState}-content`).classList.add("hidden");
-
                     observer.disconnect();
                 }
 
@@ -642,8 +850,6 @@ function render() {
 
                 pageLoadedDisplay.innerHTML = "done";
                 pageLoadedDisplay.classList.toggle("animate-spin");
-
-                console.log(`Current state is ${newState}`);
             });
         });
         return;
@@ -655,14 +861,12 @@ function render() {
      * @returns {void}
      */
     function changeState(newState, slide = true) {
-        if (state === newState) {
-            return;
-        }
+        if (state === newState) return;
 
         switch (newState) {
             case "main":
                 state = "main";
-                currentState.innerHTML = "";
+                document.getElementById("current-state").innerHTML = "";
                 pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
                 for (const child of contentContainer.children) {
@@ -733,25 +937,7 @@ function render() {
                 leftPanel.classList.toggle("-translate-x-full");
                 break;
             case "KeyR":
-                searchPanel.classList.toggle("translate-x-full");
-                searchPanel.classList.toggle("translate-x-0");
-
-                const loadingContainer = document.createElement("div");
-                loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
-                loadingContainer.innerHTML = searchPanel.classList.contains("translate-x-0")
-                    ? `<div class="text-4xl animate-spin font-material">refresh</div>`
-                    : "";
-
-                searchPanel.appendChild(loadingContainer);
-
-                searchPanel.addEventListener("transitionend", function handleTransitionEnd() {
-                    for (const child of searchPanel.children) {
-                        child.classList.toggle("hidden");
-                    }
-
-                    searchPanel.removeChild(loadingContainer);
-                    searchPanel.removeEventListener("transitionend", handleTransitionEnd);
-                });
+                displaySearchResults();
                 break;
             case "Digit1":
                 changeState("maps", false);
@@ -794,6 +980,37 @@ function render() {
     }
 
     /**
+     * Jump to the row based on the key pressed.
+     *
+     * @param {string} key - the key pressed
+     * @return {void}
+     */
+    function jumpToRow(key) {
+        const focusedElement = document.activeElement;
+        if (!focusedElement || !focusedElement.id || (key !== "alt" && key !== "ctrl")) return;
+
+        const idParts = focusedElement.id.split("-");
+        const index = parseInt(idParts.pop(), 10);
+        const baseId = idParts.join("-");
+
+        if (isNaN(index)) return;
+
+        const step = key === "alt" ? 1 : -1;
+        const nextIndex = index + step;
+        const nextElementId = `${baseId}-${nextIndex}`;
+        const nextElement = document.getElementById(nextElementId);
+
+        if (!nextElement) return;
+
+        const scrollOffset = nextElement.clientHeight + 8;
+        window.scrollBy(0, step * scrollOffset);
+        focusedElement.blur();
+        nextElement.focus();
+        nextElement.setSelectionRange(0, 0);
+        return;
+    }
+
+    /**
      * @param {KeyboardEvent} event
      * @returns {void}
      */
@@ -804,31 +1021,9 @@ function render() {
                 break;
             case "Enter":
                 if (event.altKey) {
-                    const focusedElement = document.activeElement;
-                    const idParts = focusedElement.id.split("-");
-                    const index = parseInt(idParts.pop()) + 1;
-                    const elementToFocus = document.getElementById(`${idParts.join("-")}-${index}`);
-
-                    if (elementToFocus) {
-                        window.scrollBy(0, elementToFocus.clientHeight + 8);
-                        focusedElement.blur();
-                        elementToFocus.focus();
-                        elementToFocus.setSelectionRange(0, 0);
-                    }
-                }
-
-                if (event.ctrlKey) {
-                    const focusedElement = document.activeElement;
-                    const idParts = focusedElement.id.split("-");
-                    const index = parseInt(idParts.pop()) - 1;
-                    const elementToFocus = document.getElementById(`${idParts.join("-")}-${index}`);
-
-                    if (elementToFocus) {
-                        window.scrollBy(0, -elementToFocus.clientHeight - 8);
-                        focusedElement.blur();
-                        elementToFocus.focus();
-                        elementToFocus.setSelectionRange(0, 0);
-                    }
+                    jumpToRow("alt");
+                } else if (event.ctrlKey) {
+                    jumpToRow("ctrl");
                 }
                 break;
             case "KeyS":
@@ -872,11 +1067,11 @@ function render() {
             if (event.ctrlKey) {
                 searchInput.value += "\n";
             } else {
-                if (searchInput.value) {
-                    searchPanel.innerHTML = "";
-                    displaySearchResults(searchInput.value.trim());
+                if (searchInput.value.trim()) {
+                    searchPanelFound.innerHTML = "";
+                    displaySearchResults(searchInput.value, false);
                 } else {
-                    searchPanel.innerHTML = `<div class="flex justify-center items-center h-full">Результатов нет</div>`;
+                    searchPanelFound.innerHTML = `<div class="flex justify-center items-center h-full">Результатов нет</div>`;
                 }
             }
         }
@@ -995,17 +1190,16 @@ function render() {
             cwd: join(__dirname, "../resources"),
         });
 
-        let error = false;
-
         writer.stderr.on("data", (err) => {
             alert(`Не удалось записать файлы: ${err}`);
-            error = true;
+            writer.kill();
+            return;
         });
 
         writer.on("close", () => {
             compileButton.classList.remove("animate-spin");
-            if (!error) alert("Все файлы записаны успешно.");
-            else alert("Файлы не были записаны.");
+            alert("Все файлы записаны успешно.");
+            return;
         });
 
         return;
@@ -1027,25 +1221,14 @@ function render() {
 
     function handleBackupPeriod() {
         backupPeriod = parseInt(backupPeriodInput.value);
-
-        if (backupPeriod < 60) {
-            backupPeriodInput.value = 60;
-        } else if (backupPeriod > 3600) {
-            backupPeriodInput.value = 3600;
-        }
-
+        backupPeriodInput.value = backupPeriod < 60 ? 60 : backupPeriod > 3600 ? 3600 : backupPeriod;
         return;
     }
 
     function handleBackupMax() {
         backupMax = parseInt(backupMaxInput.value);
 
-        if (backupMax < 1) {
-            backupMaxInput.value = 1;
-        } else if (backupMax > 100) {
-            backupMaxInput.value = 100;
-        }
-
+        backupMaxInput.value = backupMax < 1 ? 1 : backupMax > 100 ? 100 : backupMax;
         return;
     }
 
@@ -1076,7 +1259,6 @@ function render() {
 
             writeFileSync(join(__dirname, "settings.json"), JSON.stringify(appSettings, null, 4), "utf-8");
         }
-
         return;
     }
     //#endregion
@@ -1093,7 +1275,7 @@ function render() {
         return;
     });
 
-    for (const element of leftPanelElements) {
+    for (const element of leftPanel.children) {
         element.addEventListener("click", () => {
             changeState(element.id);
             return;
@@ -1108,19 +1290,17 @@ function render() {
 
     document.getElementById("search-button").addEventListener("click", () => {
         if (searchInput.value) {
-            searchPanel.innerHTML = "";
-            displaySearchResults(searchInput.value.trim());
+            searchPanelFound.innerHTML = "";
+            displaySearchResults(searchInput.value, false);
         } else if (document.activeElement === document.body) {
             searchInput.focus();
-        } else {
-            searchPanel.innerHTML = `<div class="flex justify-center items-center h-full">Результатов нет</div>`;
         }
         return;
     });
 
     document.getElementById("replace-button").addEventListener("click", () => {
         if (searchInput.value && replaceInput.value) {
-            replaceText(searchInput.value.trim(), true);
+            replaceText(searchInput.value, true);
         }
         return;
     });
@@ -1144,15 +1324,11 @@ function render() {
     searchRegexButton.addEventListener("click", () => {
         searchRegex = !searchRegex;
 
-        if (searchCase) {
-            searchCase = false;
-            searchCaseButton.classList.remove("bg-gray-500");
-        }
+        searchCase = false;
+        searchCaseButton.classList.remove("bg-gray-500");
 
-        if (searchWhole) {
-            searchWhole = false;
-            searchWholeButton.classList.remove("bg-gray-500");
-        }
+        searchWhole = false;
+        searchWholeButton.classList.remove("bg-gray-500");
 
         searchRegexButton.classList.toggle("bg-gray-500");
         return;
@@ -1164,23 +1340,68 @@ function render() {
         return;
     });
 
+    searchLocationButton.addEventListener("click", () => {
+        searchLocation = !searchLocation;
+        searchLocationButton.classList.toggle("bg-gray-500");
+        return;
+    });
+
     saveButton.addEventListener("click", save);
     compileButton.addEventListener("click", compile);
     document.getElementById("options-button").addEventListener("click", showOptions);
+
+    document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+            case "Tab":
+                e.preventDefault();
+                break;
+            case e.altKey:
+                e.preventDefault();
+                break;
+            case "F4" && e.altKey:
+                e.preventDefault();
+
+                if (saved) {
+                    ipcRenderer.send("quit");
+                    return;
+                }
+
+                ipcRenderer.invoke("quit-confirm").then((response) => {
+                    if (response) {
+                        save();
+                        setTimeout(() => {
+                            ipcRenderer.send("quit");
+                        }, 1000);
+                        return;
+                    } else {
+                        return;
+                    }
+                });
+                break;
+            case "F5":
+                e.preventDefault();
+
+                document.body.classList.add("hidden");
+
+                requestAnimationFrame(() => {
+                    location.reload();
+                });
+                break;
+            default:
+                if (
+                    saved &&
+                    document.activeElement !== document.body &&
+                    document.activeElement !== searchInput &&
+                    document.activeElement !== replaceInput
+                ) {
+                    saved = false;
+                }
+        }
+        return;
+    });
 
     //#endregion
     return;
 }
 
 document.addEventListener("DOMContentLoaded", render);
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Tab") {
-        e.preventDefault();
-    }
-
-    if (e.altKey) {
-        e.preventDefault();
-    }
-
-    return;
-});
