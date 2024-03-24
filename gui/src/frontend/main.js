@@ -187,6 +187,7 @@ function render() {
 
     function createRegularExpression(text) {
         text = text.trim();
+
         try {
             if (text.startsWith("/")) {
                 const first = text.indexOf("/");
@@ -328,37 +329,37 @@ function render() {
                     }
 
                     function handleReplacedClick(event) {
-                        for (const element of searchPanelReplaced.children) {
-                            const { x, y, width: w, height: h } = element.getBoundingClientRect();
+                        const element = event.target.parentElement;
+                        if (element.hasAttribute("reverted")) return;
+                        const clicked = document.getElementById(element.children[0].textContent);
 
-                            if (event.x > x && event.x < x + w && event.y > y && event.y < y + h) {
-                                const clicked = document.getElementById(element.children[0].textContent);
+                        if (event.button === 0) {
+                            changeState(
+                                clicked.parentElement.parentElement.parentElement.id.replace("-content", ""),
+                                false
+                            );
 
-                                if (event.button === 0) {
-                                    changeState(
-                                        clicked.parentElement.parentElement.parentElement.id.replace("-content", ""),
-                                        false
-                                    );
-
-                                    requestAnimationFrame(() => {
-                                        clicked.parentElement.parentElement.scrollIntoView({
-                                            block: "center",
-                                            inline: "center",
-                                        });
+                            //* it takes two frames to change the state
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    clicked.parentElement.parentElement.scrollIntoView({
+                                        block: "center",
+                                        inline: "center",
                                     });
-                                } else if (event.button === 2) {
-                                    clicked.value = element.children[3].textContent;
+                                });
+                            });
+                        } else if (event.button === 2) {
+                            clicked.value = element.children[1].textContent;
 
-                                    element.innerHTML = `<div class="text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code>${element.children[3].textContent}</code></div>`;
-                                    delete replacementLogContent[clicked.id];
+                            element.innerHTML = `<div class="inline text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code class="inline">${element.children[1].textContent}</code></div>`;
+                            element.setAttribute("reverted", "");
+                            delete replacementLogContent[clicked.id];
 
-                                    writeFileSync(
-                                        join(__dirname, "replacement-log.json"),
-                                        JSON.stringify(replacementLogContent, null, 4),
-                                        "utf8"
-                                    );
-                                }
-                            }
+                            writeFileSync(
+                                join(__dirname, "replacement-log.json"),
+                                JSON.stringify(replacementLogContent, null, 4),
+                                "utf8"
+                            );
                         }
                     }
 
@@ -458,10 +459,13 @@ function render() {
             if (event.button === 0) {
                 changeState(currentState.id.replace("-content", ""), false);
 
+                //* it takes two frames to change the state
                 requestAnimationFrame(() => {
-                    element.parentElement.parentElement.scrollIntoView({
-                        block: "center",
-                        inline: "center",
+                    requestAnimationFrame(() => {
+                        element.parentElement.parentElement.scrollIntoView({
+                            block: "center",
+                            inline: "center",
+                        });
                     });
                 });
             } else if (event.button === 2) {
@@ -483,7 +487,6 @@ function render() {
         }
 
         text = text.trim();
-
         if (!text) return;
 
         const results = searchText(text);
@@ -541,23 +544,18 @@ function render() {
          * @return {void}
          */
         function handleResultSelecting(event) {
-            for (const resultElement of searchPanelFound.children) {
-                const { x, y, width: w, height: h } = resultElement.getBoundingClientRect();
+            const resultElement = event.target.parentElement.hasAttribute("data")
+                ? event.target.parentElement
+                : event.target.parentElement.parentElement;
+            const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data").split(",");
 
-                if (event.x > x && event.x < x + w && event.y > y && event.y < y + h) {
-                    const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data").split(",");
-
-                    handleResultClick(
-                        event,
-                        document.getElementById(thirdParent),
-                        document.getElementById(element),
-                        resultElement,
-                        parseInt(counterpartIndex)
-                    );
-                    return;
-                }
-            }
-            return;
+            handleResultClick(
+                event,
+                document.getElementById(thirdParent),
+                document.getElementById(element),
+                resultElement,
+                parseInt(counterpartIndex)
+            );
         }
 
         searchPanelFound.removeEventListener("mousedown", (event) => {
@@ -1275,12 +1273,9 @@ function render() {
         return;
     });
 
-    for (const element of leftPanel.children) {
-        element.addEventListener("click", () => {
-            changeState(element.id);
-            return;
-        });
-    }
+    leftPanel.addEventListener("click", (event) => {
+        changeState(event.target.id);
+    });
 
     document.getElementById("menu-button").addEventListener("click", () => {
         leftPanel.classList.toggle("translate-x-0");
