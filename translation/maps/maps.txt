@@ -1,4 +1,3 @@
-This is text!
 A dead body. It seems to be in relatively fresh state of\ndecomposition...
 Investigate
 Search
@@ -13,18 +12,8 @@ The ghoul manages to stand up. Now name your new possession.
 Continue
 Quit
 Thank you for showing interest anyway!
-GabText Please create your character
-GabText First, you must choose your profession
-GabText \N[1]...
-GabText You have travelled a great distance
-GabText in search of your former comrade in arms.
-GabText Your journey has lead you to this wretched place.
-\nMercenary - A warrior class that will do whatever it \ntakes to see the light of the next day. There isn't \na task you wouldn't undertake for a bag of silver coins.
 Yes
 No
-\nKnight - Righteous and discliplined. Following the path\nof the sword is as much about physical, as it is about \nmental strength. Excels in melee combat.
-\nUnfortunately the only class available in this demo\nversion is Mercenary.
-\nDark Priest - Alchemy and ritual passages have gained \nyou deeper knowledge of human nature. There is no right \nand wrong, only the way of the gods.
 You are unable to move...
 Quit breathing
 Hold on!
@@ -1334,14 +1323,7 @@ GabText The dark priest is hurt!
 GabText You wound the arm of the dark priest!
 No reaction from the foul man. Lifeless eyes beneath the mask \nremain cloudy.
 You took the \c[2]Vile head\c[0] as a trophy!
-Use \c[2]Soul stone\c[0]
-The \c[2]Soul stone\c[0] changed its appearance.\nThe stone feels heavier now and is radiating faint blue light.
-Use \c[2]Demon seed\c[0]
-A baby sprouted out of your seed!
-You take the baby with you.
 You do not have enough sanity to perform this act.
-You could use \c[2]Soul stone\c[0] here...
-The \c[2]Soul stone\c[0] changed its appearance.\nThe stone feels heavier now and is radiating faint blue \nlight.
 There is a wooden chest here...
 Open it
 HEADS
@@ -1437,15 +1419,6 @@ The hay has been left at the mercies of the weather for way\ntoo long. It's all 
 These are your legs.
 Pick them up
 You got pick up 2 \c[2]Legs\c[0].
-Choose the mode?
-Normal mode
-Hard mode
-[Dungeon Nights]
-It is strongly recommended that you play the Normal mode\nbefore attempting [Dungeon Nights] mode.
-[Dungeon Nights] combines physical, mental and social\nchallenges all into one and it might be too much for beginners.
-Proceed with the [Dungeon Nights]
-Go back!
-Play intro?
 A terrible stench oozes from the fridge.
 The bed looks to be in a bad shape and very uncomfortable...
 Faint footsteps disturb your sleep...
@@ -1591,7 +1564,6 @@ A worn out bed full of dirty dishes. Sleeping here is the\nlast thing on your mi
 \>\i[76]\}ARCOH\{\<\n"It's an alright shack I suppose..."
 \>\i[76]\}ARCOH\{\<\n"I've slept in worse places."
 GabText A striking smell of mold fills the damp cottage.
-GabText You hit the Crow Mauler and it doesn't seem to care.
 An old pamphlet. There doesn't appear to be anything interesting\nprinted on it.
 You search the luggage...
 The door won't open. It seems to be locked from outside.
@@ -3007,7 +2979,6 @@ The contraption doesn't have any seeming use. You have no\nidea about its purpos
 Lifeless arms reach out from between the boards...
 GabText Your head hurts! You feel like you're losing your mind!
 A wall of suitcases... Something feels off...
-GabText The mist here carries the same odor as the dungeon air...
 All these suitcases... Something feels off...
 \>\i[85]\}OMAN WITH A SCARF\{\<\n"..."
 Zoophobia
@@ -4314,10 +4285,7 @@ You take the \c[2]Leather armor\c[0]!
 \>\i[66]\}ALIGURA\{\<\n"T-t-the f-f-fuck--!?"
 \>\i[66]\}ALIGURA\{\<\n"Ugh! Just slow the fuck down!"
 You unlock the basement doors.
-choice_text 2 Use Soul stone
 No reaction. But it is satisfying.
-Skin him
-You took a \c[2]Pale skin\c[0]!
 The chair fell over on its own.
 \>\i[76]\}ARINA\{\<\n"Looks like the basement was used for worshipping something..."
 \>\i[76]\}ARINA\{\<\n"Must have been something they didn't want the church to know about."
@@ -5067,9 +5035,6 @@ Black Kalev has too many hooves cut. He's just staring to\nemptiness, waiting fo
 Black Kalev doesn't need your sympathy. That's all you can\nget from his expression at least.
 Black Kalev just lays still and looks through you.
 Black Kalev is dead now...
-Your child is dead now...
-.\|.\|.\|.
-The \c[2]Soul stone\c[0] doesn't seem to react to his \nremains...
 \N[16] has taken too much damage. It's struggling to contain his \nsoul.
 The ghoul is breathing heavily. You can hear death rattle deep\nwithin him...
 Here lies \N[16]...
@@ -5130,7 +5095,6 @@ GabText It appears the crown of Alll-mer was too heavy for your to carry.
 GabText The blood feels warm pouring down from your throat...
 The creature seems to be breathing still despite your efforts.
 You took the \c[2]Big boy's head\c[0] as a trophy!
-Skin her
 The skin seems to disintegrate as you peel it off. You cannot\nmake any use of it.
 A mysterious ornament door remains shut.
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Rot\c[0]?
@@ -5179,7 +5143,6 @@ Who will learn \c[2]Black smog\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Advanced botanism\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Persuade\c[0]?
 Use a \c[2]Lesser soul\c[0] to get \c[2]Attack +1\c[0]?
-Sense
 Who will get \c[2]Attack +1\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Inverse crown of thorns\c[0]?
 Use a \c[2]Lesser soul\c[0] to get \c[2]Defense +1\c[0]?
@@ -5228,29 +5191,8 @@ Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Wrench toss\c[0]?
 Who will learn \c[2]Wrench toss\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Lockpicking\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Escape plan\c[0]?
-Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Dash\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Counter stance\c[0]?
 Who will learn \c[2]Counter stance\c[0]?
-ex-soldier
-occultist
-doctor
-mechanic
-botanist
-yellowmage
-fighter
-jorunalist
-mobster
-apprentice
-chef
-salaryman
-hunter
-lieauteantn
-reset all
-gro-goroth
-vinushka
-rher
-allmer
-fear
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Weaponcraft\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Gun proficiency\c[0]?
 Who will learn \c[2]Gun proficiency\c[0]?
@@ -5294,7 +5236,6 @@ Who will learn \c[2]Meditation\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Greater blood magic\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]La Danse Macabre\c[0]?
 Who will learn \c[2]La Danse Macabre\c[0]?
-Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Counter-magic\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Poison tip\c[0]?
 Who will learn \c[2]Poison tip\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Greater meditation\c[0]?
@@ -5304,7 +5245,6 @@ Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Explosives\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Steal\c[0]?
 Who will learn \c[2]Steal\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Killing intent\c[0]?
-Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Bribe\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Chains of torment\c[0]?
 Who will learn \c[2]Chains of torment\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Photosynthesis\c[0]?
@@ -6631,7 +6571,6 @@ There is some writing on the papers...
 "We are just sacrificial lambs to them. Waiting for slaughter."
 There is nothing to devour...
 There isn't much to kick. Only a sack of clothing and the\nempty shell left behind by the crimson father.
-Skin it
 There is nothing to lay your seed in...
 There is nothing to saw off...
 \>\i[76]\}OONSCORCHED\{\<\n"This place... It's cursed."
@@ -7195,7 +7134,6 @@ The toolbox is empty.
 A pile of metal crates that are sealed shut.
 Your head hurts. Your body feels a little slow as it's recovering\nfrom paralysis...
 You find a chain tied to your ankle...
-The \c[2]Soul stone\c[0] doesn't react. It seems that the\ncreature is still very much alive.
 There an electric panel here... You don't really know what to do \nwith it.
 The crate is sealed shut.
 \>\i[74]\}ARIN\{\<\n"A hidden bunker... This got me curious."
@@ -7960,9 +7898,6 @@ The hulking thing is dead now.
 \>\i[144]\}OCKETCAT\{\<\n"Just beyond the church's hidden passage you'll find the tower."
 GabText Something big is advancing towards you...
 The head of the creature really is that of a bird... Or a seagull to\nbe more precise. At first you thought it was just a mask.
-GabText Your anal hole is bleeding...
-GabText Blood just splurted out of your anus...
-This is it. Your stairway to enlightenment. You are set\nto discover the ancient secrets this stronghold keeps and\nto reach the ultimate understanding of the greater scheme\nof things.
 A math book on display. A couple of exams are highlighted.
 "The stone slabs excavated from the archeological site in Northern\nRondon. The slabs depict 'The Nine Chromatic Blights' mentioned in\n'The Book of Homer'. The carvings date back approximately 20,000 B.C."
 A thick layer of fog prevents you from seeing anything in the horizon.\nYou try your best to navigate forward regardless...
@@ -8781,199 +8716,6 @@ You could sleep here forever. Just forget the outside world and stay\nin bed.
 You became a permanent part of the sleeping house.
 There is a moldy bed here... You could sleep and rest if you wanted\nto, although every alarm bell is ringing in your head when it comes\nto this apartment.
 There is a portrait of a young man on the table. The person has his\nface scrathed over.
-You were born with the soul of the endless that makes you\nyearn for freedom and forces you to push your creativity to\nits limits.
-You put your creativity to test in the most harshest of\nenviroments. You were born and soon abandoned in the capital \nof the Eastern Sanctuaries - Jettaiah.
-You had to choose at a very young age to either become a\npickpocket, a burglar or try to struggle and lead a honest \nlife.
-Lead a honest life
-Your life spent learning thievery certainly didn't go to\nwaste. You learned to live with constant fear and danger\nover the years. The crude streets of Jettaiah teached you\nvaluable lessons.
-You learn \c[2]Steal\c[0].
-Your life spend learning thievery certainly didn't go to\nwaste. You learned to live with constant fear and danger\nover the years. The crude streets of Jettaiah teached you\nvaluable lessons.
-You learn \c[2]Lockpicking\c[0].
-You struggled through your early life, but managed to get\nby as a merchant of sorts. Your skills of haggling and\nspeech improved over the years and you also managed to\ngather some savings.
-You get \c[2]30 Silver coins\c[0].
-However your endless soul yearned for more...\nYou couldn't just become a family man, grow fat and make\na living as a mere merchant. You were destined for more.
-As you grew older you took part in various mercenary armies\nand learned the dirtiest tricks to stay alive. You were taken\nin by a notorious veteran highwayman and you joined his little\nband of criminals and ex-soldiers.
-During one of your many raids, your brigade got ambushed.\nThe odds were seriously against you. You could have just \nabandoned your comrades and kept you life, or you could have\nfought to your last breath.
-Abandon your comrades
-Fight to the last breath
-You learn \c[2]Escape plan\c[0].
-Not many survived the ambush, but that just meant that the\nmission rewards got less takers. You were one of the lucky\nones.
-You travelled across the land in your raids and eventually\nsettled down in the Kingdom of Rondon where silver was\nloose as long as you were up for getting your knife dirty.
-One day you got an omnious task from the officials of the\nKingdom of Rondon. You are to be paid well in silver to get\na captain of a fabled mercenary army out of the dungeons\nof Rondon itself.
-From the dungeons of Fear and Hunger. The morbid place has\nbeen used as a wartime prison by the kingdom and for some\nreason they need an outside sword like yourself to infiltrate\ntheir very own stronghold.
-Something is clearly not right about this mission and you\nhave felt nauseus since the the moment you agreed on the\njob. But you are short on silver and the reward is all that\nmatters in the end.
-You spent your last night in the kingdom...
-Go drinking and get laid at the brothel
-Stock up food for the mission
-Stock up healing items for the mission
-Rush straight for your mission
-You get a \c[2]Wine vial\c[0], a \c[2]Bottle of whiskey\c[0]\nand an \c[2]Ale\c[0].
-You also get an itch in your groin area...
-You get 3 \c[2]Dried meat\c[0], a \c[2]Moldy bread\c[0] and\na \c[2]Cheese\c[0].
-You get a \c[2]Blue vial\c[0] and 2 \c[2]Cloth fragments\c[0].
-You learn \c[2]Dash\c[0].
-This really is your make-or-break mission. There is a person\nback in the city relying on you to return with riches. You \nhave heard rumours about this place and you are sure that\nthere are great treasures hidden somewhere in these ruins...
-So even if the mission was to go south for some reason,\nyou are not going to return empty handed.
-You were born with the soul of the tormented. You are\ndestined to struggle in every step you take in life, but\nthis just ultimately makes you stronger physically and tempers\nyour iron will that rivals the will of the gods themselves.
-You had a balanced childhood in the city of Oldegård with \nboth of your parents always present. Your father taught you \nin the art of war. The very first step was to choose your \nweapon.
-Choose bow & arrows
-Choose mace and shield
-You get a \c[2]Short bow\c[0] and 5 \c[2]arrows\c[0].
-You get an \c[2]Iron mace\c[0] and a \c[2]Wooden buckler\c[0].
-Winters grew colder and summers shorter, which resulted\na great hunger in the north. The fine men of the Oldegård \nset sails to the unknown west in a desperate attempt to \nfind food and riches to feed the people.
-You had grown into your manhood and aboarded the ship.\nAfter months of sailing, the sea saw no end and the crew\nwas struggling for their life. Some laid weak under the\ndeck while some embraced the cold dark sea.
-As the weak met their fate, the rest indulged in the greatest\nsin...
-Devour your fallen comrades
-Don't give in
-You learn \c[2]Devour\c[0].
-Eventually you lost your mind to the hunger and like a\nraging wolf you cried the night on the deck, while others\nfeasted on the fallen.
-You learn \c[2]Bloodlust\c[0].
-As if the trip wasn't dark enough, when you finally found\nland, it was something no one in the civilized world could\never imagine. From the far reaches of the world you found the\ndark continent of Vinland.
-The continent had never been touched by a civilized man.\nThe land was tainted by ancient deities and gods you had\nnever even heard of. The things you witnessed there left a\nmark in you that could never be washed away.
-Some of your comrades lost their minds while others tried to\npillage anything worthwhile before leaving the macabre place.
-Take souveniers from Vinland
-Don't touch anything and flee back to your ship
-You get a \c[2]Soul stone\c[0].
-Unfortunately the relics you brought from the trip tainted\nyou and you formed a Panophobia, a fear of everything.
-An ancient artefact was brought from the dark continent.\nYou knew it was a mistake, but the choice wasn't in your \nhands. While you were hunting, away from home, a mercenary \narmy raided your village.
-Upon your return, you witnessed your home burning, your\nfamily slain and the artefact stolen. Those who survived\nthe raid described the army and it's captain.
-He was the famous captain from the fabled mercenary army\nKnights of the Midnight Sun. You immediately packed and\nleft after him. The man would witness the iron will tempered\nin the north and in the dark continent of Vinland.
-Stock up on equipment
-Stock up on healing items
-Rush straight after him
-You get 3 \c[2]Iron arrows\c[0] and a \c[2]Bear trap\c[0].
-You get a \c[2]Dried meat\c[0], a \c[2]Moldy bread\c[0] and\n3 \c[2]Carrots\c[0].
-You get \c[2]4 Blue herbs\c[0], a \c[2]White vial\c[0] and \n\c[2]2 Cloth fragments\c[0].
-You learned that the man has since been imprisoned in the\nKingdom of Rondons dungeons. In the notorious dungeons\nof Fear & Hunger.
-You set your mind - You will kill everything that carries\na dark soul in the dungeons, you will have your revenge \nand the dark artefact will be yours again. There is no\nother way.
-You were born with the soul of domination that makes\npeople around you bend to your will. You are a natural\nleader, but you might often end up blind to self-criticism.
-If your birth sign wasn't enough to warrant a future of\ngreatness, you were also born into a wealthy noble family.\nAt an early age you were sent into training to become\na holy knight of Kingdom of Rondon.
-Training to become a squire was a harsh school that spared\nno one. No matter if you were from a noble origin or not.
-A practice sparring match between you and a well seasoned\nsquire took place at the central training grounds.
-It is said that a fighter shows their true colours in their\nfirst fight. This applied to you too. When you saw the\nsword coming your way, you...
-Quickly stepped aside and dodged it
-Raised your buckler in defence
-You learned \c[2]Fast stance\c[0].
-You learned \c[2]Defence stance\c[0].
-As time went on, you proved out to be a gifted fighter and\na valuable asset to the army of Rondon. However...
-The Kingdom of Rondon claimed to follow the will of the\ngods in it's pursuit for more power. But all the rewards\nseemed to fall into the laps of the elite and noble sitting\ncomformtably behind the castle walls.
-Ruthlessly the kingdom would expand it's reign.\nReducing the feeble citadels to ashes and blood stains.\nEnslaving the sweet women folk whilst every man is slain.\nOnly spare a child or two, that it's legend may grow.
-Your devotion was shaken. You were all but ready to retire\nfrom the army, but your family insisted - no, they demanded\nyou to stay as a holy knight, or else you'd bring great\nshame to their noble family.
-Break ties with your family and run away.
-Listen to your family and stay as a holy knight.
-At this point family ties weighted no more than strangers\nyou met at the dirty streets of Rondon. You completely cut\nties with your family wihout hesitation.
-Just as you were about to flee from the army, things took\nan unexpected turn for you. You met a captain of a small\nmercenary army who seemed to share the same ill-will towards\nthe Kingdom of Rondon as you.
-You swallowed your grief and doubt and decided to stay as\na holy knight. In the end you could try to fix things up\nfrom the inside, you figured.
-Your family gave you a gift of \c[2]20 Silver coins\c[0].
-Just as things seemed too dark, you saw a light in the\ndarkness. You met a captain of a small mercenary army who\nseemed to share the same ill-will towards the Kingdom of \nRondon as you.
-The common folk was starting to gather around the \ncharismatic leader Le'garde, who shared the humble origin \nsimilar to farmers and villagers alike. There was\ndefinitely something otherworldy in his stature.
-Le'garde saw potential in you and with warm words, he \nalmost seduced you to join his band of mercenaries. Thanks\nto your rigorous discipline, you took a high position in\nhis army, the Knight of the Midnight Sun.
-Your army was growing fast in both size and influence in the \nwestern regions. The Kingdom of Rondon would first use your \nservices to their own benefit, but soon saw you more as a \npossible threat to their modern reigns.
-Something changed with Le'garde as well. He kept more to\nhimself and studied ancient texts and occult. He became\nobsessed with some relics and artefacts that gave you omnious\nfeelings and terrible nightmares.
-It was almost too much for you, when Le'garde decided to\nraid the northen capital Oldegård and slayed everyone who\nstood in the way between him and this mysterious ancient\nrelic. You never understood it's importance.
-It was this small overblow that was enough of an excuse \nfor the Kingdom of Rondon to turn common folks against \nLe'garde and justify his imprisonment.
-As the troops of the Rondon army marched towards your\nclearly smaller army, you had to choose which position\nto take in the coming encounter.
-Take the rear and manage defences.
-Spearhead the coming assault.
-You get a \c[2]Long sword\c[0] and an \c[2]Eagle crest shield\c[0].
-You get also get a \c[2]Plate mail\c[0] and \c[2]Leg guards\c[0].
-You get an \c[2]Iron spear\c[0].
-You get also get a \c[2]Iron cuirass\c[0] and \c[2]Arm guards\c[0].
-The Knights of the Midnight Sun lost the fight.
-Many of your comrades were slain, but you managed to escape\nthe battlefield.
-Le'garde was taken as a captive and to be used most likely\non propaganda.
-You knew you didn't have much time before he would be\nsentenced to death, so you had to act fast.
-Even if it seemed like a suicide mission, you decided to\nsave Le'garde from the prisons he was held in.
-Before leaving for your desperate journey, you decided\nto stock up on equipment and items...
-You get a \c[2]7 Tinderboxes\c[0], a \c[2]Quill\c[0]\nand a \c[2]Blue vial\c[0].
-The dungeons open before you... You won't leave the ruins\nwithout Le'garde. One way or another, you two will be\nreunited. Even if it requires you to give up on your\nprinciples.
-You were born with the soul of the enlightened. You are\nalways seeking restlessly for new knowledge and secrets \nhidden from common folk.
-This trait already started showing itself at a very young\nage as you were chosen to become a dark priest upon the birth\nof you and your twin sister.
-Like typical to such occult rites, you were pitted against\nyour sibling with ritual daggers and challenged to fight\neach other to the death.
-Unfortunate for you, you were born with a fragile body\nand your sister easily overpowered you and had her dagger\non your neck waiting for the final blow.
-She however showed mercy and withdrew her dagger. She\ntook steps away from you as your high priest masters glared\ngleefully at the event unfolding before their very eyes.
-Strike your dagger to her spine while she walks away
-Accept your defeat
-You stroke your dagger to the spine of your sister and she\ncollapsed on the ground. You high priest masters seemed\nespecially pleased with this and prepared you for your\nascension ceremony.
-In the ascension ceremony you were to resurrect your\ndeceased sister with necromancy and use her as your ghoul.\nYou did this and the cold corpse of your sister brought\na smile to your otherwise emotionless face.
-You learn \c[2]Necromancy\c[0].
-After your ascension to dark priesthood, you were to leave\nthe temple grounds and learn of occult on your own in your\ndark pilgrimage.
-The dark priests got no place for the weak, so you were\nthrown in an underground well. There you were meant to \nquietly wither away, but instead you fed on insects and other\nsmall critters that shared your fate down there.
-With time you learned to understand the language they\nspoke. You learned \c[2]Mastery over insects\c[0].
-With the aid of your new slaves, you eventually grew strong\nenough to climb up the well. You creeped upstairs to the\ntemple and noticed it was night time.
-Set the temple on fire and leave
-Quietly leave and run away without revenge
-Vengeful in how you had been treated, you set the temple on \nfire, jammed the exit door so no one could escape and then \nran away. Only muffled screams could be heard coming from\nthe temple.
-You learn \c[2]Pyromancy trick\c[0].
-You quietly left the temple area thinking that revenge\ndoesn't solve anything, but in order to make sure you\nsurvive on your own you took some precious books to secure\nyour wealth.
-You get \c[2]Alchemillia vol. 1\c[0].
-After leaving the temple grounds, you vowed to become a\ndark priest by your own merits and prove your fate wrong.
-When beginning your self-studies, you first had to choose\nthe god you'd dedicate your time to.
-Pray for Gro-goroth
-Pray for Sylvian
-Pray for Alll-Mer
-Pray for God of the Depths
-You travelled across the western continent, learning of \ndifferent gods, deities, blood magic and all known sciences.\nYour studies didn't come without their merits. You were \nacknowledged by the top scholars of the modern times.
-You were finally granted a pass to the great libraries\nof the Kingdom of Rondon. You now had the collection of\nall known history and science at your grasp.
-You learned of a certain man who was propheticed to begin\na new era for mankind. A man meant for greatness. But why\nwould you need to share the spotlight of the gods with any\nmortal man?
-Prophecies are only for those who are weak enough to bend\nto their sorry fates. You need to find this man and learn\nmore. To your current knowledge, he would be found\nimprisoned at the notorious dungeons of Fear & Hunger.
-You decided to stock up before your travels.
-Stock up on magical items
-Stock up on intoxicants
-You get a \c[2]Pipe\c[0] and \c[2]Opium powder\c[0].
-Moonless is dead now...
-GabText The dungeons of Fear & Hunger stand in front of you...
-The girl is dead now...
-The stone has a heavy aura to it. It's almost too much\nfor you to carry...
-GabText You hit the hound and manage to kill it!
-You search the barrel for anything useful...
-You search the crate for anything useful...
-\c[7]The Merchant\c[0]\n"Hello there dweller."
-\c[7]The Merchant\c[0]\n"Your eyes... They are starting to have that absent gaze\nin them already."
-\c[7]The Merchant\c[0]\n"A little bird told me that these dungeons just swallowed\na new set of poor bastards."
-\c[7]The Merchant\c[0]\n"I just saw a business opportunity, that's all."
-\c[7]The Merchant\c[0]\n"So what shall it be?"
-You have \c[2]\v[0096] Silver coins\c[0]. What do you want to trade them for?
-\i[269]Potion of full healing \c[2][8]\c[0]
-\i[267]Potion of full sanity \c[2][8]\c[0]
-\i[268]Potion of life \c[2][15]\c[0]
-You trade 8 \c[2]Silver coins\c[0] for a \c[2]Potion of full healing\c[0]!
-Unfortunately you do not have enough silver.
-You trade 5 \c[2]Silver coins\c[0] for a \c[2]Potion of full sanity\c[0]!
-You trade 15 \c[2]Silver coins\c[0] for a \c[2]Potion of life\c[0]!
-\c[7]The Merchant\c[0]\n"..."
-\c[7]The Merchant\c[0]\n"Hello there dweller. What shall it be this time?"
-\c[7]The Merchant\c[0]\n"Hm. Hm. Well my time here is done."
-\c[7]The Merchant\c[0]\n"Farewell."
-A dead horse is laying down here.
-Based on the stage of decomposition, the horse has been\ndead for approximately one week.
-Beating the horse produces no effects.
-\c[7]Le'garde\c[0]\n"So you are about to leave?"
-\c[7]Le'garde\c[0]\n"..."
-\c[7]Le'garde\c[0]\n"I'm afraid we must part our ways here."
-\c[7]Le'garde\c[0]\n"I still have unfinished business in the darkness..."
-\c[7]D'arce\c[0]\n"What do you mean Le'garde?"
-\c[7]Le'garde\c[0]\n"I can't explain it here, but I must go."
-\c[7]D'arce\c[0]\n"..."
-\c[7]D'arce\c[0]\n"Fine. I'll go with you."
-"I must leave this place."
-"I'll come with you."
-\c[7]Le'garde\c[0]\n"Farewell."
-\c[7]Le'garde\c[0]\n"You're free to join me."
-The mist is preventing you from leaving this place...
-You could \c[2]Devour\c[0] the remains of the dead hound.
-You could use \c[2]Demon seed\c[0] on the cavewolf.
-Use 
-A wild hound lies dead on the ground.
-Search him
-The hound is definitely dead.
-The hound doesn't appear to have anything.
-GabText You hear distant barking from afar...
-GabText The barking is getting closer.
-GabText The hounds are coming!
-An old wagon. Seems to be lightly equipped.
-The barrel is left here to gather rain water. The water has\nbeen still for too long and is not drinkable.
-A pile of planks. They've been left at mercy of the weather\nfor quite some time.
 The lamp doesn't work. Or if it does, the light doesn't come through\nthe white crust, so it's all the same.
 The rotten floorboards gave in to the weight of the statue.\nNow there is a gaping hole to the darkness here...
 It's dark down there. But by the looks of the rough shapes you can\nsee, it should just be a similar apartment to this.
@@ -12045,31 +11787,6 @@ The world starts fading before your eyes...
 \>\i[144]\}ER'KELE\{\<\n"You see..."
 \>\i[144]\}ER'KELE\{\<\n"I have followed your journey since the beginning and I've slowly \ncome to the conclusion that I simply hate your existence. Absolutely \ndetest your guts. I can't stand the sight of you."
 \>\i[144]\}ER'KELE\{\<\n"This is strictly personal. Between you and me."
-\>\i[144]\}ER'KELE\{\<\n"But along came silly humans..."
-\>\i[144]\}ER'KELE\{\<\n"They gave these forces a name, they created an obscure ruleset \naround their worship only to hope for some kind of a salvation at \nthe end of it."
-\>\i[144]\}ER'KELE\{\<\n"After this, the kings and sultans seized the opportunity and ruled\npeople with the strength of the older gods."
-\>\i[144]\}ER'KELE\{\<\n"Some used this strength quite literally, while some only herded the \nmasses with their teachings after tweaking them to better suit the\ndemand."
-\>\i[144]\}ER'KELE\{\<\n"Time and time again a new power rises to the top. Some call themselves\nnew gods, some puppeteer the nations from behind the curtain, but\nthe ending is always the same."
-\>\i[144]\}ER'KELE\{\<\n"It is an eternal cycle that has befallen all mankind."
-\>\i[144]\}ER'KELE\{\<\n"You can go back to that world if you choose so and live a life\nas a slave to those sitting on top, whoever happens to be wielding \nthe waning strength of the older gods at the moment..."
-\>\i[144]\}ER'KELE\{\<\n"Or..."
-\>\i[144]\}ER'KELE\{\<\n"You can embrace the chaos and break free from the cycle."
-\>\i[144]\}ER'KELE\{\<\n"We - the Cult of Sulfur - We choose to live and breathe in chaos, \noutside the artificial boundaries created by the society and mankind."
-\>\i[144]\}ER'KELE\{\<\n"You can either be at the receiving end of the stick or holding it."
-\>\i[144]\}ER'KELE\{\<\n"We choose to hold it."
-\>\i[144]\}ER'KELE\{\<\n"We revel in the blood of the sacrificial lambs, the masses are\nfor slaughter, for the fallen god - the Sulfur God."
-\>\i[144]\}ER'KELE\{\<\n"Before the exodus of the gods... There existed one that was\nbanished from the pantheon."
-\>\i[144]\}ER'KELE\{\<\n"As he was chained deep beneath the earth's surface... This fallen one, \nthis fallen god - He was never able to leave this world."
-\>\i[144]\}ER'KELE\{\<\n"He exists beyond the eternal cycle and beyond the greater scheme \nof things..."
-\>\i[144]\}ER'KELE\{\<\n"To celebrate the chaos, we gather souls for the fallen one."
-\>\i[144]\}ER'KELE\{\<\n"As the champion of Termina - You too can join us."
-"So worship your god instead of mine, because... Why exactly?"
-"What happened to the Moon God?"
-"I'd be honored to join you."
-"I just want out. I want no part in this."
-"This is enough. Just die already."
-\>\i[144]\}ER'KELE\{\<\n"Just say yes and you will find out shortly..."
-\>\i[144]\}ER'KELE\{\<\n"The Sulfur God
 \>\i[144]\}ER'KELE\{\<\n"As promised, you are entitled to the grand prize."
 \>\i[144]\}ER'KELE\{\<\n"You have faced death head-on, the only thing missing is facing\ndeath of your self."
 \>\i[144]\}ER'KELE\{\<\n"The empty man-made morals, that hollow weight stirring deep inside\nyou... All carved out. You will finally know what it means to be\ntruly free."
@@ -12133,24 +11850,12 @@ A pile of cubes with mysterious sigils carved across it. You do\nnot understand 
 \>\i[64]\}BELLA\{\<\n"Is this a children's room...?"
 \>\i[78]\}LIVIA\{\<\n"Does someone live here?"
 GabText The room has an eerie atmosphere. Something is very wrong about this place.
-GabText You hit the beast and manage to kill it!
-GabText You hit the beast and manage to wound it!
-GabText You hit the creature and manage to kill it!
-GabText You hit the creature and manage to wound it!
 \>\i[74]\}ARIN\{\<\n"What's this? A crime scene...?"
 \>\i[64]\}BELLA\{\<\n"This doesn't feel real now does it?"
 \>\i[64]\}BELLA\{\<\n"It's like someone set this up. Almost like a movie scene."
 \>\i[78]\}LIVIA\{\<\n"Is there a... dead body under the rug?"
 \>\i[78]\}'SAA\{\<\n"What exactly is this room supposed to symbolize?"
 \>\i[76]\}ARCOH\{\<\n"It's a ... Police scene?"
-mer
-occ
-doc
-mech
-yell
-bot
-journ
-thu
 There's nothing here.
 The truck seems to be wrecked. There is no using it.
 \>\i[74]\}ARIN\{\<\n"Can you imagine how many innocent people lost their lives here!?"

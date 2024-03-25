@@ -1,64 +1,6 @@
-Light torch
-You light the torch
-Light flashlight
-You turn the flashlight on
-You turn the flashlight off
-Necronomicon
-You feel a twist inside as you take the book from \nyour satchel...
-Read the book
-Leave the book
-You feel great urge to open the book - but at the same\ntime you feel like consequences might be terrible.
-It turns out that this book is the very book\nmany legends tell about...
-It goes by many names; The rites of madness,\nAl Azif, Testament of Gro-goroth, Ex Mortis and...
-The Necronomicon.
 HEADS
 TAILS
-The book is summoning powers that exceed your \nunderstanding...
-Next to this ancient presence, you're nothing\nbut a feeble ant.
-You cannot contain your fear.
-You lose your mind.
-The book is summoning powers that exceed your \nunderstanding.
 As you finish reading the book, it crumbles into dust\nbefore your very eyes.
-Book of the forgotten
-As you open the book, you feel warmth and nostalgia\nthat cannot be explained.
-Memories of your past life flash before your eyes.\nBut some of these memories are not of yours.
-You remember your ancestors leading a simple yet\nviolent life of mercenaries.
-You remember... How riches and wealth dictated\nyour masters. All while still holding a grasp at freedom\nby travelling across the known continents.
-You remember... While murdering cold blood\nyour victims on a highway heist - you had a greeting \nwith the wolf deity of northern parts.
-You remember... How for a price of your beloved ones\nyou could attain greater knowledge. You agreed of\ncourse - being the greedy bastard you were.
-You remember... The wolf deity teaching you his\ngreatest secret...
-You have already aqcuired everything from your family line.
-You remember \c[2]Dash\c[0]!
-You remember \c[2]Steal\c[0]!
-You remember your ancestors from a long line of noble\nknights from the Kingdom of Rondon.
-You remember... How from a very early age, every single\nof your ancestors had to partake the training to become\na holy knight of Alll-Mer.
-You remember... How the priests, your caretakers, would use\npunishing and cruel ways to imbed the moral codes and ways\nof the knighthood.
-You remember... How the cruelty knew no end. Every day you\nwould be pitted against beasts from exotic locations.
-And every night you would be pitted against the beast of\nthe monastery as the monks would crawl next to you in the\ndarkest hours of the night.
-You remember... Slowly sinking to the darkness within and\nhearing a voice...
-You remember how the voice would teach you skills to help\nyou one day extract revenge from the wrong-doings of your\nuprising.
-You remember \c[2]Counter\c[0]!
-You remember \c[2]Fast stance\c[0]!
-You remember \c[2]Fast attack\c[0]!
-You remember the wicked rituals your ancestors took part\nin. The crude old-fashioned witchcraft that lacked the\nfinesse of it's modern counterpart.
-You remember... How your ancestors would desperately try\nto contact even the most minor demons in their attempts to\ngain more knowledge of the otherside.
-You remember... How from every generation - only the eldest\nchild would be chosen to continue the family name...
-...While the rest would be cut open and have their blood \ndrained as a sacrifice to older gods.
-You remember... After generations of these black arts, your\nancestors finally managed to summon a wretched little evil.
-The miscreant that crawled from the summoning circle\nrevealed it's secrets.
-You remember \c[2]Blood sacrifice\c[0]!
-You remember \c[2]Greater blood magic\c[0]!
-You remember your ancestors living in the frozen wastelands\nof Oldegärd.
-You remember... Freezing winters, where the weather and gods\nwould measure the resiliency of your people. Only the\nstrongest would see the sun rising again in the spring.
-You remember... How your father would look at you from the\ndark corner of your small hut. The eyes of a starving man.
-You remember... How neither of you had ate a thing in past\ntwo weeks. How the hunger would drive even the most good-\nhearted man insane.
-You remember... How your father finally made his move during\nthe full moon. But he was already so weak from the hunger.
-You remember... His feeble arms trying to wrestle you down.\nBut he proved to be the weaker of the two of you.
-You remember... The feast you would have the next day.\nThere was so much meat on the open fire that it could feed\nthe animals of the surrounding forests as well.
-You remember how in exchange for a plate of your father,\nthe animals would teach you their own tricks of trade for\nsurvival.
-You remember \c[2]Bloodlust\c[0]!
-You remember \c[2]Marksmanship\c[0]!
-Recipes of the 15th century
 The book contains traditional recipes dating back to the 15th \ncentury cuisine.
 The recipes are collected from the memoirs of the infamous\nchef Andérs that worked at the royal kitchen of Rondon at the\ntime.
 It appears that chef Andérs gained infamy by seducing court \nladies and was even rumoured to had a fling with the princess\nElizabeth, the famous virgin princess.
@@ -70,7 +12,6 @@ Between all this romance and betreyal you find recipes of \nchef Andérs' famous
 "Frankly I'm baffled at how a city of this size has managed \nto stay so isolated from the neighbouring influences and\nmodern times."
 "The Prehevil folk still hold on tightly to religious rites\nas old as 'The Fellowship' itself."
 "The human sacrifices creep me out in this day and age. Even\nif I've seen the horrors of war, the crucifixes set around\nthe city manage to send a chill down my spine."
-Ma'havre
 "The sights of Ma'habre. You have seen them too, haven't\nyou? In your dreams you wander for one lifetime with\nsilhoutte of this city in horizon.
 "You have seen the twin towers that rise next to\na black night sky. Those macabre obelisks telling tales \nof some older, more cruel age.
 "You have seen the grand gate with it's maddening\nmurals and spirals. Patterns beyond understanding."
@@ -115,26 +56,6 @@ The text includes the sigil of the Rher and instructions on how\nto use it.
 "Conceived by the black. Born from the clay. Shaped by\nour fears. Forged by the sins of her parents."
 "From eternal darkness and void, she'd bring gloom."
 "The hubris of man brought this upon us, but it is not\nbecause of cruelty, it is because of wisdom. Only through\nhardship could we see the errors of our ways."
-Studies of Alll-mer I
-"-Studies of Alll-mer I-"
-"Alll-mer was known for being birthed by a virgin mother.\nOrigins of a human with the seed laid down by the false \ngods."
-"A god walking amongst men. Alll-mer, together with his\ntrusted 12 apostles were destined to bring back the old \nworld order."
-"Kings and sultans of the time would not stand idle when\na man of undeniably god-like posture came down to their\ngolden city gates."
-"One of the Alll-mer's most trusted apostles, the one who\nwould later be known as the Deceiving One betrayed his master\nand gave out his location to the forces that wanted Alll-mer\ngone."
-"Alll-mer was captured and tortured. The newborn god was\nnailed onto a cross as a feast for the crows."
-"Alll-mer's martyr-like posture became a symbol of the \ntimes, as even the cross couldn't prevent his ascension\nto the heavens."
-"Spending three days and three nights at the city of the \ngods - Ma'habre, he would then return among living. \nAlll-mer came back, not just to spread his gospel but also\nto extract his revenge."
-"The sultans and the kings of the time came to know his\nwrath. The biggest blood bath however was reserved for the \napostle who deceived him."
-Studies of Sylvian I
-"-Studies of Sylvian I-"
-"Sylvian is the goddess of love, lust and creation."
-"She created men and women at the dawn of time. From the\nvery first moments she loved her children greatly."
-"Over time her love blossomed into a more obsessive form\nand she would try to guide her children more and more."
-"Once she realized her children would never be able to\nreturn the same amount of affection back to her, her love \ntook a more twisted form."
-"Sylvian would shape mankind more to her liking and more\ninto her own image with her gift to people - the love magic,\notherwise known as the flower magic."
-"For a brief moment in ancient history, mankind fell into a\ncraze of fleshly delights. As a synchronized mass, sea of\nnaked people in a middle of coitus would pulsate and waste\ntheir days."
-"There are still cults dedicated to Sylvian to this day,\nbut many believe she left mankind behind long time ago."
-Book of enlightenment
 The book radiates light in every color of the spectrum.
 You feel like your journey has just began. As if your existence \nsince this very moment has been like watching someone else \nentirely.
 You feel a perspective shift in your surroundings. As if \neverything was to shrink, or perhaps you were to ascend \nhigher.
@@ -176,12 +97,6 @@ You find an \c[2]Ornament lantern\c[0]!
 You find \c[2]Mushroom stew\c[0]!
 You find a \c[2]Purifying talisman\c[0]!
 You find 6 \c[2]Shillings\c[0]!
-Assassin's handbook I
-"This book contains instructions on how to skin an animal or\na humanoid creature, and how to make a belieavable disguise\nout of their leathers."
-"Use \c[2]Skinning knife\c[0] with precise movements\nto tear up the skin from muscles and bones."
-"With enough pieces of leather, you can use them to make\nan outfit - a disguise of sorts."
-"This disguise will mask any human scent, be it a scent\nof fear or hunger. You will be able to fool the beast \nin your hunt."
-"Be cautious though as this masking technique doesn't\nwork if you get too close to the beasts."
 But there is nothing worthwhile here...
 You find the \c[2]Book of enlightenment\c[0]!
 You find the \c[2]Recipes of the 15th Century vol. 1\c[0]!
@@ -213,10 +128,6 @@ You find the \c[2]'Man in dreams' flyer\c[0]!
 You find the \c[2]The Tale of the Pocketcat Ch. 2\c[0]!
 You find the \c[2]The Tale of the Pocketcat Ch. 1\c[0]!
 You have already learned everything Gro-goroth has to\noffer at the moment...
-Gro-goroth blesses you with new blood magic! \nYou learn \c[2]Necromancy\c[0]!
-Gro-goroth blesses you with new blood magic! \nYou learn \c[2]Hurting\c[0]!
-Gro-goroth blesses you with new blood magic! \nYou learn \c[2]Blood golem\c[0]!
-Gro-goroth blesses you with new blood magic! \nYou learn \c[2]Black orb\c[0]!
 GabText \N[1] feels a little less hungry.
 GabText \N[3] feels a little less hungry.
 GabText \N[4] feels a little less hungry.
@@ -275,7 +186,6 @@ GabText You are getting paranoid because of the fear...
 GabText You are getting terrified!
 GabText You are losing your mind!
 GabText Your psyche is crumbling!
-Suicide
 Yes
 No
 Take your own life?
@@ -349,10 +259,6 @@ You examine the trenchgun. It feels crazy to you that such a simple \napparatus 
 \c[2]Tobacco\c[0]
 Nevermind
 What do you want to smoke?
-\p[1]
-\p[2]
-\p[3]
-\p[4]
 Who will smoke the \c[2]Wild dagga\c[0]?
 GabText \N[1] feels tranquil and good...
 GabText Fear seems like such a distant emotion.
@@ -396,111 +302,11 @@ Unfortunately you have nothing to smoke with the pipe...
 Create a \c[2]Blood portal\c[0]?
 Sacrifice your own blood with \c[2]Blood sacrifice\c[0]?
 Sacrifice
-Show love
 Pray
 Leave
 A ritual circle is drawn and carved here.
-Sacrifice the unnamed fetus?
-The helpless fetus breathes heavily as you put it down\non the altar.
 With the sacrifice, your affinity with the Gro-goroth is \ngrowing...
 You don't have anyone to sacrifice.
-Sacrifice \N[16]?
-\N[16] seems completely fine with it.
-Sacrifice \N[17]?
-\N[17] seems completely fine with it.
-Sacrifice \N[18]?
-\N[18] seems completely fine with it.
-Sacrifice \N[19]?
-\N[19] seems completely fine with it.
-Sacrifice \N[20]?
-\N[20] seems completely fine with it.
-Sacrifice \N[21]?
-\N[21] seems completely fine with it.
-Sacrifice the girl?
-The girl seems to struggle a little...
-Sacrifice \N[7]?
-\N[7] doesn't seem to understand your intentions.
-Sacrifice your own child, \N[8]?
-\N[8] is willing to do anything for you.
-Sacrifice your own child, \N[12]?
-\N[12] is helpless, so it is an easy task.
-Sacrifice D'arce?
-\c[7]D'arce\c[0]\n"What do you think you are doing!?"
-\c[7]D'arce\c[0]\n"If you want to keep holding to your head, I suggest\nyou forget your plans here!"
-Sacrifice Nas'hrah?
-\c[7]Nas'hrah\c[0]\n"Sacrifice me? SACRIFICE ME!?"
-\c[7]Nas'hrah\c[0]\n"Let's make a sacrifice for the fire god himself!!"
-Sacrifice Enki?
-\c[7]Enki\c[0]\n"To die for your benefit? Such a pitiful idea. I fail to\ntake it even as an insult, let alone threat."
-Sacrifice Ragnvaldr?
-\c[7]Ragnvaldr\c[0]\n"..."
-Ragnvaldr looks dissapointed at you.
-Sacrifice Cahara?
-\c[7]Cahara\c[0]\n"No deal man."
-\c[7]Cahara\c[0]\n"I might be ready to die, but I'll go with my own terms when\nthe time is right."
-Sacrifice L'garde?
-\c[7]L'garde\c[0]\n"What? You go all your way to get me out, just to sacrifice\nme on this altar?"
-\c[7]L'garde\c[0]\n"That's just not gonna happen. I have a grander purpose in\nlife."
-Unfortunately your reproductive organs fail to work in your\ncurrent form.
-You don't have anyone to make love to but yourself.
-Loving yourself produces no effects on ritual circle.
-Make love with \N[16]?
-\N[16] is willing.
-Make love with \N[17]?
-\N[17] is willing.
-Make love with \N[18]?
-\N[18] is willing.
-Make love with \N[19]?
-\N[19] has no flesh to make love to.
-Make love with \N[20]?
-\N[20] has no flesh to make love to.
-Make love with \N[21]?
-\N[21] has no flesh to make love to.
-Make love with the girl?
-The girl is NOT willing.
-Make love with the \N[8]?
-\N[8] is clueless about your intentions.
-But it appears \N[8] has no reproductive organs, so making\nlove is not possible.
-Make love with the \N[12]?
-Seriously!?
-The gods don't approve with your way of life.
-You feel great pressure inside you, starting from the crotch\narea...
-Make love with Nas'hrah?
-\c[7]Nas'hrah\c[0]\n"Make love?"
-\c[7]Nas'hrah\c[0]\n"Why of course."
-\c[7]Nas'hrah\c[0]\n"TOO BAD NOTHING GETS ME AROUSED QUITE AS \nBURNT MEAT!"
-Make love with D'arce?
-\c[7]D'arce\c[0]\n"Ah... My lord."
-Make love
-"You're right. Let's leave it for later."
-\c[7]D'arce\c[0]\n"This is something I have dreamed about, but-- Is this really\nthe right time?"
-\c[7]D'arce\c[0]\n*gasp*
-D'arce gives you a long smile.
-\c[7]D'arce\c[0]\n"...Yes... let's do this."
-\c[7]D'arce\c[0]\n"But please be gentle. I have not laid with anyone before..."
-\c[7]D'arce\c[0]\n"No way. NO WAY!"
-\c[7]D'arce\c[0]\n"What are you thinking!? That's disgusting!"
-Make love with Enki?
-\c[7]Enki\c[0]\n"I can't believe what I'm saying, but let's do this."
-\c[7]Enki\c[0]\n"No. There is nothing in this for me."
-Make love with Ragnvaldr?
-\c[7]Ragnvaldr\c[0]\n"...Very well."
-Ragnvaldr seems to think this course of action benefits you\nboth in your survival.
-\c[7]Ragnvaldr\c[0]\n"...No."
-Ragnvaldr ignores you completely.
-Make love with L'garde?
-\c[7]L'garde\c[0]\n"I apologize, but no. The fate has bigger purpose left for\nme."
-\c[7]L'garde\c[0]\n"Not gonna happen."
-Make love with Cahara?
-\c[7]Cahara\c[0]\n"Oh yeah! Let's do this."
-\c[7]Cahara\c[0]\n"There're not many who rival my skills in this line of\nbusiness."
-Cahara seems really enthusiastic.
-\c[7]Cahara\c[0]\n"Yeah, hey let's do this."
-\c[7]Cahara\c[0]\n"Gotta say that y'er probably the most beautiful man I have\never laid with."
-\c[7]Cahara\c[0]\n"Sure thing."
-\c[7]Cahara\c[0]\n"Just don't destroy my anus with those big muscles of yours,\nokay?"
-\c[7]Cahara\c[0]\n"Eeh, well that's a freaky suggestion, but fine."
-\c[7]Cahara\c[0]\n"Listen, my standards aren't really high or anything, but\nnow is not the time."
 Gro-goroth
 Sylvian
 Alll-mer
@@ -591,7 +397,6 @@ You find a \c[2]Ballistic shield\c[0]!
 "'This appeared on the front door just before you came. \nIt was directed to young mister Willem.'"
 "Slowly Willem unwrapped the decorated paper with small\nmouse prints on it..."
 "Inside the parcel, there was catnip."
-New poems of torment
 "The New Poems of Love and Torment -\nWritten by Ronn Chambara"
 "The book contains age-old writings of the famed poet\nRonn Chambara. This book concentrates on the latter half\nof his lifetime and production."
 "Poem I - 'The blackened heart'\nStakes are high, you are also and more so -\nLive your lie and play with my blood torso."
@@ -600,7 +405,6 @@ New poems of torment
 "They will come know this day as the cruel age."
 "They will come know this page as the fourth phase."
 "Won't you die."
-The four ages of history
 "-The Four Ages of Modern History-"\n"The modern age and modern chronology begins from the birth \nof our lord , the ascended one, Alll-mer."
 "There are many fabricated religious text about Alll-mer, but\nthere is enough evidence to prove that Alll-mer did indeed\nexist as a real person at the time.
 "His birth would mark as the first age. The second age started\nfrom the reign of the so-called New gods in the year 410."
@@ -611,36 +415,8 @@ The four ages of history
 "Their age would last until the end of the 16th century.\nThe western world was in a dark age at the time and out of\nnowhere appeared a new idol of worship, the god of Fear\n& Hunger."
 "People forgot the teachings of the old in times of diseases\nand death and turned on to this new saviour."
 "The appearance of the God of Fear & Hunger started the fourth\nage in which mankind had to learn to adapt and evolve. As\ntimes have progressed, we are still living according to this \nideology."
-\N[9] cannot hold weapons without arms!
-\N[9] cannot hold shield without arms!
-\N[9] cannot hold \c[2]Crude sword\c[0] with just one arm!
-\N[9] cannot hold \c[2]Claymore\c[0] with just one arm!
 \N[9] cannot hold \c[2]Iron spear\c[0] with just one arm!
-\N[9] cannot hold \c[2]Short bow\c[0] with just one arm!
-\N[9] cannot hold \c[2]Sergal spear\c[0] with just one arm!
-\N[9] cannot hold \c[2]Bone shears\c[0] with just one arm!
-\N[9] cannot hold \c[2]War scythe\c[0] with just one arm!
-\N[9] cannot hold \c[2]Ritual spear\c[0] with just one arm!
-\N[9] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[9] cannot hold \c[2]Spider shield\c[0] with just one arm!
-\N[9] cannot hold \c[2]Eagle crest shield\c[0] with just \none arm!
 You pick up the unused \c[2]Gasoline canister\c[0].
-With the act, your affinity with the Sylvian is growing...
-Sylvian has blessed you with the marriage of flesh.
-You have become a materialization of the love you two\nshared. Intervined forever. What will you call yourself\nfrom now on?
-You find a \c[2]Black vial\c[0]!
-You find 3 \c[2]Glass vials\c[0]!
-You find 2 \c[2]White vials\c[0]!
-You find a \c[2]Purple vial\c[0]!
-You find a \c[2]Red vial\c[0]!
-You find a \c[2]Green vial\c[0]!
-You find an \c[2]Orange vial\c[0]!
-You find an \c[2]Explosive vial\c[0]!
-Crow Mauler
-"Crow, crow, grow your horn.\nVile as snow in the Skårsberg massacre row."
-"Crow, crow, oh why you maul?\nThe meat is fresh and the blood still falls."
-"Crow, crow, are you there?\nHe is coming - With nothing to bare."
-"Crow, crow, behind you now.\nOh crow please reap - oh crow what I sow."
 "The Experienced Level of Alchemy - Alchemillia vol.3"
 "Recipes for intermediate alchemy:\nBlue + Pep pills = Super senses\nBlue + Blue = Greater healing"
 Talking to yourself or the voices inside won't save your \nsanity.
@@ -661,208 +437,12 @@ Levi shakes his head in disagreement.
 Black Kalev ignores you. He clearly has no interest in\nmeddling with the likes of you.
 Black Kalev mocks you with his bleats.
 Black Kalev stares right through you. In his world, you are\nnothing but an ant waiting to be stomped.
-\c[7]\N[16]\c[0]\n"Rraagghh..."
-"Let's continue \N[16]!"
-Disable necromancy
-\N[16] tries to form words... But ultimately is unable to...
-The ghoul stares at you with empty eyes, mouth open, without\na worry in the world...
-\c[7]\N[17]\c[0]\n"Rraagghh..."
-"Let's continue \N[17]!"
-\N[17] tries to form words...  But ultimately is unable to...
-\c[7]\N[18]\c[0]\n"Rraagghh..."
-\N[18] tries to form words...
-He would like to tell you about his past as a guard in the\nRondon prisons built inside the dungeons of Fear and Hunger.
-How he saw the place overrun by madness slowly, until it\nended up in the state it is today.
-"Let's continue \N[18]!"
-How \N[18] starved  to death after locking himself up from\nall the terrors his comrades performed to each other.
-\c[7]\N[19]\c[0]\n"Ack ack!"
-"Let's continue \N[19]!"
-You make no sense of \N[19]...\nSkeletons truly are full of mystery and malice.
-The skeleton stand idle. It doesn't react to your encouraging\nwords.
-\c[7]\N[20]\c[0]\n"Ack ack!"
-"Let's continue \N[20]!"
-\N[20] just rattles it's bones and flexes it's arms.
-\c[7]\N[21]\c[0]\n"Ack ack!"
-"Let's continue \N[21]!"
-Dance with it
-\N[21] does its skeletal dance and ignores you...
-You dance with \N[21] for a minute or two.
 \>\i[67]\}AAN\{\<\n"I can't help but be fascinated by this place, even if all\nthese people are suffering here..."
 \>\i[67]\}AAN\{\<\n"What I don't understand is how none of this has leaked to\noutside world? I haven't heard anything about Prehevil in\nnews or other media..."
 \>\i[67]\}AAN\{\<\n"I can still go on for a day or two or three..."
 \>\i[64]\}BELLE\{\<\n"Härregud..."
 \>\i[64]\}BELLE\{\<\n"I don't even want to guess... Frankly I have no idea."
 \>\i[64]\}BELLE\{\<\n"We can rest in the retirement home... As if we'd ever make\nit there at this rate."
-GabText You baby is starting to feel heavier...
-GabText It seems as if the baby is growing bigger...
-GabText The baby is starting to feel too heavy to be carried around...
-GabText You let your child crawl on it's on.
-GabText It seems perfectly capable of that.
-Your child is now big enough to aid you in your fights.
-It's demeanor and attitude also suggest that he has great\npotential as a warriors when he grows even older.
-That is if he is to survive the harsh world until then.
-Give a name to your wicked son.
-Is baby conceived?
-\N[25] \n\N[26] \n\N[27]...
-Unfortunately you don't have anything to write with...
-Alll-Mer blesses you with an \c[2]Iron arrow\c[0]!
-Alll-Mer blesses you with the \c[2]Ancient book\c[0]!
-Alll-Mer blesses you with the \c[2]Book of the Forgotten\nMemories\c[0]!
-Alll-Mer blesses you with the \c[2]Recipes of the 15th\nCentury\c[0]!
-Alll-Mer blesses you with the \c[2]Poems of love and\ntorment\c[0]!
-Alll-Mer blesses you with a \c[2]Tinderbox\c[0]!
-Alll-Mer blesses you with a \c[2]Cloth fragment\c[0]!
-Alll-Mer blesses you with a \c[2]Glass vial\c[0]!
-Alll-Mer blesses you with a \c[2]Murky vial\c[0]!
-Alll-Mer blesses you with a \c[2]Black vial\c[0]!
-Alll-Mer blesses you with an \c[2]Oil\c[0]!
-Alll-Mer blesses you with the \c[2]Alchemillia vol. 1\c[0]!
-Alll-Mer blesses you with a \c[2]Meatpie\c[0]!
-Alll-Mer blesses you with an \c[2]Egg\c[0]!
-Alll-Mer blesses you with a \c[2]Dried meat\c[0]!
-Alll-Mer blesses you with a bags of \c[2]Wheat flour\c[0]!
-Alll-Mer blesses you with the \c[2]Captain's orders\c[0]!
-Alll-Mer blesses you with the \c[2]List of inmates\c[0]!
-Alll-Mer blesses you with a \c[2]Small key\c[0]!
-Alll-Mer blesses you with a \c[2]Rotten meat\c[0]!
-Alll-Mer blesses you with the \c[2]Captains diary 1\c[0]!
-Alll-Mer blesses you with the \c[2]Ma'havre\c[0]!
-Alll-Mer blesses you with the \c[2]Studies of Gro-goroth\c[0]!
-Alll-Mer blesses you with the \c[2]The Fellowship ch1\c[0]!
-Alll-Mer blesses you with 20 \c[2]Pinecones\c[0]!
-Alll-Mer blesses you with a \c[2]Stick\c[0]!
-Alll-Mer blesses you with a \c[2]Blue vial\c[0]!
-Alll-Mer blesses you with a \c[2]Priest's lantern\c[0]!
-Alll-Mer blesses you with a \c[2]Bottle of whiskey\c[0]!
-Alll-Mer blesses you with a \c[2]Moldy bread\c[0]!
-Alll-Mer blesses you with the \c[2]Captain's diary 1\c[0]!
-Alll-Mer blesses you with a \c[2]Yellow vial\c[0]!
-Alll-Mer blesses you with a \c[2]Blood vial\c[0]!
-Alll-Mer blesses you with a \c[2]Torturer's notes\c[0]!
-Alll-Mer blesses you with the \c[2]Studies of Alll-Mer I\c[0]!
-Alll-Mer blesses you with a \c[2]Cheese\c[0]!
-Alll-Mer blesses you with an \c[2]Ale\c[0]!
-Alll-Mer blesses you with the \c[2]Studies of Sylvian I\c[0]!
-Alll-Mer blesses you with the \c[2]Book of Enlightenment\c[0]!
-Alll-Mer gives you no salvation this time around...
-Alll-Mer blesses you with a \c[2]Vegetable pie\c[0]!
-Alll-Mer blesses you with a \c[2]Carrot\c[0]!
-Alll-Mer blesses you with a \c[2]Cabbage\c[0]!
-Alll-Mer blesses you with a \c[2]Skinning knife\c[0]!
-Alll-Mer blesses you with a \c[2]Guard skin\c[0]!
-Alll-Mer blesses you with a \c[2]Pale skin\c[0]!
-Alll-Mer blesses you with a \c[2]Assassin's handbook I\c[0]!
-Alll-Mer blesses you with a \c[2]Cell keys F3\c[0]!
-Alll-Mer blesses you with a \c[2]Mockup book\c[0]!
-Alll-Mer blesses you with a \c[2]2F keys\c[0]!
-Alll-Mer blesses you with a \c[2]White vial\c[0]!
-Alll-Mer blesses you with a \c[2]Purple vial\c[0]!
-Alll-Mer blesses you with a \c[2]Red vial\c[0]!
-Alll-Mer blesses you with a \c[2]Fetus\c[0]!
-Alll-Mer blesses you with a \c[2]Creation of Life\c[0]!
-Alll-Mer blesses you with a \c[2]Gnome milk\c[0]!
-Alll-Mer blesses you with a \c[2]Dirt\c[0]!
-Alll-Mer blesses you with a \c[2]Silver coin\c[0]!
-Alll-Mer blesses you with a \c[2]Gnome egg\c[0]!
-Alll-Mer blesses you with a \c[2]Green vial\c[0]!
-Alll-Mer blesses you with a \c[2]Bacon & Eggs\c[0]!
-Alll-Mer blesses you with a \c[2]Mix'n'match stew\c[0]!
-Alll-Mer blesses you with a \c[2]Tomato\c[0]!
-Alll-Mer blesses you with a \c[2]Dried mushroom\c[0]!
-Alll-Mer blesses you with a \c[2]Glow mushroom\c[0]!
-Alll-Mer blesses you with a \c[2]Light blue vial\c[0]!
-Alll-Mer blesses you with a \c[2]Salami\c[0]!
-Alll-Mer blesses you with a \c[2]Blueberries\c[0]!
-Alll-Mer blesses you with a \c[2]Blueberry pie\c[0]!
-Alll-Mer blesses you with a \c[2]Nitroglycerin powder\c[0]!
-Alll-Mer blesses you with a \c[2]Opium powder\c[0]!
-Alll-Mer blesses you with a \c[2]Pipe\c[0]!
-Alll-Mer blesses you with a \c[2]Tobacco\c[0]!
-Alll-Mer blesses you with a \c[2]Bear trap\c[0]!
-Alll-Mer blesses you with a \c[2]Diamond\c[0]!
-Alll-Mer blesses you with an \c[2]Orange vial\c[0]!
-Alll-Mer blesses you with an \c[2]Explosive vial\c[0]!
-Alll-Mer blesses you with a \c[2]The Tale of the Pocketcat\c[0]!
-Alll-Mer blesses you with a \c[2]Captain's diary 2\c[0]!
-Alll-Mer blesses you with a \c[2]Captain's diary 3\c[0]!
-Alll-Mer blesses you with a \c[2]Blood & Flower magic I\c[0]!
-Alll-Mer blesses you with a \c[2]Stone\c[0]!
-Alll-Mer blesses you with a \c[2]Water vial\c[0]!
-Alll-Mer blesses you with a \c[2]Torn page\c[0]!
-Alll-Mer blesses you with a \c[2]Quill\c[0]!
-Alll-Mer blesses you with a \c[2]Empty scroll\c[0]!
-Alll-Mer blesses you with a \c[2]Alchemillia vol. 2\c[0]!
-Alll-Mer blesses you with a \c[2]Brown vial\c[0]!
-Alll-Mer blesses you with a \c[2]Salmonsnake meat\c[0]!
-Alll-Mer blesses you with a \c[2]Short sword\c[0]!
-Alll-Mer blesses you with a \c[2]Meat cleaver\c[0]!
-Alll-Mer blesses you with a \c[2]Iron mace\c[0]!
-Alll-Mer blesses you with a \c[2]Crude sword\c[0]!
-Alll-Mer blesses you with a \c[2]Claymore\c[0]!
-Alll-Mer blesses you with a \c[2]Dagger\c[0]!
-Alll-Mer blesses you with a \c[2]Long sword\c[0]!
-Alll-Mer blesses you with an \c[2]Eastern sword\c[0]!
-Alll-Mer blesses you with an \c[2]Iron spear\c[0]!
-Alll-Mer blesses you with a \c[2]Short bow\c[0]!
-Alll-Mer blesses you with a \c[2]Leather vest\c[0]!
-Alll-Mer blesses you with a \c[2]Loincloth\c[0]!
-Alll-Mer blesses you with a \c[2]Priest's robe\c[0]!
-Alll-Mer blesses you with a \c[2]Hard leather armor\c[0]!
-Alll-Mer blesses you with a \c[2]Ghoul outfit\c[0]!
-Alll-Mer blesses you with a \c[2]Guard outfit\c[0]!
-Alll-Mer blesses you with a \c[2]Cloth hood\c[0]!
-Alll-Mer blesses you with a \c[2]Leather helmet\c[0]!
-Alll-Mer blesses you with a \c[2]Cloth cape\c[0]!
-Alll-Mer blesses you with a \c[2]Eclipse talisman\c[0]!
-Alll-Mer blesses you with a \c[2]Stone crown\c[0]!
-Alll-Mer blesses you with a \c[2]Fur armor\c[0]!
-Alll-Mer blesses you with a \c[2]High priest's robe\c[0]!
-Alll-Mer blesses you with a \c[2]Plate mail\c[0]!
-Alll-Mer blesses you with a \c[2]Black dress\c[0]!
-Alll-Mer blesses you with a \c[2]Wooden buckler\c[0]!
-Alll-Mer blesses you with a \c[2]Spider shield\c[0]!
-Alll-Mer blesses you with an \c[2]Eagle crest shield\c[0]!
-Alll-Mer blesses you with a \c[2]Peculiar doll\c[0]!
-Alll-Mer blesses you with a \c[2]Cavewolf fur\c[0]!
-Alll-Mer blesses you with a \c[2]The Passages of Ma'habre\c[0]!
-Alll-Mer teaches you \c[2]Hurting\c[0]!
-Alll-Mer teaches you \c[2]Necromancy\c[0]!
-Alll-Mer teaches you \c[2]Locust swarm\c[0]!
-Alll-Mer teaches you \c[2]Blood golem\c[0]!
-Alll-Mer teaches you \c[2]Demon seed\c[0]!
-Alll-Mer teaches you \c[2]Pheromones\c[0]!
-Alll-Mer teaches you \c[2]Mastery over insects\c[0]!
-Alll-Mer teaches you \c[2]Fast attack\c[0]!
-Alll-Mer teaches you \c[2]Counter\c[0]!
-Alll-Mer teaches you \c[2]Defence stance\c[0]!
-Alll-Mer teaches you \c[2]Steal\c[0]!
-Alll-Mer teaches you \c[2]Dash\c[0]!
-Alll-Mer teaches you \c[2]Lockpicking\c[0]!
-Alll-Mer teaches you \c[2]Greater blood magic\c[0]!
-Alll-Mer teaches you \c[2]Blood sacrifice\c[0]!
-Alll-Mer teaches you \c[2]Pray\c[0]!
-Alll-Mer teaches you \c[2]Devour\c[0]!
-Alll-Mer teaches you \c[2]Marksmanship\c[0]!
-Alll-Mer teaches you \c[2]Bloodlust\c[0]!
-Alll-Mer teaches you \c[2]Backstab\c[0]!
-Alll-Mer teaches you \c[2]En garde\c[0]!
-Alll-Mer teaches you \c[2]Leg sweep\c[0]!
-Alll-Mer teaches you \c[2]Counter-magic\c[0]!
-Alll-Mer teaches you \c[2]Needle worm\c[0]!
-Alll-Mer teaches you \c[2]Blood portal\c[0]!
-Alll-Mer teaches you \c[2]Flock of crows\c[0]!
-Alll-Mer teaches you \c[2]Black orb\c[0]!
-Alll-Mer teaches you \c[2]Healing whispers\c[0]!
-Alll-Mer teaches you \c[2]Loving whispers\c[0]!
-Alll-Mer teaches you \c[2]Chains of torment\c[0]!
-Alll-Mer teaches you \c[2]Pyromancy trick\c[0]!
-Alll-Mer teaches you \c[2]Combustion\c[0]!
-Alll-Mer teaches you \c[2]Walk on water\c[0]!
-Alll-Mer teaches you \c[2]Simple transmutation\c[0]!
-Alll-Mer teaches you \c[2]War cry\c[0]!
-The Passages of Ma'habre
-You open The Passages of Ma'habre. The pages start telling\nyou stories of past ages...
-The passages of Ma'habre turn to dust as you return to this\nworld.
 \>\i[64]\}BELLA\{\<\n"Huh... Where did Marina go?"
 You notice that Marina is not in the party anymore.
 "Let's look for her!"
@@ -876,13 +456,6 @@ GabText You can feel someone or something following you...
 GabText It's as if someone is staring at you from distance...
 GabText Did something just move in the corner of your eye?
 GabText You have an ominous feeling about this place...
-GabText \N[2] is starting to feel hungry...
-GabText \N[2] is weak from hunger.
-GabText \N[2] is ill from hunger.
-GabText Hunger is driving \N[2] mad.
-GabText Hunger is crippling \N[2].
-GabText \N[2] is blind from hunger.
-GabText \N[2] feels dizzy...
 GabText \N[3] is starting to feel hungry...
 GabText \N[3] is weak from hunger.
 GabText \N[3] is ill from hunger.
@@ -974,8 +547,6 @@ GabText Hunger is driving \N[18] mad.
 GabText Hunger is crippling \N[18].
 GabText \N[18] is blind from hunger.
 GabText \N[18] feels dizzy...
-Counter-magic
-Book of Fears
 "The book of fears and phobias."
 "Nosophobia - Fear of disease and contamination\nPhasmophobia - Fear of ghosts and ghastly figures\nRhabdophobia - Fear of magic and otherworldly powers."
 "Erotophobia - Fear of sex and genitals\nZoophobia - Fear of animals and beasts\nTeratophobia - Fear of monsters and malformations."
@@ -995,41 +566,7 @@ GabText \N[14] is at the edge of her sanity...
 GabText \N[14] has formed a panophobia. A fear of everything.
 GabText \N[13] is at the edge of his sanity...
 GabText \N[13] has formed a panophobia. A fear of everything.
-You find \c[2]Arm guards\c[0]!
-You find \c[2]Leg guards\c[0]!
-You find a \c[2]Plate mail\c[0]!
-You find a \c[2]Chainmail hood\c[0]!
-You find a \c[2]Plate helmet\c[0]!
-You find an \c[2]Eagle crest shield\c[0]!
-You find an \c[2]Iron cuirass\c[0]!
-Black vial
-GabText Drinking black liquid doesn't seem to produce immediate results...
-You find the \c[2]Scroll of thievery\c[0]!
-You find the \c[2]Scroll of the highwaymen\c[0]!
-You find the \c[2]Scroll of lockpicking\c[0]!
-You find the \c[2]Scroll of fencing\c[0]!
-You find the \c[2]Scroll of the swordsman\c[0]!
-You find the \c[2]Scroll of the general\c[0]!
-You find the \c[2]Scroll of the wizards\c[0]!
-You find the \c[2]Scroll of the dark mage\c[0]!
-You find the \c[2]Scroll of the wildman\c[0]!
-You find the \c[2]Scroll of marksmanship\c[0]!
-You find the \c[2]Scroll of berserk\c[0]!
-You find the \c[2]Scroll of the long sword\c[0]!
-You find the \c[2]Scroll of pyromancy trick\c[0]!
-You find the \c[2]Scroll of the black arts\c[0]!
-You find the \c[2]Scroll of the church of healing\c[0]!
-You find the \c[2]Scroll of the church of Sylvian\c[0]!
-You find the \c[2]Scroll of the leeches\c[0]!
-You find an \c[2]Empty scroll\c[0]!
-Poison potions
 GabText The potion causes burning sensation the moment it is drank.
-Level 1 - Entrance
-Level 5 - Mines
-Level 7 - Catacombs
-Ancient city - Grand library
-Ancient city - Tower of Endless
-Where do you want to travel?
 "The Basics of Alchemy - Alchemillia vol.1"
 "The effects of different herbs and plants are listed here:"
 "Blue - Blue herb has healing properties. It's often rubbed against\nopen wounds and injuries. The effects are almost immediate."
@@ -1037,7 +574,6 @@ Where do you want to travel?
 "Red - Red herbs have little to no effect on their own, but when\nused together with other herbs they have a boosting effect."
 "Lavender - The smell of lavender can be used to ease anxiety and\nfear. It's also said to keep bees away."
 "Recipes for basic alchemy:\nBlue + Red = Greater healing properties\nGreen + Red = Antidote for mild poisons\nBlue + Blue = Blue vial"
-Book of Anathomia
 "The book of medical science - The book of Anathomia.\nCollected knowledge of Homer of the Abyssonia."
 "Symptoms - Effects:\n\i[117] - Concussion\n\i[124] - Fracture or broken bone\n\i[114] - Bleeding wounds"
 "Symptoms - Effects:\n\i[16] - Mild Poisoning\n\i[113] - Poisoned\n\i[112] - Toxic/Severe poisoning
@@ -1047,22 +583,6 @@ Book of Anathomia
 "Symptoms - Effects:\n\i[17] - Irritation\n\i[137] - Burn\n\i[119] - Temporary paralysis"
 "Symptoms - Effects:\n\i[147]-\i[151] - Different stages of hunger\n\i[131]-\i[135] - Different stages of fear"
 "This book by no means covers everything under the sun and\nstars and thus it should only be used as a reference.
-"The fellowship chapter 2 -\nThe fellowship found their way to the ancient tombs that\nwould lead them to their confrontation with the older gods."
-"The fellowship persisted through the numerous hazards\nand dangers the older gods threw at them. Eventually all\nfive of them would reach the golden gates of Mahavre, the\nvery same gates Alll-mer ascended from 800 years prior."
-"It seemed like the fellowship had bested all the\nchallenges gods layed for them, but at the most crucial\nmoment a seed of doubt was planted into the mind of the\nfifth one."
-"The forgotten one was the last trial the old gods had\nin store. His purpose in the grand scheme of things was\nto create doubt and unease between the fellowship."
-"Holding tight to their grand mission, the fellowship\nprevailed however. They laid down all the doubts and\nproceeded to the golden temple of Mahavre."
-"The fellowship tore down the legacy of the old gods and\ncreated a new world order. An age where mankind decided\ntheir own fate. An age of growth and prosperity."
-"The fellowship became the new gods we know and love today."
-The Fellowship ch.2(OG)
-"The fellowship persisted through the numerous hazards\nand dangers the older gods threw at them. Eventually all\nfive of them would reach the golden gates of Ma'habre, the\nvery same gates Alll-mer ascended from 800 years prior."
-"The forgotten one was a scholar of many arts and sciences,\nand as such, believed what was laid before eyes. The Older\ngods would use this to their advantage and create a grand\nlie. A lie about the greater scheme of things."
-"The grand lie told of the way the older gods directed the\nflow of mankind. That many had gone before the same trials\nas the fellowship. Yet nothing had changed for the better\nfor men as eons went by."
-"This suspicion created a drift between the fellowship.\nIn the end the four other members proceeded with the\ninitial mission, trusting fate and glory that was just\ninches away from them."
-"The forgotten one was never again seen or heard. The fifth\none simply disappeared in the dusts of time..."
-The Fellowship ch.1(OG)
-"Chambara - the tormented one,\nand then there was the fifth one - she who never aspired\nfor the same greatness as the rest of the party - whose \nstory bears no listeners. The forgotten one."
-"Back then, there existed an ancient tomb to\nancient city of Ma'habre that worked as a hub for \nmultiple different planes of existance. A place\nwhere a man could meet his maker."
 Saw off an arm
 Saw off a leg
 What do you want to saw off from \N[1]?
@@ -1149,35 +669,10 @@ Unfortunately \N[14] has no arms left to saw.
 Unfortunately there is no one to saw off \N[14]'s other\narm and she cannot do it herself.
 Unfortunately \N[14] has no legs left to saw.
 Unfortunately there is no one to saw off \N[14]'s legs\nand she cannot do it herself.
-The cube doesn't react.
-The cube is burning hot from the previous use. You need\nto let it cooldown before using it again!
-GabText \N[1]'s weapon is melting because of the acid attack.
-GabText \N[3]'s weapon is melting because of the acid attack.
-GabText \N[4]'s weapon is melting because of the acid attack.
-GabText \N[5]'s weapon is melting because of the acid attack.
-GabText \N[6]'s weapon is melting because of the acid attack.
-GabText \N[2]'s weapon is melting because of the acid attack.
-GabText \N[8]'s weapon is melting because of the acid attack.
-You find \c[2]Ancient book\c[0]!
-You find \c[2]Book of the Forgotten Memories\c[0]!
 You find \c[2]Alchemillia vol. 1\c[0]!
-You find \c[2]Book of enlightenment\c[0]!
 You find \c[2]Alchemillia vol. 2\c[0]!
-You find \c[2]The Passages of Ma'habre\c[0]!
 You find \c[2]Alchemillia vol. 3\c[0]!
-You find \c[2]The Fellowship ch.2 (Original)\c[0]!
-You find \c[2]Poems of love and torment\c[0]!
-You find \c[2]The Fellowship ch.1 (Original)\c[0]!
-You find \c[2]Studies of Gro-goroth I\c[0]!
 You find a \c[2]Anathomia\c[0]!
-You find \c[2]Studies of Alll-mer I\c[0]!
-You find \c[2]Studies of Sylvian I\c[0]!
-You find \c[2]Natural doctrine I\c[0]!
-You find \c[2]Natural doctrine II\c[0]!
-You find \c[2]The Tale of the Pocketcat II\c[0]!
-You find \c[2]The Tale of the Pocketcat I\c[0]!
-You find \c[2]Blood & Flower magic I\c[0]!
-You find \c[2]Book of Fears\c[0]!
 \N[1] assists in this task.
 \>\i[75]\}EVI\{\<\n"... I... I can do it. Just hold still..."
 \N[3] assists in this task.
@@ -1195,82 +690,11 @@ You find \c[2]Book of Fears\c[0]!
 Marcoh just picks up the saw and goes for it.
 \N[14] assists in this task.
 \>\i[74]\}ARIN\{\<\n"Ah... Ummm... \.Just give me the saw. I guess there's no one else\nto do this!"
-\c[7]New gods\c[0]\n"Ask anything you want to."
-\c[7]New gods\c[0]\n"What subject do you want to know more about?"
-\c[7]New gods\c[0]\n"\N[28]..."
-\c[7]New gods\c[0]\n"The poor creature wants to get the gift of the God of the\nDepths..."
-\c[7]New gods\c[0]\n"He was once persuaded by the king of the insects."
-\c[7]New gods\c[0]\n"Needless to say that his pursuits are in vain."
-\c[7]New gods\c[0]\n"He was once sentenced to the prisons."
-\c[7]New gods\c[0]\n"He used to lust to hurt women. Now he is an epitome of his \nperversions."
-\c[7]New gods\c[0]\n"Overwhelming physical strength and endless lust that is\nonly weakened by their loneliness. It manifests in their final \nform."
-\c[7]New gods\c[0]\n"Those whose physical and mental fortitude couldn't handle\nthe ever-pressing darkness."
-\c[7]New gods\c[0]\n"They lost their mind."
-\c[7]New gods\c[0]\n"Francóis the dominating one has trained the hunting hounds to\nharass all those who trespass his domain."
-\c[7]New gods\c[0]\n"Those mindless beasts only taste the blood of their victim\nin their mouth. That is all they know."
-\c[7]New gods\c[0]\n"They came from the green hue. Even we don't know their \ntrue purpose."
-\c[7]New gods\c[0]\n"They manifest around sickness and dead carcasses."
-\c[7]New gods\c[0]\n"He is a human that was lost to blood magic. The darkness\nhas had its way with him."
-\c[7]New gods\c[0]\n"He is but a slave to Gro-goroth."
-\c[7]New gods\c[0]\n"As things started to succumb to chaos in the dungeons of\nfear and hunger, he was sent from the Kingdom of Rondon for\naid."
-\c[7]New gods\c[0]\n"In short time he too lost his mind. Now he tries to guard\nthe area to his last breath from anyone who sets foot to the\nfortress."
-\c[7]New gods\c[0]\n"The priests came for the pilgrimage to the dungeons. They\nare worshippers of both new and older gods."
-\c[7]New gods\c[0]\n"The little halflings given birth by the Cavemother. Even\ntheir mother think little of them and uses them to do her\ndirty work."
-\c[7]New gods\c[0]\n"The remaining guards of the fortress. They tried to save\nthemselves with an act of love."
-\c[7]New gods\c[0]\n"Cavemother, a being who has stayed in the darkness for too\nlong. It longs for human kind to pregnate her."
-\c[7]New gods\c[0]\n"A lone cave wolf who was once driven away from her pack\nbecause of her superior strength."
-\c[7]New gods\c[0]\n"The black has its way of changing the nature of wolves."
-\c[7]New gods\c[0]\n"Long ago, before men took the dungeons as their own, there\ndwelled a different race in the black."
-\c[7]New gods\c[0]\n"A virtuous knight who was on a path to the black of the\ndungeons."
-\c[7]New gods\c[0]\n"He met the alchemist Nosramus on his way down who saved\nhis life. The old knight decided to serve Nosramus for his\nlifetime and beyond."
-\c[7]New gods\c[0]\n"The true of the old knight."
-\c[7]New gods\c[0]\n"Creations of the black. The darkness has had its way with\ncountless of victims."
-\c[7]New gods\c[0]\n"They are fully erect despite being left untouched for\ndecades."
-\c[7]New gods\c[0]\n"Primal and savage beings. The poor souls were once stuck in\nthe black because of a cave-in."
-\c[7]New gods\c[0]\n"An ancient being that swims in the underground waterways.\nThere are many human legends which mention this beast as \nwell."
-\c[7]New gods\c[0]\n"He was set on purifying the dungeons from filth and \ndeprivement. Little did he know that he would become a part\nof the black himself."
-\c[7]New gods\c[0]\n"Unable to satisfy the needs of his victims, he resorts\nto more violent ways of pleasure."
-\c[7]New gods\c[0]\n"He travelled far from the east just to stop the spreading\nof the inevitable darkness."
-\c[7]New gods\c[0]\n"His iron will manifests in his blade even to this day."
-\c[7]New gods\c[0]\n"Pupils of the Nas'hrah the destroyer. They use the strength \nof the Gro-goroth to their master's advantage."
-\c[7]New gods\c[0]\n"A simple reanimated skeleton. The necromancy needs to be\nstronger in them to animate mere dust and bones, thus their\nstrength is also greater than ghouls."
-\c[7]New gods\c[0]\n"He who suffered the torture of the tormented one for\nhundreds of years. With every passing year its pain grows \nstronger."
-\c[7]New gods\c[0]\n"Valteil the enlightened one, in his attempts to understand\nthe secrets of life, he accidentally created this being."
-\c[7]New gods\c[0]\n"Men are wicked. Condensed wickedness can manifest in many\nways. Scarabs are there to remind us of this."
-\c[7]New gods\c[0]\n"The fool has travelled wide and far, but has gotten no\nwiser."
-\c[7]New gods\c[0]\n"A manifestation of your grudge during your stay in the\ndungeons."
-\c[7]New gods\c[0]\n"Valteil the enlightened one created many forms of life for\nmany different purposes."
-\c[7]New gods\c[0]\n"Uterus serves a purpose too and every night Valteil would\nsummon one of them to his quarters."
-\c[7]New gods\c[0]\n"An act of love between a cave wolf and a guard."
-\c[7]New gods\c[0]\n"Only traces of the older gods remain in this plane of\nexistence. Nas'hrah has been able to bend a powerful being\nunder his will."
-\c[7]New gods\c[0]\n"The wretched being was locked behind the sealed door when\nhe was looting the dungeon from valuables."
-\c[7]New gods\c[0]\n"He turned on the god of the depths for salvation..."
-\c[7]New gods\c[0]\n"We do not know much about her. She is the servant of the\nMoon god. The older one."
-\c[7]New gods\c[0]\n"The moon god has his motivations to meddle with the act in\nprocess, but we do not understand him."
-\c[7]New gods\c[0]\n"The figurine created by the older gods to protect the \ngolden temple of the true king."
-\c[7]New gods\c[0]\n"He has seen millenia go by, but still the fool waits for\na false prophecy."
-\c[7]New gods\c[0]\n"The older gods, before their departure, nominated a king \nto rule the Ma'habre and mankind."
-\c[7]New gods\c[0]\n"It's all fallacy. We as the new gods rule the Ma'habre now."
-\c[7]New gods\c[0]\n"The miserable creation that is but mockery of human beings."
-\c[7]New gods\c[0]\n"It is a simple being created by a new god that once existed\nwho was trying to achieve the power of the older gods with\nlimited understanding."
-\c[7]New gods\c[0]\n"Before men, the lizardmen roamed as the dominating lifeform."
-\c[7]New gods\c[0]\n"Like us, they too desired to ascend higher."
-\c[7]New gods\c[0]\n"What remains of those ancient times are the forms."
-\c[7]New gods\c[0]\n"Greater blight is something that rivals the powers of the\nnew gods even in this day and age."
-\c[7]New gods\c[0]\n"It is truly curious how powerful those ancient relics were\nin their true prime."
-\c[7]New gods\c[0]\n"Those ghastly figures are but echoes of the people that\ndwelled those dungeons before."
-\c[7]New gods\c[0]\n"Many of them saw end when the current reign in the dungeons\nended just a brief time ago."
-\c[7]New gods\c[0]\n"Just like how the black changes the humans, it also affects\nthe plants."
-\c[7]New gods\c[0]\n"On this soil, that has seen countless death, that curious\nflower once started blooming."
-\c[7]New gods\c[0]\n"It requires fertile ground to grow to its full bloom and\nthere is no better source of life than humans."
 GabText The infection on \N[1]'s arm is looking bad...
 GabText \N[1] is feeling terrible because of the infection...
 GabText You are feeling dizzy...
 You died because of your infected wound.
 \N[1] died because of his infected wound.
-GabText The infection on \N[2]'s arm is looking bad...
-GabText \N[2] is feeling terrible because of the infection...
-\N[2] died because of her infected wound.
 GabText The infection on \N[3]'s arm is looking bad...
 GabText \N[3] is feeling terrible because of the infection...
 \N[3] died because of her infected wound.
@@ -1286,255 +710,8 @@ GabText \N[6] is feeling terrible because of the infection...
 GabText The infection on \N[7]'s arm is looking bad...
 GabText \N[7] is feeling terrible because of the infection...
 \N[7] died because of her infected wound.
-GabText The infection on \N[8]'s arm is looking bad...
-GabText \N[8] is feeling terrible because of the infection...
-\N[8] died because of his infected wound.
-GabText The infection on \N[9]'s arm is looking bad...
-GabText \N[9] is feeling terrible because of the infection...
-GabText The infection on \N[11]'s arm is looking bad...
-GabText \N[11] is feeling terrible because of the infection...
 GabText The infection on \N[1]'s leg is looking bad...
-\i[191]Short sword \c[2][1]\c[0]
-\i[203]Meat cleaver \c[2][1]\c[0]
-\i[222]Iron mace \c[2][1]\c[0]
-\i[219]Crude sword \c[2][3]\c[0]
-\i[218]Claymore \c[2][3]\c[0]
-\i[257]Long sword \c[2][2]\c[0]
-Which weapon do you want to curse?\nYou have \c[2]\v[0096] Lesser souls\c[0].
-You got a \c[2]Cursed short sword\c[0].
-You do not have enough souls to curse the weapon.
-You got a \c[2]Cursed meat cleaver\c[0].
-You got a \c[2]Cursed iron mace\c[0].
-The weapon couldn't handle the pressure of cursing and\nshattered to pieces.
-You got a \c[2]Cursed claymore\c[0].
-You got a \c[2]Cursed long sword\c[0].
-\i[223]Eastern sword \c[2][0]\c[0]
-\i[239]Iron spear \c[2][2]\c[0]
-\i[238]Short bow \c[2][2]\c[0]
-\i[221]Dagger \c[2][1]\c[0]
-\i[239]Ritual spear \c[2][2]\c[0]
-\i[306]Shark teeth \c[2][2]\c[0]
-\c[2]Eastern sword\c[0] already has too many souls attached\nto it.
-You got a \c[2]Cursed iron spear\c[0].
-You got a \c[2]Cursed short bow\c[0].
-You got a \c[2]Cursed dagger\c[0].
-You got a \c[2]Cursed ritual spear\c[0].
-You got a \c[2]Cursed shark teeth\c[0].
-\i[304]Morning star \c[2][1]\c[0]
-\i[307]Bone shears \c[2][3]\c[0]
-\i[305]War scythe \c[2][3]\c[0]
-You got a \c[2]Cursed morning star\c[0].
-You got a \c[2]Cursed bone shears\c[0].
-You got a \c[2]Cursed war scythe\c[0].
-\c[7]New gods\c[0]\n"You only come to realize the greater scheme of things as\nyou ascend to become a new god."
-\c[7]New gods\c[0]\n"Time is a cycle as cliché as that sounds."
-\c[7]New gods\c[0]\n"The gift of the Gro-goroth to mankind. As his presence\nfades, so does his gift."
-\c[7]New gods\c[0]\n"Older gods left us without answers in the times of peril. \nFor men to take matters to their own hands, we had to form."
-\c[7]New gods\c[0]\n"We are many as you can see. But we have taken a seat in\nthe grand hall for now to let the new ones reign for their\ntime."
-\c[7]New gods\c[0]\n"The original gods. They have forsaken the mankind. We must\ntake matters to our own hands."
-\c[7]New gods\c[0]\n"They have not been present in the memories of any of us.\nOnly their traces remain."
-\c[7]New gods\c[0]\n"The gift Sylvian left for mankind. Love from her \nperspective."
-\c[7]New gods\c[0]\n"What you are to become is up to you."
-\c[7]New gods\c[0]\n"Men and women are born to suffer. No matter what your\npursuits are, humans are never content."
-\c[7]New gods\c[0]\n"Love is something that is unique to every person. Love can\ntake many shapes."
-\c[7]New gods\c[0]\n"You can form love on your own, or it can form on its won\nbetween multiple people."
-\c[7]New gods\c[0]\n"It is a term commonly used with the tale about the ascension\nof the current generation of new gods."
-\c[7]New gods\c[0]\n"This is not the time and place for such. The throne of\nascension is located elsewhere."
-\c[7]New gods\c[0]\n"Whether you are worthy of ascension or not, remains to be\nseen."
-\c[7]New gods\c[0]\n"The hue that eminates from the true Ma'habre. The plane\nof the older gods."
-\c[7]New gods\c[0]\n"The great western Kingdom of Rondon. The center of western\ncivilization."
-\c[7]New gods\c[0]\n"It was once formed out of hundreds of small warring nations\nand tribes to fight under one flag."
-\c[7]New gods\c[0]\n"The northern kingdom that has stayed independant for the\nmost parts."
-\c[7]New gods\c[0]\n"Known for their iron will and advanced ships that sail\neven to the most western continents."
-\c[7]New gods\c[0]\n"The holy city of the Eastern Sanctuaries. Originally the\nhomeland of the older god Alll-mer."
-\c[7]New gods\c[0]\n"A hotspot for all trading, be it from the east or west."
-\c[7]New gods\c[0]\n"The continent of the old world order. A land unknown for\nthe most parts in the western world.
-\c[7]New gods\c[0]\n"Even us, the new gods, know little of the continent."
-\c[7]New gods\c[0]\n"Even us, the new gods, know little of this part of the world.\nThe continent is tightly connected to the older gods."
-\c[7]New gods\c[0]\n"The city of the gods. Once we took over the city from the\nolder gods. We decided to reside here. Still some remnants\nof the older gods still linger in the city."
-\c[7]New gods\c[0]\n"Time and space do not follow the same rules here. Sun\ndoesn't warm you and death is not the same once you walk\nthese streets."
-\c[7]New gods\c[0]\n"The language always changes. Mahavre is what was known as\nthe Ma'habre."
-\c[7]New gods\c[0]\n"The dungeons of fear and hunger are ancient. Almost as\nold as this city."
-\c[7]New gods\c[0]\n"They have seen many different ages. They have always worked\nas a nexus between multiple different planes of existence."
-\c[7]New gods\c[0]\n"In current era, the Kingdom of Rondon built prison sections\nover the ancient tombs."
-\c[7]New gods\c[0]\n"They most likely tried to use the nightmarish rumours about\nthe tombs to their own advantage."
-\c[7]New gods\c[0]\n"But little did they know that such darkness could not be\ncontained."
-\c[7]New gods\c[0]\n"This is the grand hall of course."
-\c[7]New gods\c[0]\n"New gods reside here, once our reign has seen its end."
-\c[7]New gods\c[0]\n"You've seen the outside world right?"
-\c[7]New gods\c[0]\n"That's where you came after all."
-\c[7]New gods\c[0]\n"Did you forget already?"
-\c[7]New gods\c[0]\n"The world of humans is in chaos. They are waiting for their\nsaviour."
-\c[7]New gods\c[0]\n"Someone to lift them from misery and agony. Someone to stop\nendless wars, someone to cleanse them from their diseases."
-\c[7]New gods\c[0]\n"Someone to destroy the old world order and the older gods\nthat were the cause of the dark times."
-\c[7]New gods\c[0]\n"Abyssonia, which is the origin of the western civilization.\nMany of us come from the land in which olive trees bloom and\npeople bathe in sun."
-\c[7]New gods\c[0]\n"How do you know about the void?"
-\c[7]New gods\c[0]\n"This is truly curious."
-\c[7]New gods\c[0]\n"The void is... It is the other side of the coin, so to\nspeak. If your world is the other side that is.
-\c[7]New gods\c[0]\n"Some also call it 'The true Ma'habre'... It is a correct\nterm in a sense as that indeed is the plane where the\nolder gods were said to exist once upon time."
-\c[7]New gods\c[0]\n"I'm afraid even our knowledge is limited when it comes to\nthe void. It is the plane where ascension is finally possible."
-\c[7]New gods\c[0]\n"Thus all of us have spent an eternity searcing its empty\ncorners..."
-\c[7]New gods\c[0]\n"Francóis the dominating one. The new god of the current\nera. He rose to power in pursuits for more strength to\nunify the warring lands."
-\c[7]New gods\c[0]\n"Selfishly he has taken over the golden temple and tries\nto rule Ma'habre with his iron fist."
-\c[7]New gods\c[0]\n"He deserves to die."
-\c[7]New gods\c[0]\n"In the books and legends he goes by the name 'forgotten\none' or the 'fifth one', but his birth name is Nosramus."
-\c[7]New gods\c[0]\n"He was part of the fellowship that consisted of 4 of the\ncurrent new gods."
-\c[7]New gods\c[0]\n"He supposedly understood the true nature of the greater\nscheme and thus refused his ascension."
-\c[7]New gods\c[0]\n"He is since forgotten in our eyes and must be left in the\ndarkness for the time he will rot."
-\c[7]New gods\c[0]\n"A pure being, in which both strength of the new gods and\na seed of the man from the prophecies come together."
-\c[7]New gods\c[0]\n"Never in the written history has there been similar situation.\nIt is truly exciting, isn't it?"
-\c[7]New gods\c[0]\n"We can expect great things from her."
-\c[7]New gods\c[0]\n"Miro... From the far-away country near Oldegård."
-\c[7]New gods\c[0]\n"Ha as haven. Ve to verify. Ri to rise. Nen as the human\nbeing in the far east."
-\c[7]New gods\c[0]\n"The new goddess. She believes in the endless potential of\nthe mankind. That anything can be within reach, if you try\nhard enough."
-\c[7]New gods\c[0]\n"She is aware of the end of an era and is desperately looking\nfor a way to continue her reign beyond her destined lifetime."
-\c[7]New gods\c[0]\n"She believes Le'garde holds the key to eternal existence."
-\c[7]New gods\c[0]\n"The new god of enlightenment. Valteil is current master\nof the grand libraries."
-\c[7]New gods\c[0]\n"He is obsessed with creation of artificial life. He has\nwasted his cycle at the libraries on the subject without\nmuch triumph."
-\c[7]New gods\c[0]\n"He believes this to be the key to true godhood. He believes\ncreation of life closes the gap between the new and the\nolder gods."
-\c[7]New gods\c[0]\n"Also knows as Ronn Chambara when he still walked among men\nas a mere mortal."
-\c[7]New gods\c[0]\n"Once a poet, he believes no great art can be achieved\nwithout pain and suffering. He now continues the same \nprincipals as a new god"
-\c[7]New gods\c[0]\n"Ronn Chambara when he still walked among men as a mere \nmortal."
-\c[7]New gods\c[0]\n"A servant of the trickster god - the Moon. His motivations\nlie in the path laid out by the older god."
-\c[7]New gods\c[0]\n"Unfortunately even we don't understand his mysterious\nways..."
-\c[7]New gods\c[0]\n"A soul that radiates the light of an older god. The soul\nhas formed itself inside the body of a little girl."
-\c[7]New gods\c[0]\n"The mother of the ancient one is the endless one and the\nfather is the man from the prophecies."
-\c[7]New gods\c[0]\n"The results of such unholy union are unfamiliar to us."
-\c[7]New gods\c[0]\n"Trickster god, also known as the Moon god. He is one of\nthe last older gods to still observe mankind."
-\c[7]New gods\c[0]\n"He is a jealous kind. He would not share the godhood and\nthe world order with humans and the new gods."
-\c[7]New gods\c[0]\n"He has many ploys to diminish our influence."
-\c[7]New gods\c[0]\n"The new god of enlightenment that preceeded Nas'hrah at\nthe grand libraries."
-\c[7]New gods\c[0]\n"He created the grand libraries to store the immense knowledge\nthe world holds."
-\c[7]New gods\c[0]\n"He wished that the archives would one day surpass the\nknowledge and the wisdom of the older gods."
-\c[7]New gods\c[0]\n"Every new god of the enlightenment would from then on\ndedicate their cycle at the libraries to a certain subject\nthey would decide themselves."
-\c[7]New gods\c[0]\n"Cahara of the South... He originates from the Eastern\nSanctuaries. A bastard child left on his own at a very\nyoung age."
-\c[7]New gods\c[0]\n"Somehow this poor soul found his way to these dungeons..."
-\c[7]New gods\c[0]\n"An intimidating figure for sure. Seems like even a northern\nbrute like him can appreciate finesse and knowledge."
-\c[7]New gods\c[0]\n"One of the more notorious dark priests of the modern age.\nWe would not be surprised if he was to rise and become the\nnew enlightened one."
-\c[7]New gods\c[0]\n"The trusted knight of the propheticed one. She seems \nawfully dim standing next to the blinding shimmer of the \none..."
-\c[7]New gods\c[0]\n"But it might be wrong to misjudge her potential..."
-\c[7]New gods\c[0]\n"The propheticed one... Already while still alive, there\nwere many tales written and sung about his tale."
-\c[7]New gods\c[0]\n"We don't know where the prophecy got started but needless\nto say that it's all fallacy."
-\c[7]New gods\c[0]\n"But the man himself... Is a curious kind."
-\c[7]New gods\c[0]\n"There is definitely something different about him and \nwhatever his part might be in the greater scheme of things,\nthe very least he started something larger..."
-\c[7]New gods\c[0]\n"The previous new god who held the libraries as his own\nafter the great Betel."
-\c[7]New gods\c[0]\n"How Betel fell for the pathetic tricks Nas'hrah pulled \nagainst him is a complete mystery to us."
-\c[7]New gods\c[0]\n"Nas'hrah was not content with what we have here. That \nmiserable worm..."
-\c[7]New gods\c[0]\n"The old fool... His mind was weak, his body was weak and\nmost of all, he couldn't hold his own against the pressure\nthis place has on people."
-\c[7]New gods\c[0]\n"Without reason he used to sodomize everyone who stood in \nhis way..."
-\c[7]New gods\c[0]\n"That is how he desired to spend his days instead of the\ntrue godhood we have here."
-You disable the necromancy and say your farewells to\n\N[16]. \N[16] doesn't seem to understand what is\ngoing on.
-You disable the necromancy and say your farewells to\n\N[17]. \N[17] doesn't seem to understand what is\ngoing on.
-You disable the necromancy and say your farewells to\n\N[18]. \N[18] doesn't seem to understand what is\ngoing on.
-You disable the necromancy and say your farewells to\n\N[19]. \N[19] doesn't seem to understand what is\ngoing on.
-You disable the necromancy and say your farewells to\n\N[20]. \N[20] doesn't seem to understand what is\ngoing on.
-You disable the necromancy and say your farewells to\n\N[21]. \N[21] doesn't seem to understand what is\ngoing on.
-Alll-Mer blesses you with a \c[2]Soul stone\c[0]!
-Alll-Mer blesses you with a \c[2]Lesser soul\c[0]!
-Alll-Mer blesses you with the \c[2]Pinecone pig instructions\c[0]!
-Alll-Mer blesses you with the \c[2]Elixir of mind\c[0]!
-Alll-Mer blesses you with the \c[2]Elixir of body\c[0]!
-Alll-Mer blesses you with the \c[2]Endless soul\c[0]!
-Alll-Mer blesses you with the \c[2]Domination soul\c[0]!
-Alll-Mer blesses you with the \c[2]Enlightened soul\c[0]!
-Alll-Mer blesses you with the \c[2]Tormented soul\c[0]!
-Alll-Mer blesses you with the \c[2]Crow Mauler soul\c[0]!
-Alll-Mer blesses you with the \c[2]Cavemother soul\c[0]!
-Alll-Mer blesses you with the \c[2]Salmonsnake soul\c[0]!
-Alll-Mer blesses you with the \c[2]White angel soul\c[0]!
-Alll-Mer blesses you with the \c[2]Iron Shakespeare soul\c[0]!
-Alll-Mer blesses you with the \c[2]Black witch soul\c[0]!
-Alll-Mer blesses you with the \c[2]Butterfly soul\c[0]!
-Alll-Mer blesses you with the \c[2]Arm guards\c[0]!
-Alll-Mer blesses you with the \c[2]Leg guards\c[0]!
-Alll-Mer blesses you with the \c[2]Iron mask\c[0]!
-Alll-Mer blesses you with the \c[2]Sorcerer's stone\c[0]!
-Alll-Mer blesses you with the \c[2]Gaunt plate armor\c[0]!
-Alll-Mer blesses you with the \c[2]Gaunt bascinet\c[0]!
-Alll-Mer blesses you with the \c[2]Worm juice\c[0]!
-Alll-Mer blesses you with the \c[2]Cube of depths\c[0]!
-Alll-Mer blesses you with the \c[2]Alchemillia vol. 3\c[0]!
-Alll-Mer blesses you with the \c[2]Ring of wraiths\c[0]!
-Alll-Mer blesses you with the \c[2]Old guardian soul\c[0]!
-Alll-Mer blesses you with the \c[2]Old passage key\c[0]!
-Alll-Mer blesses you with the \c[2]King's passage key\c[0]!
-Alll-Mer blesses you with \c[2]Eastern perfume\c[0]!
-Alll-Mer blesses you with a \c[2]Monocle\c[0]!
-Alll-Mer blesses you with \c[2]Eyeglasses\c[0]!
-Alll-Mer blesses you with a \c[2]Fur outfit\c[0]!
-Alll-Mer blesses you with a \c[2]Soul devour necklace\c[0]!
-Alll-Mer blesses you with a \c[2]Shark teeth\c[0]!
-Alll-Mer blesses you with a \c[2]War scythe\c[0]!
-Alll-Mer blesses you with \c[2]Bone shears\c[0]!
-Alll-Mer blesses you with a \c[2]Morning star\c[0]!
-Alll-Mer blesses you with a \c[2]Ritual spear\c[0]!
-Pinecone pig
-The pinecone pig brought you a \c[2]Scroll of the highwaymen\c[0]!
-The pinecone pig brought you a \c[2]Cloth fragment\c[0]!
-The pinecone pig brought you a \c[2]Glass vial\c[0]!
-The pinecone pig brought you some \c[2]Tobacco\c[0]!
-The pinecone pig brought you a \c[2]Pipe\c[0]!
-The pinecone pig brought you some \c[2]Opium powder\c[0]!
-The pinecone pig brought you a \c[2]Bottle of whiskey\c[0]!
-The pinecone pig brought you some \c[2]Nitroglycerin powder\c[0]!
-The pinecone pig brought you a \c[2]Red vial\c[0]!
-The pinecone pig brought you a bottle of \c[2]Ale\c[0]!
-The pinecone pig brought you a \c[2]Pinecone\c[0]!
-The pinecone pig brought you a \c[2]Small key\c[0]!
-The pinecone pig brought you nothing...
-The pinecone pig brought you a \c[2]Stick\c[0]!
-The pinecone pig brought you a \c[2]Blue vial\c[0]!
-The pinecone pig brought you an \c[2]Ale\c[0]!
-The pinecone pig brought you nothing. It just wanted some\ncompany.
-The pinecone pig brought you a \c[2]Cloth hood\c[0]!
-The pinecone pig brought you a \c[2]Leather helmet\c[0]!
-The pinecone pig brought you \c[2]Oil\c[0]!
-The pinecone pig brought you \c[2]5 Silver coins\c[0]!
-The pinecone pig brought you \c[2]Dirt\c[0]!
-The pinecone pig brought you an \c[2]Iron arrow\c[0]!
-The pinecone pig brought you a \c[2]White vial\c[0]!
-The pinecone pig brought you a \c[2]Quill\c[0]!
-The pinecone pig brought you a \c[2]Water vial\c[0]!
-The pinecone pig brought you a \c[2]Wooden buckler\c[0]!
-The pinecone pig brought you an \c[2]Explosive vial\c[0]!
-The pinecone pig brought you nothing. It would like to fight\nwith you, but you shoo it away.
-The pinecone pig brought you a \c[2]Purifying talisman\c[0]!
-The pinecone pig brought you a \c[2]Red herb\c[0]!
-The pinecone pig brought you a \c[2]Blue herb\c[0]!
-The pinecone pig brought you a \c[2]Green herb\c[0]!
-The pinecone pig brought you \c[2]12 Silver coins\c[0]!
-The pinecone pig brought you \c[2]6 Silver coins\c[0]!
-The pinecone pig brought you \c[2]3 Silver coins\c[0]!
-The pinecone pig brought you \c[2]Raw meat\c[0]!
-The pinecone pig brought you a \c[2]Bonesaw\c[0]!
-The pinecone pig brought you a \c[2]Throwing knife\c[0]!
-Pinecone pig instructions
-There are instructions on how to build your own pinecone\npig - The amulet of good luck and fortune. The pinecone pig\nseems to originate from the north, from the little villages\nin the Oldegård.
-"- First you need a narrow stick. Break it into four equally\nlong pieces. Align them to each other to make sure they are\nthe right size."
-"- Take a well-kept pinecone. Push the sticks inside the\nopenings on the pinecone. The sticks should be able to\ncarry the weight of the pinecone, so they should be placed\non all four sides of the bottom of the pinecone."
-"- The pinecone pig is ready. Enjoy."
-With the act your affinity with the Gro-goroth is growing...
-With the act, your affinity with the Sylvian is \ngrowing...
-With the act, your affinity with the Alll-mer is \ngrowing...
-GabText \N[9]'s weapon is melting because of the acid attack.
-GabText \N[19]'s weapon is melting because of the acid attack.
-GabText \N[20]'s weapon is melting because of the acid attack.
-GabText \N[21]'s weapon is melting because of the acid attack.
-You find an \c[2]Short sword\c[0]!
-You find an \c[2]Meat cleaver\c[0]!
-You find an \c[2]Iron mace\c[0]!
-You find a \c[2]Long sword\c[0]!
 You find an \c[2]Iron spear\c[0]!
-You find a \c[2]Short bow\c[0]!
-You find a \c[2]Claymore\c[0]!
-You find a \c[2]Cursed iron mace\c[0]!
-You find a \c[2]Cursed short sword\c[0]!
-You find a \c[2]Shark teeth\c[0]!
-You find a \c[2]Morning star\c[0]!
-You find a \c[2]Bone shears\c[0]!
-You find a \c[2]War scythe\c[0]!
-You find a \c[2]Cursed iron spear\c[0]!
-You find a \c[2]Cursed shark teeth\c[0]!
 GabText \N[1] lost his left arm! It's bleeding heavily!
 GabText \N[1] lost his another arm too!
 \N[1] has lost both legs and arms and is useless now.
@@ -1576,16 +753,6 @@ GabText \N[6] lost his another leg too!
 GabText \N[6] is tied up!
 GabText \N[6] got decapitated!
 GabText \N[6]'s head exploded from the pressure!
-GabText \N[9] lost it's left arm! It's bleeding heavily!
-GabText \N[9] lost it's another arm too!
-\N[9] has lost both legs and arms and is\nuseless now.
-GabText \N[9] lost it's left leg! It's bleeding heavily!
-GabText \N[9] lost it's another leg too!
-GabText Crow Mauler pecks \N[9]'s head off.
-The flock of crows clawed your eyes. You lose your eye sight\ncompletely. You can only see faint silhouettes here and\nthere, but otherwise it's a dark world now.
-GabText The white angel splits \N[9] in two.
-GabText \N[9] lost a piece of its soul.
-GabText \N[9] is feeling more hollow.
 GabText \N[7] lost a hoof! The stump is bleeding heavily!
 GabText \N[7] lost another hoof! He is having trouble standing up...
 GabText \N[7] lost his third hoof already!
@@ -1593,36 +760,10 @@ GabText \N[7] lost his third hoof already!
 GabText \N[7] is tied up!
 GabText \N[7] is decapitated!
 GabText \N[7]'s head exploded because of the pressure!
-GabText The white angel splits \N[2] in two.
-GabText \N[7] lost a piece of his soul.
-GabText \N[7] is feeling more hollow.
-GabText \N[8] lost it's left arm! It's bleeding heavily!
-GabText \N[8] lost it's another arm too!
-GabText \N[8] cannot wield dagger anymore.
-GabText \N[8] cannot wield skeletal arm anymore.
-GabText \N[8] cannot wield cursed dagger anymore.
-\N[8] has lost both legs and arms and died because\nof the shock.
-GabText \N[8] lost it's left leg! It's bleeding heavily!
-GabText \N[8] lost it's another leg too!
-GabText Crow Mauler pecks \N[8]'s head off.
-GabText The white angel splits \N[8] in two.
-GabText \N[8] lost a piece of its soul.
-GabText \N[8] is feeling more hollow.
 GabText \N[10] lost it's left arm!
 GabText \N[10] lost it's another arm too!
 GabText \N[10] lost it's left leg!
 GabText \N[10] lost it's another leg too!
-GabText The white angel splits \N[10] in two.
-GabText Crow Mauler pecks \N[10]'s head off.
-GabText \N[11] lost it's left arm! It's bleeding heavily!
-GabText \N[11] lost it's another arm too!
-\N[11] has lost both legs and arms and is\nuseless now.
-GabText \N[11] lost it's left leg! It's bleeding heavily!
-GabText \N[11] lost it's another leg too!
-GabText Crow Mauler pecks \N[11]'s head off.
-GabText The white angel splits \N[11] in two.
-GabText \N[11] lost a piece of his soul.
-GabText \N[11] is feeling more hollow.
 GabText \N[16] lost his left arm! It's bleeding heavily!
 GabText \N[16] lost his another arm too!
 \N[16] has lost both legs and arms and is\nuseless now.
@@ -1630,7 +771,6 @@ GabText \N[16] lost his left leg! It's bleeding heavily!
 GabText \N[16] lost his another leg too!
 \N[16] has lost both legs and arms and is useless now.
 GabText \N[16] is tied up!
-GabText The white angel splits \N[16] in two.
 GabText \N[16] is decapitated!
 GabText \N[16]'s head exploded from the pressure!
 GabText \N[17] lost his left arm! It's bleeding heavily!
@@ -1640,7 +780,6 @@ GabText \N[17] lost his left leg! It's bleeding heavily!
 GabText \N[17] lost his another leg too!
 \N[17] has lost both legs and arms and is useless now.
 GabText \N[17] is tied up!
-GabText The white angel splits \N[17] in two.
 GabText \N[17] is decapitated!
 GabText \N[17]'s head exploded from the pressure!
 GabText \N[18] lost his left arm! It's bleeding heavily!
@@ -1649,8 +788,6 @@ GabText \N[18] lost his another arm too!
 GabText \N[18] lost his left leg! It's bleeding heavily!
 GabText \N[18] lost his another leg too!
 GabText \N[18] is tied up!
-GabText The white angel splits \N[18] in two.
-GabText Crow Mauler pecks \N[18]'s head off.
 GabText \N[22] lost his left arm!
 GabText \N[22] lost his another arm too!
 \N[22] has lost both legs and arms and is useless now.
@@ -1776,8 +913,6 @@ You find \c[2]3 Blue herbs\c[0] and \c[2]2 Small seeds\c[0]!
 You find a \c[2]Monocle\c[0]!
 You find \c[2]2 Opium powders\c[0]!
 You find a \c[2]Sorcerer's stone\c[0]!
-You find an \c[2]Elixir of mind\c[0]!
-You find a \c[2]Scroll of the black arts\c[0]!
 \N[1] has no arms to use the syringe.
 \N[3] has no arms to use the syringe.
 \N[4] has no arms to use the syringe.
@@ -1806,79 +941,8 @@ You get \c[2]Sturdy overalls\c[0] and a \c[2]Booby trap\c[0].
 "I don't know what's so special about this miserable place,\nbut I even heard that the Kaiser himself will be coming here\nin the upcoming days."
 "Maybe after that, I can finally return home. I hope you\nare able to wait for me just a little while longer."
 "Yours forever - Jonni."
-\N[1] cannot hold shield without arms!
-\N[1] cannot hold \c[2]Crude sword\c[0] with just one arm!
-\N[1] cannot hold \c[2]Claymore\c[0] with just one arm!
-\N[1] cannot hold \c[2]Short bow\c[0] with just one arm!
-\N[1] cannot hold \c[2]Bone shears\c[0] with just one arm!
-\N[1] cannot hold \c[2]War scythe\c[0] with just one arm!
-\N[1] cannot hold \c[2]Ritual spear\c[0] with just one arm!
-\N[1] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[1] cannot hold \c[2]Spider shield\c[0] with just one arm!
-\N[1] cannot hold \c[2]Eagle crest shield\c[0] with just \none arm!
-\N[3] cannot hold shield without arms!
-\N[3] cannot hold \c[2]Crude sword\c[0] with just one arm!
-\N[3] cannot hold \c[2]Claymore\c[0] with just one arm!
 \N[3] cannot hold \c[2]Iron spear\c[0] with just one arm!
-\N[3] cannot hold \c[2]Short bow\c[0] with just one arm!
-\N[3] cannot hold \c[2]Sergal spear\c[0] with just one arm!
-\N[3] cannot hold \c[2]Bone shears\c[0] with just one arm!
-\N[3] cannot hold \c[2]War scythe\c[0] with just one arm!
-\N[3] cannot hold \c[2]Ritual spear\c[0] with just one arm!
-\N[3] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[3] cannot hold \c[2]Spider shield\c[0] with just one arm!
-\N[3] cannot hold \c[2]Eagle crest shield\c[0] with just \none arm!
-\N[4] cannot hold shield without arms!
-\N[4] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[5] cannot hold shield without arms!
-\N[5] cannot hold \c[2]Crude sword\c[0] with just one arm!
-\N[5] cannot hold \c[2]Claymore\c[0] with just one arm!
-\N[5] cannot hold \c[2]Short bow\c[0] with just one arm!
-\N[5] cannot hold \c[2]Bone shears\c[0] with just one arm!
-\N[5] cannot hold \c[2]War scythe\c[0] with just one arm!
-\N[5] cannot hold \c[2]Ritual spear\c[0] with just one arm!
-\N[5] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[5] cannot hold \c[2]Spider shield\c[0] with just one arm!
-\N[5] cannot hold \c[2]Eagle crest shield\c[0] with just \none arm!
-\N[6] cannot hold shield without arms!
-\N[6] cannot hold \c[2]Crude sword\c[0] with just one arm!
-\N[6] cannot hold \c[2]Claymore\c[0] with just one arm!
-\N[6] cannot hold \c[2]Short bow\c[0] with just one arm!
-\N[6] cannot hold \c[2]Bone shears\c[0] with just one arm!
-\N[6] cannot hold \c[2]War scythe\c[0] with just one arm!
-\N[6] cannot hold \c[2]Ritual spear\c[0] with just one arm!
-\N[6] cannot hold \c[2]Wooden buckler\c[0] with just one arm!
-\N[6] cannot hold \c[2]Spider shield\c[0] with just one arm!
-\N[6] cannot hold \c[2]Eagle crest shield\c[0] with just \none arm!
-You find \c[2]4 Tinderboxes\c[0]!
-You find some \c[2]Tobacco\c[0]!
-You find some \c[2]Opium powder\c[0]!
-You find a \c[2]Bottle of whiskey\c[0]!
-You find some \c[2]Nitroglycerin powder\c[0]!
-You find a vial of \c[2]Red vial\c[0]!
-You find a bottle of \c[2]Ale\c[0]!
-You find a \c[2]Pinecone\c[0]!
-But there is nothing worthwhile here.
-You find a \c[2]Stick\c[0]!
-You find an \c[2]Ale\c[0]!
-You find a \c[2]Cloth hood\c[0]!
-You find a \c[2]Leather helmet\c[0]!
-You find \c[2]Oil\c[0]!
-You find \c[2]5 Silver coins\c[0]!
-You find \c[2]Dirt\c[0]!
-You find an \c[2]Iron arrow\c[0]!
-You find a \c[2]Quill\c[0]!
-You find a \c[2]Water vial\c[0]!
-You find a \c[2]Wooden buckler\c[0]!
-You find \c[2]12 Silver coins\c[0]!
-You find \c[2]6 Silver coins\c[0]!
-You find \c[2]3 Silver coins\c[0]!
-You find a piece of \c[2]Raw meat\c[0]!
-You find a \c[2]Throwing knife\c[0]!
-You find a \c[2]Worm juice\c[0]!
-You find a \c[2]Throwing dart\c[0]!
 The bonesaw cracked!
-Occult grimoires
 "The Occult Grimoires - Magick in Theory and Practice.\nWritten by Samiri Zimri. Translated by Oscar Renté."
 "So that one doesn't lose his mind along with the soul, one\nmust come prepared for all situations."
 "The basics of any knowledge are always the most important,\nyou need steady foundations, in order to build the tower to\nthe gods."
@@ -1958,7 +1022,6 @@ Unfortunately \N[29] has got a sigil already.
 "If an enemy spots you, you will go into Tension mode where stamina \ndepletes at an alarming rate. This tense moment will luckily pass by\nfairly fast."
 "If you have firearms equipped, you can't run. No running and\ngunning. If you have injured your legs, no running either."
 "There is a lot more to survival, but hopefully these lessons will\naid you to get started. Good luck."
-Newspaper
 It is a week-old newspaper article about the supposed end of \nthe Great War II.
 "...Two of the biggest powers in the western world - The\nEastern Union and the Bremen settled for peace after the last \naggressive push by the Bremen troops happening just days prior\nto the treaty."
 "The Bremen troops seized the power in a small city of\nPrehevil, located in central Bohemia, just west from Lake\nVerdite."
@@ -2022,8 +1085,6 @@ You find \c[2]Tobacco\c[0]!
 You find 3 syringes of \c[2]Heroin\c[0]!
 You find 2 \c[2]Fly amanitas\c[0]!
 You find 3 \c[2]Lavender\c[0] petals!
-Crosswords
-
 You find a \c[2]Bone saw\c[0]!
 You find a \c[2]C-ration\c[0]!
 You find a \c[2]Broomstick\c[0]!
@@ -2062,7 +1123,6 @@ Book store
 Church of Alll-mer
 PRHL Bop
 Donnovan's house
-Skin bible - alll-mer
 "Alll-mer - The ascended one. One of the two humanborn gods known \nto this day."
 "There are two stories of the origins of Alll-mer."
 "The more common story speaks of a human born from a virgin \nmother. A mere mortal that had humble origins, but one that quickly \nrose to prominence because of his teachings."
@@ -2100,10 +1160,8 @@ You find a \c[2]Knife\c[0]!
 You receive \v[397] \c[2]Soul stone shards\c[0]!
 You receive a \c[2]Soul stone shard\c[0]!
 You receive \v[1831] \c[2]Soul stone shards\c[0]!
-Flute
 "Is anyone out there?"
 What do you want to ask?
-\..\..\..\..\..\..
 "Where are you?"
 "What about your dolls?"
 "What happened to you here?"
@@ -2120,8 +1178,6 @@ What do you want to ask?
 The talking board doesn't react to your question...
 Looks like you lost the connection to the spirit.
 The talking board doesn't react to your question in any way.
-Dragul of Lyra
-Devour
 "THIS ... IS ... ME"
 "What happened to you?"
 "Can I do something for you?"
@@ -2166,7 +1222,6 @@ Most parts of the diary are completely illegible scriblings of\na madman, but to
 "Maybe these totems are the manifestation of human guilt. Once they\nunderstand the events that took place, mankind will surely feel\ntheir grief too."
 "For now it's best to exploit the nature while we still can.\nThe Mark of Vinushka raises the otherwordly offence of its wielder."
 The text includes the sigil of the Vinushka and instructions on how\nto use it.
-The truth under the moonlight
 "- The truth under the moonlight -"
 "Who of us doesn't cover their true face and hide behind a persona?"
 "In the broad daylight we adopt a social role depending on the\nsurrounding people. We put on a mask that works as the public image\nof our true personality."
@@ -2178,7 +1233,6 @@ The truth under the moonlight
 "Vinushka and the represenation of humanity, Alll-mer the Ascended\nOne are considered equal. Neither of the two stands taller."
 "What is Vinushka's, is for the men to reap, just as the nature\nreaps our old and weary."
 "The Mark of Vinushka raises the otherwordly offence of its wielder."
-Prehevil document
 "...Looking back at the history of this place - There has been\nsettlement here for as long as the history books cover the area. It\nhas always centered around the mysterious Hollow Tower that works as \nthe central pillar of the community."
 "The city flourished during the cruel age in the 1600s, but it \nquickly fell from prominence the closer we got to the modern times."
 "I understand the city is medium in size as far as cities in\neastern Europa go, but still I find it hard to believe that this\nplace would serve as a hub of any kind in a civilized world."
@@ -2273,7 +1327,6 @@ Map
 "- Reila Haas arrested for a treason against the Empire\n- Held at the East-Bremen for iterrogations\n- Information about the 'Operation Logic' gathered\n- Reila Haas reported missing in East-Bremen State Prison
 "- NLU suspected to have aided her escape\n- Suspected to work with Bohemian sect of NLU\n- Possesses potential danger for 'Operation ein Geist'\n- Marked as 'a Person of Special Interest' by Kaiser"
 "- Wanted: Alive"
-Telelectroscope and Logic
 "Telelectroscope - An interconnected, computerized system which\ndocuments our lives and extracts information from our consciousness. \nThe data is abstracted from banks of every person in the whole human \nsystem."
 "Logic - Logic works as the center of Telelectroscope. A core in \nthis world where all of our knowledge and inspiration come from and\ngo to."
 A data tank which possess all knowledge and it provides people with \nsaid information as they need it."
@@ -2373,8 +1426,6 @@ You hear voices echoing from the beheaded wizard...\n\c[7]"Although I wouldn't u
 \>\i[144]\}ER'KELE\{\<\n"I never said that."
 \>\i[144]\}ER'KELE\{\<\n"There are plenty of deities that could fall under that category."
 \>\i[144]\}ER'KELE\{\<\n"Even you've probably heard of some."
-Party talk
-Talk
 The document page is one of many. You do not have the previous pages,\nso it's difficult to make out the full context of the document...
 "The modern science and medicine is still limited in this subject.\nThere is a debate if science will ever be capable of calculating \nthe necessary amounts of information."
 "Human mind and soul after all are so complex that it is not \nquantifiable by any computer. Thus it might not be possible to\nreplace the Logic even as the technology advances in coming \ndecades."
@@ -2421,11 +1472,9 @@ Phasmophobia
 Erotophobia
 Rhabdophobia
 "It has come to our knowledge that there are sinister forces at play\nand they have their eyes set on Prehevil, Bohemia for whatever wicked \nreason."
-harmony of the world"
 GabText IT BURNS!
 GabText Your skin is burning to a crisp!
 GabText The pain is maddening!
-Chair
 Sacrifice an arm
 Sacrifice a leg
 What do you want to sacrifice to resurrect \N[1]?
@@ -2498,7 +1547,6 @@ You got the \c[2]Skin bible - Chapter of God of Fear and Hunger\c[0]!
 "Have you seen this man in dreams?"
 "Over the past week or so, since the full moon, people all over\nPrehevil and its neighbouring settlements see this face in their\ndreams, every night."
 "If you are one of them, or if you have any information that can\nhelp us identify this person, please contact us."
-...
 The flyer tells to contact 'us', but there's no contact information\nto be found from the flyer.
 "Furniture moving without a reason, flickering lights, a television \nset turning on, all on its own. These are usually the first signs \nof a shadow presence or a spirit trying to contact you from the \notherside." 
 "There is no need to be scared about this. Spirits vary and there\nare as many types as there are personality types among the living.\nSome are kind, some are hostile."
@@ -2633,14 +1681,6 @@ The fortune teller flips a card.
 \>\i[69]\}ORTUNE TELLER\{\<\n"A man-made conflict hides a stream of consciousness..."
 \>\i[69]\}ORTUNE TELLER\{\<\n"A stone fortress that rises in the deep green..."
 \>\i[69]\}ORTUNE TELLER\{\<\n"Follow upstream... A treasure hidden behind a waterfall..."
-\N[1]
-\N[3]
-\N[4]
-\N[5]
-\N[6]
-\N[15]
-\N[13]
-\N[14]
 \>\i[67]\}AAN\{\<\n"His face..."
 \>\i[67]\}AAN\{\<\n"It's smeared with makeup and blood... His expression is still \nfrozen in that shit-eating grin despite having gone through a \npainful death..."
 \>\i[67]\}AAN\{\<\n"..."
@@ -2706,6 +1746,3 @@ GabText The pinecone pig brought you a \c[2]Glass shards\c[0]!
 "Eastern Union abandoned the compound like expected. They \ndetonated explosives to cave-in the railway tracks to the compound. \nBut Bremen and Kaiser will find their way inside."
 "We have to move now. This is our only window of opportunity. \nOur sources say Kaiser is already on his way to Prehevil. I'm not \nsure if the project is far enough, but we must hijack it asap."
 "Kaiser plans to launch the system himself, it looks like the \nonly way to stop this is to do it before him. I know how to \nset it up, just mobilize whoever is in the area. \nWe must act - now. -R"
-En Garde
-En Garde Cooldown
-failsafe

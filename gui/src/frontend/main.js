@@ -218,8 +218,7 @@ function render() {
      * @returns {void}
      */
     // TODO: Replace nodeText constant with function argument
-    function setMatches(map, text, node) {
-        const expr = createRegularExpression(text);
+    function setMatches(map, expr, node) {
         const nodeText = node.tagName === "TEXTAREA" ? node.value : node.innerHTML;
         const matches = nodeText.match(expr) || [];
 
@@ -257,13 +256,15 @@ function render() {
         const targetElements = searchLocation
             ? [...document.getElementById(`${state}-content`).children]
             : [...contentContainer.children].flatMap((parent) => [...parent.children]);
+        const expr = createRegularExpression(text);
+        if (!expr) return;
 
         for (const child of targetElements) {
             const node = child.children[0].children;
-            setMatches(matches, text, node[2]);
+            setMatches(matches, expr, node[2]);
 
             if (!searchTranslation) {
-                setMatches(matches, text, node[1]);
+                setMatches(matches, expr, node[1]);
             }
         }
 
@@ -490,6 +491,7 @@ function render() {
         if (!text) return;
 
         const results = searchText(text);
+        if (!results) return;
 
         if (results.size === 0) {
             searchPanelFound.innerHTML = `<div class="flex justify-center items-center h-full">Нет совпадений</div>`;
@@ -601,7 +603,7 @@ function render() {
         if (!text) return;
 
         const results = searchText(text);
-        if (results.size === 0) return;
+        if (!results || results.size === 0) return;
 
         const regex = createRegularExpression(text);
         if (!regex) return;
@@ -773,7 +775,7 @@ function render() {
             //* Original text field
             const originalTextDiv = document.createElement("div");
             originalTextDiv.id = `${id}-original-${i}`;
-            originalTextDiv.innerHTML = text.replaceAll("\\n", "\n");
+            originalTextDiv.textContent = text.replaceAll("\\n", "\n");
             originalTextDiv.classList.add(
                 ..."p-1 w-full h-auto text-xl bg-gray-800 outline outline-2 outline-gray-700 mr-2 inline-block whitespace-pre-wrap".split(
                     " "
@@ -795,7 +797,7 @@ function render() {
             //* Row field
             const row = document.createElement("div");
             row.id = `${id}-row-${i}`;
-            row.innerHTML = i;
+            row.textContent = i;
             row.classList.add(..."p-1 w-36 h-auto text-xl bg-gray-800 outline-none".split(" "));
 
             //* Append elements to containers

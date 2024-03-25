@@ -1,15 +1,11 @@
 Prehevil map
 A map of Prehevil.
-\n\n\n\n\n<Picture: icon_map>
 Photo album
 A humble little album containing all the photos you've collected\nthrough the years.
-\n\n\n\n\n\n\n<Picture: icon_blank_book>
 Recipes of the 15th Century vol.1
 The first volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
-\n\n\n\n\n\n<Item Recipe: 14>\n<Item Recipe: 41>\n<Picture: icon_blank_book>
 The Four Ages of History
 A brief history book about the different ages of modern\nchronology.
-\n\n\n\n\n<Picture: icon_blank_book>
 Torch
 A torch
 Flashlight
@@ -47,7 +43,6 @@ Grinded wheat. On its own it's not much of use, but can be\nused in bakery.
 \n\n\n\n\n<Picture: icon_flour>\n<Menu Category: Food>
 Woodsman's letter
 A single piece of paper with crude writing on it. It seems\nto have been written in a hurry.
-\n\n\n\n\n<Picture: icon_letter>
 Dirty toilet paper
 This paper can be used to tie up small wounds and stop bleeding.\nIt does look absolutely rancid though. It definitely isn't the
 \nmost hygienic way to patch up yourself...\n\n\n\n\n\n<Picture: icon_filthy_paper>\n<Synthesis Ingredients>\narmor 7\n</Synthesis Ingredients>\n<Menu Category: Healing>
@@ -61,8 +56,6 @@ New poems of love and torment
 A perfect collection of love letters written by the storied\nhero Ronn Chambara.
 Mahavre
 A book about the ancient city Mahavre.
-Studies of Gro-goroth I
-A book about the older god Gro-goroth.
 This book tells the tale of the legendary fellowship\nthat would be known in this day as the new gods.
 Soldier's diary 1
 A diary of a Bremen soldier that arrived to this area \nrecently.
@@ -85,16 +78,12 @@ Blood vial
 A vial full of blood.
 \n\n\n\n\n<Picture: icon_redvial>\n<Menu Category: Items>
 Notes written by a torturer.
-Studies of Alll-mer I
-A book about the older god Alll-mer.
 Cheese
 An old dried up cheese. It has a pretty bad smell to it.
 \n\n\n\n\n\n\n<Menu Category: Food>
 Beer
 A bottle of beer. The beer inside is murky. Helps you stay\nsane in the ever-pressing darkness.
 \n\n\n\n\n<Picture: icon_beer>\n<Menu Category: Healing>
-Studies of Sylvian I
-A book about the older god Sylvian.
 Book of enlightenment
 A mysterious ancient book radiating warm light. It's said\nto be written by the monks beyond the Eastern Sanctuaries.
 \n\n\n\n\n<Picture: icon_enlightenment>
@@ -236,8 +225,6 @@ Ronteal's head
 The severed head of a ronteal. The head is full of sharp teeth\nand muckus.
 Rifleman head
 The severed head of a rifleman. His eyes are in permanent squint\nnow.
-The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
-\n\n\n\n\n<Picture: icon_soul_stone>
 Soul stone
 The insides of the gemstone radiate faint light that slowly\nswirls around.
 \n\n\n\n\n<Picture: icon_lesser_soul>\n<Synthesis Ingredients>\nitem 118: 3\n</Synthesis Ingredients>\n<Menu Category: Items>
@@ -271,7 +258,6 @@ A mixture of green and red herbs that is especially potent.
 \n\n\n\n\n<Synthesis Ingredients>\nitem 94\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_green_red>\n<Menu Category: Healing>
 Anathomia
 The book of collected knowledge of medical science.
-\n\n\n\n\n<Item Recipe: 8>\n<Picture: icon_anathomia>
 The Fellowship ch.2 (Original)
 The Fellowship ch.1 (Original)
 Bonesaw
@@ -308,7 +294,6 @@ A saw blade that is used in table saws. The blade has been\ngathering a little b
 \n\n\n\n\n\n<Picture: icon_saw_blade>\n<Menu Category: Items>
 Pinecone pig instructions
 Instructions on how to craft your very own pinecone pig.\n
-\n\n\n\n\n<Armor Recipe: 32>
 Worm juice
 A vial full of mild poison that is said to kill parasites\nand worms inside the host body.
 \n\n\n\n\n<Picture: icon_orangevial>\n<Menu Category: Items>
@@ -322,7 +307,6 @@ The severed head of a fallen cherub. The head feels hollow and its\nskin feels c
 Throwing dart
 Small darts designed for throwing. They are also dipped\nin poison.
 A letter with a coded message...
-\n\n\n\n\n\n\n<Picture: icon_codex_letter>
 Lion brass key
 A brass key with a crude insignia of the 2-tailed lion that\nis the old symbol of Prehevil.
 \n\n\n\n\n<Picture: icon_lion_key>\n<Menu Category: Items>
@@ -352,7 +336,6 @@ Basement key
 A basement key found from the woodsman.
 Skin bible - Gro-goroth
 A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Gro-goroth.
-\n\n\n\n\n<Picture: icon_skin_bible>
 Skin bible - Rher
 A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Rher.
 Combat manual
@@ -360,12 +343,8 @@ A beginner's guide to survival and combat on a battlefield.
 Black matter
 You cannot quite tell what you are looking at. You can\nrecognize pasta in there. It might be edible?
 \n\n\n\n\n<Picture: icon_black_stuff>\n<Menu Category: Food>
-\n\n\n\n\n<LanguagePrimer: m h>
 Newspaper article
 An article about the end of the Great War II.
-\n\n\n\n\n<Picture: icon_newspaper>
-Coded letter #1 - UNUSED
-\n\n\n\n\n\n\n<Picture: letter_codex1>
 Penny bun
 A mushroom commonly found throughout Europa. An edible mushroom.\nIt is used widely as an ingredient in various foods.
 \n\n\n\n\n<Picture: icon_penny_bun>\n<Menu Category: Food>
@@ -413,7 +392,6 @@ A set of keys found from the lower levels of the Church of\nAlll-mer. They look 
 \n\n\n\n\n<Picture: icon_prison_keys>\n<Menu Category: Items>
 Crosswords puzzle
 A torn crosswords puzzle from an old newspaper. Looks like someone\nhas filled some of it already...
-\n\n\n\n\n<Picture: icon_crosswords>
 Broomstick
 A simple wooden broomstick. It doesn't feel sturdy enough\nto be used as a weapon.
 \n\n\n\n\n<Picture: icon_broomstick>\n<Menu Category: Items>
@@ -438,10 +416,8 @@ Schematics for custom weaponry.
 \n\n\n\n\n<Weapon Recipe: 16>\n<Weapon Recipe: 17>\n<Weapon Recipe: 18>\n<Weapon Recipe: 19>
 Trap schematics
 Schematics for custom traps.
-\n\n\n\n\n<Item Recipe: 76>\n<Item Recipe: 104>
 Explosive schematics
 Schematics for explosives
-\n\n\n\n\n\n<Item Recipe: 352>
 Liver
 The liver has a function in detoxication, the removal of\ntoxic substances from a living organism.
 \n\n\n\n\n<Picture: icon_liver>\n<Menu Category: Body bag>
@@ -591,13 +567,10 @@ A brief report about a partisan organization called NLU - Nameless \nLiberty Und
 \nassigned to Bohemia.\n\n\n\n\n\n\n\n\n<Picture: icon_document1>
 NLU Reconnaissance Report #2
 A brief report about NLU member Haas Reila Audrey. Distributed to \nall mid-level Bremen officers assigned to Bohemia.
-\n\n\n\n\n\n\n\n<Picture: icon_document1>
 Telelectroscope and Logic
 A document giving you broad overview on Telelectroscope and Logic.
-\n\n\n\n\n\n\n<Picture: icon_document1>
 Brain diagram document
 A document about brain usage and technology.
-\n\n\n\n\n\n<Picture: icon_document_brain>
 Sylvian trooper head
 The severed head of a sylvian trooper.
 Per'kele's head
@@ -608,10 +581,8 @@ Head of the Heartless one
 The severed head of the Heartless one.
 Botanism schematics
 Schematics for botanism
-\n\n\n\n\n<Item Recipe: 333>\n<Item Recipe: 334>\n<Item Recipe: 335>\n<Item Recipe: 370>\n<Item Recipe: 371>
 Toxicology schematics
 Schematics for toxicology
-\n\n\n\n\n<Item Recipe: 338>\n<Item Recipe: 339>
 Condensed blue
 A condensed ball of blue herbs. Recovers great amount of\nhealth when digested.
 \n\n\n\n\n<Synthesis Ingredients>\nitem 95: 2\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_condensed_blue>\n<Menu Category: Healing>
@@ -649,16 +620,12 @@ Catnip
 Pipe bomb
 \n\n\n\n\n<Synthesis Ingredients>\nitem 223: 2\nitem 225: 2\nitem 247: 4\n</Synthesis Ingredients>\n<Picture: icon_pipe_bomb>\n<Menu Category: Items>
 Schematics for custom foods.
-\n\n\n\n\n\n<Item Recipe: 346>\n<Item Recipe: 347>
-\n\n\n\n\n\n<Item Recipe: 348>\n<Item Recipe: 349>
 The talisman rises defence against otherwordly powers momentarily\nbut it might have some other uses as well...
 \n\n\n\n\n<Picture: icon_purifying_talisman>\n<Menu Category: Items>
 'Man in dreams' flyer
 A flyer with an eerily familiar face...
-\n\n\n\n\n<Picture: icon_flyer_perkele>
 Taking board instructions
 Instructions on how to operate a talking board to communicate\nwith spirits and others alike.
-\n\n\n\n\n\n<Picture: icon_blank_book>
 God manifesto
 A short manifesto on godhood. Written by renowned occultist\nDonnovan Hugo.
 The first chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the

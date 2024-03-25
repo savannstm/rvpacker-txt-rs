@@ -172,7 +172,6 @@ Fallen cherub [torso]
 Fallen cherub [head]
 Cherub [torso]
 Irrational obelisk
-giant
 Half-cocooned [torso]
 Half-cocooned [head]
 Half-cocooned [left arm]
@@ -413,7 +412,6 @@ Rher [eye 3]
 Rher [eye 4]
 Rher [eye 5]
 Rher [eye 6]
-test
 Death mask [torso]
 Death mask [head]
 Death mask [right arm]

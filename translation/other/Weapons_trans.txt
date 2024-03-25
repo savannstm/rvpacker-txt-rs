@@ -1,54 +1,38 @@
 Нож
 Короткий кухонный нож. То, чего ему не хватает в размере,\nон компенсирует скоростью.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_knife>\n<Replace Attack: 1>
 Офицерская шпага
 Шпага армейского офицера. Такие мечи не находят особого\nприменения в наши дни. Их хранят скорее из-за традиций.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_sword>\n<Replace Attack: 1>
 Ржавая труба
 Ржавая и тяжелая железная труба. Может неплохо оглушить.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_steel_pipe>\n<Replace Attack: 1>
 Истязатель
 Длинный шест с зубьями и шипами. Тяжел в обращении, но при\nпопадании наносит огромный урон.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_mauler>\n<Replace Attack: 1>
 Скальпель
 Острый скальпель. Короткий, но крайне точный в умелых руках.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_scalpel>\n<Replace Attack: 1>
 Топор
 Деревянный топор средних размеров. Размахивание им безусловно\nнапугает слабых противников.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_axe>\n<Replace Attack: 1>
 Сучкоруб
 Инструмент для обрезки веток деревьев. Его можно использовать\nдля чего-нибудь тех же размеров - например, человеческих\nконечностей.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_kassara>\n<Replace Attack: 1>
 Серп
 Орудие, используемое для сбора урожая. Также имеет длинную\nисторию использования в качестве гражданского оружия.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Picture: icon_sickle>\n<Replace Attack: 1>
 Винтовка со штыком
 Винтовка с насадкой-штыком. Она позволяет быстро\nпереключиться на ближний бой. Стреляйте вне боя на [SHIFT].
-\n\n\n\n\n<Random Variance: 10>\n<Picture: icon_bayonet>\n<Replace Attack: 1>
 Винтовка Mk.I .303
 Винтовка со скользящим затвором и магазинной подачей. Такие\nвинтовки были самыми распространенными в период\nПервой мировой. Стреляйте вне боя на [SHIFT].
-\n\n\n\n\n<skill_id:282>\n<Random Variance: 10>\n<Picture: icon_rifle>\n<Replace Attack: 1>
 Дробовик 12-го калибра
 Мощное оружие с серьезной отдачей. Стреляет дробью,\nспособной остановить даже крупных противников.\nСтреляйте вне боя на [SHIFT].
-\n\n\n\n\n<skill_id:283>\n<Random Variance: 10>\n<Picture: icon_trenchgun>\n<Replace Attack: 1>
 Пистолет Люгера
 Полуавтоматический пистолет с предохранителем и компенсатором\nразброса. Используется офицерами бременской армии в качестве\nтабельного оружия. Стреляйте вне боя на [SHIFT].
-\n\n\n\n\n<skill_id:281>\n<Random Variance: 5>\n<Picture: icon_pistol>\n<Replace Attack: 1>
 Разводной ключ
 Инструмент, используемый для разведения самых разных штук.\nТакже служит в качестве тупого оружия.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_pipe_wrench>\n<Replace Attack: 1>
 Поцелуй сновидца
 Шприц с нейротоксинами, прикрепленный к офицерской сабле.\nС каждым взмахом, шприц сочится ядом.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_the_kiss>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 224: 2\nitem 223\nweapon 2\nitem 57\n</Synthesis Ingredients>
 Грабли жнеца
 Четыре серпа, прикрепленные к метлам. Двуручное режущее\nоружие, вызывающее сильные кровотечения.
-\n\n\n\n\n<Random Variance: 10>\n<Picture: icon_the_rake>\n<Synthesis Ingredients>\n<Replace Attack: 1>\nitem 224: 2\nitem 223: 3\nweapon 8: 4\nitem 240\n</Synthesis Ingredients>
 Цепной фонарь
 Импровизированное оружие, которым тяжело управлять.\nОно абсолютно массивное и непредсказуемое. Может\nсильно обжечь.
 \n\n\n\n\n\n\n<Picture: icon_lantern_flail>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 224\nitem 240\nitem 172\n</Synthesis Ingredients>
 Мясорубка
 Жестокое и яростное оружие. Циркулярная пила, прибитая\nк шлифовальной машинке, которой еще и не нужно подключение\nк сети.
-\n\n\n\n\n\n\n<skill_id:806>\n<Picture: icon_meat_grinder>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 337\nitem 224\nitem 169\nitem 225\n</Synthesis Ingredients>
 Гаэлийский двуручный меч
 Старый двуручный меч с северного высокогорья Рондона. Эти мечи\nдаже получили название «королевское проклятье» благодаря тому,\nнасколько эффективны они были против рыцарей Рондона в 12 веке.
 \n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_gaelian_greatsword>\n<Replace Attack: 1>
@@ -67,7 +51,6 @@
 Чемодан
 Кровавый меч
 Меч, выкованный из крови Алл-мера.
-\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_red_virtue>\n<Replace Attack: 1>
 Лонгин
 Это копье пронзило Алл-мера, когда он был закован в цепи и\nраспят. Оно - остаток того, что Алл-мер, вознёсшись,\nоставил после себя.
 \n\n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_javelin>\n<Replace Attack: 1>

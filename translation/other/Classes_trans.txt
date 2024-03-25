@@ -14,13 +14,7 @@ Mechanic\n<Equip Slot>\nОружие\nГолова\nТело\nАксессуар
 Капитан
 Черный Калев
 <Equip Slot>\nАксессуар\n</Equip Slot>
-Kid demon
 Кровавый голем
-Marriage
-Baby demon
-Skeleton
-Buckman
-Nas'hrah
 Желтый маг
 Бандит
 Ботаник

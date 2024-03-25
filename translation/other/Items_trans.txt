@@ -1,15 +1,11 @@
 Карта Прехевила
 Карта Прехевила.
-\n\n\n\n\n<Picture: icon_map>
 Фотоальбом
 Скромный маленький альбом, содержащий все фотографии, которые\nвы собрали на протяжении многих лет.
-\n\n\n\n\n\n\n<Picture: icon_blank_book>
 Рецепты 15-го века, том 1
 Первый том серии кулинарных книг. Содержит рецепты мясного\nи овощного пирогов.
-\n\n\n\n\n\n<Item Recipe: 14>\n<Item Recipe: 41>\n<Picture: icon_blank_book>
 Четыре Века Истории
 Краткая историческая книга о разных эпохах современной\nхронологии.
-\n\n\n\n\n<Picture: icon_blank_book>
 Факел
 Факел
 Фонарик
@@ -47,7 +43,6 @@
 \n\n\n\n\n<Picture: icon_flour>\n<Menu Category: Еда>
 Письмо дровосека
 Лист бумаги с грубым почерком на нем. Похоже, было написано\nв спешке.
-\n\n\n\n\n<Picture: icon_letter>
 Грязная туалетная бумага
 Эту бумагу можно использовать для перевязки небольших ран\nи остановки кровотечений. Определенно не самый гигиеничный\nспособ подлатать себя...
 \n\n\n\n\n\n\n<Picture: icon_filthy_paper>\n<Synthesis Ingredients>\narmor 7\n</Synthesis Ingredients>\n<Menu Category: Исцеление>
@@ -61,8 +56,6 @@
 Идеальная коллекция любовных писем, написанных легендарным\nгероем Ронном Чамбарой.
 Ма'Хабре
 Книга о древнем городе Ма'Хабре.
-Studies of Gro-goroth I
-A book about the older god Gro-goroth.
 В этой книге рассказывается история легендарного братства,\nизвестного в наши дни как новые боги.
 Дневник солдата 1
 Дневник бременского солдата, недавно прибывшего в этот\nрегион.
@@ -85,16 +78,12 @@ A book about the older god Gro-goroth.
 Флакон, полный крови.
 \n\n\n\n\n<Picture: icon_redvial>\n<Menu Category: Предметы>
 Записки, написанные мучителем.
-Studies of Alll-mer I
-A book about the older god Alll-mer.
 Сыр
 Старый засохший сыр. У него довольно неприятный запах.
 \n\n\n\n\n\n\n<Menu Category: Еда>
 Пиво
 Бутылка пива. Пиво внутри мутное. Поможет остаться в здравом\nуме даже в вечно давящей темноте.
 \n\n\n\n\n<Picture: icon_beer>\n<Menu Category: Исцеление>
-Studies of Sylvian I
-A book about the older god Sylvian.
 Книга просветления
 Таинственная древняя книга, излучающая теплый свет.\nПодпись гласит, что книга написана монахами из Восточных\nСвятилищ.
 \n\n\n\n\n<Picture: icon_enlightenment>
@@ -236,8 +225,6 @@ A book about the older god Sylvian.
 Отрубленная голова Ронтила. Полна острых зубов и слизи.
 Голова стрелка
 Отрубленная голова стрелка. Его глаза застыли в прищуре.
-The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
-\n\n\n\n\n<Picture: icon_soul_stone>
 Камень душ
 Внутренности этого драгоценного камня излучают слабый свет,\nкоторый медленно кружит над ним.
 \n\n\n\n\n<Picture: icon_lesser_soul>\n<Synthesis Ingredients>\nitem 118: 3\n</Synthesis Ingredients>\n<Menu Category: Предметы>
@@ -271,7 +258,6 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 \n\n\n\n\n<Synthesis Ingredients>\nitem 94\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_green_red>\n<Menu Category: Исцеление>
 Анатомия
 Книга собранных знаний медицинской науки.
-\n\n\n\n\n<Item Recipe: 8>\n<Picture: icon_anathomia>
 Братство, часть 2 (Оригинал)
 Братство, часть 1 (Оригинал)
 Хирургическая пила
@@ -308,7 +294,6 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 \n\n\n\n\n\n<Picture: icon_saw_blade>\n<Menu Category: Предметы>
 Инструкция по созданию шишкосвина
 Инструкции по изготовлению собственной свиньи из сосновой шишки.
-\n\n\n\n\n<Armor Recipe: 32>
 Противопаразитный сок
 Флакон со слабым ядом, который, по слухам, убивает паразитов\nи червей внутри тела носителя.
 \n\n\n\n\n<Picture: icon_orangevial>\n<Menu Category: Предметы>
@@ -322,7 +307,6 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 Метательный дротик
 Маленький дротик, предназначенный для метания.\nНаконечник покрыт ядом.
 Письмо с зашифрованным сообщением...
-\n\n\n\n\n\n\n<Picture: icon_codex_letter>
 Латунный ключ со львом
 Латунный ключ с грубым изображением двухвостого льва,\nявляющегося древним символом Прехевила.
 \n\n\n\n\n<Picture: icon_lion_key>\n<Menu Category: Предметы>
@@ -352,7 +336,6 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 Ключ от подвала, найденный у дровосека.
 Кожаная библия - Гро-горот
 Полная оккультная книга, написанная в средние века Энки\nАнкарианом. Эта глава рассказывает про древнего бога\nГро-горота.
-\n\n\n\n\n<Picture: icon_skin_bible>
 Кожаная библия - Рхер
 Полная оккультная книга, написанная в средние века Энки\nАнкарианом. Эта глава рассказывает про древнего бога Рхера.
 Боевое руководство
@@ -360,12 +343,8 @@ The surface of the gemstone is smooth yet it seems to be\nnaturally formed.
 Черная материя
 Вы не можете точно сказать, на что вы смотрите.\nВам это напоминает пасту. Может, оно съедобно?
 \n\n\n\n\n<Picture: icon_black_stuff>\n<Menu Category: Еда>
-\n\n\n\n\n<LanguagePrimer: m h>
 Газетная статья
 Статья об окончании Второй мировой войны.
-\n\n\n\n\n<Picture: icon_newspaper>
-Coded letter #1 - UNUSED
-\n\n\n\n\n\n\n<Picture: letter_codex1>
 Белый гриб
 Гриб, распространенный по всей Европе. Он съедобен.\nШироко используется в различных блюдах.
 \n\n\n\n\n<Picture: icon_penny_bun>\n<Menu Category: Еда>
@@ -413,7 +392,6 @@ Coded letter #1 - UNUSED
 \n\n\n\n\n<Picture: icon_prison_keys>\n<Menu Category: Предметы>
 Кроссворд
 Разорванный кроссворд из старой газеты. Похоже, кто-то\nуже частично его решил...
-\n\n\n\n\n<Picture: icon_crosswords>
 Метла
 Простая деревянная метла. Недостаточно крепка для использования\nв качестве оружия.
 \n\n\n\n\n<Picture: icon_broomstick>\n<Menu Category: Предметы>
@@ -438,10 +416,8 @@ Coded letter #1 - UNUSED
 \n\n\n\n\n<Weapon Recipe: 16>\n<Weapon Recipe: 17>\n<Weapon Recipe: 18>\n<Weapon Recipe: 19>
 Чертежи ловушек
 Чертежи самодельных ловушек.
-\n\n\n\n\n<Item Recipe: 76>\n<Item Recipe: 104>
 Схемы взрывчатки
 Схемы взрывчатых веществ.
-\n\n\n\n\n\n<Item Recipe: 352>
 Печень
 Печень выполняет функцию детоксикации, удаляя токсичные\nвещества из организма.
 \n\n\n\n\n<Picture: icon_liver>\n<Menu Category: Мешок для трупов>
@@ -591,13 +567,10 @@ Coded letter #1 - UNUSED
 \n\n\n\n\n\n\n\n\n\n<Picture: icon_document1>
 Разведывательный отчет ПБС №2
 Краткий отчет о члене ПБС - Хаас Рейле Одри.\nВыдается всем бременским офицерам, назначенным\nв Богемии.
-\n\n\n\n\n\n\n\n<Picture: icon_document1>
 Телеэлектроскоп и Логика
 Документ, дающий общее представление о Телеэлектроскопах и Логике.
-\n\n\n\n\n\n\n<Picture: icon_document1>
 Диаграмма мозговой активности
 Документ о мозговой активности и технологиях.
-\n\n\n\n\n\n<Picture: icon_document_brain>
 Голова наездницы Сильвиан
 Отрубленная голова наездницы Сильвиан.
 Голова Пер'келе
@@ -608,10 +581,8 @@ Coded letter #1 - UNUSED
 Отрубленная голова Бессердечной.
 Ботанические чертежи
 Чертежи по ботанике.
-\n\n\n\n\n<Item Recipe: 333>\n<Item Recipe: 334>\n<Item Recipe: 335>\n<Item Recipe: 370>\n<Item Recipe: 371>
 Токсикологические чертежи
 Чертежи по токсикологии.
-\n\n\n\n\n<Item Recipe: 338>\n<Item Recipe: 339>
 Концентрированная синяя трава
 Сконцентрированный шарик из синей травы.\nВосстанавливает большое количество здоровья.
 \n\n\n\n\n<Synthesis Ingredients>\nitem 95: 2\nitem 132\n</Synthesis Ingredients>\n<Picture: icon_condensed_blue>\n<Menu Category: Исцеление>
@@ -649,17 +620,13 @@ Coded letter #1 - UNUSED
 Самодельная бомба
 \n\n\n\n\n<Synthesis Ingredients>\nitem 223: 2\nitem 225: 2\nitem 247: 4\n</Synthesis Ingredients>\n<Picture: icon_pipe_bomb>\n<Menu Category: Предметы>
 Схемы для нестандартных блюд.
-\n\n\n\n\n\n<Item Recipe: 346>\n<Item Recipe: 347>
-\n\n\n\n\n\n<Item Recipe: 348>\n<Item Recipe: 349>
 Талисман усиливает защиту от потусторонних сил, но возможно\nимеет и какое-то другое применение...
 \n\n\n\n\n<Picture: icon_purifying_talisman>\n<Menu Category: Предметы>
 Листовка «Человек из снов»
 Листовка с устрашающе знакомым лицом...
-\n\n\n\n\n<Picture: icon_flyer_perkele>
 Инструкция по доске Уиджи.
 Инструкции по использованию доски для общения\nс духами.
-\n\n\n\n\n\n<Picture: icon_blank_book>
-Манифест Бога
+Божий манифест
 Краткий манифест о божественности. Написан известным\nоккультистом Доннованом Хьюго.
 Первая глава старинной сказки, которой пугали детей, чтобы\nони не гуляли подолгу. Эта конкретная копия более близка к\nоригиналу, отличному от современных упрощенных версий.
 \n\n\n\n\n\n\n\n<Picture: icon_blank_book>

@@ -4,23 +4,14 @@
 Абелла
 О'саа
 Черный Калев
-Ghoul1
-Kid Demon
-Marriage
 Кровавый голем
-Baby Demon
 Марко
-<Replace Attack: 633>\n<Replace Attack: Quick jabs>
 Карин
 Оливия
 Гуль
-Ghoul2
 Скелет
 Житель
 персонаж
-First verse
-Second verse
-Third verse
 Август
 Калигура
 Генрик
@@ -28,6 +19,3 @@ Third verse
 Танака
 Самари
 Белый ключ
-save slot
-hero
-test

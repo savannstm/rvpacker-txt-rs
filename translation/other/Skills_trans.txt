@@ -1,7 +1,5 @@
 Атака
-<Target Action>\nperform action\naction animation\nwait for animation\naction effect\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
 Защита
-Skill #2 will be used when you select\nthe Guard command.
 Рубить
 Отросток отлетает...
 Отросток пульсирует...
@@ -14,14 +12,11 @@ Skill #2 will be used when you select\nthe Guard command.
 Фигурка свиньи из шишки. Верный компаньон до самого конца.
 Поговорить
 Разговор иногда может вывести вас из неловкой ситуации.
-\n\n\n\n\n<Target Action>\nmotion swing: user\n</Target Action>
 Раны
 Создайте разрушительный вихрь из ваших концентрированных\nчувств боли и ненависти. Требуется 1 очко концентрации.
-\n\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
 Царапание
 Удар рукой
 Врезать
-ghoul tackle
 Пестицид
 Лампа
 Небольшая огненная атака лампой.
@@ -46,9 +41,6 @@ ghoul tackle
 Критический удар
 Трюк пироманта
 Простой трюк пиромантии, оставляющий ожоги на теле.
-\n\n\n\n\n\nPlayer pyromancy!
-\n\n\n\n\n\n
-\n\n\n\n\n
 Священник широко улыбается...
 Вертикальный взмах
 Рой саранчи
@@ -60,153 +52,40 @@ ghoul tackle
 Кровавый голем
 Пожертвуйте кровью, чтобы призвать голема, который будет\nвременно сражаться на вашей стороне. Голем слушается\nтолько того, кто создал его. Необходимо 1 очко концентрации.
 \n\n\n\n\n\n\n<Require 1 BP>
-Shivering touch
-Mumbler's head explodes on you!
-Demon seed
-Insert your seed into a fresh corpse, the most fertile \nof growing grounds.
 Феромоны
 Выброс феромонов, заставляющий противника переключить все\nвнимание на цель.
-Mastery over insects
-Understanding of insects. You can hear and talk with insects\nof all sizes.
 Удар камнем
-The guard loads an arrow to ballista...
 Разгромить
 Украсть
-<Bypass Taunt>
-Salmonsnake is uncertain of your position...
-Fast attack
-With swift movements - you gain an additional\nturn.
-Counter
-Stay alert for enemy attacks to parry them the instant\nthey land.
-Defence stance
-A special combat stance to prevent severe physical trauma. \nA skill taught to all the squires at the Rondon military.
-Steal from the rich and give to yourself.
-Dash
-Your movement speed increases greatly. Running can prove\nout to be a really valuable skill.
-Lockpicking
-An ability to open any simple lock with your trusty \nlockpick.
-Greater blood magic
-Years spent studying blood magic has given you an ability\nto use magic more efficiently.
-Blood sacrifice
-Sacrifice blood for gods.
-Pray
-Since your affection to gods is higher than average human\nbeing, you can try to reach out to them in need.
-Devour
-A barbaric trait of devouring the carcass of your\nenemies to ease hunger.
-Marksmanship
-High level archery skill. Use your accurate shots to\nfinish off opponents from distance.
-Bloodlust
-Hype yourself into a state of aggression and trance. An old\ntraditional Oldegård folk skill.
-Soul binding
-Mumblers head is pulsating...
 Клевок
-Talk(old)
-Talking can sometimes get you out of uncomformtable\nsituations.
-Bite
-A vicious bite that leaves the opponent bleeding.
-Howl
-A melancholy moonless howl.
-Jagged jaw
-A stronger and more vicious bite that leaves the \nopponent bleeding.
-Grim jaw
-A terrifying bite that leaves the opponent helpless.
 Истязание
-Crow Mauler is staring you with it's empty eyes...
-Harvestman gently pets you.
-Harvestman whistles...
-Harvestman smiles at you.
-Harvestman wraps you gently with his arms.
-Greater Hurting
-Concentrated feelings of hurting create a\ndevastating vortex.
-Greater Blood golem
-Sacrifice your own blood to summon a golem to fight by\nyour side temporarily.
-Greater Necromancy
-Try to bring back life to where it once lingered...
-The spectre tilts it's sword sideways...
-Lantern smash
-Skeleton kick
-Skeleton hatchet
-Whip
-Manebas tentacle is swinging around.
-Counter-magic
-Undo the effects of any lesser magic by your superior\nknowledge in the greater scheme of things.
 Мерзкий укус
 Гуль смотрит на вас своими мертвыми глазами...
 Зола
-<Target Action>\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
 Игольчатые черви
 Обуздайте силу сотен пиявок. Вам придется заплатить\nцену - носить их в собственном теле...
 Игольчатый червь
-Enemy
 Желтый маг рисует магические символы руками...
-yellow mage attack - legs
-yellow mage attack - arms
-Revolution tear
-3rd circle swings around it's axis.
-2nd circle swings around it's axis.
-1st circle swings around it's axis.
-The red man reaches for you...
-Shivering scream
-Leg sweep
-A high finesse arcing attack that can only be performed\nwith light bladed weapons.
-<CCPS_weapon:true>
-Check
-Check the status.
-Red grasp
-Red man breathes heavily...
-Red man is tapping its fingers.
-Pummel
-<Target Action>\nperform action\naction animation\naction effect\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
 Цепи истязаний
 Призовите цепи истязаний, которые мучали Чамбару\nсотни лет.
-enemy
 Ан гард
 Многолетний боевой опыт подготовил вас к битвам.\nПриготовьтесь к атаке, чтобы нанести первый удар, нажав [E].
 Ритуальное копье
-Blood portal
-A magic that enables one to create portals between ritual\ncircles.
 Стая ворон
 Сфера тьмы
 Сконцентрированная негативная энергия, которую можно несколько\nраз направить в противника. Сфера сохраняет свою форму только\nопределенное время, пока не негативная энергия не рассеется.
 \n\n\n\n\n\n\n<Boost Damage>
 Исцеляющий шепот
 Шепот древнего бога Сильвиан исцеляет раны\nи затягивает плоть.
-\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
-Marriage of flesh
-Insect armor
-Hairy palm
-Bad breath
-The snatcher tilts it heads curiously...
-The fur of the creature attracts flies.
-The creature reaches out for you...
 Укол
-Maneba stares at you without expression...
-Poke
-Scarab's shell bursts open!
-Acid spills out
 Ритуальный нож
-The beast wants to manhandle you...
-Arm of the beast twitches...
-Helmbreaker
-The monster takes a step closer...
-The heart is beating slowly...
-Blade dance
-Single blade
-The arm is twitching restlessly...
 Удар топором
 Ржавый коготь
-The embryo tries to grab onto you!
-Dislocating joints
-The embryo is gnawing your feet!
-Headbutt
-Left-brain is calculating the situation...
-Right-brain tries to come up with creative ways to combat...
 Шепот Гро-горота
 Возгорание
 Талантливый волшебник способен контролировать окружающий воздух\nи создать сильное возгорание. Требуется 1 очко концентрации.
 \n\n\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
 Уворот
-<Target Action>\nmotion evade: user\n</Target Action>
 Пинок
 Разрывание лица
 Тощая бабуля медленно приближается, спотыкаясь......
@@ -214,13 +93,8 @@ Right-brain tries to come up with creative ways to combat...
 Сабля
 Расплавленное золото
 Простой трюк пиромантии, позволяющий поджечь ваших противников.
-\n\n\n\n\n\nPlayer pyromancy!\n<Boost Damage>
 Сильный взрыв из огня и пламени. Требуется 1 очко\nконцентрации.
-<Require 1 BP>\n<Boost Damage>
-The golden body of Francóis is shining bright.
-Francóis takes a step forward...
 Запрещенный прием
-D'arce enemy
 Удар щитом
 Голубой флакон
 Чужеземец тщательно целится...
@@ -230,23 +104,17 @@ D'arce enemy
 Сосредоточенный шепот древнего бога Сильвиан. Исцеляет\nзначительное количество здоровья всех членов группы.
 Очищающий уголь
 Очищающее черное пламя
-Stampede of arms
 Существо корчится от боли...
 Токсичный туман
 Иглы для тела
 Пустой взгляд
 Двуручный удар
-Disable necromancy
-Disable the magic that is keeping this ghoul standing.
-Disable the magic that is keeping this skeleton standing.
 Чумное прикосновение
 Удар
 Шепот любви
 Сосредоточенный шепот древней богини Сильвиан.\nВосстанавливает значительное количество здоровья.\nЭффект шепота основывается лишь на прихотях Сильвиан.
 \n\n\n\n\n\n
 Призовите божество удачи. Шишкосвина.
-You cause headache to the enlightened one.
-<Target Action>\nmotion swing: user\n</Target Action>
 Удар рукавицей
 Укус паука
 Астериск витает в воздухе...
@@ -261,22 +129,14 @@ You cause headache to the enlightened one.
 Гро-горот тяжело дышит...
 Отравленный дротик
 Парализующий дротик
-<Target Action>\nperform action\naction animation\nwait for animation\nmotion wait: user\naction effect\naction effect\naction effect\ndeath break\n</Target Action>
 Порыв безумия
 Поперечный разрез
 Страж швыряет в вас валун!
-Francóis spits a molten from his mouth!
-The golden god smirks at you.
-The god squirts molten from its eye!
 Разрушить
 Плесневелый корчится от боли...
 Эякуляция
-pistol_attack\n<Boost Repeats>\n<Boost Damage>
-rifle_attack\n<Boost Repeats>\n<Boost Damage>
-shotgun_attack\n<Boost Repeats>\n<Boost Damage>
 Боевой клич
 Спровоцируйте врага напасть на вас.
-<Target Action>\nmotion swing: user\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
 Чавкание
 Возрождение возлюбленного
 Скрытая любовная магия, которая, как говорят, возвращает того,\nкого вы любили больше всего.
@@ -286,7 +146,6 @@ shotgun_attack\n<Boost Repeats>\n<Boost Damage>
 Растаптывание
 Гниение
 Разложите врага изнутри, чтобы сделать его уязвимым для атак.\nТребуется 1 очко концентрации.
-\n\n\n\n\n\n<Require 1 BP>
 Надзиратель
 Житель устанавливает медвежий капкан
 Медвежий капкан
@@ -304,15 +163,10 @@ shotgun_attack\n<Boost Repeats>\n<Boost Damage>
 Получите возможность разговаривать с теми, кто скрыт природой.
 Марионетка из плоти
 Дергайте нитками за отрубленные конечности, чтобы атаковать врага.\nДля этого вам нужны отрубленные конечности в инвентаре.
-\n\n\n\n\n\n\n\nflesh puppetry 0
 Чтение мыслей
 Лунная магия, раскрывающая сокровенные мысли людского бытия.
 Хватка гиганта
 Монстр хватает вас за лицо!
-\n\n\n\n\n\n\n\nflesh puppetry 1\n
-\n\n\n\n\n\n\n\n\nflesh puppetry 2\n
-\n\n\n\n\n\n\n\nflesh puppetry 3\n
-\n\n\n\n\n\n\n\n\n\nflesh puppetry 4\n
 Владение оружием
 Владение огнестрельным оружием дает вам большую точность при\nстрельбе. Пассивный навык.
 Опытный стрелок
@@ -334,10 +188,8 @@ shotgun_attack\n<Boost Repeats>\n<Boost Damage>
 Жестокая таранная атака.
 Продвинутый оккультизм
 Ваши продвинутые знания в оккультизме позволяют вам начать\nбитву с дополнительным очком концентрации. Пассивный навык.
-\n\n\n\n\n\n<BP Battle Start: +1>
 Медитация
 Достигните просветления. Медитируйте во время защиты,\nчтобы получить дополнительные очки концентрации в\nследующем ходу.
-\n\n\n\n\n\n<BP Regen: +1>
 С форели стекают мускус и слизь...
 Выстрел
 Критический выстрел
@@ -388,19 +240,10 @@ shotgun_attack\n<Boost Repeats>\n<Boost Damage>
 Проанализируйте поведение противника и найдите слабые места.\nВы можете использовать полученную информацию против подобных\nврагов.
 Бросок разводного ключа
 Бросьте свой разводной ключ во врага с огромной силой.\nМожет вызвать оглушение. Разводной ключ должен быть\nэкипирован.
-\n\n\n\n\n\n\n<Boost Damage>
-\n\n\n\n\n<Boost Damage>
-\n\n\n\n\n\nex-soldier\n<Boost Damage>
-\n\n\n\n\n\n\noccultist\n<Boost Damage>
-\n\n\n\n\n\n\n\n\ndoctor\n<Boost Damage>
 Сбивание с ног
 Столпник пускается в бег...
 Рука Дисморфии сильно дергается...
 Дисморфия сияет!
-flesh puppetry 1\n<Boost Damage>
-flesh puppetry 2\n<Boost Damage>
-flesh puppetry 3\n<Boost Damage>
-flesh puppetry 4\n<Boost Damage>
 Нидлз готовит свой шприц...
 Взвод наводит свою пушку...
 Обезумевшая мелодия
@@ -414,7 +257,6 @@ flesh puppetry 4\n<Boost Damage>
 Солдат безумно размахивает пистолетом
 Судный колокол
 Инквизитор призывает магию крови...
-<Require 1 BP>
 Упивание фекалиями
 Инфицированный укус
 Жало
@@ -424,23 +266,19 @@ flesh puppetry 4\n<Boost Damage>
 Нежный укус x3
 Коготь-полумесяц
 Бросок тела
-<Target Action>\nperform action\naction animation\nwait for animation\naction effect\nmotion wait: user\ndeath break\n</Target Action>
 Подкуп
 Молоток болтается...
 Высший оккультизм
 Ваши более глубокие знания в оккультизме позволяют вам\nначать битву с двумя дополнительными очками концентрации.\nПассивный навык.
-\n\n\n\n\n\n\n<BP Battle Start: +2>
 Защитный круг
 Нарисуйте на земле защитный круг, чтобы отогнать зло и\nсуществ со злыми намерениями. Изначально создан\nнепорочными магами Восточных Святилищ.
 \n
-\n\n\n\n\n\n\n<BP Battle Start: +1>
 Танец смерти
 Ритуальный танец, используемый для связи с потусторонними силами.\nПостепенно усиливает магические силы танцующего в ходе боя.\nПассивный навык.
 \n
 Предчувствия
 Высшая медитация
 Достигните высшего просветления. Медитируйте во время защиты,\nчтобы получить два очка концентрации в следующем ходу.
-\n\n\n\n\n\n\n<BP Regen: +2>
 Кузница специй
 Кузницы специй широко использовались практикующими магию на\nБлижнем Востоке в былые времена. Специи позволяют\nулучшить ваши магические способности.
 \n
@@ -509,17 +347,13 @@ flesh puppetry 4\n<Boost Damage>
 \n
 Суровый внешний вид
 Этот навык не обязательно применим ко всем. В конце концов,\nкрасота - в глазах смотрящего.
-stat increases
 Варварская черта пожирания трупов противников для облегчения\nголода.
 Введите себя в состояние агрессии и транса. Старинный\nнародный ольдегардский навык.
 Спровоцируйте врага на себя, чтобы остальные были\nневредимыми.
-\n\n\n\n\n<Target Action>\nmotion swing: user\nperform action\naction animation\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>
-Long combat experience has prepared you for fights.\nPrepare for an attack to gain advantage with [SHIFT].
 Сису
 Ваша северная воля к жизни.\nВы стискиваете зубы, вместо того, чтобы сдаться и умереть.\nВы просто не готовы умирать.
 Черный смог
 Кристаллизуйте искусственную тьму, рожденную индустриальной\nэпохой, чтобы ослеплять и душить своих противников. Требуется\n1 очко концентрации.
-\n\n\n\n\n\n\n<Require 1 BP>
 Метка Гро-горота
 Выжженная земля
 Подожгите землю вокруг себя, чтобы создать обстановку,\nусиливающую огненные атаки. Требуется 1 очко концентрации.
@@ -564,21 +398,8 @@ Long combat experience has prepared you for fights.\nPrepare for an attack to ga
 Взмах ножом
 Пинок в живот
 Абелла устанавливает медвежий капкан
-\n\n\n\n\n\n\nthug\n<Boost Damage>
-\n\n\n\n\n\n\njournalist\n<Boost Damage>
-\n\n\n\n\n\n\nbotanist\n<Boost Damage>
-\n\n\n\n\n\nyellow_mage\n<Boost Damage>
-\n\n\n\n\n\n\nhunter\n<Boost Damage>
-\n\n\n\n\n\n\n\nmobster\n<Boost Damage>
-\n\n\n\n\n\n\nchef\n<Boost Damage>
-\n\n\n\n\n\n\n\nlieutenant\n<Boost Damage>
-\n\n\n\n\n\n\n\nsalaryman\n<Boost Damage>
-\n\n\n\n\n\n\napprentice\n<Boost Damage>
-\n\n\n\n\n\n\n\n\n\nmarriage\n<Boost Damage>
-\n\n\n\n\n\n\n\n\nenemy\n<Boost Damage>
 Быстрые джебы
 Правый прямой
-enemy\n\n\n
 Крапивный туман
 Удар с наезда
 Удар чемоданом
@@ -599,7 +420,6 @@ enemy\n\n\n
 Вышивание крестиком
 Концентрированный шепот древней богини Сильвиан\nисцеляет значительное количество здоровья.
 Громоздкая рука бездействует.
-empty_skill
 Сосед готовится к разрушительной атаке!
 Его громоздкая рука напрягается...
 Отбивной молоток
@@ -611,15 +431,7 @@ empty_skill
 Мышцы на его руке сокращаются...
 Механический танец кричит от боли!
 Гигант охвачен яростью!
-flesh puppetry 4\n
-flesh puppetry 2
 Лапание
-1 arm
-2 arm
-3 arm
-4 arm
-5 arm
-6 arm
 Когти
 Когти x2
 Головастый целится в вас...
@@ -632,9 +444,7 @@ flesh puppetry 2
 Элитный солдат уверенным движением поднимает винтовку...
 Огнемет
 Огнеметчик готовит свой огнемет...
-<User BP: +1>
 Удар штыком
-<Target Action>\nperform action\naction animation\naction effect\naction effect\nwait for animation\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
 Защита+
 Навык №2 будет применен, когда вы выберите\nдействие защиты.
 Идеальная защита
@@ -649,7 +459,6 @@ flesh puppetry 2
 Астериск
 Край бабочки
 Вы разворошили осиное гнездо!
-status
 Укус шершня
 Удар
 Двойной удар
@@ -660,7 +469,6 @@ status
 Бросок копья
 Дождь из перьев
 Тяжелая пушка
-<Target Action>\nperform action\naction animation\naction effect\ndeath break\nwait for animation\nmotion wait: user\n</Target Action>
 «Двигайся, жирный ублюдок!»
 Рывок взвода
 «Делай свое дело, идиот!»
@@ -672,7 +480,6 @@ status
 Появляется рука разрушения...
 Появляется рука сотворения...
 Начальные раны
-\n\n\n\n<Require 1 BP>\n<Boost Damage>
 Начальный черный смог
 Начальный кровавый голем
 \n\n\n\n\n\n\n\n<Require 1 BP>
@@ -680,16 +487,12 @@ status
 Начальная выжженная земля
 Начальные пожинающие корни
 Начальный трюк пироманта
-\n\n\n\n\n\n\n\n<Boost Damage>
 Начальное возгорание
 \n\n\n\n\n\n\n
 Начальный кровавый меч
 Начальный Лонгин
 Начальное гниение
-\n\n\n\n\n\n\n\n\n<Require 1 BP>
 Начальная марионетка из плоти
-\n\n\n\n\n\n\n\n\n\nflesh puppetry 0
-\n\n\n\n\n\n\n\n\n\nflesh puppetry 3\n
 Начальные крысиные проказы
 Начальные феромоны
 Начальный шепот любви
@@ -704,7 +507,6 @@ status
 Двойные пожинающие корни
 Двойной трюк пироманта
 Двойное возгорание
-\n\n\n\n\n\n\n\n<Require 1 BP>
 Двойной кровавый меч
 Двойной Лонгин
 Двойное гниение
@@ -716,10 +518,8 @@ status
 Двойной шепот исцеления
 Высшие раны
 Создайте разрушительный вихрь из своей боли и ненависти.
-\n\n\n\n\n\n<Boost Damage>
 Высший черный смог
 Кристаллизуйте рукотворную тьму, рожденную индустриальной эпохой,\nчтобы ослепить и задушить ваших противников.
-\n\n\n\n\n\n\n
 Высший кровавый голем
 \n\n\n\n\n\n\n\n
 Высшая сфера тьмы
@@ -728,17 +528,12 @@ status
 Высшие пожинающие корни
 \n\n\n\n\n\n
 Высший трюк пироманта
-\n\n\n\n\n\n\n\nPlayer pyromancy!\n<Boost Damage>
 Высшее возгорание
 Высший кровавый меч
 Высший Лонгин
 Высшее гниение
 Разложите жертву изнутри, чтобы сделать ее уязвимой для атак.\n
 Высшая марионетка из плоти
-\n\n\n\n\n\n\nflesh puppetry 1\n
-\n\n\n\n\n\n\nflesh puppetry 2\n
-\n\n\n\n\n\n\nflesh puppetry 3\n
-\n\n\n\n\n\n\nflesh puppetry 4\n
 Высшие крысиные проказы
 Высшие феромоны
 Высший шепот любви
@@ -749,7 +544,6 @@ status
 Ядовитый дротик
 Культист совы наклоняет голову...
 Дух совы наклоняет голову...
-2
 Двойное царапание
 Костное копье
 Лихорадка от крысиных царапин
@@ -768,7 +562,6 @@ status
 Пальцы верховного жреца подергиваются...
 Убийственное безумие
 Сергал встает в низкую стойку...
-<Target Action>\nperform action\naction animation\nwait for animation\naction effect\naction effect\nmotion wait: user\ndeath break\n</Target Action>\n<Boost Repeats>\n<Boost Damage>
 Разрубание
 Насмешка
 Мясорубка
@@ -783,19 +576,15 @@ status
 Глаза Покеткэта загораются...
 Поразите своего врага концентрированным разрядом электричества,\nкоторый оглушит слабых противников.
 Призовите цепи, которые мучали Чамбару, Измученного, сотни лет.\nТребуется 2 очка концентрации.
-\n\n\n\n\n\n\n\n\n<Require 2 BP>\n<Boost Damage>
 Рой мотыльков
 Призовите рой мотыльков, которые помогут вам в бою. Мотыльки\nпросочились в этот из рая, из зеленого света, когда была\nоткрыта дверь между мирами. Требуется 1 очко концентрации.
 \n\n\n\n\n\n\n<Require 1 BP>\n<Boost Damage>
 Исцеляющая связь
 Требуется 2 очка концентрации.
-\n\n\n\n\n\n\n\n<Require 2 BP>\n<Boost Damage>
-\n\n\n\n\n\n\n\n\n<Boost Repeats>\n<Boost Damage>
 Левый удар
 Правый удар
 Истязание
 Брат-чайка кричит и смеется...
-\n\n\n\n\n\n\n\nflesh puppetry 1\n<Boost Damage>
 Безумный удар
 Деревенщина бросается на вас!
 Размягчитель мяса

@@ -29,7 +29,6 @@ Equip
 St
 Formation
 Save
-uit Game
 Options
 Weapon
 Armor
@@ -66,11 +65,7 @@ BGS Volume
 %1's %2 returned to normal!
 Command Remember
 %1 counterattacked!
-A painful blow!!
-An excellent hit!!
-%1's %2 went down!
 %1 was defeated.
-%1 emerged!
 %1 took %2 damage!
 %1 was drained of %2 %3!
 %1 gained %2 %3!
@@ -81,10 +76,6 @@ Miss! %1 took no damage!
 However, it was unable to escape!
 %1 tries to escape...
 %1 evaded the attack!
-Current %1
-Current %1
-File
-%1 is now %2 %3!
 Load which file?
 %1 nullified the magic!
 ME Volume
@@ -97,7 +88,6 @@ Possession
 %1 got the upper hand!
 Save to which file?
 SE Volume
-%1 protected %2!
 %1 was surprised!
 %1 uses %2!
 %1 was victorious!

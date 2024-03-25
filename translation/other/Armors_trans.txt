@@ -41,28 +41,12 @@ A plate mail armor offers great defence, but is rather\nclunky to use.
 \n\n\n\n\n\n\n<Picture: icon_shield_of_four>
 Простой самодельный щит. Обеспечивает невысокую защиту.\nРеж. 94% Кол. 94% Дроб. 94% Огонь 105%
 \n\n\n\n\n\n\n<Picture: icon_plank_shield>
-An ever watching eye is taking care of you. It seems to\nrelieve your feelings of fear and terror...
-A pair of leg guards to prevent serious injuries.
-Chainmail hood gives it's users great protection, however\nit's a little uncomformtable.
-A heavy helmet that not only gives great protection,\nbut also prevents confusion and getting stunned.
-A plated iron cuirass armour that offers moderate defence.\nWithout pauldrons it offers good mobility.
-A freshly cut cavewolf paw. It is said to bring good luck,\nbut surely that's just some nonsense folklore?
 Кольцо Бетеля
 Кольцо давно погибшего нового бога Бетеля. В кольце\nзаключена магия, что постоянно сочится из его кристалла.
 \n\n\n\n\n<Picture: icon_sorcerers_stone>\n<Passive State: 229>
 Кольцо стылой крови
 Кольцо, способное останавливать кровь в жилах владельца и\nи прекращать кровотечения. Кроме как магией - это не \nобъяснить.
 \n\n\n\n\n\n\n<Picture: icon_ring_of_stillblood>
-An iron helmet that protect the entire face, including\neyes.
-A mascot of good luck and fortune. The fact that you can\ncraft it yourself works as powerful symbolism.
-\n\n\n\n\n<Synthesis Ingredients>\nitem 26\nitem 27\n</Synthesis Ingredients>
-A plated armor which offers great protection. The armor\nhas a family insignia of a bird.
-A steel military helmet with a face guard. Offers\nprotection for throat, neck and rest of the head.
-The soul of the Cavemother gives its owner increased\naggression.
-The condensed wrath of the Crow Mauler. Increases the \nstrength of whoever holds it.
-The soul of the Iron Shakespeare enhances the defence\nof whoever holds it.
-The soul of the Butterfly makes it easier to evade incoming\nattacks with a feather light steps.
-The soul of the Black witch gives its owner occult\npowers that poison the opponent.
 Рифленые наручи
 Наручи, ранее бывшие частью доспеха. Сами по себе, они\nуже обеспечивают достойную защиту, предотвращая потерю\nконечностей. Реж. 85% Кол. 85% Дроб. 85%
 \n\n\n\n\n\n\n<Picture: icon_fluted_arm_pieces>\n<Armor Recipe: 44>\n<Not Independent Item>\n
@@ -87,11 +71,9 @@ The soul of the Black witch gives its owner occult\npowers that poison the oppon
 Камео
 Камео с изображением красивой женщины из прошлого.\nИзлучает странную ауру...
 \n\n\n\n\n\n<Picture: icon_cameo>
-A simple lens worn on one eye. Slightly improves the\naccuracy of its wearer.
 Очки
 С ними вы видите мир намного четче. Значительно\nувеличивают меткость владельца.
 \n\n\n\n\n<Picture: icon_eyeglasses>
-A bottle that contains eastern perfume. The aroma\nattracts monsters and beasts of all kind.
 Разбитые очки
 С ними вы видите мир намного четче. Ну или могли бы\nвидеть, если бы они не были сломаны...
 Обезглавленный волшебник
