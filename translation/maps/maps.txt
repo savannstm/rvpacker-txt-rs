@@ -1187,7 +1187,6 @@ Sacrifice
 Use \c[2]Blood sacrifice\c[0]
 There is a sigil of Gro-goroth drawn here...
 The ritual circle has been exhausted.
-...
 The ritual circle doesn't seem to react to your drawing...
 GabText You feel rejuvenated and whole again.
 You could use the skill \c[2]Masturbation\c[0] here...
@@ -1232,7 +1231,6 @@ Something is moving inside you... Something primal is trying to\nget out of your
 There is something written here... But it's all nonsensical\nramblings of a crazy person.
 You find \c[2]Glass shards\c[0]!
 You pick up the pinecone from the tree. You get a \c[2]Pinecone pig\c[0]!
-a
 \>\i[76]\}YSTERIOUS PERSON\{\<\n"Ah, there you are."
 A mysterious person greets you in a monotonous voice.
 \>\i[76]\}YSTERIOUS PERSON\{\<\n"Got you pulled out from that nasty place."
@@ -5099,10 +5097,6 @@ The skin seems to disintegrate as you peel it off. You cannot\nmake any use of i
 A mysterious ornament door remains shut.
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Rot\c[0]?
 Who will learn \c[2]Rot\c[0]?
-\p[1]
-\p[2]
-\p[3]
-\p[4]
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Mastery over vermin\c[0]?
 Use a \c[2]Lesser soul\c[0] to learn the skill \c[2]Necromancy\c[0]?
 Who will learn \c[2]Necromancy\c[0]?
