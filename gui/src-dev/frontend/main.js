@@ -200,10 +200,15 @@ function render() {
             }
 
             const expressionProperties = {
-                text: searchRegex ? text : searchWhole ? `\\b${text}\\b` : text,
+                text: searchRegex
+                    ? text
+                    : searchWhole
+                    ? `\\b${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`
+                    : text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
                 attr: searchRegex ? "g" : searchCase ? "g" : "gi",
             };
 
+            console.log(new RegExp(expressionProperties.text, expressionProperties.attr));
             return new RegExp(expressionProperties.text, expressionProperties.attr);
         } catch (error) {
             alert(`Неверное регулярное выражение: ${error}`);
@@ -217,7 +222,8 @@ function render() {
      * @param {HTMLTextAreaElement} node
      * @returns {void}
      */
-    // TODO: Replace nodeText constant with function argument
+    //? TODO: Replace nodeText constant with function argument... or perhaps not.
+    //! TODO: This function mustn't set nodes to map, but instead return new string with divs, and they must be immeadiately appended to search panel.
     function setMatches(map, expr, node) {
         const nodeText = node.tagName === "TEXTAREA" ? node.value : node.innerHTML;
         const matches = nodeText.match(expr) || [];
@@ -250,6 +256,7 @@ function render() {
      */
     function searchText(text) {
         text = text.trim();
+        if (!text) return;
 
         /** @type {Map<HTMLDivElement|HTMLTextAreaElement, string>} */
         const matches = new Map();
@@ -271,165 +278,186 @@ function render() {
         return matches;
     }
 
+    function showSearchPanel(hide = true) {
+        if (hide) {
+            if (searchPanel.getAttribute("moving") === "false") {
+                searchPanel.classList.toggle("translate-x-full");
+                searchPanel.classList.toggle("translate-x-0");
+                searchPanel.setAttribute("moving", true);
+            }
+        } else {
+            searchPanel.classList.remove("translate-x-full");
+            searchPanel.classList.add("translate-x-0");
+            searchPanel.setAttribute("moving", true);
+        }
+
+        const searchSwitch = document.getElementById("switch-search-content");
+
+        function handleSearchSwitch() {
+            searchPanelFound.classList.toggle("hidden");
+            searchPanelFound.classList.toggle("flex");
+            searchPanelFound.classList.toggle("flex-col");
+
+            searchPanelReplaced.classList.toggle("hidden");
+            searchPanelReplaced.classList.toggle("flex");
+            searchPanelReplaced.classList.toggle("flex-col");
+
+            if (searchSwitch.innerHTML.trim() === "search") {
+                searchSwitch.innerHTML = "menu_book";
+
+                const replacementLogContent = JSON.parse(readFileSync(join(__dirname, "replacement-log.json"), "utf8"));
+
+                const replacedObserver = new IntersectionObserver(
+                    (entries) => {
+                        for (const entry of entries) {
+                            if (entry.isIntersecting) {
+                                entry.target.children[0].classList.remove("hidden");
+                            } else {
+                                entry.target.children[0].classList.add("hidden");
+                            }
+                        }
+                    },
+                    { root: searchPanelReplaced, threshold: 0.1 }
+                );
+
+                for (const [key, value] of Object.entries(replacementLogContent)) {
+                    const replacedContainer = document.createElement("div");
+
+                    const replacedElement = document.createElement("div");
+                    replacedElement.classList.add(
+                        "text-white",
+                        "text-xl",
+                        "cursor-pointer",
+                        "bg-gray-700",
+                        "my-1",
+                        "p-1",
+                        "border-2",
+                        "border-gray-600"
+                    );
+
+                    replacedElement.innerHTML = `<div class="text-base text-gray-400">${key}</div>
+                        <div class="text-base">${value.original}</div>
+                        <div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
+                        <div class="text-base">${value.translated}</div>`;
+
+                    replacedContainer.appendChild(replacedElement);
+                    searchPanelReplaced.appendChild(replacedContainer);
+                }
+
+                foundObserver.disconnect();
+                searchPanelReplaced.style.height = `${searchPanelReplaced.scrollHeight}px`;
+
+                for (const container of searchPanelReplaced.children) {
+                    const { width: w, height: h } = container.getBoundingClientRect();
+
+                    container.style.width = `${w}px`;
+                    container.style.height = `${h}px`;
+
+                    replacedObserver.observe(container);
+                    container.children[0].classList.add("hidden");
+                }
+
+                function handleReplacedClick(event) {
+                    const element = event.target.parentElement;
+
+                    if (element.hasAttribute("reverted")) return;
+                    if (!searchPanelReplaced.contains(element)) return;
+
+                    const clicked = document.getElementById(element.children[0].textContent);
+
+                    if (event.button === 0) {
+                        changeState(
+                            clicked.parentElement.parentElement.parentElement.id.replace("-content", ""),
+                            false
+                        );
+
+                        //* it takes two frames to change the state
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                clicked.parentElement.parentElement.scrollIntoView({
+                                    block: "center",
+                                    inline: "center",
+                                });
+                            });
+                        });
+                    } else if (event.button === 2) {
+                        clicked.value = element.children[1].textContent;
+
+                        element.innerHTML = `<div class="inline text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code class="inline">${element.children[1].textContent}</code></div>`;
+                        element.setAttribute("reverted", "");
+                        delete replacementLogContent[clicked.id];
+
+                        writeFileSync(
+                            join(__dirname, "replacement-log.json"),
+                            JSON.stringify(replacementLogContent, null, 4),
+                            "utf8"
+                        );
+                    }
+                }
+
+                searchPanelReplaced.addEventListener("mousedown", (event) => {
+                    handleReplacedClick(event);
+                });
+            } else {
+                searchSwitch.innerHTML = "search";
+                searchPanelReplaced.innerHTML = "";
+                searchPanelReplaced.removeEventListener("mousedown", (event) => {
+                    handleReplacedClick(event);
+                });
+            }
+
+            return;
+        }
+
+        let loadingContainer;
+        if (searchPanelFound.children.length > 0 && searchPanelFound.children[0].id !== "no-results") {
+            loadingContainer = document.createElement("div");
+            loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
+            loadingContainer.innerHTML = searchPanel.classList.contains("translate-x-0")
+                ? `<div class="text-4xl animate-spin font-material">refresh</div>`
+                : "";
+
+            searchPanelFound.appendChild(loadingContainer);
+        }
+
+        if (searchPanel.getAttribute("shown") === "false") {
+            searchPanel.addEventListener(
+                "transitionend",
+                () => {
+                    if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
+                    searchSwitch.addEventListener("click", handleSearchSwitch);
+                    searchPanel.setAttribute("shown", "true");
+                    searchPanel.setAttribute("moving", false);
+                    return;
+                },
+                { once: true }
+            );
+        } else {
+            if (searchPanel.classList.contains("translate-x-full")) {
+                searchPanel.setAttribute("shown", "false");
+                searchPanel.setAttribute("moving", true);
+
+                searchSwitch.removeEventListener("click", handleSearchSwitch);
+                searchPanel.addEventListener(
+                    "transitionend",
+                    () => {
+                        searchPanel.setAttribute("moving", false);
+                    },
+                    { once: true }
+                );
+                return;
+            }
+
+            if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
+            searchPanel.setAttribute("moving", false);
+        }
+    }
+
     /**
      * @param {string} id
      * @returns {[HTMLElement, number]}
      */
-    // TODO: Heavily refactor
     function displaySearchResults(text = null, hide = true) {
-        function showSearchPanel(hide = true) {
-            if (hide) {
-                if (searchPanel.getAttribute("moving") === "false") {
-                    searchPanel.classList.toggle("translate-x-full");
-                    searchPanel.classList.toggle("translate-x-0");
-                    searchPanel.setAttribute("moving", true);
-                }
-            } else {
-                searchPanel.classList.remove("translate-x-full");
-                searchPanel.classList.add("translate-x-0");
-                searchPanel.setAttribute("moving", true);
-            }
-
-            const searchSwitch = document.getElementById("switch-search-content");
-
-            function handleSearchSwitch() {
-                searchPanelFound.classList.toggle("hidden");
-                searchPanelFound.classList.toggle("flex");
-                searchPanelFound.classList.toggle("flex-col");
-
-                searchPanelReplaced.classList.toggle("hidden");
-                searchPanelReplaced.classList.toggle("flex");
-                searchPanelReplaced.classList.toggle("flex-col");
-
-                if (searchSwitch.innerHTML.trim() === "search") {
-                    searchSwitch.innerHTML = "menu_book";
-
-                    const replacementLogContent = JSON.parse(
-                        readFileSync(join(__dirname, "replacement-log.json"), "utf8")
-                    );
-
-                    for (const [key, value] of Object.entries(replacementLogContent)) {
-                        const replacedElement = document.createElement("div");
-                        replacedElement.classList.add(
-                            "text-white",
-                            "text-xl",
-                            "cursor-pointer",
-                            "bg-gray-700",
-                            "my-1",
-                            "p-1",
-                            "border-2",
-                            "border-gray-600"
-                        );
-
-                        replacedElement.innerHTML = `<div class="text-base text-gray-400">${key}</div>
-                            <div class="text-base">${value.original}</div>
-                            <div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
-                            <div class="text-base">${value.translated}</div>`;
-
-                        searchPanelReplaced.appendChild(replacedElement);
-                    }
-
-                    function handleReplacedClick(event) {
-                        const element = event.target.parentElement;
-                        if (element.hasAttribute("reverted")) return;
-                        const clicked = document.getElementById(element.children[0].textContent);
-
-                        if (event.button === 0) {
-                            changeState(
-                                clicked.parentElement.parentElement.parentElement.id.replace("-content", ""),
-                                false
-                            );
-
-                            //* it takes two frames to change the state
-                            requestAnimationFrame(() => {
-                                requestAnimationFrame(() => {
-                                    clicked.parentElement.parentElement.scrollIntoView({
-                                        block: "center",
-                                        inline: "center",
-                                    });
-                                });
-                            });
-                        } else if (event.button === 2) {
-                            clicked.value = element.children[1].textContent;
-
-                            element.innerHTML = `<div class="inline text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code class="inline">${element.children[1].textContent}</code></div>`;
-                            element.setAttribute("reverted", "");
-                            delete replacementLogContent[clicked.id];
-
-                            writeFileSync(
-                                join(__dirname, "replacement-log.json"),
-                                JSON.stringify(replacementLogContent, null, 4),
-                                "utf8"
-                            );
-                        }
-                    }
-
-                    searchPanelReplaced.addEventListener("mousedown", (event) => {
-                        handleReplacedClick(event);
-                    });
-                } else {
-                    searchSwitch.innerHTML = "search";
-                    searchPanelReplaced.innerHTML = "";
-                    searchPanelReplaced.removeEventListener("mousedown", (event) => {
-                        handleReplacedClick(event);
-                    });
-                }
-
-                return;
-            }
-
-            let loadingContainer;
-            if (searchPanelFound.children.length > 0 && searchPanelFound.children[0].id !== "no-results") {
-                loadingContainer = document.createElement("div");
-                loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
-                loadingContainer.innerHTML = searchPanel.classList.contains("translate-x-0")
-                    ? `<div class="text-4xl animate-spin font-material">refresh</div>`
-                    : "";
-
-                searchPanelFound.appendChild(loadingContainer);
-            }
-
-            if (searchPanel.getAttribute("shown") === "false") {
-                searchPanel.addEventListener(
-                    "transitionend",
-                    () => {
-                        for (const child of searchPanelFound.children) {
-                            child.classList.toggle("hidden");
-                        }
-
-                        if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
-                        searchSwitch.addEventListener("click", handleSearchSwitch);
-                        searchPanel.setAttribute("shown", "true");
-                        searchPanel.setAttribute("moving", false);
-                        return;
-                    },
-                    { once: true }
-                );
-            } else {
-                if (searchPanel.classList.contains("translate-x-full")) {
-                    searchPanel.setAttribute("shown", "false");
-                    searchPanel.setAttribute("moving", true);
-
-                    searchSwitch.removeEventListener("click", handleSearchSwitch);
-                    searchPanel.addEventListener(
-                        "transitionend",
-                        () => {
-                            searchPanel.setAttribute("moving", false);
-                        },
-                        { once: true }
-                    );
-                    return;
-                }
-
-                for (const child of searchPanelFound.children) {
-                    child.classList.toggle("hidden");
-                }
-
-                if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
-                searchPanel.setAttribute("moving", false);
-            }
-        }
-
         if (!text) {
             showSearchPanel(hide);
             return;
@@ -456,8 +484,8 @@ function render() {
             return [parentId, id];
         }
 
-        function handleResultClick(event, currentState, element, resultElement, counterpartIndex) {
-            if (event.button === 0) {
+        function handleResultClick(button, currentState, element, resultElement, counterpartIndex) {
+            if (button === 0) {
                 changeState(currentState.id.replace("-content", ""), false);
 
                 //* it takes two frames to change the state
@@ -469,7 +497,7 @@ function render() {
                         });
                     });
                 });
-            } else if (event.button === 2) {
+            } else if (button === 2) {
                 if (element.id.includes("original")) {
                     alert("Оригинальные строки не могут быть заменены.");
                     return;
@@ -498,7 +526,22 @@ function render() {
             return;
         }
 
+        const foundObserver = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) {
+                        entry.target.children[0].classList.remove("hidden");
+                    } else {
+                        entry.target.children[0].classList.add("hidden");
+                    }
+                }
+            },
+            { root: searchPanelFound, threshold: 0.1 }
+        );
+
         for (const [element, result] of results) {
+            const resultContainer = document.createElement("div");
+
             const resultElement = document.createElement("div");
             resultElement.classList.add(
                 "text-white",
@@ -508,8 +551,7 @@ function render() {
                 "my-1",
                 "p-1",
                 "border-2",
-                "border-gray-600",
-                "hidden"
+                "border-gray-600"
             );
 
             const thirdParent = element.parentElement.parentElement.parentElement;
@@ -533,7 +575,21 @@ function render() {
 				`;
 
             resultElement.setAttribute("data", `${thirdParent.id},${element.id},${counterpartIndex}`);
-            searchPanelFound.appendChild(resultElement);
+            resultContainer.appendChild(resultElement);
+            searchPanelFound.appendChild(resultContainer);
+        }
+
+        foundObserver.disconnect();
+        searchPanelFound.style.height = `${searchPanelFound.scrollHeight}px`;
+
+        for (const container of searchPanelFound.children) {
+            const { width: w, height: h } = container.getBoundingClientRect();
+
+            container.style.width = `${w}px`;
+            container.style.height = `${h}px`;
+
+            foundObserver.observe(container);
+            container.children[0].classList.add("hidden");
         }
 
         showSearchPanel(hide);
@@ -548,10 +604,12 @@ function render() {
             const resultElement = event.target.parentElement.hasAttribute("data")
                 ? event.target.parentElement
                 : event.target.parentElement.parentElement;
+            if (!searchPanelFound.contains(resultElement)) return;
+
             const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data").split(",");
 
             handleResultClick(
-                event,
+                event.button,
                 document.getElementById(thirdParent),
                 document.getElementById(element),
                 resultElement,
@@ -706,13 +764,9 @@ function render() {
 
                 dirName = join(backupRoot, backupFolderName);
 
-                ensureDirSync(join(dirName, "maps"), {
-                    recursive: true,
-                });
-
-                ensureDirSync(join(dirName, "other"), {
-                    recursive: true,
-                });
+                ensureDirSync(dirName);
+                ensureDirSync(join(dirName, "maps"));
+                ensureDirSync(join(dirName, "other"));
             }
 
             for (const contentElement of contentContainer.children) {
@@ -774,7 +828,7 @@ function render() {
             //* Original text field
             const originalTextDiv = document.createElement("div");
             originalTextDiv.id = `${id}-original-${i}`;
-            originalTextDiv.textContent = text.replaceAll("\\n", "\n");
+            originalTextDiv.textContent = text.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
             originalTextDiv.classList.add(
                 ..."p-1 w-full h-auto text-xl bg-gray-800 outline outline-2 outline-gray-700 mr-2 inline-block whitespace-pre-wrap".split(
                     " "
