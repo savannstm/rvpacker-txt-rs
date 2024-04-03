@@ -89,15 +89,15 @@ function render() {
     const observer = new IntersectionObserver((entries) => {
         for (const entry of entries) {
             if (entry.isIntersecting) {
-                entry.target.children[0].classList.remove("hidden");
+                entry.target.firstElementChild.classList.remove("hidden");
             } else {
-                entry.target.children[0].classList.add("hidden");
+                entry.target.firstElementChild.classList.add("hidden");
             }
         }
         return;
     });
 
-    async function getSettings() {
+    function getSettings() {
         try {
             const settings = JSON.parse(readFileSync(join(__dirname, "settings.json"), "utf8"));
 
@@ -107,10 +107,11 @@ function render() {
             return;
         } catch (err) {
             alert("Не удалось получить настройки.");
-            const response = await ipcRenderer.invoke("create-settings-file");
-            if (response) {
-                getSettings();
-            }
+            ipcRenderer.invoke("create-settings-file").then((response) => {
+                if (response) {
+                    getSettings();
+                }
+            });
         }
     }
 
@@ -118,7 +119,7 @@ function render() {
         try {
             accessSync(translationRoot, constants.F_OK);
             return;
-        } catch (err) {
+        } catch {
             alert(
                 "Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
             );
@@ -129,7 +130,7 @@ function render() {
             accessSync(join(translationRoot, "maps"), constants.F_OK);
             accessSync(join(translationRoot, "other"), constants.F_OK);
             return;
-        } catch (err) {
+        } catch {
             alert(
                 "Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
             );
@@ -145,30 +146,26 @@ function render() {
                 child.classList.remove("hidden");
                 child.classList.add("flex", "flex-col");
 
-                const nodeYCoordinates = new Map();
-                const nodeXCoordinates = new Map();
-                let margin = 0;
+                let heights = new Int32Array(child.children.length);
 
+                let i = 0;
                 for (const node of child.children) {
-                    const { x, y } = node.getBoundingClientRect();
-
-                    nodeXCoordinates.set(node.id, x);
-                    nodeYCoordinates.set(node.id, y + margin);
-                    margin += 8;
+                    const { height: h } = node.getBoundingClientRect();
+                    heights.set([h], i);
+                    i++;
                 }
 
+                i = 0;
                 for (const node of child.children) {
-                    const id = node.id;
-
-                    node.style.position = "absolute";
-                    node.style.left = `${nodeXCoordinates.get(id)}px`;
-                    node.style.top = `${nodeYCoordinates.get(id)}px`;
-                    node.style.width = "1840px";
-                    node.children[0].classList.add("hidden");
+                    node.style.height = `${heights[i] + 8}px`;
+                    node.firstElementChild.classList.add("hidden");
+                    i++;
                 }
 
-                const lastChild = Array.from(child.children).at(-1);
-                child.style.height = `${nodeYCoordinates.get(lastChild.id) - 64}px`;
+                i = null;
+                heights = null;
+                child.style.height = `${child.scrollHeight}px`;
+
                 child.classList.remove("flex", "flex-col");
                 child.classList.add("hidden");
 
@@ -192,26 +189,19 @@ function render() {
             if (text.startsWith("/")) {
                 const first = text.indexOf("/");
                 const last = text.lastIndexOf("/");
-
-                const expression = text.substring(first + 1, last);
-                const flags = text.substring(last + 1);
-
+                const expression = text.slice(first + 1, last);
+                const flags = text.slice(last + 1);
                 return new RegExp(expression, flags);
             }
 
             const expressionProperties = {
-                text: searchRegex
-                    ? text
-                    : searchWhole
-                    ? `\\b${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`
-                    : text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                text: searchRegex ? text : searchWhole ? `\\b${String.raw(text)}\\b` : String.raw(text),
                 attr: searchRegex ? "g" : searchCase ? "g" : "gi",
             };
 
-            console.log(new RegExp(expressionProperties.text, expressionProperties.attr));
             return new RegExp(expressionProperties.text, expressionProperties.attr);
         } catch (error) {
-            alert(`Неверное регулярное выражение: ${error}`);
+            alert(`Неверное регулярное выражение (${String.raw(text)}): ${error}`);
             return;
         }
     }
@@ -237,13 +227,25 @@ function render() {
             const start = nodeText.indexOf(match, lastIndex);
             const end = start + match.length;
 
-            result.push(`<div class="inline">${nodeText.slice(lastIndex, start)}</div>`);
-            result.push(`<div class="inline bg-gray-500">${match}</div>`);
+            const beforeDiv = document.createElement("div");
+            beforeDiv.classList.add("inline");
+            beforeDiv.textContent = nodeText.slice(lastIndex, start);
+
+            const matchDiv = document.createElement("div");
+            matchDiv.classList.add("inline", "bg-gray-500");
+            matchDiv.textContent = match;
+
+            result.push(beforeDiv);
+            result.push(matchDiv);
 
             lastIndex = end;
         }
 
-        result.push(`<div class="inline">${nodeText.slice(lastIndex)}</div>`);
+        const afterDiv = document.createElement("div");
+        afterDiv.classList.add("inline");
+        afterDiv.textContent = nodeText.slice(lastIndex);
+
+        result.push(afterDiv);
 
         map.set(node, result.join(""));
 
@@ -263,11 +265,12 @@ function render() {
         const targetElements = searchLocation
             ? [...document.getElementById(`${state}-content`).children]
             : [...contentContainer.children].flatMap((parent) => [...parent.children]);
+
         const expr = createRegularExpression(text);
         if (!expr) return;
 
         for (const child of targetElements) {
-            const node = child.children[0].children;
+            const node = child.firstElementChild.children;
             setMatches(matches, expr, node[2]);
 
             if (!searchTranslation) {
@@ -311,9 +314,9 @@ function render() {
                     (entries) => {
                         for (const entry of entries) {
                             if (entry.isIntersecting) {
-                                entry.target.children[0].classList.remove("hidden");
+                                entry.target.firstElementChild.classList.remove("hidden");
                             } else {
-                                entry.target.children[0].classList.add("hidden");
+                                entry.target.firstElementChild.classList.add("hidden");
                             }
                         }
                     },
@@ -354,7 +357,7 @@ function render() {
                     container.style.height = `${h}px`;
 
                     replacedObserver.observe(container);
-                    container.children[0].classList.add("hidden");
+                    container.firstElementChild.classList.add("hidden");
                 }
 
                 function handleReplacedClick(event) {
@@ -363,7 +366,7 @@ function render() {
                     if (element.hasAttribute("reverted")) return;
                     if (!searchPanelReplaced.contains(element)) return;
 
-                    const clicked = document.getElementById(element.children[0].textContent);
+                    const clicked = document.getElementById(element.firstElementChild.textContent);
 
                     if (event.button === 0) {
                         changeState(
@@ -383,7 +386,7 @@ function render() {
                     } else if (event.button === 2) {
                         clicked.value = element.children[1].textContent;
 
-                        element.innerHTML = `<div class="inline text-base">Текст на позиции\n<code class="inline">${element.children[0].textContent}</code>\nбыл возвращён к исходному значению\n<code class="inline">${element.children[1].textContent}</code></div>`;
+                        element.innerHTML = `<div class="inline text-base">Текст на позиции\n<code class="inline">${element.firstElementChild.textContent}</code>\nбыл возвращён к исходному значению\n<code class="inline">${element.children[1].textContent}</code></div>`;
                         element.setAttribute("reverted", "");
                         delete replacementLogContent[clicked.id];
 
@@ -410,7 +413,7 @@ function render() {
         }
 
         let loadingContainer;
-        if (searchPanelFound.children.length > 0 && searchPanelFound.children[0].id !== "no-results") {
+        if (searchPanelFound.children.length > 0 && searchPanelFound.firstElementChild.id !== "no-results") {
             loadingContainer = document.createElement("div");
             loadingContainer.classList.add("flex", "justify-center", "items-center", "h-full", "w-full");
             loadingContainer.innerHTML = searchPanel.classList.contains("translate-x-0")
@@ -530,9 +533,9 @@ function render() {
             (entries) => {
                 for (const entry of entries) {
                     if (entry.isIntersecting) {
-                        entry.target.children[0].classList.remove("hidden");
+                        entry.target.firstElementChild.classList.remove("hidden");
                     } else {
-                        entry.target.children[0].classList.add("hidden");
+                        entry.target.firstElementChild.classList.add("hidden");
                     }
                 }
             },
@@ -589,7 +592,7 @@ function render() {
             container.style.height = `${h}px`;
 
             foundObserver.observe(container);
-            container.children[0].classList.add("hidden");
+            container.firstElementChild.classList.add("hidden");
         }
 
         showSearchPanel(hide);
@@ -635,7 +638,8 @@ function render() {
         if (!isAll) {
             const regex = createRegularExpression(searchInput.value);
             const replacementValue = replaceInput.value;
-            const highlightedReplacement = `<div class="inline bg-red-600">${replacementValue}</div>`;
+            const highlightedReplacement = `<div class="inline bg-red-600"></div>`;
+            highlightedReplacement.textContent = replacementValue;
 
             const newText = text.value.split(regex);
             const newTextParts = newText.flatMap((part, i) => [
@@ -773,7 +777,7 @@ function render() {
                 const outputArray = [];
 
                 for (const child of contentElement.children) {
-                    const node = child.children[0].children[2];
+                    const node = child.firstElementChild.children[2];
 
                     outputArray.push(node.value.replaceAll("\n", "\\n"));
                 }
@@ -922,9 +926,11 @@ function render() {
                 document.getElementById("current-state").innerHTML = "";
                 pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
+                observer.disconnect();
                 for (const child of contentContainer.children) {
-                    child.classList.remove("flex", "flex-col");
-                    child.classList.add("hidden");
+                    for (const element of child.children) {
+                        element.firstElementChild.classList.add("hidden");
+                    }
                 }
                 break;
             default:
@@ -1226,7 +1232,7 @@ function render() {
         const result = new Map();
 
         for (const [key, path] of Object.entries(copiesDirs)) {
-            result.set(key, readFileSync(path, "utf-8").split("\n"));
+            result.set(key, readFileSync(path, "utf8").split("\n"));
         }
 
         for (const content of contentTypes) {
@@ -1308,7 +1314,7 @@ function render() {
                 },
             };
 
-            writeFileSync(join(__dirname, "settings.json"), JSON.stringify(appSettings, null, 4), "utf-8");
+            writeFileSync(join(__dirname, "settings.json"), JSON.stringify(appSettings, null, 4), "utf8");
         }
         return;
     }

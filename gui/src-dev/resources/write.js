@@ -62,7 +62,7 @@ function mergeOther401(file) {
 }
 
 const dirPaths = {
-    original: join(__dirname, "./original"),
+    original: join(__dirname, "../../../../original"),
     output: join(__dirname, "../../../../data"),
     maps: join(__dirname, "../../../../copies/maps/maps.txt"),
     mapsTrans: join(__dirname, "../../../../copies/maps/maps_trans.txt"),

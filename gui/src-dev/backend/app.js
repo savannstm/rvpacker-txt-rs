@@ -21,6 +21,7 @@ app.on("ready", () => {
                 preload: join(__dirname, "../frontend/main.js"),
                 nodeIntegration: true,
             },
+            show: false,
         });
 
         if (DEBUG) {
@@ -122,9 +123,29 @@ app.on("ready", () => {
             },
         ];
 
-        win.maximize();
         win.setMenu(Menu.buildFromTemplate(mainWindowMenu));
         win.loadFile(join(__dirname, "../frontend/main.html"));
+
+        win.once("ready-to-show", () => {
+            win.show();
+            win.maximize();
+            win.focus();
+
+            if (firstLaunch) {
+                createHelpWindow();
+
+                if (!DEBUG) {
+                    writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: false }, null, 4));
+                }
+            }
+        });
+
+        /*
+        win.on("close", (event) => {
+            event.preventDefault();
+            win.webContents.send("quit-confirm");
+        });
+        */
     };
 
     const createHelpWindow = () => {
@@ -139,14 +160,6 @@ app.on("ready", () => {
     };
 
     createWindow();
-
-    if (firstLaunch) {
-        createHelpWindow();
-
-        if (!DEBUG) {
-            writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: false }, null, 4));
-        }
-    }
 
     app.on("window-all-closed", () => {
         if (process.platform !== "darwin") {
@@ -181,10 +194,14 @@ app.on("ready", () => {
         return result;
     });
 
-    ipcMain.on("openLink", (event, link) => {
+    ipcMain.on("openLink", (_event, link) => {
         shell.openExternal(link);
         return;
     });
+
+    /*
+    ipcMain.on("get-saved-state", (_event, state) => {});
+    */
 
     ipcMain.handleOnce("create-settings-file", async () => {
         const result = await dialog
