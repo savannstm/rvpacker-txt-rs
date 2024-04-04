@@ -15,7 +15,6 @@ const { join } = require("path");
 const PRODUCTION = false;
 
 function render() {
-    //#region Directories
     const copiesRoot = PRODUCTION ? join(__dirname, "../../../../copies") : join(__dirname, "../../../copies");
     const backupRoot = PRODUCTION ? join(__dirname, "../../../../backups") : join(__dirname, "../../../backups");
     const translationRoot = PRODUCTION
@@ -23,9 +22,7 @@ function render() {
         : join(__dirname, "../../../translation");
 
     ensureStart();
-    //#endregion
 
-    //#region Main logic
     copy();
 
     const contentContainer = document.getElementById("content-container");
@@ -97,6 +94,26 @@ function render() {
         return;
     });
 
+    ipcRenderer.on("exit-sequence", () => {
+        if (saved) {
+            ipcRenderer.send("quit");
+            return;
+        }
+
+        ipcRenderer.invoke("quit-confirm").then((response) => {
+            if (response) {
+                save();
+
+                setTimeout(() => {
+                    ipcRenderer.send("quit");
+                }, 1000);
+                return;
+            } else {
+                return;
+            }
+        });
+    });
+
     function getSettings() {
         try {
             const settings = JSON.parse(readFileSync(join(__dirname, "settings.json"), "utf8"));
@@ -129,6 +146,7 @@ function render() {
         try {
             accessSync(join(translationRoot, "maps"), constants.F_OK);
             accessSync(join(translationRoot, "other"), constants.F_OK);
+            accessSync(join(translationRoot, "plugins"), constants.F_OK);
             return;
         } catch {
             alert(
@@ -143,8 +161,7 @@ function render() {
 
         requestAnimationFrame(() => {
             for (const child of contentContainer.children) {
-                child.classList.remove("hidden");
-                child.classList.add("flex", "flex-col");
+                replaceTwoWay(child, "hidden", "flex");
 
                 let heights = new Int32Array(child.children.length);
 
@@ -166,8 +183,7 @@ function render() {
                 heights = null;
                 child.style.height = `${child.scrollHeight}px`;
 
-                child.classList.remove("flex", "flex-col");
-                child.classList.add("hidden");
+                replaceTwoWay(child, "hidden", "flex");
 
                 requestAnimationFrame(() => {
                     document.body.classList.remove("invisible");
@@ -195,13 +211,17 @@ function render() {
             }
 
             const expressionProperties = {
-                text: searchRegex ? text : searchWhole ? `\\b${String.raw(text)}\\b` : String.raw(text),
+                text: searchRegex
+                    ? text
+                    : searchWhole
+                    ? `\\b${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`
+                    : text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
                 attr: searchRegex ? "g" : searchCase ? "g" : "gi",
             };
 
             return new RegExp(expressionProperties.text, expressionProperties.attr);
         } catch (error) {
-            alert(`Неверное регулярное выражение (${String.raw(text)}): ${error}`);
+            alert(`Неверное регулярное выражение (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}): ${error}`);
             return;
         }
     }
@@ -212,28 +232,25 @@ function render() {
      * @param {HTMLTextAreaElement} node
      * @returns {void}
      */
-    //? TODO: Replace nodeText constant with function argument... or perhaps not.
-    //! TODO: This function mustn't set nodes to map, but instead return new string with divs, and they must be immeadiately appended to search panel.
-    function setMatches(map, expr, node) {
-        const nodeText = node.tagName === "TEXTAREA" ? node.value : node.innerHTML;
-        const matches = nodeText.match(expr) || [];
+    // ! TODO: This function mustn't set nodes to map, but instead create new string with divs, and they must be immeadiately appended to search panel.
+    function setMatches(expr, node) {
+        const nodeText =
+            node.tagName === "TEXTAREA"
+                ? node.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+                : node.innerHTML.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+        const textMatches = nodeText.match(expr) || [];
 
-        if (matches.length === 0) return;
+        if (textMatches.length === 0) return;
 
         const result = [];
         let lastIndex = 0;
 
-        for (const match of matches) {
+        for (const match of textMatches) {
             const start = nodeText.indexOf(match, lastIndex);
             const end = start + match.length;
 
-            const beforeDiv = document.createElement("div");
-            beforeDiv.classList.add("inline");
-            beforeDiv.textContent = nodeText.slice(lastIndex, start);
-
-            const matchDiv = document.createElement("div");
-            matchDiv.classList.add("inline", "bg-gray-500");
-            matchDiv.textContent = match;
+            const beforeDiv = `<div class="inline">${nodeText.slice(lastIndex, start)}</div>`;
+            const matchDiv = `<div class="inline bg-gray-500">${match}</div>`;
 
             result.push(beforeDiv);
             result.push(matchDiv);
@@ -241,15 +258,10 @@ function render() {
             lastIndex = end;
         }
 
-        const afterDiv = document.createElement("div");
-        afterDiv.classList.add("inline");
-        afterDiv.textContent = nodeText.slice(lastIndex);
-
+        const afterDiv = `<div class="inline">${nodeText.slice(lastIndex)}</div>`;
         result.push(afterDiv);
 
-        map.set(node, result.join(""));
-
-        return;
+        return result.join("");
     }
 
     /**
@@ -271,10 +283,21 @@ function render() {
 
         for (const child of targetElements) {
             const node = child.firstElementChild.children;
-            setMatches(matches, expr, node[2]);
+
+            const match = setMatches(expr, node[2]);
+            if (match) matches.set(node[2], match);
+            if (matches.size > 10000) {
+                alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                return;
+            }
 
             if (!searchTranslation) {
-                setMatches(matches, expr, node[1]);
+                const match = setMatches(expr, node[1]);
+                if (match) matches.set(node[1], match);
+                if (matches.size > 10000) {
+                    alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                    return;
+                }
             }
         }
 
@@ -284,26 +307,20 @@ function render() {
     function showSearchPanel(hide = true) {
         if (hide) {
             if (searchPanel.getAttribute("moving") === "false") {
-                searchPanel.classList.toggle("translate-x-full");
-                searchPanel.classList.toggle("translate-x-0");
-                searchPanel.setAttribute("moving", true);
+                replaceTwoWay(searchPanel, "translate-x-0", "translate-x-full");
+                searchPanel.setAttribute("moving", "true");
             }
         } else {
             searchPanel.classList.remove("translate-x-full");
             searchPanel.classList.add("translate-x-0");
-            searchPanel.setAttribute("moving", true);
+            searchPanel.setAttribute("moving", "true");
         }
 
         const searchSwitch = document.getElementById("switch-search-content");
 
         function handleSearchSwitch() {
-            searchPanelFound.classList.toggle("hidden");
-            searchPanelFound.classList.toggle("flex");
-            searchPanelFound.classList.toggle("flex-col");
-
-            searchPanelReplaced.classList.toggle("hidden");
-            searchPanelReplaced.classList.toggle("flex");
-            searchPanelReplaced.classList.toggle("flex-col");
+            replaceTwoWay(searchPanelFound, "hidden", "flex");
+            replaceTwoWay(searchPanelReplaced, "hidden", "flex");
 
             if (searchSwitch.innerHTML.trim() === "search") {
                 searchSwitch.innerHTML = "menu_book";
@@ -338,10 +355,7 @@ function render() {
                         "border-gray-600"
                     );
 
-                    replacedElement.innerHTML = `<div class="text-base text-gray-400">${key}</div>
-                        <div class="text-base">${value.original}</div>
-                        <div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
-                        <div class="text-base">${value.translated}</div>`;
+                    replacedElement.innerHTML = `<div class="text-base text-gray-400">${key}</div><div class="text-base">${value.original}</div><div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div><div class="text-base">${value.translated}</div>`;
 
                     replacedContainer.appendChild(replacedElement);
                     searchPanelReplaced.appendChild(replacedContainer);
@@ -404,6 +418,7 @@ function render() {
             } else {
                 searchSwitch.innerHTML = "search";
                 searchPanelReplaced.innerHTML = "";
+
                 searchPanelReplaced.removeEventListener("mousedown", (event) => {
                     handleReplacedClick(event);
                 });
@@ -430,7 +445,7 @@ function render() {
                     if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
                     searchSwitch.addEventListener("click", handleSearchSwitch);
                     searchPanel.setAttribute("shown", "true");
-                    searchPanel.setAttribute("moving", false);
+                    searchPanel.setAttribute("moving", "false");
                     return;
                 },
                 { once: true }
@@ -438,13 +453,13 @@ function render() {
         } else {
             if (searchPanel.classList.contains("translate-x-full")) {
                 searchPanel.setAttribute("shown", "false");
-                searchPanel.setAttribute("moving", true);
+                searchPanel.setAttribute("moving", "true");
 
                 searchSwitch.removeEventListener("click", handleSearchSwitch);
                 searchPanel.addEventListener(
                     "transitionend",
                     () => {
-                        searchPanel.setAttribute("moving", false);
+                        searchPanel.setAttribute("moving", "false");
                     },
                     { once: true }
                 );
@@ -452,7 +467,7 @@ function render() {
             }
 
             if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
-            searchPanel.setAttribute("moving", false);
+            searchPanel.setAttribute("moving", "false");
         }
     }
 
@@ -563,19 +578,17 @@ function render() {
             const [elementParentId, elementId] = extractInfo(element);
             const [counterpartParentId, counterpartId] = extractInfo(counterpart);
 
-            resultElement.innerHTML = `
-					<div class="text-base">${result}</div>
-					<div class="text-xs text-gray-400">${element.parentElement.parentElement.id.slice(
-                        0,
-                        element.parentElement.parentElement.id.lastIndexOf("-")
-                    )} - ${elementParentId} - ${elementId}</div>
-					<div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div>
-					<div class="text-base">${counterpart.tagName === "TEXTAREA" ? counterpart.value : counterpart.innerHTML}</div>
-					<div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id.slice(
-                        0,
-                        counterpart.parentElement.parentElement.id.lastIndexOf("-")
-                    )} - ${counterpartParentId} - ${counterpartId}</div>
-				`;
+            resultElement.innerHTML = `<div class="text-base">${result}</div><div class="text-xs text-gray-400">${element.parentElement.parentElement.id.slice(
+                0,
+                element.parentElement.parentElement.id.lastIndexOf("-")
+            )} - ${elementParentId} - ${elementId}</div><div class="flex justify-center items-center text-xl text-white font-material">arrow_downward</div><div class="text-base">${
+                counterpart.tagName === "TEXTAREA"
+                    ? counterpart.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+                    : counterpart.innerHTML.replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+            }</div><div class="text-xs text-gray-400">${counterpart.parentElement.parentElement.id.slice(
+                0,
+                counterpart.parentElement.parentElement.id.lastIndexOf("-")
+            )} - ${counterpartParentId} - ${counterpartId}</div>`;
 
             resultElement.setAttribute("data", `${thirdParent.id},${element.id},${counterpartIndex}`);
             resultContainer.appendChild(resultElement);
@@ -638,7 +651,8 @@ function render() {
         if (!isAll) {
             const regex = createRegularExpression(searchInput.value);
             const replacementValue = replaceInput.value;
-            const highlightedReplacement = `<div class="inline bg-red-600"></div>`;
+            const highlightedReplacement = document.createElement("div");
+            highlightedReplacement.classList.add("inline", "bg-red-600");
             highlightedReplacement.textContent = replacementValue;
 
             const newText = text.value.split(regex);
@@ -696,13 +710,20 @@ function render() {
             ensureDirSync(copiesRoot);
             ensureDirSync(join(copiesRoot, "maps"));
             ensureDirSync(join(copiesRoot, "other"));
+            ensureDirSync(join(copiesRoot, "plugins"));
 
             const mapsLength = readdirSync(join(translationRoot, "maps")).length;
             const otherLength = readdirSync(join(translationRoot, "other")).length;
+            const pluginsLength = readdirSync(join(translationRoot, "plugins")).length;
             const copiesMapsLength = readdirSync(join(copiesRoot, "maps")).length;
             const copiesOtherLength = readdirSync(join(copiesRoot, "other")).length;
+            const copiesPluginsLength = readdirSync(join(copiesRoot, "plugins")).length;
 
-            if (copiesMapsLength === mapsLength && copiesOtherLength === otherLength) {
+            if (
+                copiesMapsLength === mapsLength &&
+                copiesOtherLength === otherLength &&
+                copiesPluginsLength === pluginsLength
+            ) {
                 return true;
             }
 
@@ -717,6 +738,10 @@ function render() {
 
         for (const file of readdirSync(join(translationRoot, "other"))) {
             copyFileSync(join(translationRoot, "other", file), join(copiesRoot, "other", file));
+        }
+
+        for (const file of readdirSync(join(translationRoot, "plugins"))) {
+            copyFileSync(join(translationRoot, "plugins", file), join(copiesRoot, "plugins", file));
         }
         return;
     }
@@ -735,6 +760,7 @@ function render() {
             "system-content": "./other/System_trans.txt",
             "troops-content": "./other/Troops_trans.txt",
             "weapons-content": "./other/Weapons_trans.txt",
+            "plugins-content": "./plugins/plugins_trans.txt",
         };
 
         saveButton.classList.add("animate-spin");
@@ -771,6 +797,7 @@ function render() {
                 ensureDirSync(dirName);
                 ensureDirSync(join(dirName, "maps"));
                 ensureDirSync(join(dirName, "other"));
+                ensureDirSync(join(dirName, "plugins"));
             }
 
             for (const contentElement of contentContainer.children) {
@@ -786,6 +813,7 @@ function render() {
 
                 if (filePath) {
                     const dir = join(dirName, filePath);
+
                     writeFileSync(dir, outputArray.join("\n"), "utf8");
                     if (!backup) saved = true;
                 }
@@ -819,11 +847,11 @@ function render() {
     function createContentChildren(id, originalText, translatedText) {
         const content = document.createElement("div");
         content.id = id;
-        content.classList.add("hidden");
+        content.classList.add("hidden", "flex-col");
 
         for (const [i, text] of originalText.entries()) {
             const contentParent = document.createElement("div");
-            contentParent.id = `${id}-${i}`;
+            contentParent.id = `${id}-${i + 1}`;
             contentParent.classList.add("w-full", "z-10");
 
             const contentChild = document.createElement("div");
@@ -831,10 +859,10 @@ function render() {
 
             //* Original text field
             const originalTextDiv = document.createElement("div");
-            originalTextDiv.id = `${id}-original-${i}`;
+            originalTextDiv.id = `${id}-original-${i + 1}`;
             originalTextDiv.textContent = text.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
             originalTextDiv.classList.add(
-                ..."p-1 w-full h-auto text-xl bg-gray-800 outline outline-2 outline-gray-700 mr-2 inline-block whitespace-pre-wrap".split(
+                ..."p-1 w-full h-auto bg-gray-800 outline outline-2 outline-gray-700 mr-2 inline-block whitespace-pre-wrap".split(
                     " "
                 )
             );
@@ -842,20 +870,20 @@ function render() {
             //* Translated text field
             const translatedTextInput = document.createElement("textarea");
             const splittedTranslatedText = translatedText[i].split("\\n");
-            translatedTextInput.id = `${id}-translated-${i}`;
+            translatedTextInput.id = `${id}-translated-${i + 1}`;
             translatedTextInput.rows = splittedTranslatedText.length;
             translatedTextInput.value = splittedTranslatedText.join("\n");
             translatedTextInput.classList.add(
-                ..."p-1 w-full h-auto text-xl bg-gray-800 resize-none outline outline-2 outline-gray-700 focus:outline-gray-400".split(
+                ..."p-1 w-full h-auto bg-gray-800 resize-none outline outline-2 outline-gray-700 focus:outline-gray-400".split(
                     " "
                 )
             );
 
             //* Row field
             const row = document.createElement("div");
-            row.id = `${id}-row-${i}`;
-            row.textContent = i;
-            row.classList.add(..."p-1 w-36 h-auto text-xl bg-gray-800 outline-none".split(" "));
+            row.id = `${id}-row-${i + 1}`;
+            row.textContent = i + 1;
+            row.classList.add(..."p-1 w-36 h-auto bg-gray-800 outline-none".split(" "));
 
             //* Append elements to containers
             contentChild.appendChild(row);
@@ -891,8 +919,7 @@ function render() {
                 contentParent.classList.add("flex", "flex-col");
 
                 if (previousState !== "main") {
-                    document.getElementById(`${previousState}-content`).classList.remove("flex", "flex-col");
-                    document.getElementById(`${previousState}-content`).classList.add("hidden");
+                    replaceTwoWay(document.getElementById(`${previousState}-content`), "flex", "hidden");
                     observer.disconnect();
                 }
 
@@ -901,8 +928,7 @@ function render() {
                 }
 
                 if (slide) {
-                    leftPanel.classList.toggle("translate-x-0");
-                    leftPanel.classList.toggle("-translate-x-full");
+                    replaceTwoWay(leftPanel, "-translate-x-full", "translate-x-0");
                 }
 
                 pageLoadedDisplay.innerHTML = "done";
@@ -947,10 +973,9 @@ function render() {
         goToRowInput.focus();
 
         const element = document.getElementById(`${state}-content`);
-        const lastChild = element.children[element.children.length - 1];
-        const lastRow = lastChild.id.slice(lastChild.id.lastIndexOf("-") + 1);
+        const lastRow = element.lastElementChild.id.split("-").at(-1);
 
-        goToRowInput.placeholder = `Перейти к строке... от 0 до ${lastRow}`;
+        goToRowInput.placeholder = `Перейти к строке... от 1 до ${lastRow}`;
 
         goToRowInput.addEventListener("keydown", function handleKeydown(event) {
             if (event.code === "Enter") {
@@ -992,8 +1017,7 @@ function render() {
                 changeState("main", false);
                 break;
             case "Tab":
-                leftPanel.classList.toggle("translate-x-0");
-                leftPanel.classList.toggle("-translate-x-full");
+                replaceTwoWay(leftPanel, "translate-x-0", "-translate-x-full");
                 break;
             case "KeyR":
                 displaySearchResults();
@@ -1096,7 +1120,7 @@ function render() {
                 }
                 break;
             case "KeyC":
-                if (event.altKey) {
+                if (document.activeElement !== searchInput && event.altKey) {
                     compile();
                 }
                 break;
@@ -1134,36 +1158,57 @@ function render() {
                 }
             }
         }
-        return;
+
+        if (event.altKey) {
+            switch (event.code) {
+                case "KeyC":
+                    switchCaseButton();
+                    break;
+                case "KeyW":
+                    switchWholeButton();
+                    break;
+                case "KeyR":
+                    switchRegexButton();
+                    break;
+                case "KeyT":
+                    switchTranslationButton();
+                    break;
+                case "KeyL":
+                    switchLocationButton();
+                    break;
+            }
+        }
     }
 
     // ! Single-call function
     function createContent() {
         const copiesDirs = {
-            originalMapText: join(copiesRoot, "maps/maps.txt"),
-            translatedMapText: join(copiesRoot, "maps/maps_trans.txt"),
-            originalMapNames: join(copiesRoot, "maps/names.txt"),
-            translatedMapNames: join(copiesRoot, "maps/names_trans.txt"),
-            originalActors: join(copiesRoot, "other/Actors.txt"),
-            translatedActors: join(copiesRoot, "other/Actors_trans.txt"),
-            originalArmors: join(copiesRoot, "other/Armors.txt"),
-            translatedArmors: join(copiesRoot, "other/Armors_trans.txt"),
-            originalClasses: join(copiesRoot, "other/Classes.txt"),
-            translatedClasses: join(copiesRoot, "other/Classes_trans.txt"),
-            originalCommonEvents: join(copiesRoot, "other/CommonEvents.txt"),
-            translatedCommonEvents: join(copiesRoot, "other/CommonEvents_trans.txt"),
-            originalEnemies: join(copiesRoot, "other/Enemies.txt"),
-            translatedEnemies: join(copiesRoot, "other/Enemies_trans.txt"),
-            originalItems: join(copiesRoot, "other/Items.txt"),
-            translatedItems: join(copiesRoot, "other/Items_trans.txt"),
-            originalSkills: join(copiesRoot, "other/Skills.txt"),
-            translatedSkills: join(copiesRoot, "other/Skills_trans.txt"),
-            originalSystem: join(copiesRoot, "other/System.txt"),
-            translatedSystem: join(copiesRoot, "other/System_trans.txt"),
-            originalTroops: join(copiesRoot, "other/Troops.txt"),
-            translatedTroops: join(copiesRoot, "other/Troops_trans.txt"),
-            originalWeapons: join(copiesRoot, "other/Weapons.txt"),
-            translatedWeapons: join(copiesRoot, "other/Weapons_trans.txt"),
+            originalMapText: "maps/maps.txt",
+            translatedMapText: "maps/maps_trans.txt",
+            originalMapNames: "maps/names.txt",
+            translatedMapNames: "maps/names_trans.txt",
+            originalActors: "other/Actors.txt",
+            translatedActors: "other/Actors_trans.txt",
+            originalArmors: "other/Armors.txt",
+            translatedArmors: "other/Armors_trans.txt",
+            originalClasses: "other/Classes.txt",
+            translatedClasses: "other/Classes_trans.txt",
+            originalCommonEvents: "other/CommonEvents.txt",
+            translatedCommonEvents: "other/CommonEvents_trans.txt",
+            originalEnemies: "other/Enemies.txt",
+            translatedEnemies: "other/Enemies_trans.txt",
+            originalItems: "other/Items.txt",
+            translatedItems: "other/Items_trans.txt",
+            originalSkills: "other/Skills.txt",
+            translatedSkills: "other/Skills_trans.txt",
+            originalSystem: "other/System.txt",
+            translatedSystem: "other/System_trans.txt",
+            originalTroops: "other/Troops.txt",
+            translatedTroops: "other/Troops_trans.txt",
+            originalWeapons: "other/Weapons.txt",
+            translatedWeapons: "other/Weapons_trans.txt",
+            originalPlugins: "plugins/plugins.txt",
+            translatedPlugins: "plugins/plugins_trans.txt",
         };
 
         const contentTypes = [
@@ -1227,12 +1272,17 @@ function render() {
                 original: "originalWeapons",
                 translated: "translatedWeapons",
             },
+            {
+                id: "plugins-content",
+                original: "originalPlugins",
+                translated: "translatedPlugins",
+            },
         ];
 
         const result = new Map();
 
         for (const [key, path] of Object.entries(copiesDirs)) {
-            result.set(key, readFileSync(path, "utf8").split("\n"));
+            result.set(key, readFileSync(join(copiesRoot, path), "utf8").split("\n"));
         }
 
         for (const content of contentTypes) {
@@ -1248,6 +1298,7 @@ function render() {
         const writer = fork(join(__dirname, "../resources/write.js"), [], { timeout: 15000 });
 
         writer.on("error", (err) => {
+            compileButton.classList.remove("animate-spin");
             alert(`Не удалось записать файлы: ${err}`);
             writer.kill();
             return;
@@ -1318,102 +1369,25 @@ function render() {
         }
         return;
     }
-    //#endregion
 
-    //#region Event listeners
-    document.addEventListener("keydown", (event) => {
-        if (document.activeElement === document.body) handleKeypressBody(event);
-        handleKeypressGlobal(event);
-        return;
-    });
+    function replaceTwoWay(element, firstClass, secondClass) {
+        const containsClass = element.classList.contains(secondClass);
+        element.classList.toggle(firstClass, containsClass);
+        element.classList.toggle(secondClass, !containsClass);
+    }
 
-    searchInput.addEventListener("keydown", (event) => {
-        handleKeypressSearch(event);
-        return;
-    });
-
-    leftPanel.addEventListener("click", (event) => {
-        changeState(event.target.id);
-    });
-
-    document.getElementById("menu-button").addEventListener("click", () => {
-        leftPanel.classList.toggle("translate-x-0");
-        leftPanel.classList.toggle("-translate-x-full");
-        return;
-    });
-
-    document.getElementById("search-button").addEventListener("click", () => {
-        if (searchInput.value) {
-            searchPanelFound.innerHTML = "";
-            displaySearchResults(searchInput.value, false);
-        } else if (document.activeElement === document.body) {
-            searchInput.focus();
-        }
-        return;
-    });
-
-    document.getElementById("replace-button").addEventListener("click", () => {
-        if (searchInput.value && replaceInput.value) {
-            replaceText(searchInput.value, true);
-        }
-        return;
-    });
-
-    searchCaseButton.addEventListener("click", () => {
-        if (!searchRegex) {
-            searchCase = !searchCase;
-            searchCaseButton.classList.toggle("bg-gray-500");
-        }
-        return;
-    });
-
-    searchWholeButton.addEventListener("click", () => {
-        if (!searchRegex) {
-            searchWhole = !searchWhole;
-            searchWholeButton.classList.toggle("bg-gray-500");
-        }
-        return;
-    });
-
-    searchRegexButton.addEventListener("click", () => {
-        searchRegex = !searchRegex;
-
-        searchCase = false;
-        searchCaseButton.classList.remove("bg-gray-500");
-
-        searchWhole = false;
-        searchWholeButton.classList.remove("bg-gray-500");
-
-        searchRegexButton.classList.toggle("bg-gray-500");
-        return;
-    });
-
-    searchTranslationButton.addEventListener("click", () => {
-        searchTranslation = !searchTranslation;
-        searchTranslationButton.classList.toggle("bg-gray-500");
-        return;
-    });
-
-    searchLocationButton.addEventListener("click", () => {
-        searchLocation = !searchLocation;
-        searchLocationButton.classList.toggle("bg-gray-500");
-        return;
-    });
-
-    saveButton.addEventListener("click", save);
-    compileButton.addEventListener("click", compile);
-    document.getElementById("options-button").addEventListener("click", showOptions);
-
-    document.addEventListener("keydown", (e) => {
-        switch (e.key) {
+    function preventKeyDefaults(event) {
+        switch (event.key) {
             case "Tab":
-                e.preventDefault();
+                event.preventDefault();
                 break;
-            case e.altKey:
-                e.preventDefault();
+            case event.altKey:
+                event.preventDefault();
                 break;
-            case "F4" && e.altKey:
-                e.preventDefault();
+            case "F4":
+                if (!event.altKey) return;
+
+                event.preventDefault();
 
                 if (saved) {
                     ipcRenderer.send("quit");
@@ -1433,7 +1407,7 @@ function render() {
                 });
                 break;
             case "F5":
-                e.preventDefault();
+                event.preventDefault();
 
                 document.body.classList.add("hidden");
 
@@ -1452,9 +1426,176 @@ function render() {
                 }
         }
         return;
+    }
+
+    function menuButtonClick() {
+        replaceTwoWay(leftPanel, "translate-x-0", "-translate-x-full");
+        return;
+    }
+
+    function searchButtonClick() {
+        if (searchInput.value) {
+            searchPanelFound.innerHTML = "";
+            displaySearchResults(searchInput.value, false);
+        } else if (document.activeElement === document.body) {
+            searchInput.focus();
+        }
+        return;
+    }
+
+    function replaceButtonClick() {
+        if (searchInput.value && replaceInput.value) {
+            replaceText(searchInput.value, false);
+        }
+        return;
+    }
+
+    function switchCaseButton() {
+        if (!searchRegex) {
+            searchCase = !searchCase;
+            searchCaseButton.classList.toggle("bg-gray-500");
+        }
+        return;
+    }
+
+    function switchWholeButton() {
+        if (!searchRegex) {
+            searchWhole = !searchWhole;
+            searchWholeButton.classList.toggle("bg-gray-500");
+        }
+        return;
+    }
+
+    function switchRegexButton() {
+        searchRegex = !searchRegex;
+
+        if (searchRegex) {
+            searchCase = false;
+            searchCaseButton.classList.remove("bg-gray-500");
+
+            searchWhole = false;
+            searchWholeButton.classList.remove("bg-gray-500");
+        }
+
+        searchRegexButton.classList.toggle("bg-gray-500");
+        return;
+    }
+
+    function switchTranslationButton() {
+        searchTranslation = !searchTranslation;
+        searchTranslationButton.classList.toggle("bg-gray-500");
+        return;
+    }
+
+    function switchLocationButton() {
+        searchLocation = !searchLocation;
+        searchLocationButton.classList.toggle("bg-gray-500");
+        return;
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (document.activeElement === document.body) handleKeypressBody(event);
+        handleKeypressGlobal(event);
+        return;
     });
 
-    //#endregion
+    searchInput.addEventListener("keydown", (event) => handleKeypressSearch(event));
+    leftPanel.addEventListener("click", (event) => changeState(event.target.id));
+    document.getElementById("menu-button").addEventListener("click", menuButtonClick);
+    document.getElementById("search-button").addEventListener("click", searchButtonClick);
+    document.getElementById("replace-button").addEventListener("click", replaceButtonClick);
+    searchCaseButton.addEventListener("click", switchCaseButton);
+    searchWholeButton.addEventListener("click", switchWholeButton);
+    searchRegexButton.addEventListener("click", switchRegexButton);
+    searchTranslationButton.addEventListener("click", switchTranslationButton);
+    searchLocationButton.addEventListener("click", switchLocationButton);
+    saveButton.addEventListener("click", save);
+    compileButton.addEventListener("click", compile);
+    document.getElementById("options-button").addEventListener("click", showOptions);
+    document.addEventListener("keydown", (event) => preventKeyDefaults(event));
+
+    const activeGhostLines = [];
+
+    function trackFocus(focusedElement) {
+        /**
+         * Generate an array of positions representing the left and top coordinates of each line in a textarea.
+         *
+         * @param {HTMLTextAreaElement} textarea - The textarea element to extract line positions from.
+         * @return {Array} An array of objects containing the left and top coordinates of each line.
+         */
+        function getNewLinePositions(textarea) {
+            const positions = [];
+            const lines = textarea.value.split("\n");
+            const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
+
+            const textareaRect = textarea.getBoundingClientRect();
+            const y = textareaRect.y + window.scrollY;
+            const x = textareaRect.x;
+
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            context.font = '18px "Segoe UI"';
+
+            let top = y;
+
+            for (let i = 0; i < lines.length - 1; i++) {
+                const line = lines[i];
+                const textWidth = context.measureText(`${line} `).width;
+                const left = x + textWidth;
+
+                positions.push({ left, top });
+                top += lineHeight;
+            }
+
+            return positions;
+        }
+
+        const result = getNewLinePositions(focusedElement);
+        if (result.length === 0) return;
+
+        for (const object of result) {
+            const { left, top } = object;
+            const ghostNewLine = document.createElement("div");
+            ghostNewLine.classList.add("text-gray-400", "absolute", "font-lg", "z-50", "select-none", "cursor-default");
+            ghostNewLine.textContent = "\\n";
+            ghostNewLine.style.left = `${left}px`;
+            ghostNewLine.style.top = `${top}px`;
+
+            activeGhostLines.push(ghostNewLine);
+            1;
+            document.body.appendChild(ghostNewLine);
+        }
+    }
+
+    let currentFocusedElement = null;
+
+    function handleFocus(event) {
+        const target = event.target;
+
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
+        if (target !== currentFocusedElement) {
+            currentFocusedElement = target;
+            trackFocus(target);
+        }
+    }
+
+    function handleBlur(event) {
+        const target = event.target;
+
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
+        if (target === currentFocusedElement) {
+            currentFocusedElement = null;
+        }
+    }
+
+    document.addEventListener("focus", handleFocus, true);
+    document.addEventListener("blur", handleBlur, true);
     return;
 }
 

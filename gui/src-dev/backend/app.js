@@ -4,6 +4,7 @@ const { join } = require("path");
 
 const DEBUG = true;
 const firstLaunch = JSON.parse(readFileSync(join(__dirname, "launch.json"), "utf8")).firstLaunch;
+let forceClose;
 
 if (DEBUG && !firstLaunch) {
     writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: true }, null, 4));
@@ -76,29 +77,27 @@ app.on("ready", () => {
                     {
                         label: "Как пользоваться программой?",
                         click: () => {
-                            const win = new BrowserWindow({
+                            const helpWin = new BrowserWindow({
                                 width: 640,
                                 height: 480,
-                                titleBarStyle: "hiddenInset",
                                 autoHideMenuBar: true,
                             });
 
-                            win.setAlwaysOnTop(true);
-                            win.loadFile(join(__dirname, "../frontend/help.html"));
+                            helpWin.setAlwaysOnTop(true);
+                            helpWin.loadFile(join(__dirname, "../frontend/help.html"));
                         },
                     },
                     {
                         label: "Горячие клавиши",
                         click: () => {
-                            const win = new BrowserWindow({
+                            const hotkeysWin = new BrowserWindow({
                                 width: 640,
                                 height: 480,
-                                titleBarStyle: "hiddenInset",
                                 autoHideMenuBar: true,
                             });
 
-                            win.setAlwaysOnTop(true);
-                            win.loadFile(join(__dirname, "../frontend/hotkeys.html"));
+                            hotkeysWin.setAlwaysOnTop(true, "pop-up-menu");
+                            hotkeysWin.loadFile(join(__dirname, "../frontend/hotkeys.html"));
                         },
                     },
                 ],
@@ -106,10 +105,9 @@ app.on("ready", () => {
             {
                 label: "О программе",
                 click: () => {
-                    const win = new BrowserWindow({
+                    const aboutWin = new BrowserWindow({
                         width: 640,
                         height: 480,
-                        titleBarStyle: "hiddenInset",
                         autoHideMenuBar: true,
                         webPreferences: {
                             preload: join(__dirname, "../frontend/about.js"),
@@ -117,8 +115,8 @@ app.on("ready", () => {
                         },
                     });
 
-                    win.setAlwaysOnTop(true);
-                    win.loadFile(join(__dirname, "../frontend/about.html"));
+                    aboutWin.setAlwaysOnTop(true);
+                    aboutWin.loadFile(join(__dirname, "../frontend/about.html"));
                 },
             },
         ];
@@ -140,19 +138,25 @@ app.on("ready", () => {
             }
         });
 
-        /*
         win.on("close", (event) => {
+            if (forceClose) {
+                app.quit();
+                return;
+            }
+
             event.preventDefault();
-            win.webContents.send("quit-confirm");
+            win.webContents.send("exit-sequence", true);
+
+            console.log("close");
+            return;
         });
-        */
     };
 
     const createHelpWindow = () => {
         const helpWin = new BrowserWindow({
             width: 800,
             height: 600,
-            titleBarStyle: "hiddenInset",
+            autoHideMenuBar: true,
         });
 
         helpWin.setAlwaysOnTop(true);
@@ -168,11 +172,12 @@ app.on("ready", () => {
     });
 
     ipcMain.on("quit", () => {
+        forceClose = true;
         app.quit();
     });
 
-    ipcMain.handle("quit-confirm", async () => {
-        const result = await dialog
+    ipcMain.handle("quit-confirm", () => {
+        const result = dialog
             .showMessageBox({
                 type: "warning",
                 title: "У вас остались несохранённые изменения",
@@ -185,6 +190,7 @@ app.on("ready", () => {
                 if (clickedButton === 0) {
                     return true;
                 } else if (clickedButton === 1) {
+                    forceClose = true;
                     app.quit();
                 } else {
                     return false;
@@ -199,12 +205,8 @@ app.on("ready", () => {
         return;
     });
 
-    /*
-    ipcMain.on("get-saved-state", (_event, state) => {});
-    */
-
-    ipcMain.handleOnce("create-settings-file", async () => {
-        const result = await dialog
+    ipcMain.handleOnce("create-settings-file", () => {
+        const result = dialog
             .showMessageBox({
                 type: "question",
                 title: "Создать файл настроек?",
