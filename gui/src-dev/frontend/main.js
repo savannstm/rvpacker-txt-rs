@@ -163,7 +163,7 @@ function render() {
             for (const child of contentContainer.children) {
                 replaceTwoWay(child, "hidden", "flex");
 
-                let heights = new Int32Array(child.children.length);
+                let heights = new Uint32Array(child.children.length);
 
                 let i = 0;
                 for (const node of child.children) {
@@ -174,14 +174,15 @@ function render() {
 
                 i = 0;
                 for (const node of child.children) {
-                    node.style.height = `${heights[i] + 8}px`;
+                    node.style.minHeight = `${heights[i]}px`;
                     node.firstElementChild.classList.add("hidden");
                     i++;
                 }
 
                 i = null;
                 heights = null;
-                child.style.height = `${child.scrollHeight}px`;
+                child.style.minHeight = `${child.scrollHeight}px`;
+                child.classList.add("h-auto");
 
                 replaceTwoWay(child, "hidden", "flex");
 
@@ -852,10 +853,10 @@ function render() {
         for (const [i, text] of originalText.entries()) {
             const contentParent = document.createElement("div");
             contentParent.id = `${id}-${i + 1}`;
-            contentParent.classList.add("w-full", "z-10");
+            contentParent.classList.add("w-full", "z-10", "h-auto", "p-1");
 
             const contentChild = document.createElement("div");
-            contentChild.classList.add("flex", "flex-row");
+            contentChild.classList.add("flex", "flex-row", "h-auto");
 
             //* Original text field
             const originalTextDiv = document.createElement("div");
@@ -1517,12 +1518,10 @@ function render() {
     const activeGhostLines = [];
 
     function trackFocus(focusedElement) {
-        /**
-         * Generate an array of positions representing the left and top coordinates of each line in a textarea.
-         *
-         * @param {HTMLTextAreaElement} textarea - The textarea element to extract line positions from.
-         * @return {Array} An array of objects containing the left and top coordinates of each line.
-         */
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
         function getNewLinePositions(textarea) {
             const positions = [];
             const lines = textarea.value.split("\n");
@@ -1556,18 +1555,41 @@ function render() {
         for (const object of result) {
             const { left, top } = object;
             const ghostNewLine = document.createElement("div");
-            ghostNewLine.classList.add("text-gray-400", "absolute", "font-lg", "z-50", "select-none", "cursor-default");
+            ghostNewLine.classList.add(
+                "text-gray-400",
+                "absolute",
+                "font-lg",
+                "z-50",
+                "select-none",
+                "cursor-default",
+                "pointer-events-none"
+            );
             ghostNewLine.textContent = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
 
             activeGhostLines.push(ghostNewLine);
-            1;
             document.body.appendChild(ghostNewLine);
         }
     }
 
     let currentFocusedElement = null;
+
+    function calculateTextAreaHeight(target) {
+        let lineBreaks = target.value.split("\n").length;
+
+        const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
+            window.getComputedStyle(target);
+
+        let newHeight =
+            lineBreaks * parseFloat(lineHeight) +
+            parseFloat(paddingTop) +
+            parseFloat(paddingBottom) +
+            parseFloat(borderTopWidth) +
+            parseFloat(borderBottomWidth);
+
+        target.style.height = `${newHeight}px`;
+    }
 
     function handleFocus(event) {
         const target = event.target;
@@ -1578,7 +1600,18 @@ function render() {
 
         if (target !== currentFocusedElement) {
             currentFocusedElement = target;
-            trackFocus(target);
+
+            if (target.tagName === "TEXTAREA") {
+                target.addEventListener("keyup", () => {
+                    calculateTextAreaHeight(target);
+                });
+
+                target.addEventListener("input", () => {
+                    trackFocus(target);
+                });
+
+                trackFocus(target);
+            }
         }
     }
 
@@ -1591,6 +1624,16 @@ function render() {
 
         if (target === currentFocusedElement) {
             currentFocusedElement = null;
+
+            if (target.tagName === "TEXTAREA") {
+                target.removeEventListener("input", () => {
+                    trackFocus(target);
+                });
+
+                target.removeEventListener("keyup", () => {
+                    calculateTextAreaHeight(target);
+                });
+            }
         }
     }
 
