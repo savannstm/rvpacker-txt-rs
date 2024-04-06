@@ -1,9 +1,5 @@
 const { ensureDirSync, readFileSync, writeFileSync, readdirSync } = require("fs-extra");
 const { join } = require("path");
-const { exit } = require("process");
-
-const start = performance.now();
-const DEBUG = false;
 
 function merge401(array) {
     let first = undefined;
@@ -103,7 +99,7 @@ function extractPluginsJSON() {
     return newString.join("").slice(0, -1);
 }
 
-//const pluginsJSON = JSON.parse(extractPluginsJSON());
+const pluginsJSON = JSON.parse(extractPluginsJSON());
 
 function isUselessLine(line) {
     const uselessLines = [
@@ -192,8 +188,6 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
 
                                             if (textHashMap.has(paramText)) {
                                                 item.parameters[pr][p] = textHashMap.get(paramText);
-                                            } else if (DEBUG) {
-                                                console.log(`Текст не найден: ${paramText}`);
                                             }
                                         }
                                     }
@@ -211,8 +205,6 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
                                 ) {
                                     if (textHashMap.has(parameterText)) {
                                         item.parameters[pr] = textHashMap.get(parameterText);
-                                    } else if (DEBUG) {
-                                        console.log(`Текст не найден: ${parameterText}`);
                                     }
                                 }
                                 break;
@@ -222,7 +214,6 @@ function writeMaps(files, originalTextFile, translatedTextFile) {
             }
         }
         writeFileSync(outputPath, JSON.stringify(outputJSON), "utf8");
-        console.log(`Записан файл ${filenames[f]}.`);
     }
     return;
 }
@@ -289,8 +280,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
                         ) {
                             if (hashMap.has(element[attr])) {
                                 element[attr] = hashMap.get(element[attr]);
-                            } else if (DEBUG) {
-                                console.log(`Текст не найден: ${element[attr]}`);
                             }
                         }
                     }
@@ -300,8 +289,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
                     if (name && !isUselessLine(name)) {
                         if (hashMap.has(name)) {
                             element.name = hashMap.get(name);
-                        } else if (DEBUG) {
-                            console.log(`Текст не найден: ${name}`);
                         }
                     }
                 }
@@ -330,8 +317,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
 
                                             if (hashMap.has(paramText)) {
                                                 list.parameters[pr][p] = hashMap.get(paramText);
-                                            } else if (DEBUG) {
-                                                console.log(`Текст не найден: ${paramText}`);
                                             }
                                         }
                                     }
@@ -349,8 +334,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
                                 ) {
                                     if (hashMap.has(parameterText)) {
                                         list.parameters[pr] = hashMap.get(parameterText);
-                                    } else if (DEBUG) {
-                                        console.log(`Текст не найден: ${parameterText}`);
                                     }
                                 }
                                 break;
@@ -360,7 +343,6 @@ function writeOther(files, originalTextFile, translatedTextFile) {
             }
         }
         writeFileSync(outputPath, JSON.stringify(outputJSON), "utf8");
-        console.log(`Записан файл ${filenames[f]}.`);
     }
     return;
 }
@@ -413,7 +395,6 @@ function writeSystem(file, originalTextFile, translatedTextFile) {
     }
 
     writeFileSync(join(dirPaths.output, "System.json"), JSON.stringify(outputJSON), "utf8");
-    console.log("Записан файл System.json.");
     return;
 }
 
@@ -425,7 +406,7 @@ function writePlugins(file, originalTextFile, translatedTextFile) {
 
     for (const obj of outputJSON) {
         const name = obj.name;
-        const pluginNames = [
+        const pluginNames = new Set([
             "YEP_BattleEngineCore",
             "YEP_OptionsCore",
             "SRD_NameInputUpgrade",
@@ -437,14 +418,26 @@ function writePlugins(file, originalTextFile, translatedTextFile) {
             "ARP_CommandIcons",
             "YEP_X_ItemCategories",
             "Olivia_OctoBattle",
-        ];
+        ]);
 
-        if (pluginNames.includes(name)) {
-            for (const key in obj.parameters) {
-                const param = obj.parameters[key];
+        if (pluginNames.has(name)) {
+            if (name === "YEP_OptionsCore") {
+                for (const key in obj.parameters) {
+                    let param = obj.parameters[key];
 
-                if (hashMap.has(param)) {
-                    obj.parameters[key] = hashMap.get(param);
+                    for (const [i, text] of originalText.entries()) {
+                        param = param.replace(text, translatedText[i]);
+                    }
+
+                    obj.parameters[key] = param;
+                }
+            } else {
+                for (const key in obj.parameters) {
+                    const param = obj.parameters[key];
+
+                    if (hashMap.has(param)) {
+                        obj.parameters[key] = hashMap.get(param);
+                    }
                 }
             }
         }
@@ -453,19 +446,10 @@ function writePlugins(file, originalTextFile, translatedTextFile) {
     const prefix = "// Generated by RPG Maker.\n// Do not edit this file directly.\nvar $plugins =\n";
     ensureDirSync("./js");
     writeFileSync(join("./js", "plugins.js"), prefix + JSON.stringify(outputJSON), "utf8");
-    console.log("Записан файл plugins.js.");
     return;
 }
 
 writeMaps(mapsJSON, dirPaths.maps, dirPaths.mapsTrans);
 writeOther(otherJSON, dirPaths.other, dirPaths.other);
 writeSystem(systemJSON, join(dirPaths.other, "System.txt"), join(dirPaths.other, "System_trans.txt"));
-/*writePlugins(
-	pluginsJSON,
-	join(dirPaths.plugins, "plugins.txt"),
-	join(dirPaths.plugins, "plugins_trans.txt")
-);
-*/
-
-console.log("Все файлы успешно записаны.");
-console.log(`Потрачено ${(performance.now() - start) / 1000} секунд.`);
+writePlugins(pluginsJSON, join(dirPaths.plugins, "plugins.txt"), join(dirPaths.plugins, "plugins_trans.txt"));

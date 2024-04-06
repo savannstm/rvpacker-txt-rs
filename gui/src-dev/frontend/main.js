@@ -46,6 +46,7 @@ function render() {
     const goToRowInput = document.getElementById("goto-row-input");
 
     const replaced = new Map();
+    const activeGhostLines = [];
 
     /** @type {boolean} */
     let backupEnabled;
@@ -63,10 +64,11 @@ function render() {
     let searchLocation = false;
     let optionsOpened = false;
 
-    let state = "main";
-    let previousState = "main";
+    let state = null;
+    let previousState = null;
 
     let saved = true;
+    let currentFocusedElement = null;
 
     backupCheck.innerHTML = backupEnabled ? "check" : "close";
     backupSettings.classList.toggle("hidden", !backupEnabled);
@@ -77,6 +79,7 @@ function render() {
         writeFileSync(join(__dirname, "replacement-log.json"), "{}", "utf8");
     }
     ensureDirSync(backupRoot);
+
     let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
     if (backupEnabled) backup(backupPeriod);
 
@@ -919,7 +922,7 @@ function render() {
                 contentParent.classList.remove("hidden");
                 contentParent.classList.add("flex", "flex-col");
 
-                if (previousState !== "main") {
+                if (previousState) {
                     replaceTwoWay(document.getElementById(`${previousState}-content`), "flex", "hidden");
                     observer.disconnect();
                 }
@@ -948,8 +951,8 @@ function render() {
         if (state === newState) return;
 
         switch (newState) {
-            case "main":
-                state = "main";
+            case null:
+                state = null;
                 document.getElementById("current-state").innerHTML = "";
                 pageLoadedDisplay.innerHTML = "check_indeterminate_small";
 
@@ -1015,7 +1018,7 @@ function render() {
     function handleKeypressBody(event) {
         switch (event.code) {
             case "Escape":
-                changeState("main", false);
+                changeState(null, false);
                 break;
             case "Tab":
                 replaceTwoWay(leftPanel, "translate-x-0", "-translate-x-full");
@@ -1127,7 +1130,7 @@ function render() {
                 break;
             case "KeyG":
                 if (event.ctrlKey) {
-                    if (state !== "main") {
+                    if (state) {
                         if (goToRowInput.classList.contains("hidden")) {
                             goToRow();
                         } else {
@@ -1298,16 +1301,22 @@ function render() {
 
         const writer = fork(join(__dirname, "../resources/write.js"), [], { timeout: 15000 });
 
+        let error;
+
         writer.on("error", (err) => {
-            compileButton.classList.remove("animate-spin");
-            alert(`Не удалось записать файлы: ${err}`);
-            writer.kill();
+            error = err;
+            writer.kill("SIGKILL");
             return;
         });
 
-        writer.on("close", () => {
+        writer.on("exit", (code) => {
+            if (code !== 0) {
+                alert(`Не удалось записать файлы: ${error}`);
+            } else {
+                alert("Все файлы записаны успешно.");
+            }
+
             compileButton.classList.remove("animate-spin");
-            alert("Все файлы записаны успешно.");
             return;
         });
 
@@ -1402,9 +1411,8 @@ function render() {
                             ipcRenderer.send("quit");
                         }, 1000);
                         return;
-                    } else {
-                        return;
                     }
+                    return;
                 });
                 break;
             case "F5":
@@ -1427,6 +1435,124 @@ function render() {
                 }
         }
         return;
+    }
+
+    function trackFocus(focusedElement) {
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
+        function getNewLinePositions(textarea) {
+            const positions = [];
+            const lines = textarea.value.split("\n");
+            const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
+
+            const textareaRect = textarea.getBoundingClientRect();
+            const y = textareaRect.y + window.scrollY;
+            const x = textareaRect.x;
+
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            context.font = '18px "Segoe UI"';
+
+            let top = y;
+
+            for (let i = 0; i < lines.length - 1; i++) {
+                const line = lines[i];
+                const textWidth = context.measureText(`${line} `).width;
+                const left = x + textWidth;
+
+                positions.push({ left, top });
+                top += lineHeight;
+            }
+
+            return positions;
+        }
+
+        const result = getNewLinePositions(focusedElement);
+        if (result.length === 0) return;
+
+        for (const object of result) {
+            const { left, top } = object;
+            const ghostNewLine = document.createElement("div");
+            ghostNewLine.classList.add(
+                "text-gray-400",
+                "absolute",
+                "font-lg",
+                "z-50",
+                "select-none",
+                "cursor-default",
+                "pointer-events-none"
+            );
+            ghostNewLine.textContent = "\\n";
+            ghostNewLine.style.left = `${left}px`;
+            ghostNewLine.style.top = `${top}px`;
+
+            activeGhostLines.push(ghostNewLine);
+            document.body.appendChild(ghostNewLine);
+        }
+    }
+
+    function calculateTextAreaHeight(target) {
+        let lineBreaks = target.value.split("\n").length;
+
+        const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
+            window.getComputedStyle(target);
+
+        let newHeight =
+            lineBreaks * parseFloat(lineHeight) +
+            parseFloat(paddingTop) +
+            parseFloat(paddingBottom) +
+            parseFloat(borderTopWidth) +
+            parseFloat(borderBottomWidth);
+
+        target.style.height = `${newHeight}px`;
+    }
+
+    function handleFocus(event) {
+        const target = event.target;
+
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
+        if (target !== currentFocusedElement) {
+            currentFocusedElement = target;
+
+            if (target.tagName === "TEXTAREA") {
+                target.addEventListener("keyup", () => {
+                    calculateTextAreaHeight(target);
+                });
+
+                target.addEventListener("input", () => {
+                    trackFocus(target);
+                });
+
+                trackFocus(target);
+            }
+        }
+    }
+
+    function handleBlur(event) {
+        const target = event.target;
+
+        for (const ghost of activeGhostLines) {
+            ghost.remove();
+        }
+
+        if (target === currentFocusedElement) {
+            currentFocusedElement = null;
+
+            if (target.tagName === "TEXTAREA") {
+                target.removeEventListener("input", () => {
+                    trackFocus(target);
+                });
+
+                target.removeEventListener("keyup", () => {
+                    calculateTextAreaHeight(target);
+                });
+            }
+        }
     }
 
     function menuButtonClick() {
@@ -1514,128 +1640,6 @@ function render() {
     compileButton.addEventListener("click", compile);
     document.getElementById("options-button").addEventListener("click", showOptions);
     document.addEventListener("keydown", (event) => preventKeyDefaults(event));
-
-    const activeGhostLines = [];
-
-    function trackFocus(focusedElement) {
-        for (const ghost of activeGhostLines) {
-            ghost.remove();
-        }
-
-        function getNewLinePositions(textarea) {
-            const positions = [];
-            const lines = textarea.value.split("\n");
-            const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
-
-            const textareaRect = textarea.getBoundingClientRect();
-            const y = textareaRect.y + window.scrollY;
-            const x = textareaRect.x;
-
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-            context.font = '18px "Segoe UI"';
-
-            let top = y;
-
-            for (let i = 0; i < lines.length - 1; i++) {
-                const line = lines[i];
-                const textWidth = context.measureText(`${line} `).width;
-                const left = x + textWidth;
-
-                positions.push({ left, top });
-                top += lineHeight;
-            }
-
-            return positions;
-        }
-
-        const result = getNewLinePositions(focusedElement);
-        if (result.length === 0) return;
-
-        for (const object of result) {
-            const { left, top } = object;
-            const ghostNewLine = document.createElement("div");
-            ghostNewLine.classList.add(
-                "text-gray-400",
-                "absolute",
-                "font-lg",
-                "z-50",
-                "select-none",
-                "cursor-default",
-                "pointer-events-none"
-            );
-            ghostNewLine.textContent = "\\n";
-            ghostNewLine.style.left = `${left}px`;
-            ghostNewLine.style.top = `${top}px`;
-
-            activeGhostLines.push(ghostNewLine);
-            document.body.appendChild(ghostNewLine);
-        }
-    }
-
-    let currentFocusedElement = null;
-
-    function calculateTextAreaHeight(target) {
-        let lineBreaks = target.value.split("\n").length;
-
-        const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
-            window.getComputedStyle(target);
-
-        let newHeight =
-            lineBreaks * parseFloat(lineHeight) +
-            parseFloat(paddingTop) +
-            parseFloat(paddingBottom) +
-            parseFloat(borderTopWidth) +
-            parseFloat(borderBottomWidth);
-
-        target.style.height = `${newHeight}px`;
-    }
-
-    function handleFocus(event) {
-        const target = event.target;
-
-        for (const ghost of activeGhostLines) {
-            ghost.remove();
-        }
-
-        if (target !== currentFocusedElement) {
-            currentFocusedElement = target;
-
-            if (target.tagName === "TEXTAREA") {
-                target.addEventListener("keyup", () => {
-                    calculateTextAreaHeight(target);
-                });
-
-                target.addEventListener("input", () => {
-                    trackFocus(target);
-                });
-
-                trackFocus(target);
-            }
-        }
-    }
-
-    function handleBlur(event) {
-        const target = event.target;
-
-        for (const ghost of activeGhostLines) {
-            ghost.remove();
-        }
-
-        if (target === currentFocusedElement) {
-            currentFocusedElement = null;
-
-            if (target.tagName === "TEXTAREA") {
-                target.removeEventListener("input", () => {
-                    trackFocus(target);
-                });
-
-                target.removeEventListener("keyup", () => {
-                    calculateTextAreaHeight(target);
-                });
-            }
-        }
-    }
 
     document.addEventListener("focus", handleFocus, true);
     document.addEventListener("blur", handleBlur, true);

@@ -83,7 +83,7 @@ app.on("ready", () => {
                                 autoHideMenuBar: true,
                             });
 
-                            helpWin.setAlwaysOnTop(true);
+                            helpWin.moveTop(true);
                             helpWin.loadFile(join(__dirname, "../frontend/help.html"));
                         },
                     },
@@ -96,7 +96,7 @@ app.on("ready", () => {
                                 autoHideMenuBar: true,
                             });
 
-                            hotkeysWin.setAlwaysOnTop(true, "pop-up-menu");
+                            hotkeysWin.moveTop(true, "pop-up-menu");
                             hotkeysWin.loadFile(join(__dirname, "../frontend/hotkeys.html"));
                         },
                     },
@@ -115,7 +115,7 @@ app.on("ready", () => {
                         },
                     });
 
-                    aboutWin.setAlwaysOnTop(true);
+                    aboutWin.moveTop(true);
                     aboutWin.loadFile(join(__dirname, "../frontend/about.html"));
                 },
             },
@@ -128,6 +128,7 @@ app.on("ready", () => {
             win.show();
             win.maximize();
             win.focus();
+            win.moveTop();
 
             if (firstLaunch) {
                 createHelpWindow();
@@ -159,7 +160,7 @@ app.on("ready", () => {
             autoHideMenuBar: true,
         });
 
-        helpWin.setAlwaysOnTop(true);
+        helpWin.moveTop(true);
         helpWin.loadFile(join(__dirname, "../frontend/help.html"));
     };
 
