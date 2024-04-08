@@ -14,14 +14,14 @@ const { join } = require("path");
 
 const PRODUCTION = false;
 
-function render() {
+async function render() {
     const copiesRoot = PRODUCTION ? join(__dirname, "../../../../copies") : join(__dirname, "../../../copies");
     const backupRoot = PRODUCTION ? join(__dirname, "../../../../backups") : join(__dirname, "../../../backups");
     const translationRoot = PRODUCTION
         ? join(__dirname, "../../../../translation")
         : join(__dirname, "../../../translation");
 
-    ensureStart();
+    await ensureStart();
 
     copy();
 
@@ -97,27 +97,28 @@ function render() {
         return;
     });
 
-    ipcRenderer.on("exit-sequence", () => {
+    ipcRenderer.on("exit-sequence", async () => {
         if (saved) {
-            ipcRenderer.send("quit");
-            return;
+            return ipcRenderer.send("quit");
         }
 
-        ipcRenderer.invoke("quit-confirm").then((response) => {
+        return await ipcRenderer.invoke("quit-confirm").then((response) => {
             if (response) {
                 save();
 
-                setTimeout(() => {
-                    ipcRenderer.send("quit");
+                return setTimeout(() => {
+                    return ipcRenderer.send("quit");
                 }, 1000);
-                return;
-            } else {
-                return;
             }
+            return;
         });
     });
 
-    function getSettings() {
+    ipcRenderer.once("reload", () => {
+        location.reload();
+    });
+
+    async function getSettings() {
         try {
             const settings = JSON.parse(readFileSync(join(__dirname, "settings.json"), "utf8"));
 
@@ -127,23 +128,31 @@ function render() {
             return;
         } catch (err) {
             alert("Не удалось получить настройки.");
-            ipcRenderer.invoke("create-settings-file").then((response) => {
+            /*
+            await ipcRenderer.invoke("create-settings-file").then(async (response) => {
                 if (response) {
-                    getSettings();
+                    await getSettings();
                 }
             });
+            */
+            return ipcRenderer.send("quit");
         }
     }
 
-    function ensureStart() {
+    async function ensureStart() {
         try {
             accessSync(translationRoot, constants.F_OK);
             return;
         } catch {
-            alert(
-                "Не удалось найти файлы перевода. Убедитесь, что вы включили папку translation в корневую директорию программы."
-            );
-            ipcRenderer.send("quit");
+            alert("Не удалось найти файлы перевода.");
+            /*
+            await ipcRenderer.invoke("get-translation-files").then(async (response) => {
+                if (response) {
+                    await ensureStart();
+                }
+            });
+            */
+            return ipcRenderer.send("quit");
         }
 
         try {
@@ -155,7 +164,14 @@ function render() {
             alert(
                 "Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
             );
-            ipcRenderer.send("quit");
+            /*
+            await ipcRenderer.invoke("get-translation-files").then(async (response) => {
+                if (response) {
+                    await ensureStart();
+                }
+            });
+            */
+            return ipcRenderer.send("quit");
         }
     }
 
@@ -167,25 +183,27 @@ function render() {
                 replaceTwoWay(child, "hidden", "flex");
 
                 let heights = new Uint32Array(child.children.length);
-
                 let i = 0;
                 for (const node of child.children) {
-                    const { height: h } = node.getBoundingClientRect();
-                    heights.set([h], i);
+                    heights.set([node.firstElementChild.children[1].clientHeight], i);
                     i++;
                 }
 
                 i = 0;
                 for (const node of child.children) {
                     node.style.minHeight = `${heights[i]}px`;
+                    node.firstElementChild.children[1].style.minHeight = `${heights[i]}px`;
+                    for (const element of node.firstElementChild.children) {
+                        element.style.minHeight = `${heights[i]}px`;
+                    }
                     node.firstElementChild.classList.add("hidden");
                     i++;
                 }
 
                 i = null;
                 heights = null;
+
                 child.style.minHeight = `${child.scrollHeight}px`;
-                child.classList.add("h-auto");
 
                 replaceTwoWay(child, "hidden", "flex");
 
@@ -285,23 +303,29 @@ function render() {
         const expr = createRegularExpression(text);
         if (!expr) return;
 
+        let size = 0;
+
         for (const child of targetElements) {
             const node = child.firstElementChild.children;
 
             const match = setMatches(expr, node[2]);
-            if (match) matches.set(node[2], match);
-            if (matches.size > 10000) {
-                alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
-                return;
+            if (match) {
+                matches.set(node[2], match);
             }
+            if (size > 10000) {
+                return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+            }
+            size++;
 
             if (!searchTranslation) {
                 const match = setMatches(expr, node[1]);
-                if (match) matches.set(node[1], match);
-                if (matches.size > 10000) {
-                    alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
-                    return;
+                if (match) {
+                    matches.set(node[1], match);
                 }
+                if (size > 10000) {
+                    return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                }
+                size++;
             }
         }
 
@@ -851,7 +875,7 @@ function render() {
     function createContentChildren(id, originalText, translatedText) {
         const content = document.createElement("div");
         content.id = id;
-        content.classList.add("hidden", "flex-col");
+        content.classList.add("hidden", "flex-col", "h-auto");
 
         for (const [i, text] of originalText.entries()) {
             const contentParent = document.createElement("div");
@@ -866,9 +890,16 @@ function render() {
             originalTextDiv.id = `${id}-original-${i + 1}`;
             originalTextDiv.textContent = text.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
             originalTextDiv.classList.add(
-                ..."p-1 w-full h-auto bg-gray-800 outline outline-2 outline-gray-700 mr-2 inline-block whitespace-pre-wrap".split(
-                    " "
-                )
+                "p-1",
+                "w-full",
+                "h-auto",
+                "bg-gray-800",
+                "outline",
+                "outline-2",
+                "outline-gray-700",
+                "mr-2",
+                "inline-block",
+                "whitespace-pre-wrap"
             );
 
             //* Translated text field
@@ -878,16 +909,22 @@ function render() {
             translatedTextInput.rows = splittedTranslatedText.length;
             translatedTextInput.value = splittedTranslatedText.join("\n");
             translatedTextInput.classList.add(
-                ..."p-1 w-full h-auto bg-gray-800 resize-none outline outline-2 outline-gray-700 focus:outline-gray-400".split(
-                    " "
-                )
+                "p-1",
+                "w-full",
+                "h-auto",
+                "bg-gray-800",
+                "resize-none",
+                "outline",
+                "outline-2",
+                "outline-gray-700",
+                "focus:outline-gray-400"
             );
 
             //* Row field
             const row = document.createElement("div");
             row.id = `${id}-row-${i + 1}`;
             row.textContent = i + 1;
-            row.classList.add(..."p-1 w-36 h-auto bg-gray-800 outline-none".split(" "));
+            row.classList.add("p-1", "w-36", "h-auto", "bg-gray-800", "outline-none");
 
             //* Append elements to containers
             contentChild.appendChild(row);
@@ -1386,7 +1423,7 @@ function render() {
         element.classList.toggle(secondClass, !containsClass);
     }
 
-    function preventKeyDefaults(event) {
+    async function preventKeyDefaults(event) {
         switch (event.key) {
             case "Tab":
                 event.preventDefault();
@@ -1400,19 +1437,16 @@ function render() {
                 event.preventDefault();
 
                 if (saved) {
-                    ipcRenderer.send("quit");
-                    return;
+                    return ipcRenderer.send("quit");
                 }
 
-                ipcRenderer.invoke("quit-confirm").then((response) => {
+                return await ipcRenderer.invoke("quit-confirm").then((response) => {
                     if (response) {
                         save();
-                        setTimeout(() => {
-                            ipcRenderer.send("quit");
+                        return setTimeout(() => {
+                            return ipcRenderer.send("quit");
                         }, 1000);
-                        return;
                     }
-                    return;
                 });
                 break;
             case "F5":
@@ -1506,7 +1540,9 @@ function render() {
             parseFloat(borderTopWidth) +
             parseFloat(borderBottomWidth);
 
-        target.style.height = `${newHeight}px`;
+        for (const child of target.parentElement.children) {
+            child.style.height = `${newHeight}px`;
+        }
     }
 
     function handleFocus(event) {
@@ -1639,11 +1675,15 @@ function render() {
     saveButton.addEventListener("click", save);
     compileButton.addEventListener("click", compile);
     document.getElementById("options-button").addEventListener("click", showOptions);
-    document.addEventListener("keydown", (event) => preventKeyDefaults(event));
+    document.addEventListener("keydown", async (event) => {
+        await preventKeyDefaults(event);
+    });
 
     document.addEventListener("focus", handleFocus, true);
     document.addEventListener("blur", handleBlur, true);
     return;
 }
 
-document.addEventListener("DOMContentLoaded", render);
+document.addEventListener("DOMContentLoaded", async () => {
+    await render();
+});

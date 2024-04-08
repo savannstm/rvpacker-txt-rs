@@ -1,8 +1,10 @@
 const { app, BrowserWindow, Menu, ipcMain, shell, screen, dialog } = require("electron");
-const { readFileSync, writeFileSync } = require("fs");
+const { readFileSync, writeFileSync, rmdirSync } = require("fs");
+const { copySync } = require("fs-extra");
 const { join } = require("path");
 
 const DEBUG = true;
+const PLATFORM = process.platform;
 const firstLaunch = JSON.parse(readFileSync(join(__dirname, "launch.json"), "utf8")).firstLaunch;
 let forceClose;
 
@@ -36,6 +38,9 @@ app.on("ready", () => {
                     {
                         label: "Перегрузить",
                         accelerator: "F5",
+                        click: () => {
+                            win.webContents.send("reload");
+                        },
                     },
                     {
                         label: "Закрыть",
@@ -141,8 +146,7 @@ app.on("ready", () => {
 
         win.on("close", (event) => {
             if (forceClose) {
-                app.quit();
-                return;
+                return app.quit();
             }
 
             event.preventDefault();
@@ -167,18 +171,18 @@ app.on("ready", () => {
     createWindow();
 
     app.on("window-all-closed", () => {
-        if (process.platform !== "darwin") {
-            app.quit();
+        if (PLATFORM !== "darwin") {
+            return app.quit();
         }
     });
 
     ipcMain.on("quit", () => {
         forceClose = true;
-        app.quit();
+        return app.quit();
     });
 
-    ipcMain.handle("quit-confirm", () => {
-        const result = dialog
+    ipcMain.handle("quit-confirm", async () => {
+        const result = await dialog
             .showMessageBox({
                 type: "warning",
                 title: "У вас остались несохранённые изменения",
@@ -192,7 +196,7 @@ app.on("ready", () => {
                     return true;
                 } else if (clickedButton === 1) {
                     forceClose = true;
-                    app.quit();
+                    return app.quit();
                 } else {
                     return false;
                 }
@@ -201,13 +205,60 @@ app.on("ready", () => {
         return result;
     });
 
+    /*
+    ipcMain.handle("get-translation-files", async () => {
+        if (PLATFORM !== "win32") {
+            dialog.showMessageBoxSync({
+                type: "info",
+                message: "Скачивание файлов перевода поддерживается только на Windows",
+                buttons: ["ОК"],
+            });
+            return app.quit();
+        }
+
+        const result = await dialog
+            .showMessageBox({
+                type: "warning",
+                title: "Скачать файлы перевода?",
+                message: "Вы уверены, что хотите скачать файлы перевода?",
+                buttons: ["Скачать", "Выйти"],
+                defaultId: 1,
+                cancelId: 1,
+            })
+            .then(async ({ response: clickedButton }) => {
+                if (clickedButton === 0) {
+                    const cloningResult = await Clone(
+                        "https://github.com/savannstm/fh-termina-json-writer.git",
+                        join(__dirname, "../../../../temp")
+                    ).then(() => {
+                        copySync(
+                            join(__dirname, "../../../../temp/translation"),
+                            join(__dirname, "../../../../translation")
+                        );
+
+                        rmdirSync(join(__dirname, "../../../../temp"), { recursive: true, force: true });
+
+                        return true;
+                    });
+
+                    return cloningResult;
+                } else {
+                    forceClose = true;
+                    return app.quit();
+                }
+            });
+
+        return result;
+    });
+    */
+
     ipcMain.on("openLink", (_event, link) => {
         shell.openExternal(link);
         return;
     });
 
-    ipcMain.handleOnce("create-settings-file", () => {
-        const result = dialog
+    ipcMain.handleOnce("create-settings-file", async () => {
+        const result = await dialog
             .showMessageBox({
                 type: "question",
                 title: "Создать файл настроек?",
@@ -244,8 +295,7 @@ app.on("ready", () => {
 
                     return true;
                 } else {
-                    app.quit();
-                    return false;
+                    return app.quit();
                 }
             });
 
