@@ -20,7 +20,7 @@ app.on("ready", () => {
     const createWindow = () => {
         const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
-        const win = new BrowserWindow({
+        const mainWin = new BrowserWindow({
             width: width,
             height: height,
             titleBarStyle: "hiddenInset",
@@ -32,7 +32,7 @@ app.on("ready", () => {
         });
 
         if (DEBUG) {
-            win.webContents.openDevTools();
+            mainWin.webContents.openDevTools();
         }
 
         const mainWindowMenu = [
@@ -43,7 +43,7 @@ app.on("ready", () => {
                         label: "Перегрузить",
                         accelerator: "F5",
                         click: () => {
-                            win.webContents.send("reload");
+                            mainWin.webContents.send("reload");
                         },
                     },
                     {
@@ -130,14 +130,14 @@ app.on("ready", () => {
             },
         ];
 
-        win.setMenu(Menu.buildFromTemplate(mainWindowMenu));
-        win.loadFile(join(__dirname, "../frontend/main.html"));
+        mainWin.setMenu(Menu.buildFromTemplate(mainWindowMenu));
+        mainWin.loadFile(join(__dirname, "../frontend/main.html"));
 
-        win.once("ready-to-show", () => {
-            win.show();
-            win.maximize();
-            win.focus();
-            win.moveTop();
+        mainWin.once("ready-to-show", () => {
+            mainWin.show();
+            mainWin.maximize();
+            mainWin.focus();
+            mainWin.moveTop();
 
             if (firstLaunch) {
                 createHelpWindow();
@@ -148,13 +148,13 @@ app.on("ready", () => {
             }
         });
 
-        win.on("close", (event) => {
+        mainWin.on("close", (event) => {
             if (forceClose) {
                 return app.quit();
             }
 
             event.preventDefault();
-            win.webContents.send("exit-sequence", true);
+            mainWin.webContents.send("exit-sequence", true);
             return;
         });
 
