@@ -176,10 +176,10 @@ async function render() {
 
                 i = 0;
                 for (const node of child.children) {
-                    node.style.minHeight = `${heights[i]}px`;
-                    node.firstElementChild.children[1].style.minHeight = `${heights[i]}px`;
-                    for (const element of node.firstElementChild.children) {
-                        element.style.minHeight = `${heights[i]}px`;
+                    node.style.minHeight = `${heights[i] + 8}px`;
+                    node.firstElementChild.style.minHeight = `${heights[i]}px`;
+                    for (const child of node.firstElementChild.children) {
+                        child.style.minHeight = `${heights[i]}px`;
                     }
                     node.firstElementChild.classList.add("hidden");
                     i++;
@@ -234,10 +234,9 @@ async function render() {
     }
 
     /**
-     * @param {Map<HTMLElement, string>} map
-     * @param {string} text
+     * @param {RegExp} expr
      * @param {HTMLTextAreaElement} node
-     * @returns {void}
+     * @returns {string | undefined}
      */
     // ! TODO: This function mustn't set nodes to map, but instead create new string with divs, and they must be immeadiately appended to search panel.
     function setMatches(expr, node) {
@@ -296,21 +295,23 @@ async function render() {
             const match = setMatches(expr, node[2]);
             if (match) {
                 matches.set(node[2], match);
+                size++;
             }
+
             if (size > 10000) {
                 return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
             }
-            size++;
 
             if (!searchTranslation) {
                 const match = setMatches(expr, node[1]);
                 if (match) {
                     matches.set(node[1], match);
+                    size++;
                 }
+
                 if (size > 10000) {
                     return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
                 }
-                size++;
             }
         }
 
