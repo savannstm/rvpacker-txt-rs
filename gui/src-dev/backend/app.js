@@ -1,12 +1,16 @@
 const { app, BrowserWindow, Menu, ipcMain, shell, screen, dialog } = require("electron");
-const { readFileSync, writeFileSync, rmdirSync } = require("fs");
-const { copySync } = require("fs-extra");
+const { readFileSync, writeFileSync, existsSync, rmSync } = require("fs");
 const { join } = require("path");
+const { download, extract } = require("gitly");
 
 const DEBUG = true;
 const PLATFORM = process.platform;
+
+if (!existsSync(join(__dirname, "launch.json"))) {
+    writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: true }, null, 4));
+}
 const firstLaunch = JSON.parse(readFileSync(join(__dirname, "launch.json"), "utf8")).firstLaunch;
-let forceClose;
+let forceClose = false;
 
 if (DEBUG && !firstLaunch) {
     writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: true }, null, 4));
@@ -151,9 +155,124 @@ app.on("ready", () => {
 
             event.preventDefault();
             win.webContents.send("exit-sequence", true);
-
-            console.log("close");
             return;
+        });
+
+        ipcMain.on("quit", quit);
+
+        ipcMain.handle("quit-confirm", async () => {
+            const result = await dialog
+                .showMessageBox({
+                    type: "warning",
+                    title: "У вас остались несохранённые изменения",
+                    message: "Вы уверены, что хотите выйти?",
+                    buttons: ["Сохранить и выйти", "Выйти без сохранения", "Отмена"],
+                    defaultId: 2,
+                    cancelId: 2,
+                })
+                .then(({ response: clickedButton }) => {
+                    if (clickedButton === 0) {
+                        return true;
+                    } else if (clickedButton === 1) {
+                        quit();
+                    } else {
+                        return false;
+                    }
+                });
+
+            return result;
+        });
+
+        ipcMain.handle("get-translation-files", async () => {
+            const result = await dialog
+                .showMessageBox({
+                    type: "warning",
+                    title: "Скачать файлы перевода?",
+                    message: "Вы уверены, что хотите скачать файлы перевода?",
+                    buttons: ["Скачать", "Выйти"],
+                    defaultId: 1,
+                    cancelId: 1,
+                })
+                .then(async ({ response: clickedButton }) => {
+                    if (clickedButton === 0) {
+                        const loadingWin = new BrowserWindow({
+                            width: 640,
+                            height: 480,
+                            autoHideMenuBar: true,
+                            titleBarStyle: "hidden",
+                            alwaysOnTop: true,
+                            webPreferences: {
+                                nodeIntegration: true,
+                            },
+                        });
+
+                        loadingWin.loadFile(join(__dirname, "../frontend/loading.html"));
+
+                        await extract(await download("savannstm/fh-termina-json-writer"), "./");
+                        const filesToDelete = ["README.md", "LICENSE.md", "LICENSE-ru.md", "gui"];
+
+                        for (let i = 0; i < 4; i++) {
+                            rmSync(filesToDelete[i], { recursive: true, force: true });
+                        }
+
+                        loadingWin.close();
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+
+            return result;
+        });
+
+        ipcMain.on("openLink", (_event, link) => {
+            shell.openExternal(link);
+            return;
+        });
+
+        ipcMain.handleOnce("create-settings-file", async () => {
+            const result = await dialog
+                .showMessageBox({
+                    type: "question",
+                    title: "Создать файл настроек?",
+                    message: "Файл с настройками программы не был найден. Создать его?",
+                    detail: "Отказ приведёт к закрытию программы.",
+                    buttons: ["Создать", "Отмена"],
+                    defaultId: 0,
+                    cancelId: 1,
+                })
+                .then(({ response: clickedButton }) => {
+                    if (clickedButton === 0) {
+                        writeFileSync(
+                            join(__dirname, "../frontend/settings.json"),
+                            JSON.stringify(
+                                {
+                                    backup: {
+                                        enabled: true,
+                                        period: 60,
+                                        max: 99,
+                                    },
+                                },
+                                null,
+                                4
+                            ),
+                            "utf8"
+                        );
+
+                        dialog.showMessageBoxSync({
+                            type: "info",
+                            message:
+                                "Был создан стандартный файл настроек программы с опциями: - резервное копирование включено\n- интервал резервного копирования 60 секунд\n- максимальное количество резервных копий 99.",
+                            buttons: ["ОК"],
+                        });
+
+                        return true;
+                    } else {
+                        return quit();
+                    }
+                });
+
+            return result;
         });
     };
 
@@ -172,135 +291,14 @@ app.on("ready", () => {
 
     app.on("window-all-closed", () => {
         if (PLATFORM !== "darwin") {
-            return app.quit();
+            quit();
         }
     });
 
-    ipcMain.on("quit", () => {
+    function quit() {
         forceClose = true;
         return app.quit();
-    });
-
-    ipcMain.handle("quit-confirm", async () => {
-        const result = await dialog
-            .showMessageBox({
-                type: "warning",
-                title: "У вас остались несохранённые изменения",
-                message: "Вы уверены, что хотите выйти?",
-                buttons: ["Сохранить и выйти", "Выйти без сохранения", "Отмена"],
-                defaultId: 2,
-                cancelId: 2,
-            })
-            .then(({ response: clickedButton }) => {
-                if (clickedButton === 0) {
-                    return true;
-                } else if (clickedButton === 1) {
-                    forceClose = true;
-                    return app.quit();
-                } else {
-                    return false;
-                }
-            });
-
-        return result;
-    });
-
-    /*
-    ipcMain.handle("get-translation-files", async () => {
-        if (PLATFORM !== "win32") {
-            dialog.showMessageBoxSync({
-                type: "info",
-                message: "Скачивание файлов перевода поддерживается только на Windows",
-                buttons: ["ОК"],
-            });
-            return app.quit();
-        }
-
-        const result = await dialog
-            .showMessageBox({
-                type: "warning",
-                title: "Скачать файлы перевода?",
-                message: "Вы уверены, что хотите скачать файлы перевода?",
-                buttons: ["Скачать", "Выйти"],
-                defaultId: 1,
-                cancelId: 1,
-            })
-            .then(async ({ response: clickedButton }) => {
-                if (clickedButton === 0) {
-                    const cloningResult = await Clone(
-                        "https://github.com/savannstm/fh-termina-json-writer.git",
-                        join(__dirname, "../../../../temp")
-                    ).then(() => {
-                        copySync(
-                            join(__dirname, "../../../../temp/translation"),
-                            join(__dirname, "../../../../translation")
-                        );
-
-                        rmdirSync(join(__dirname, "../../../../temp"), { recursive: true, force: true });
-
-                        return true;
-                    });
-
-                    return cloningResult;
-                } else {
-                    forceClose = true;
-                    return app.quit();
-                }
-            });
-
-        return result;
-    });
-    */
-
-    ipcMain.on("openLink", (_event, link) => {
-        shell.openExternal(link);
-        return;
-    });
-
-    ipcMain.handleOnce("create-settings-file", async () => {
-        const result = await dialog
-            .showMessageBox({
-                type: "question",
-                title: "Создать файл настроек?",
-                message: "Файл с настройками программы не был найден. Создать его?",
-                detail: "Отказ приведёт к закрытию программы.",
-                buttons: ["Создать", "Отмена"],
-                defaultId: 0,
-                cancelId: 1,
-            })
-            .then(({ response: clickedButton }) => {
-                if (clickedButton === 0) {
-                    writeFileSync(
-                        join(__dirname, "../frontend/settings.json"),
-                        JSON.stringify(
-                            {
-                                backup: {
-                                    enabled: true,
-                                    period: 60,
-                                    max: 99,
-                                },
-                            },
-                            null,
-                            4
-                        ),
-                        "utf8"
-                    );
-
-                    dialog.showMessageBoxSync({
-                        type: "info",
-                        message:
-                            "Был создан стандартный файл настроек программы с опциями: - резервное копирование включено\n- интервал резервного копирования 60 секунд\n- максимальное количество резервных копий 99.",
-                        buttons: ["ОК"],
-                    });
-
-                    return true;
-                } else {
-                    return app.quit();
-                }
-            });
-
-        return result;
-    });
+    }
 
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {

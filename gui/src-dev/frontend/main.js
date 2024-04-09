@@ -7,8 +7,9 @@ const {
     copyFileSync,
     accessSync,
     writeFileSync,
-    pathExistsSync,
+    existsSync,
 } = require("fs-extra");
+const { F_OK } = constants;
 const { fork } = require("child_process");
 const { join } = require("path");
 
@@ -75,7 +76,7 @@ async function render() {
     backupPeriodInput.value = backupPeriod;
     backupMaxInput.value = backupMax;
 
-    if (!pathExistsSync(join(__dirname, "replacement-log.json"))) {
+    if (!existsSync(join(__dirname, "replacement-log.json"))) {
         writeFileSync(join(__dirname, "replacement-log.json"), "{}", "utf8");
     }
     ensureDirSync(backupRoot);
@@ -128,50 +129,34 @@ async function render() {
             return;
         } catch (err) {
             alert("Не удалось получить настройки.");
-            /*
-            await ipcRenderer.invoke("create-settings-file").then(async (response) => {
+            return await ipcRenderer.invoke("create-settings-file").then(async (response) => {
                 if (response) {
-                    await getSettings();
+                    return await getSettings();
                 }
+                return;
             });
-            */
-            return ipcRenderer.send("quit");
         }
     }
 
     async function ensureStart() {
         try {
-            accessSync(translationRoot, constants.F_OK);
+            accessSync(join(translationRoot, "maps"), F_OK);
+            accessSync(join(translationRoot, "other"), F_OK);
+            accessSync(join(translationRoot, "plugins"), F_OK);
+
             return;
         } catch {
             alert("Не удалось найти файлы перевода.");
-            /*
-            await ipcRenderer.invoke("get-translation-files").then(async (response) => {
-                if (response) {
-                    await ensureStart();
-                }
-            });
-            */
-            return ipcRenderer.send("quit");
-        }
 
-        try {
-            accessSync(join(translationRoot, "maps"), constants.F_OK);
-            accessSync(join(translationRoot, "other"), constants.F_OK);
-            accessSync(join(translationRoot, "plugins"), constants.F_OK);
-            return;
-        } catch {
-            alert(
-                "Программа не может обнаружить папки с файлами перевода внутри папки translation. Убедитесь, что в папке translation присутствуют подпапки maps и other."
-            );
-            /*
-            await ipcRenderer.invoke("get-translation-files").then(async (response) => {
+            return await ipcRenderer.invoke("get-translation-files").then(async (response) => {
                 if (response) {
-                    await ensureStart();
+                    alert("Файлы перевода были получены.");
+                    return;
                 }
+
+                alert("Не удалось получить файлы перевода.");
+                return ipcRenderer.send("quit");
             });
-            */
-            return ipcRenderer.send("quit");
         }
     }
 
@@ -549,9 +534,10 @@ async function render() {
                     return;
                 } else {
                     if (replaceInput.value.trim()) {
-                        const newText = replaceText(element);
+                        const newText = replaceText(element, false);
 
                         if (newText) {
+                            saved = false;
                             const index = counterpartIndex === 1 ? 3 : 0;
                             resultElement.children[index].innerHTML = newText;
                         }
@@ -675,8 +661,8 @@ async function render() {
      * @param {HTMLTextAreaElement|string} text
      * @returns {void}
      */
-    function replaceText(text, isAll = false) {
-        if (!isAll) {
+    function replaceText(text, replaceAll) {
+        if (!replaceAll) {
             const regex = createRegularExpression(searchInput.value);
             const replacementValue = replaceInput.value;
             const highlightedReplacement = document.createElement("div");
@@ -1458,15 +1444,6 @@ async function render() {
                     location.reload();
                 });
                 break;
-            default:
-                if (
-                    saved &&
-                    document.activeElement !== document.body &&
-                    document.activeElement !== searchInput &&
-                    document.activeElement !== replaceInput
-                ) {
-                    saved = false;
-                }
         }
         return;
     }
@@ -1577,6 +1554,9 @@ async function render() {
         }
 
         if (target === currentFocusedElement) {
+            if (currentFocusedElement.innerHTML !== target.innerHTML) {
+                saved = false;
+            }
             currentFocusedElement = null;
 
             if (target.tagName === "TEXTAREA") {
@@ -1608,7 +1588,7 @@ async function render() {
 
     function replaceButtonClick() {
         if (searchInput.value && replaceInput.value) {
-            replaceText(searchInput.value, false);
+            replaceText(searchInput.value, true);
         }
         return;
     }
