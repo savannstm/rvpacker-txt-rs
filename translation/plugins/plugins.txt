@@ -37,7 +37,7 @@ Adjusts the volume of the sound effects.
 Controls
 Change the way you can control the game.
 Gamepad Config
-Change the way you can control the game.
+Configure the game's gamepad settings.
 Keyboard Config
 Configure the game's keyboard settings.
 All
