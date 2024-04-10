@@ -425,11 +425,17 @@ function writePlugins(file, originalTextFile, translatedTextFile) {
                 for (const key in obj.parameters) {
                     let param = obj.parameters[key];
 
-                    for (const [i, text] of originalText.entries()) {
-                        param = param.replace(text, translatedText[i]);
-                    }
+                    if (key === "OptionsCategories") {
+                        for (const [i, text] of originalText.entries()) {
+                            param = param.replace(text, translatedText[i]);
+                        }
 
-                    obj.parameters[key] = param;
+                        obj.parameters[key] = param;
+                    } else {
+                        if (hashMap.has(param)) {
+                            obj.parameters[key] = hashMap.get(param);
+                        }
+                    }
                 }
             } else {
                 for (const key in obj.parameters) {
