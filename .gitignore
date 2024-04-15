@@ -1,7 +1,9 @@
+/.vscode
 /cli/read
-/cli/.vscode
 /cli/cargo.lock
 /cli/target
+/cli/data
+/cli/js
 /gui/node_modules
 /gui/target
 /gui/.prettierrc

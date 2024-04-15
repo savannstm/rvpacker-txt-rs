@@ -145,14 +145,12 @@ fn write_maps(
 
     json.par_iter_mut().for_each(|(f, file)| {
         let output_path: String = format!("{}/{}", output_dir, f).to_string();
-        let location_name: Option<&str> = match file["locationName"].as_str() {
-            Some(name) => Some(name),
-            None => None,
-        };
 
-        if location_name.is_some() {
-            if names_hashmap.get(location_name.as_ref().unwrap()).is_some() {
-                file["displayName"] = to_value(&names_hashmap[&location_name.unwrap()]).unwrap();
+        if !file["displayName"].is_null() {
+            let location_name: &str = file["displayName"].as_str().unwrap();
+
+            if names_hashmap.get(location_name).is_some() {
+                file["displayName"] = to_value(&names_hashmap[location_name]).unwrap();
             }
         }
 
