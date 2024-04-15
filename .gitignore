@@ -1,0 +1,9 @@
+/cli/read
+/cli/.vscode
+/gui/node_modules
+/gui/target
+/gui/.prettierrc
+/gui/bun.lockb
+/gui/input.css
+/gui/package-lock.json
+/gui/tailwind.config.js

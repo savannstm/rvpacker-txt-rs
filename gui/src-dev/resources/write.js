@@ -100,6 +100,7 @@ function extractPluginsJSON() {
 }
 
 const pluginsJSON = JSON.parse(extractPluginsJSON());
+writeFileSync(join(__dirname, "plugins.json"), JSON.stringify(pluginsJSON), "utf8");
 
 function isUselessLine(line) {
     const uselessLines = [
