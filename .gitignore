@@ -1,5 +1,7 @@
 /cli/read
 /cli/.vscode
+/cli/cargo.lock
+/cli/target
 /gui/node_modules
 /gui/target
 /gui/.prettierrc
