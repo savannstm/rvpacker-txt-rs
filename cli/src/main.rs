@@ -91,11 +91,8 @@ fn merge_other(mut json: Value) -> Value {
                     .for_each(|page: &mut Value| {
                         page["list"] = Array(merge_401(page["list"].as_array().unwrap().to_vec()));
                     });
-            } else {
-                if !element["list"].is_null() {
-                    element["list"] =
-                        Array(merge_401(element["list"].as_array().unwrap().to_vec()));
-                }
+            } else if !element["list"].is_null() {
+                element["list"] = Array(merge_401(element["list"].as_array().unwrap().to_vec()));
             }
         });
     json
@@ -104,18 +101,18 @@ fn merge_other(mut json: Value) -> Value {
 fn write_maps(
     json: &mut HashMap<String, Value>,
     output_dir: &str,
-    text_hashmap: &HashMap<&str, &str>,
-    names_hashmap: &HashMap<&str, &str>,
+    text_hashmap: HashMap<&str, &str>,
+    names_hashmap: HashMap<&str, &str>,
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
-            let output_path: String = format!("{}/{}", output_dir, f).to_string();
+            let output_path: String = format!("{}/{}", output_dir, f);
 
             if !file["displayName"].is_null() {
                 let location_name: &str = file["displayName"].as_str().unwrap();
 
                 if names_hashmap.get(location_name).is_some() {
-                    file["displayName"] = to_value(&names_hashmap[location_name]).unwrap();
+                    file["displayName"] = to_value(names_hashmap[location_name]).unwrap();
                 }
             }
 
@@ -181,12 +178,12 @@ fn write_maps(
                                                                         .replace("\\n[", "\\N[");
 
                                                                     if text_hashmap
-                                                                        .get(&param_text.as_str())
+                                                                        .get(param_text.as_str())
                                                                         .is_some()
                                                                     {
                                                                         *param = to_value(
-                                                                            &text_hashmap
-                                                                                [&param_text
+                                                                            text_hashmap
+                                                                                [param_text
                                                                                     .as_str()],
                                                                         )
                                                                         .unwrap();
@@ -196,7 +193,7 @@ fn write_maps(
                                                     }
                                                 }
                                                 Some(_) => {
-                                                    if code == 401
+                                                    if (code == 401
                                                         || code == 402
                                                         || code == 324
                                                         || (code == 356
@@ -211,24 +208,21 @@ fn write_maps(
                                                                     && !parameter_text
                                                                         .as_ref()
                                                                         .unwrap()
-                                                                        .ends_with("????"))))
-                                                    {
-                                                        if text_hashmap
+                                                                        .ends_with("????")))))
+                                                        && text_hashmap
                                                             .get(
-                                                                &parameter_text
+                                                                parameter_text
                                                                     .as_ref()
                                                                     .unwrap()
                                                                     .as_str(),
                                                             )
                                                             .is_some()
-                                                        {
-                                                            *parameter = to_value(
-                                                                &text_hashmap[&parameter_text
-                                                                    .unwrap()
-                                                                    .as_str()],
-                                                            )
-                                                            .unwrap();
-                                                        }
+                                                    {
+                                                        *parameter = to_value(
+                                                            text_hashmap
+                                                                [parameter_text.unwrap().as_str()],
+                                                        )
+                                                        .unwrap();
                                                     }
                                                 }
                                             }
@@ -244,17 +238,17 @@ fn write_maps(
 fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &str) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
-            let other_original_text: &Vec<String> =
-                &read_to_string(format!("{}/{}.txt", &other_dir, &f[..f.len() - 5]))
+            let other_original_text: Vec<String> =
+                read_to_string(format!("{}/{}.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
-                    .split("\n")
+                    .split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
 
-            let other_translated_text: &Vec<String> =
-                &read_to_string(format!("{}/{}_trans.txt", &other_dir, &f[..f.len() - 5]))
+            let other_translated_text: Vec<String> =
+                read_to_string(format!("{}/{}_trans.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
-                    .split("\n")
+                    .split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
 
@@ -262,14 +256,14 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                 .par_iter()
                 .zip(other_translated_text.par_iter())
                 .fold(
-                    || HashMap::new(),
+                    HashMap::new,
                     |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
                         hashmap.insert(key.as_str(), value.as_str());
                         hashmap
                     },
                 )
                 .reduce(
-                    || HashMap::new(),
+                    HashMap::new,
                     |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                         a.extend(b);
                         a
@@ -295,42 +289,35 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                                     continue;
                                 }
 
-                                if !value.is_null() && value.as_str().unwrap().len() != 0 {
-                                    if hashmap.get(&value.as_str().unwrap()).is_some() {
-                                        *value = to_value(
-                                            &hashmap[&value.as_str().unwrap()].to_string(),
-                                        )
+                                if !value.is_null()
+                                    && !value.as_str().unwrap().is_empty()
+                                    && hashmap.get(value.as_str().unwrap()).is_some()
+                                {
+                                    *value = to_value(hashmap[value.as_str().unwrap()].to_string())
                                         .unwrap();
-                                    }
                                 }
                             }
                         } else {
                             let name: &str = element["name"].as_str().unwrap();
 
-                            if name.len() != 0 {
-                                if hashmap.get(&name).is_some() {
-                                    element["name"] = to_value(&hashmap[&name]).unwrap();
-                                }
+                            if !name.is_empty() && hashmap.get(name).is_some() {
+                                element["name"] = to_value(hashmap[name]).unwrap();
                             }
                         }
                     }
 
-                    let pages_length: usize;
-
-                    if !element["pages"].is_null() {
-                        pages_length = element["pages"].as_array().unwrap().len();
+                    let pages_length: usize = if !element["pages"].is_null() {
+                        element["pages"].as_array().unwrap().len()
                     } else {
-                        pages_length = 1;
-                    }
+                        1
+                    };
 
                     for i in 0..pages_length {
-                        let iterable_object: &mut Value;
-
-                        if pages_length != 1 {
-                            iterable_object = &mut element["pages"][i]["list"];
+                        let iterable_object: &mut Value = if pages_length != 1 {
+                            &mut element["pages"][i]["list"]
                         } else {
-                            iterable_object = &mut element["list"];
-                        }
+                            &mut element["list"]
+                        };
 
                         if iterable_object.is_null() {
                             continue;
@@ -369,13 +356,13 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                                                                     .replace("\\n[", "\\N[");
 
                                                                 if hashmap
-                                                                    .get(&param_text.as_str())
+                                                                    .get(param_text.as_str())
                                                                     .is_some()
                                                                 {
                                                                     *param = to_value(
-                                                                        &hashmap
-                                                                            [&param_text.as_str()]
-                                                                            .to_string(),
+                                                                        hashmap
+                                                                            [param_text.as_str()]
+                                                                        .to_string(),
                                                                     )
                                                                     .unwrap();
                                                                 }
@@ -384,7 +371,7 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                                                 }
                                             }
                                             Some(_) => {
-                                                if code == 401
+                                                if (code == 401
                                                     || code == 402
                                                     || code == 324
                                                     || (code == 356
@@ -399,19 +386,16 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                                                                 && !parameter_text
                                                                     .as_ref()
                                                                     .unwrap()
-                                                                    .ends_with("????"))))
-                                                {
-                                                    if hashmap
+                                                                    .ends_with("????")))))
+                                                    && hashmap
                                                         .get(parameter_text.as_ref().unwrap())
                                                         .is_some()
-                                                    {
-                                                        *parameter = to_value(
-                                                            &hashmap
-                                                                [parameter_text.as_ref().unwrap()]
+                                                {
+                                                    *parameter = to_value(
+                                                        hashmap[parameter_text.as_ref().unwrap()]
                                                             .to_string(),
-                                                        )
-                                                        .unwrap();
-                                                    }
+                                                    )
+                                                    .unwrap();
                                                 }
                                             }
                                         }
@@ -420,22 +404,18 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                     }
                 });
             write(output_path, file.to_string()).unwrap();
-            println!("Записан файл {}", &f);
+            println!("Записан файл {}", f);
         });
 }
 
-fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashMap<&str, &str>) {
+fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: HashMap<&str, &str>) {
     json["equipTypes"]
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null()
-                && system_text_hashmap
-                    .get(&element.as_str().unwrap())
-                    .is_some()
-            {
-                *element = to_value(&system_text_hashmap[&element.as_str().unwrap()]).unwrap();
+            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
+                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
             }
         });
 
@@ -444,12 +424,8 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null()
-                && system_text_hashmap
-                    .get(&element.as_str().unwrap())
-                    .is_some()
-            {
-                *element = to_value(&system_text_hashmap[&element.as_str().unwrap()]).unwrap();
+            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
+                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
             }
         });
 
@@ -459,16 +435,11 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
         .par_iter_mut()
         .for_each(|element: &mut Value| {
             if element.as_str().unwrap().ends_with("phobia") {
-                if system_text_hashmap
-                    .get(&element.as_str().unwrap())
-                    .is_some()
-                {
-                    *element = to_value(&system_text_hashmap[&element.as_str().unwrap()]).unwrap();
+                if system_text_hashmap.get(element.as_str().unwrap()).is_some() {
+                    *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
                 }
 
-                if element.as_str().unwrap().starts_with("Pan") {
-                    return;
-                }
+                if element.as_str().unwrap().starts_with("Pan") {}
             }
         });
 
@@ -485,10 +456,10 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
                     .par_iter_mut()
                     .for_each(|string: &mut Value| {
                         if !string.is_null()
-                            && system_text_hashmap.get(&string.as_str().unwrap()).is_some()
+                            && system_text_hashmap.get(string.as_str().unwrap()).is_some()
                         {
                             *string =
-                                to_value(&system_text_hashmap[&string.as_str().unwrap()]).unwrap();
+                                to_value(system_text_hashmap[string.as_str().unwrap()]).unwrap();
                         }
                     });
             } else {
@@ -504,11 +475,11 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
                     .for_each(|message_value: &mut Value| {
                         if !message_value.is_null()
                             && system_text_hashmap
-                                .get(&message_value.as_str().unwrap())
+                                .get(message_value.as_str().unwrap())
                                 .is_some()
                         {
                             *message_value =
-                                to_value(&system_text_hashmap[&message_value.as_str().unwrap()])
+                                to_value(system_text_hashmap[message_value.as_str().unwrap()])
                                     .unwrap();
                         }
                     });
@@ -516,8 +487,8 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
         });
 
     write(
-        format!("{}/System.json", &output_path),
-        &to_string(&json).unwrap(),
+        format!("{}/System.json", output_path),
+        to_string(&json).unwrap(),
     )
     .unwrap();
     println!("Записан файл System.json");
@@ -526,21 +497,21 @@ fn write_system(json: &mut Value, output_path: &str, system_text_hashmap: &HashM
 fn write_plugins(
     json: &mut Vec<Value>,
     output_path: &str,
-    original_text_vec: &Vec<String>,
-    translated_text_vec: &Vec<String>,
+    original_text_vec: Vec<String>,
+    translated_text_vec: Vec<String>,
 ) {
     let hashmap: HashMap<&str, &str> = original_text_vec
         .par_iter()
         .zip(translated_text_vec.par_iter())
         .fold(
-            || HashMap::new(),
+            HashMap::new,
             |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
                 hashmap.insert(key.as_str(), value.as_str());
                 hashmap
             },
         )
         .reduce(
-            || HashMap::new(),
+            HashMap::new,
             |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                 a.extend(b);
                 a
@@ -580,12 +551,12 @@ fn write_plugins(
                                 param = param.replacen(text, translated_text.as_str(), 1);
                             }
 
-                            *value = to_value(&param).unwrap();
+                            *value = to_value(param.as_str()).unwrap();
                         } else {
                             let param: &str = value.as_str().unwrap();
 
-                            if hashmap.get(&param).is_some() {
-                                *value = to_value(&hashmap[&param]).unwrap();
+                            if hashmap.get(param).is_some() {
+                                *value = to_value(hashmap[param]).unwrap();
                             }
                         }
                     });
@@ -598,8 +569,8 @@ fn write_plugins(
                     .for_each(|value: &mut Value| {
                         let param: &str = value.as_str().unwrap();
 
-                        if hashmap.get(&param).is_some() {
-                            *value = to_value(&hashmap[&param]).unwrap();
+                        if hashmap.get(param).is_some() {
+                            *value = to_value(hashmap[param]).unwrap();
                         }
                     });
             }
@@ -610,14 +581,14 @@ fn write_plugins(
         "// Generated by RPG Maker.\n// Do not edit this file directly.\nvar $plugins =";
 
     write(
-        format!("{}/plugins.js", &output_path),
-        format!("{}\n{}", PREFIX, &to_string(&json).unwrap()),
+        format!("{}/plugins.js", output_path),
+        format!("{}\n{}", PREFIX, to_string(&json).unwrap()),
     )
     .unwrap();
     println!("Записан файл plugins.js");
 }
 
-fn handle_args(args: &Vec<String>) -> (bool, bool, bool, bool) {
+fn handle_args(args: Vec<String>) -> (bool, bool, bool, bool) {
     let mut to_write: (bool, bool, bool, bool) = (true, true, true, true);
 
     if args.len() >= 2 {
@@ -625,7 +596,7 @@ fn handle_args(args: &Vec<String>) -> (bool, bool, bool, bool) {
             println!("\nДанный CLI инструмент записывает .txt файлы перевода в .json файлы игры.\nИспользование:\njson-writer [-h|--help] [-no={{maps,other,system,plugins}}\n\nЕсли аргументы не переданы, программа запишет все файлы.\n\n-h, --help: Выводит эту справку и завершает работу.\n\n-no={{maps,other,system,plugins}}: В зависимости от слов, которые переданы в аргумент -no, будет отключена запись тех или иных файлов.\nПример: -no=maps,other - программа не будет записывать файлы maps и other.");
             exit(0);
         } else if args[1].starts_with("-no=") {
-            for arg in args[1][4..].split(",") {
+            for arg in args[1][4..].split(',') {
                 match arg {
                     "maps" => to_write.0 = false,
                     "other" => to_write.1 = false,
@@ -646,7 +617,7 @@ fn handle_args(args: &Vec<String>) -> (bool, bool, bool, bool) {
 fn main() {
     let start_time: Instant = Instant::now();
 
-    let args: &Vec<String> = &args().collect();
+    let args: Vec<String> = args().collect();
     let to_write: (bool, bool, bool, bool) = handle_args(args);
 
     let dir_paths: Paths = Paths {
@@ -661,92 +632,88 @@ fn main() {
         plugins_output: "./js",
     };
 
-    create_dir_all(&dir_paths.output).unwrap();
-    create_dir_all(&dir_paths.plugins_output).unwrap();
+    create_dir_all(dir_paths.output).unwrap();
+    create_dir_all(dir_paths.plugins_output).unwrap();
 
     if to_write.0 {
-        let mut maps_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+        let mut maps_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
             .unwrap()
             .par_bridge()
-            .fold(
-                || HashMap::new(),
-                |mut hashmap, path| {
-                    let filename: String =
-                        path.as_ref().unwrap().file_name().into_string().unwrap();
+            .fold(HashMap::new, |mut hashmap, path| {
+                let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
 
-                    if filename.starts_with("Map") {
-                        hashmap.insert(
-                            filename,
-                            merge_map(
-                                from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
-                            ),
-                        );
-                    }
-                    hashmap
-                },
-            )
+                if filename.starts_with("Map") {
+                    hashmap.insert(
+                        filename,
+                        merge_map(
+                            from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
+                        ),
+                    );
+                }
+                hashmap
+            })
             .reduce(
-                || HashMap::new(),
+                HashMap::new,
                 |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
                     a.extend(b);
                     a
                 },
             );
 
-        let maps_original_text_vec: &Vec<String> = &read_to_string(&dir_paths.maps)
+        let maps_original_text_vec: Vec<String> = read_to_string(dir_paths.maps)
             .unwrap()
-            .split("\n")
+            .split('\n')
             .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
             .collect();
 
-        let maps_translated_text_vec: &Vec<String> = &read_to_string(&dir_paths.maps_trans)
+        let maps_translated_text_vec: Vec<String> = read_to_string(dir_paths.maps_trans)
             .unwrap()
-            .split("\n")
+            .split('\n')
             .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
             .collect();
 
-        let maps_original_names_vec: &Vec<String> = &read_to_string(&dir_paths.names)
+        let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
             .unwrap()
-            .split("\n")
+            .split('\n')
             .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
             .collect();
 
-        let maps_translated_names_vec: &Vec<String> = &read_to_string(&dir_paths.names_trans)
+        let maps_translated_names_vec: Vec<String> = read_to_string(dir_paths.names_trans)
             .unwrap()
-            .split("\n")
+            .split('\n')
             .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
             .collect();
 
-        let maps_text_hashmap: &HashMap<&str, &str> = &maps_original_text_vec
+        let maps_text_hashmap: HashMap<&str, &str> = maps_original_text_vec
             .par_iter()
             .zip(maps_translated_text_vec.par_iter())
             .fold(
-                || HashMap::new(),
+                HashMap::new,
                 |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
                     hashmap.insert(key.as_str(), value.as_str());
                     hashmap
                 },
             )
             .reduce(
-                || HashMap::new(),
+                HashMap::new,
                 |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                     a.extend(b);
                     a
                 },
             );
 
-        let maps_names_hashmap: &HashMap<&str, &str> = &maps_original_names_vec
+        let maps_names_hashmap: HashMap<&str, &str> = maps_original_names_vec
             .par_iter()
             .zip(maps_translated_names_vec.par_iter())
             .fold(
-                || HashMap::new(),
+                HashMap::new,
                 |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
                     hashmap.insert(key.as_str(), value.as_str());
                     hashmap
                 },
             )
             .reduce(
-                || HashMap::new(),
+                HashMap::new,
                 |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                     a.extend(b);
                     a
@@ -764,28 +731,24 @@ fn main() {
     if to_write.1 {
         const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
 
-        let mut other_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+        let mut other_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
             .unwrap()
             .par_bridge()
-            .fold(
-                || HashMap::new(),
-                |mut hashmap: HashMap<String, Value>, path| {
-                    let filename: String =
-                        path.as_ref().unwrap().file_name().into_string().unwrap();
+            .fold(HashMap::new, |mut hashmap: HashMap<String, Value>, path| {
+                let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
 
-                    if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
-                        hashmap.insert(
-                            filename,
-                            merge_other(
-                                from_str(&read_to_string(&path.unwrap().path()).unwrap()).unwrap(),
-                            ),
-                        );
-                    }
-                    hashmap
-                },
-            )
+                if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
+                    hashmap.insert(
+                        filename,
+                        merge_other(
+                            from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
+                        ),
+                    );
+                }
+                hashmap
+            })
             .reduce(
-                || HashMap::new(),
+                HashMap::new,
                 |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
                     a.extend(b);
                     a
@@ -797,35 +760,35 @@ fn main() {
 
     if to_write.2 {
         let mut system_json: Value =
-            from_str(&read_to_string(&format!("{}/System.json", &dir_paths.original)).unwrap())
+            from_str(&read_to_string(format!("{}/System.json", dir_paths.original)).unwrap())
                 .unwrap();
 
-        let system_original_text: &Vec<String> =
-            &read_to_string(format!("{}/System.txt", &dir_paths.other))
+        let system_original_text: Vec<String> =
+            read_to_string(format!("{}/System.txt", dir_paths.other))
                 .unwrap()
-                .split("\n")
+                .split('\n')
                 .map(|x: &str| x.to_string())
                 .collect();
 
-        let system_translated_text: &Vec<String> =
-            &read_to_string(format!("{}/System_trans.txt", &dir_paths.other))
+        let system_translated_text: Vec<String> =
+            read_to_string(format!("{}/System_trans.txt", dir_paths.other))
                 .unwrap()
-                .split("\n")
+                .split('\n')
                 .map(|x: &str| x.to_string())
                 .collect();
 
-        let system_text_hashmap: &HashMap<&str, &str> = &system_original_text
+        let system_text_hashmap: HashMap<&str, &str> = system_original_text
             .par_iter()
             .zip(system_translated_text.par_iter())
             .fold(
-                || HashMap::new(),
+                HashMap::new,
                 |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
                     hashmap.insert(key.as_str(), value.as_str());
                     hashmap
                 },
             )
             .reduce(
-                || HashMap::new(),
+                HashMap::new,
                 |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                     a.extend(b);
                     a
@@ -837,20 +800,20 @@ fn main() {
 
     if to_write.3 {
         let mut plugins_json: Vec<Value> =
-            from_str(&read_to_string(&format!("{}/plugins.json", dir_paths.plugins)).unwrap())
+            from_str(&read_to_string(format!("{}/plugins.json", dir_paths.plugins)).unwrap())
                 .unwrap();
 
-        let plugins_original_text_vec: &Vec<String> =
-            &read_to_string(format!("{}/plugins.txt", dir_paths.plugins))
+        let plugins_original_text_vec: Vec<String> =
+            read_to_string(format!("{}/plugins.txt", dir_paths.plugins))
                 .unwrap()
-                .split("\n")
+                .split('\n')
                 .map(|x: &str| x.to_string())
                 .collect();
 
-        let plugins_translated_text_vec: &Vec<String> =
-            &read_to_string(format!("{}/plugins_trans.txt", &dir_paths.plugins))
+        let plugins_translated_text_vec: Vec<String> =
+            read_to_string(format!("{}/plugins_trans.txt", dir_paths.plugins))
                 .unwrap()
-                .split("\n")
+                .split('\n')
                 .map(|x: &str| x.to_string())
                 .collect();
 
