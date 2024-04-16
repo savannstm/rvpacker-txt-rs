@@ -6,6 +6,8 @@
 
 После того, как вы внесли изменения в файлы \_trans.txt в папке translation - **запустите файл json-writer.exe.**
 
+json-writer.exe поддерживает аргументы - чтобы получить сводку, вызовите `json-writer -h` или `json-writer --help`.
+
 **Через несколько секунд, он создаст конечные файлы в папке data и js, которые вы можете скопировать в папку www, находящуюся в корне игры (C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www) с заменой.**
 
 ## Папка gui
