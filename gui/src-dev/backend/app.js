@@ -1,8 +1,7 @@
 const { app, BrowserWindow, Menu, ipcMain, shell, screen, dialog } = require("electron");
 const { readFileSync, writeFileSync, existsSync, rmSync } = require("fs");
 const { join } = require("path");
-const { download, extract } = require("gitly");
-
+const gitly = require("gitly");
 const DEBUG = true;
 const PLATFORM = process.platform;
 
@@ -200,19 +199,19 @@ app.on("ready", () => {
                             height: 480,
                             autoHideMenuBar: true,
                             titleBarStyle: "hidden",
-                            alwaysOnTop: true,
                             webPreferences: {
                                 nodeIntegration: true,
                             },
                         });
 
                         loadingWin.loadFile(join(__dirname, "../frontend/loading.html"));
+                        loadingWin.moveTop();
 
-                        await extract(await download("savannstm/fh-termina-json-writer"), "./");
-                        const filesToDelete = ["README.md", "LICENSE.md", "LICENSE-ru.md", "gui"];
+                        await gitly("savannstm/fh-termina-json-writer", "./");
+                        const filesToDelete = ["README.md", "LICENSE.md", "LICENSE-ru.md", "gui", "cli"];
 
-                        for (let i = 0; i < 4; i++) {
-                            rmSync(filesToDelete[i], { recursive: true, force: true });
+                        for (const file of filesToDelete) {
+                            rmSync(file, { recursive: true, force: true });
                         }
 
                         loadingWin.close();

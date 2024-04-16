@@ -88,7 +88,7 @@ fn merge_other(mut json: Value) -> Value {
                     .as_array_mut()
                     .unwrap()
                     .par_iter_mut()
-                    .for_each(|page| {
+                    .for_each(|page: &mut Value| {
                         page["list"] = Array(merge_401(page["list"].as_array().unwrap().to_vec()));
                     });
             } else {
@@ -107,139 +107,143 @@ fn write_maps(
     text_hashmap: &HashMap<&str, &str>,
     names_hashmap: &HashMap<&str, &str>,
 ) {
-    json.par_iter_mut().for_each(|(f, file)| {
-        let output_path: String = format!("{}/{}", output_dir, f).to_string();
+    json.par_iter_mut()
+        .for_each(|(f, file): (&String, &mut Value)| {
+            let output_path: String = format!("{}/{}", output_dir, f).to_string();
 
-        if !file["displayName"].is_null() {
-            let location_name: &str = file["displayName"].as_str().unwrap();
+            if !file["displayName"].is_null() {
+                let location_name: &str = file["displayName"].as_str().unwrap();
 
-            if names_hashmap.get(location_name).is_some() {
-                file["displayName"] = to_value(&names_hashmap[location_name]).unwrap();
-            }
-        }
-
-        file["events"]
-            .as_array_mut()
-            .unwrap()
-            .par_iter_mut()
-            .for_each(|event: &mut Value| {
-                if event["pages"].is_null() {
-                    return;
+                if names_hashmap.get(location_name).is_some() {
+                    file["displayName"] = to_value(&names_hashmap[location_name]).unwrap();
                 }
+            }
 
-                event["pages"]
-                    .as_array_mut()
-                    .unwrap()
-                    .par_iter_mut()
-                    .for_each(|page| {
-                        if page["list"].is_null() {
-                            return;
-                        }
+            file["events"]
+                .as_array_mut()
+                .unwrap()
+                .par_iter_mut()
+                .for_each(|event: &mut Value| {
+                    if event["pages"].is_null() {
+                        return;
+                    }
 
-                        page["list"]
-                            .as_array_mut()
-                            .unwrap()
-                            .par_iter_mut()
-                            .for_each(|item: &mut Value| {
-                                if item["parameters"].is_null()
-                                    || item["parameters"].as_array().is_none()
-                                {
-                                    return;
-                                }
+                    event["pages"]
+                        .as_array_mut()
+                        .unwrap()
+                        .par_iter_mut()
+                        .for_each(|page: &mut Value| {
+                            if page["list"].is_null() {
+                                return;
+                            }
 
-                                let code: u16 = item["code"].as_u64().unwrap() as u16;
+                            page["list"]
+                                .as_array_mut()
+                                .unwrap()
+                                .par_iter_mut()
+                                .for_each(|item: &mut Value| {
+                                    if item["parameters"].is_null()
+                                        || item["parameters"].as_array().is_none()
+                                    {
+                                        return;
+                                    }
 
-                                item["parameters"]
-                                    .as_array_mut()
-                                    .unwrap()
-                                    .par_iter_mut()
-                                    .for_each(|parameter: &mut Value| {
-                                        let mut parameter_text: Option<String> = None;
+                                    let code: u16 = item["code"].as_u64().unwrap() as u16;
 
-                                        if parameter.is_string() {
-                                            parameter_text = Some(
-                                                parameter.as_str().unwrap().replace("\\n[", "\\N["),
-                                            );
-                                        }
+                                    item["parameters"]
+                                        .as_array_mut()
+                                        .unwrap()
+                                        .par_iter_mut()
+                                        .for_each(|parameter: &mut Value| {
+                                            let mut parameter_text: Option<String> = None;
 
-                                        match parameter_text {
-                                            None => {
-                                                if code == 102 && parameter.is_array() {
+                                            if parameter.is_string() {
+                                                parameter_text = Some(
                                                     parameter
-                                                        .as_array_mut()
+                                                        .as_str()
                                                         .unwrap()
-                                                        .par_iter_mut()
-                                                        .for_each(|param: &mut Value| {
-                                                            if param.is_string() {
-                                                                let param_text: String = param
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .replace("\\n[", "\\N[");
-
-                                                                if text_hashmap
-                                                                    .get(&param_text.as_str())
-                                                                    .is_some()
-                                                                {
-                                                                    *param = to_value(
-                                                                        &text_hashmap
-                                                                            [&param_text.as_str()],
-                                                                    )
-                                                                    .unwrap();
-                                                                }
-                                                            }
-                                                        });
-                                                }
+                                                        .replace("\\n[", "\\N["),
+                                                );
                                             }
-                                            Some(_) => {
-                                                if code == 401
-                                                    || code == 402
-                                                    || code == 324
-                                                    || (code == 356
-                                                        && (parameter_text
-                                                            .as_ref()
+
+                                            match parameter_text {
+                                                None => {
+                                                    if code == 102 && parameter.is_array() {
+                                                        parameter
+                                                            .as_array_mut()
                                                             .unwrap()
-                                                            .starts_with("GabText")
-                                                            || (parameter_text
+                                                            .par_iter_mut()
+                                                            .for_each(|param: &mut Value| {
+                                                                if param.is_string() {
+                                                                    let param_text: String = param
+                                                                        .as_str()
+                                                                        .unwrap()
+                                                                        .replace("\\n[", "\\N[");
+
+                                                                    if text_hashmap
+                                                                        .get(&param_text.as_str())
+                                                                        .is_some()
+                                                                    {
+                                                                        *param = to_value(
+                                                                            &text_hashmap
+                                                                                [&param_text
+                                                                                    .as_str()],
+                                                                        )
+                                                                        .unwrap();
+                                                                    }
+                                                                }
+                                                            });
+                                                    }
+                                                }
+                                                Some(_) => {
+                                                    if code == 401
+                                                        || code == 402
+                                                        || code == 324
+                                                        || (code == 356
+                                                            && (parameter_text
                                                                 .as_ref()
                                                                 .unwrap()
-                                                                .starts_with("choice_text")
-                                                                && !parameter_text
+                                                                .starts_with("GabText")
+                                                                || (parameter_text
                                                                     .as_ref()
                                                                     .unwrap()
-                                                                    .ends_with("????"))))
-                                                {
-                                                    if text_hashmap
-                                                        .get(
-                                                            &parameter_text
-                                                                .as_ref()
-                                                                .unwrap()
-                                                                .as_str(),
-                                                        )
-                                                        .is_some()
+                                                                    .starts_with("choice_text")
+                                                                    && !parameter_text
+                                                                        .as_ref()
+                                                                        .unwrap()
+                                                                        .ends_with("????"))))
                                                     {
-                                                        *parameter = to_value(
-                                                            &text_hashmap
-                                                                [&parameter_text.unwrap().as_str()],
-                                                        )
-                                                        .unwrap();
+                                                        if text_hashmap
+                                                            .get(
+                                                                &parameter_text
+                                                                    .as_ref()
+                                                                    .unwrap()
+                                                                    .as_str(),
+                                                            )
+                                                            .is_some()
+                                                        {
+                                                            *parameter = to_value(
+                                                                &text_hashmap[&parameter_text
+                                                                    .unwrap()
+                                                                    .as_str()],
+                                                            )
+                                                            .unwrap();
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                            });
-                    });
-            });
-        write(output_path, file.to_string()).unwrap();
-        println!("Записан файл {}", f);
-    });
+                                        });
+                                });
+                        });
+                });
+            write(output_path, file.to_string()).unwrap();
+            println!("Записан файл {}", f);
+        });
 }
 
 fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &str) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
-            let output_path: String = format!("{}/{}", output_dir, &f);
-
             let other_original_text: &Vec<String> =
                 &read_to_string(format!("{}/{}.txt", &other_dir, &f[..f.len() - 5]))
                     .unwrap()
@@ -271,6 +275,8 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                         a
                     },
                 );
+
+            let output_path: String = format!("{}/{}", output_dir, f);
 
             file.as_array_mut()
                 .unwrap()
@@ -309,30 +315,31 @@ fn write_other(json: &mut HashMap<String, Value>, output_dir: &str, other_dir: &
                         }
                     }
 
-                    let mut pages_length: Option<usize> = None;
+                    let pages_length: usize;
 
                     if !element["pages"].is_null() {
-                        pages_length = Some(element["pages"].as_array().unwrap().len());
+                        pages_length = element["pages"].as_array().unwrap().len();
+                    } else {
+                        pages_length = 1;
                     }
 
-                    for i in 0..(pages_length.unwrap_or(0)) {
-                        let mut iterable_object: Option<&mut Value> = None;
+                    for i in 0..pages_length {
+                        let iterable_object: &mut Value;
 
-                        if pages_length.unwrap() != 1 {
-                            iterable_object = Some(&mut element["pages"][i]["list"]);
+                        if pages_length != 1 {
+                            iterable_object = &mut element["pages"][i]["list"];
                         } else {
-                            iterable_object = Some(&mut element["list"]);
+                            iterable_object = &mut element["list"];
                         }
 
-                        if iterable_object.as_ref().unwrap().is_null() {
+                        if iterable_object.is_null() {
                             continue;
                         }
 
                         iterable_object
-                            .unwrap()
                             .as_array_mut()
                             .unwrap()
-                            .iter_mut()
+                            .par_iter_mut()
                             .for_each(|list: &mut Value| {
                                 let code: u16 = list["code"].as_u64().unwrap() as u16;
 
