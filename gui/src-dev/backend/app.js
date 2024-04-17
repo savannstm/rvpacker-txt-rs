@@ -1,8 +1,8 @@
 const { app, BrowserWindow, Menu, ipcMain, shell, screen, dialog } = require("electron");
 const { readFileSync, writeFileSync, existsSync, rmSync } = require("fs");
 const { join } = require("path");
-const gitly = require("gitly");
-const DEBUG = true;
+const { default: gitly } = require("gitly");
+const DEBUG = app.isPackaged ? false : true;
 const PLATFORM = process.platform;
 
 if (!existsSync(join(__dirname, "launch.json"))) {
@@ -43,6 +43,7 @@ app.on("ready", () => {
                         accelerator: "F5",
                         click: () => {
                             mainWin.webContents.send("reload");
+                            return;
                         },
                     },
                     {
@@ -93,6 +94,7 @@ app.on("ready", () => {
 
                             helpWin.moveTop(true);
                             helpWin.loadFile(join(__dirname, "../frontend/help.html"));
+                            return;
                         },
                     },
                     {
@@ -106,6 +108,7 @@ app.on("ready", () => {
 
                             hotkeysWin.moveTop(true, "pop-up-menu");
                             hotkeysWin.loadFile(join(__dirname, "../frontend/hotkeys.html"));
+                            return;
                         },
                     },
                 ],
@@ -125,6 +128,7 @@ app.on("ready", () => {
 
                     aboutWin.moveTop(true);
                     aboutWin.loadFile(join(__dirname, "../frontend/about.html"));
+                    return;
                 },
             },
         ];
@@ -138,6 +142,8 @@ app.on("ready", () => {
             mainWin.focus();
             mainWin.moveTop();
 
+            mainWin.webContents.send("env", DEBUG);
+
             if (firstLaunch) {
                 createHelpWindow();
 
@@ -145,11 +151,13 @@ app.on("ready", () => {
                     writeFileSync(join(__dirname, "launch.json"), JSON.stringify({ firstLaunch: false }, null, 4));
                 }
             }
+            return;
         });
 
         mainWin.on("close", (event) => {
             if (forceClose) {
-                return app.quit();
+                app.quit();
+                return;
             }
 
             event.preventDefault();
@@ -267,12 +275,14 @@ app.on("ready", () => {
 
                         return true;
                     } else {
-                        return quit();
+                        quit();
+                        return;
                     }
                 });
 
             return result;
         });
+        return;
     };
 
     const createHelpWindow = () => {
@@ -284,6 +294,7 @@ app.on("ready", () => {
 
         helpWin.moveTop(true);
         helpWin.loadFile(join(__dirname, "../frontend/help.html"));
+        return;
     };
 
     createWindow();
@@ -292,16 +303,19 @@ app.on("ready", () => {
         if (PLATFORM !== "darwin") {
             quit();
         }
+        return;
     });
 
     function quit() {
         forceClose = true;
-        return app.quit();
+        app.quit();
+        return;
     }
 
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
         }
+        return;
     });
 });

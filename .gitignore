@@ -1,4 +1,6 @@
 /.vscode
+/copies
+/backups
 /cli/read
 /cli/cargo.lock
 /cli/target
@@ -11,3 +13,12 @@
 /gui/input.css
 /gui/package-lock.json
 /gui/tailwind.config.js
+/gui/src/backend/app.js
+/gui/src/frontend/about.html
+/gui/src/frontend/about.js
+/gui/src/frontend/help.html
+/gui/src/frontend/hotkeys.html
+/gui/src/frontend/loading.html
+/gui/src/frontend/main.html
+/gui/src/frontend/main.js
+/gui/src/resources/write.js

@@ -13,10 +13,10 @@ const { F_OK } = constants;
 const { fork } = require("child_process");
 const { join } = require("path");
 
-const PRODUCTION = false;
+let PRODUCTION;
 
 async function render() {
-    const copiesRoot = PRODUCTION ? join(__dirname, "../../../../copies") : join(__dirname, "../../../copies");
+    const copiesRoot = PRODUCTION ? join(__dirname, "../../../../сopies") : join(__dirname, "../../../copies");
     const backupRoot = PRODUCTION ? join(__dirname, "../../../../backups") : join(__dirname, "../../../backups");
     const translationRoot = PRODUCTION
         ? join(__dirname, "../../../../translation")
@@ -81,7 +81,7 @@ async function render() {
     }
     ensureDirSync(backupRoot);
 
-    let nextBackupNumber = parseInt(determineLastBackupNumber()) + 1;
+    let nextBackupNumber = Number.parseInt(determineLastBackupNumber()) + 1;
     if (backupEnabled) backup(backupPeriod);
 
     createContent();
@@ -100,23 +100,26 @@ async function render() {
 
     ipcRenderer.on("exit-sequence", async () => {
         if (saved) {
-            return ipcRenderer.send("quit");
+            ipcRenderer.send("quit");
+            return;
         }
 
-        return await ipcRenderer.invoke("quit-confirm").then((response) => {
+        await ipcRenderer.invoke("quit-confirm").then((response) => {
             if (response) {
                 save();
 
-                return setTimeout(() => {
-                    return ipcRenderer.send("quit");
+                setTimeout(() => {
+                    ipcRenderer.send("quit");
                 }, 1000);
             }
             return;
         });
+        return;
     });
 
     ipcRenderer.once("reload", () => {
         location.reload();
+        return;
     });
 
     async function getSettings() {
@@ -129,13 +132,16 @@ async function render() {
             return;
         } catch (err) {
             alert("Не удалось получить настройки.");
-            return await ipcRenderer.invoke("create-settings-file").then(async (response) => {
+            await ipcRenderer.invoke("create-settings-file").then(async (response) => {
                 if (response) {
-                    return await getSettings();
+                    await getSettings();
+                    return;
                 }
                 return;
             });
+            return;
         }
+        return;
     }
 
     async function ensureStart() {
@@ -143,21 +149,23 @@ async function render() {
             accessSync(join(translationRoot, "maps"), F_OK);
             accessSync(join(translationRoot, "other"), F_OK);
             accessSync(join(translationRoot, "plugins"), F_OK);
-
             return;
         } catch {
             alert("Не удалось найти файлы перевода.");
 
-            return await ipcRenderer.invoke("get-translation-files").then(async (response) => {
+            await ipcRenderer.invoke("get-translation-files").then(async (response) => {
                 if (response) {
                     alert("Файлы перевода были получены.");
                     return;
                 }
 
                 alert("Не удалось получить файлы перевода.");
-                return ipcRenderer.send("quit");
+                ipcRenderer.send("quit");
+                return;
             });
+            return;
         }
+        return;
     }
 
     function arrangeElements() {
@@ -194,8 +202,10 @@ async function render() {
 
                 requestAnimationFrame(() => {
                     document.body.classList.remove("invisible");
+                    return;
                 });
             }
+            return;
         });
         return;
     }
@@ -207,6 +217,9 @@ async function render() {
 
     function createRegularExpression(text) {
         text = text.trim();
+        if (!text) {
+            return;
+        }
 
         try {
             if (text.startsWith("/")) {
@@ -231,6 +244,7 @@ async function render() {
             alert(`Неверное регулярное выражение (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}): ${error}`);
             return;
         }
+        return;
     }
 
     /**
@@ -246,7 +260,9 @@ async function render() {
                 : node.innerHTML.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         const textMatches = nodeText.match(expr) || [];
 
-        if (textMatches.length === 0) return;
+        if (textMatches.length === 0) {
+            return;
+        }
 
         const result = [];
         let lastIndex = 0;
@@ -276,7 +292,9 @@ async function render() {
      */
     function searchText(text) {
         text = text.trim();
-        if (!text) return;
+        if (!text) {
+            return;
+        }
 
         /** @type {Map<HTMLDivElement|HTMLTextAreaElement, string>} */
         const matches = new Map();
@@ -285,9 +303,9 @@ async function render() {
             : [...contentContainer.children].flatMap((parent) => [...parent.children]);
 
         const expr = createRegularExpression(text);
-        if (!expr) return;
-
-        let size = 0;
+        if (!expr) {
+            return;
+        }
 
         for (const child of targetElements) {
             const node = child.firstElementChild.children;
@@ -295,22 +313,22 @@ async function render() {
             const match = setMatches(expr, node[2]);
             if (match) {
                 matches.set(node[2], match);
-                size++;
             }
 
-            if (size > 10000) {
-                return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+            if (matches.size > 10000) {
+                alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                return;
             }
 
             if (!searchTranslation) {
                 const match = setMatches(expr, node[1]);
                 if (match) {
                     matches.set(node[1], match);
-                    size++;
                 }
 
-                if (size > 10000) {
-                    return alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                if (matches.size > 10000) {
+                    alert("Совпадения превышают 10 000. Чтобы избежать утечку памяти, поиск был остановлен.");
+                    return;
                 }
             }
         }
@@ -350,6 +368,7 @@ async function render() {
                                 entry.target.firstElementChild.classList.add("hidden");
                             }
                         }
+                        return;
                     },
                     { root: searchPanelReplaced, threshold: 0.1 }
                 );
@@ -391,8 +410,9 @@ async function render() {
                 function handleReplacedClick(event) {
                     const element = event.target.parentElement;
 
-                    if (element.hasAttribute("reverted")) return;
-                    if (!searchPanelReplaced.contains(element)) return;
+                    if (element.hasAttribute("reverted") || !searchPanelReplaced.contains(element)) {
+                        return;
+                    }
 
                     const clicked = document.getElementById(element.firstElementChild.textContent);
 
@@ -426,18 +446,13 @@ async function render() {
                     }
                 }
 
-                searchPanelReplaced.addEventListener("mousedown", (event) => {
-                    handleReplacedClick(event);
-                });
+                searchPanelReplaced.addEventListener("mousedown", (event) => handleReplacedClick(event));
             } else {
                 searchSwitch.innerHTML = "search";
                 searchPanelReplaced.innerHTML = "";
 
-                searchPanelReplaced.removeEventListener("mousedown", (event) => {
-                    handleReplacedClick(event);
-                });
+                searchPanelReplaced.removeEventListener("mousedown", (event) => handleReplacedClick(event));
             }
-
             return;
         }
 
@@ -470,19 +485,16 @@ async function render() {
                 searchPanel.setAttribute("moving", "true");
 
                 searchSwitch.removeEventListener("click", handleSearchSwitch);
-                searchPanel.addEventListener(
-                    "transitionend",
-                    () => {
-                        searchPanel.setAttribute("moving", "false");
-                    },
-                    { once: true }
-                );
+                searchPanel.addEventListener("transitionend", () => searchPanel.setAttribute("moving", "false"), {
+                    once: true,
+                });
                 return;
             }
 
             if (loadingContainer) searchPanelFound.removeChild(loadingContainer);
             searchPanel.setAttribute("moving", "false");
         }
+        return;
     }
 
     /**
@@ -549,7 +561,9 @@ async function render() {
         }
 
         text = text.trim();
-        if (!text) return;
+        if (!text) {
+            return;
+        }
 
         const results = searchText(text);
 
@@ -568,6 +582,7 @@ async function render() {
                         entry.target.firstElementChild.classList.add("hidden");
                     }
                 }
+                return;
             },
             { root: searchPanelFound, threshold: 0.1 }
         );
@@ -635,7 +650,9 @@ async function render() {
             const resultElement = event.target.parentElement.hasAttribute("data")
                 ? event.target.parentElement
                 : event.target.parentElement.parentElement;
-            if (!searchPanelFound.contains(resultElement)) return;
+            if (!searchPanelFound.contains(resultElement)) {
+                return;
+            }
 
             const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data").split(",");
 
@@ -644,17 +661,13 @@ async function render() {
                 document.getElementById(thirdParent),
                 document.getElementById(element),
                 resultElement,
-                parseInt(counterpartIndex)
+                Number.parseInt(counterpartIndex)
             );
+            return;
         }
 
-        searchPanelFound.removeEventListener("mousedown", (event) => {
-            handleResultSelecting(event);
-        });
-
-        searchPanelFound.addEventListener("mousedown", (event) => {
-            handleResultSelecting(event);
-        });
+        searchPanelFound.removeEventListener("mousedown", (event) => handleResultSelecting(event));
+        searchPanelFound.addEventListener("mousedown", (event) => handleResultSelecting(event));
         return;
     }
 
@@ -690,13 +703,19 @@ async function render() {
         }
 
         text = text.trim();
-        if (!text) return;
+        if (!text) {
+            return;
+        }
 
         const results = searchText(text);
-        if (!results || results.size === 0) return;
+        if (!results || results.size === 0) {
+            return;
+        }
 
         const regex = createRegularExpression(text);
-        if (!regex) return;
+        if (!regex) {
+            return;
+        }
 
         for (const textarea of results.keys()) {
             if (!textarea.id.includes("original")) {
@@ -745,7 +764,9 @@ async function render() {
             return false;
         }
 
-        if (isCopied()) return;
+        if (isCopied()) {
+            return;
+        }
 
         for (const file of readdirSync(join(translationRoot, "maps"))) {
             copyFileSync(join(translationRoot, "maps", file), join(copiesRoot, "maps", file));
@@ -836,18 +857,23 @@ async function render() {
 
             setTimeout(() => {
                 saveButton.classList.remove("animate-spin");
+                return;
             }, 1000);
+            return;
         });
         return;
     }
 
     function backup(s) {
-        if (!backupEnabled) return;
+        if (!backupEnabled) {
+            return;
+        }
 
         setTimeout(() => {
             if (backupEnabled) {
                 save(true);
                 backup(s);
+                return;
             }
             return;
         }, s * 1000);
@@ -961,7 +987,9 @@ async function render() {
 
                 pageLoadedDisplay.innerHTML = "done";
                 pageLoadedDisplay.classList.toggle("animate-spin");
+                return;
             });
+            return;
         });
         return;
     }
@@ -972,7 +1000,9 @@ async function render() {
      * @returns {void}
      */
     function changeState(newState, slide = true) {
-        if (state === newState) return;
+        if (state === newState) {
+            return;
+        }
 
         switch (newState) {
             case null:
@@ -1031,7 +1061,6 @@ async function render() {
                 goToRowInput.removeEventListener("keydown", handleKeydown);
             }
         });
-
         return;
     }
 
@@ -1098,20 +1127,26 @@ async function render() {
      */
     function jumpToRow(key) {
         const focusedElement = document.activeElement;
-        if (!focusedElement || !focusedElement.id || (key !== "alt" && key !== "ctrl")) return;
+        if (!focusedElement || !focusedElement.id || (key !== "alt" && key !== "ctrl")) {
+            return;
+        }
 
         const idParts = focusedElement.id.split("-");
-        const index = parseInt(idParts.pop(), 10);
+        const index = Number.parseInt(idParts.pop(), 10);
         const baseId = idParts.join("-");
 
-        if (isNaN(index)) return;
+        if (isNaN(index)) {
+            return;
+        }
 
         const step = key === "alt" ? 1 : -1;
         const nextIndex = index + step;
         const nextElementId = `${baseId}-${nextIndex}`;
         const nextElement = document.getElementById(nextElementId);
 
-        if (!nextElement) return;
+        if (!nextElement) {
+            return;
+        }
 
         const scrollOffset = nextElement.clientHeight + 8;
         window.scrollBy(0, step * scrollOffset);
@@ -1206,6 +1241,7 @@ async function render() {
                     break;
             }
         }
+        return;
     }
 
     // ! Single-call function
@@ -1316,7 +1352,6 @@ async function render() {
         for (const content of contentTypes) {
             createContentChildren(content.id, result.get(content.original), result.get(content.translated));
         }
-
         return;
     }
 
@@ -1363,14 +1398,13 @@ async function render() {
         }
 
         function handleBackupPeriod() {
-            backupPeriod = parseInt(backupPeriodInput.value);
+            backupPeriod = Number.parseInt(backupPeriodInput.value);
             backupPeriodInput.value = backupPeriod < 60 ? 60 : backupPeriod > 3600 ? 3600 : backupPeriod;
             return;
         }
 
         function handleBackupMax() {
-            backupMax = parseInt(backupMaxInput.value);
-
+            backupMax = Number.parseInt(backupMaxInput.value);
             backupMaxInput.value = backupMax < 1 ? 1 : backupMax > 100 ? 100 : backupMax;
             return;
         }
@@ -1408,6 +1442,7 @@ async function render() {
         const containsClass = element.classList.contains(secondClass);
         element.classList.toggle(firstClass, containsClass);
         element.classList.toggle(secondClass, !containsClass);
+        return;
     }
 
     async function preventKeyDefaults(event) {
@@ -1419,21 +1454,27 @@ async function render() {
                 event.preventDefault();
                 break;
             case "F4":
-                if (!event.altKey) return;
+                if (!event.altKey) {
+                    return;
+                }
 
                 event.preventDefault();
 
                 if (saved) {
-                    return ipcRenderer.send("quit");
+                    ipcRenderer.send("quit");
+                    return;
                 }
 
-                return await ipcRenderer.invoke("quit-confirm").then((response) => {
+                await ipcRenderer.invoke("quit-confirm").then((response) => {
                     if (response) {
                         save();
-                        return setTimeout(() => {
-                            return ipcRenderer.send("quit");
+                        setTimeout(() => {
+                            ipcRenderer.send("quit");
+                            return;
                         }, 1000);
+                        return;
                     }
+                    return;
                 });
                 break;
             case "F5":
@@ -1443,6 +1484,7 @@ async function render() {
 
                 requestAnimationFrame(() => {
                     location.reload();
+                    return;
                 });
                 break;
         }
@@ -1482,7 +1524,9 @@ async function render() {
         }
 
         const result = getNewLinePositions(focusedElement);
-        if (result.length === 0) return;
+        if (result.length === 0) {
+            return;
+        }
 
         for (const object of result) {
             const { left, top } = object;
@@ -1503,6 +1547,7 @@ async function render() {
             activeGhostLines.push(ghostNewLine);
             document.body.appendChild(ghostNewLine);
         }
+        return;
     }
 
     function calculateTextAreaHeight(target) {
@@ -1521,6 +1566,7 @@ async function render() {
         for (const child of target.parentElement.children) {
             child.style.height = `${newHeight}px`;
         }
+        return;
     }
 
     function handleFocus(event) {
@@ -1545,6 +1591,7 @@ async function render() {
                 trackFocus(target);
             }
         }
+        return;
     }
 
     function handleBlur(event) {
@@ -1570,6 +1617,7 @@ async function render() {
                 });
             }
         }
+        return;
     }
 
     function menuButtonClick() {
@@ -1658,6 +1706,7 @@ async function render() {
     document.getElementById("options-button").addEventListener("click", showOptions);
     document.addEventListener("keydown", async (event) => {
         await preventKeyDefaults(event);
+        return;
     });
 
     document.addEventListener("focus", handleFocus, true);
@@ -1665,6 +1714,10 @@ async function render() {
     return;
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await render();
+document.addEventListener("DOMContentLoaded", () => {
+    ipcRenderer.once("env", async (_event, env) => {
+        PRODUCTION = !env;
+        await render();
+    });
+    return;
 });
