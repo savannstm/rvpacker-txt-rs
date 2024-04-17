@@ -16,7 +16,7 @@ const { join } = require("path");
 let PRODUCTION;
 
 async function render() {
-    const copiesRoot = PRODUCTION ? join(__dirname, "../../../../сopies") : join(__dirname, "../../../copies");
+    const copiesRoot = PRODUCTION ? join(__dirname, "../../../../copies") : join(__dirname, "../../../copies");
     const backupRoot = PRODUCTION ? join(__dirname, "../../../../backups") : join(__dirname, "../../../backups");
     const translationRoot = PRODUCTION
         ? join(__dirname, "../../../../translation")
