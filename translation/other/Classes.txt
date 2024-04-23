@@ -1,0 +1,22 @@
+Ex-Soldier
+Mercenary\n<Equip Slot>\nWeapon\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Ghoul
+<Equip Slot>\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Girl
+Mercenary
+Priest
+Occultist
+<Equip Slot>\nWeapon\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Doctor
+Doctor\n<Equip Slot>\nWeapon\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Mechanic
+Mechanic\n<Equip Slot>\nWeapon\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Captain
+Black Kalev
+<Equip Slot>\nAccessory\n</Equip Slot>
+Blood golem
+Yellow Mage
+Thug
+Botanist
+<Equip Slot>\nWeapon\nHead\nBody\nWheels\nAccessory\nAccessory\nAccessory\n</Equip Slot>
+Journalist

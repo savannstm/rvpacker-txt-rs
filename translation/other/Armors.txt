@@ -1,0 +1,196 @@
+Army jumpsuit
+A standard model army jumpsuit. It's made from a durable\nmaterial that withstands fire well.
+\nSlash 90%  Pierce 93%  Fire 70%\n\n\n\n\n\n<Picture: icon_jumpsuit>
+Collared blouse
+A simple blouse with a fancy collar. Offers next to no protection\nbut looks formal and nice.
+\nOtherworldly 93%\n\n\n\n\n\n<Picture: icon_collar_shirt>
+Army uniform
+A standard Bremen uniform. The material is somewhat durable against\nknives and other slashing weapons.
+\nSlash 93%  Pierce 93%  Fire 70%\n\n\n\n\n\n<Picture: icon_uniform>
+Silk vest
+A tailor-made silk vest. It fits you perfectly. It's defensive\ncapabilities are mostly otherwordly.
+\nOtherworldly 92%\n\n\n\n\n\n<Picture: icon_silk_vest>
+Rugged vest
+A simple yet stylish vest. Offers very little protection,\nbut it truly is stylish.
+\nOtherworldly 92%\n\n\n\n\n\n<Picture: icon_collar_shirt>
+Sturdy overalls
+Sturdy worker's overalls. They offer decent protection and\nare especially efficient against fire.
+\nSlash 95%  Pierce 95%  Fire 70%\n\n\n\n\n<Picture: icon_overalls>
+Turtleneck shirt
+\nOtherworldly 95%\n\n\n\n\n<Picture: icon_turtleneck>
+Stahlhelm
+A Bremen-style helmet made of steel. Feels uncomfortable but\noffers great protection. Protects against concussion.
+\nSlash 94%  Pierce 94%  Blunt 94%\n\n\n\n\n<Picture: icon_helmet>
+Pickelhaube
+A decorative helmet made from hardened leather with reinforced\nmetal trims. It's an out-of-date model but works just fine.
+\nSlash 96%  Pierce 96%  Blunt 96%\n\n\n\n\n<Picture: icon_spiked_helmet>
+Eclipse talisman
+An eastern style talisman with decorations depicting\nan eclipse of the sun.
+Dragoon helmet
+A 18th century cavalry metal helmet. It doesn't stay on very\nwell and feels clumsy, but offer great protection.
+\nSlash 92%  Pierce 92%  Blunt 92%\n\n\n\n\n\n<Picture: icon_dragoon_helmet>
+A plate mail armor offers great defence, but is rather\nclunky to use.
+Ballistic shield
+A military grade ballistic shield.
+\nSlash 80%  Pierce 80%  Blunt 80%  Fire 80%\n\n\n\n\n\n<Picture: icon_ballistic_shield>
+Plank shield
+A simple makeshift shield. This particular one seems to be\nbroken beyond repair...
+\nSlash 94%  Pierce 94%  Blunt 94%  Fire 105%\n\n\n\n\n<Picture: icon_plank_shield>
+Shield of the Four
+An enchanted shield with severed hands placed to ward off\notherwordly powers.
+\nSlash 94%  Pierce 94%  Blunt 94%  Fire 105%  Otherworldly 87%\n\n\n\n\n\n<Picture: icon_shield_of_four>
+A simple makeshift shield. Offers a little bit protection.
+\nSlash 94%  Pierce 94%  Blunt 94%  Fire 105%\n\n\n\n\n\n<Picture: icon_plank_shield>
+Betel's stone
+The ring of a long gone new god Betel. The ring has magic\nimbued in it that is constantly leaking from the crystal.
+\n\n\n\n\n<Picture: icon_sorcerers_stone>\n<Passive State: 229>
+Ring of the still-blood
+A ring that is said to make blood still and thus prevent\nbleeding. There's no way to explain this but magic.
+\n\n\n\n\n\n\n<Picture: icon_ring_of_stillblood>
+Fluted armpieces
+Armpieces that clearly belong to a larger setup. On their own\nthey already offer decent protection and prevent arm loss.
+\nSlash 85%  Pierce 85%  Blunt 85%\n\n\n\n\n\n<Picture: icon_fluted_arm_pieces>\n<Armor Recipe: 44>\n<Not Independent Item>\n
+Fluted breastplate
+An old medieval breastplate that seems to belong to a larger\nsetup. On its own it already offers great protection.
+\nSlash 68%  Pierce 70%  Blunt 80%\n\n\n\n\n\n<Picture: icon_fluted_breastplate>\n<Armor Recipe: 44>\n<Not Independent Item>\n
+Fluted fauld
+A fauld that clearly belong to a larger setup, most likely\nto an armor set. On its own it already offers decent protection.
+\nSlash 89%  Pierce 89%  Blunt 89%\n\n\n\n\n<Picture: icon_fluted_fauld>\n<Armor Recipe: 44>\n<Not Independent Item>\n
+Fluted armor
+An old medieval armor that is in surprisingly good shape.\nThe decoration suggests this armor came from Valland originally.
+\nSlash 55%  Pierce 65%  Blunt 65%  Fire 93%\n\n\n\n\n<Synthesis Ingredients>\narmor 41\narmor 42\narmor 43\n</Synthesis Ingredients>\n<Picture: icon_fluted_armor>
+Bremen chestplate
+A plate mail armor offers great defence, but is rather clunky\nand uncomfortable to use. The armor has egravings of a Bremen eagle.
+\nSlash 65%  Pierce 65%  Blunt 70%  Fire 98%\n\n\n\n\n\n<Picture: icon_bremen_chestplate>
+Arm guards
+A pair of arm guards that prevent serious injuries.
+\nSlash 88%  Pierce 88%  Blunt 88%\n\n\n\n\n\n<Picture: icon_armguards>
+Soul devour necklace
+A silver necklace with a soul stone embedded on it. The stone\nprotects against otherwordly powers.
+\nOtherworldly 82%\n\n\n\n\n<Picture: icon_souldevour>
+Cameo
+A cameo carving of a beautiful woman from a bygone era. The \njewel emits strange aura...
+\n\n\n\n\n\n<Picture: icon_cameo>
+Eyeglasses
+You can see the world clearer with these. Improves the\naccuracy of its wearer greatly.
+\n\n\n\n\n<Picture: icon_eyeglasses>
+Broken eyeglasses
+You can see the world clearer with these. Or you could if\nthey weren't broken...
+Beheaded wizard
+A dried and burned severed head. The face is forever left\nin a spiteful grimace. The head is not without purpose though,
+\nsomekind of power in it reflects otherwordly attacks occasionally.\n\n\n\n\n\n\n\n<Element Reflect 06: +30%>\n<Cannot Discard>\n<Picture: icon_beheaded_wizard>
+Leechmonger ring
+A hefty ring forged by the Hermit Mages of South who dedicated\ntheir lives to the God of the Depths hundreds of years ago.
+\nThe mages were able to infuse the ring with life draining magic.\n\n\n\n\n\n\n\n<Picture: icon_leechmonger_ring>\n<Passive State: 232>
+Counter
+Guardian cameo
+A cameo carving of a beautiful woman from a bygone era.\nThe jewel emits strange aura... It is now possessed and grants
+\nprotection to those in low health.\n\n\n\n\n<Picture: icon_cameo>\n<Passive State: 146>
+Hardened heart
+A crystalized and hardened heart that has seen its share of pain\nand suffering. It now offers a glimpse of the same determination
+\nits previous owner had to its new master.\n\n\n\n\n\n<Picture: icon_hardened_heart>\n<Passive State: 145>
+Small thing's amulet
+A crudely shaped amulet representing a rat deity. The peculiar\nthing is imbued with prayers of the ratkin that grant its wearer
+\na small boost in agility to help evade possible dangers.\n\n\n\n\n\n<Picture: icon_small_things_amulet>
+Salmonsnake rune
+An old relic from northern warrior tribes of Oldegård. The rune is said\nto contain a soul of a Salmonsnake that gives its owner a hardened skin
+\nthat prevents limb losses, burns and bleeding.\n\n\n\n\n\n\n\n<Picture: icon_salmonsnake_rune>
+Ring of wraiths
+A ring with a blood diamond embedded on it. The diamond has seen\nso much death that life force is leaking from it. The priests of Rondon
+\nhave slaves digging these diamonds no matter the cost.\n\n\n\n\n\n\n<Picture: icon_ring_of_wraiths>\n<Passive State: 230>\n\n
+Thorned ring
+A ring with thorns that emit steady flow of poison to its wearer.\nSteady flow makes one immune to more potent toxins.
+\n\n\n\n\n\n\n<Picture: icon_thorned_ring>
+Foldable wheelchair
+A special lightweight foldable wheelchair. It is easy and fast\nto set up and feels surprisingly durable despite its size.
+\n\n\n\n\n\n<Picture: icon_wheelchair>
+Linen vest
+A rather nonchalant linen vest. It's defensive capabilities are \nmostly otherwordly.
+\nOtherworldly 95%\n\n\n\n\n<Picture: icon_linen_vest>
+Combat jacket
+A military-issue combat jacket that has become popular with\ncivilians as well.
+\nSlash 91%  Pierce 91%  Fire 80%\n\n\n\n\n<Picture: icon_combat_jacket>
+Gentleman's hat
+A fine looking gentleman's hat. It's a little bit old fashioned\nbut some things are timeless.
+\nOtherworldly 99%\n\n\n\n\n<Picture: icon_gentleman_hat>
+Kashmir suit
+A natural white kashmir suit.\nYou feel especially confident in such a fine suit and thus your
+\nhit, evasion and critical rates are all boosted.\n\n\n\n\n<Picture: icon_kashmir_suit>
+Pilot jacket
+A pilot jacket.
+\nSlash 93%  Pierce 93%  Fire 85%  Otherworldly 93%\n\n\n\n\n<Picture: icon_pilot_jacket>
+Yellow mage robes
+Traditional wear of a yellow mage. The robes have multiple\ndifferent patterns from multiple different cultures. Different
+\ndangly bits and talismans protect its user from otherwordly powers.\n\n\n\n<Picture: icon_yellow_robes>
+Suede jacket
+A fine suede jacket with button closure on front. It is a little\nbit worn at places but overall in great condition.
+\nWearing such nice jacket boosts your confidence and critical rate.\n\n\n\n\n<Picture: icon_suede_jacket>
+Pigskin gas mask
+A crude gas mask made out of pigskin. It's not the most reliable\nprotection against toxic gasses, but better than nothing.
+\nSlash 97%\n\n\n\n\n<Picture: icon_vile_head>
+Bremen gas mask
+Gas mask of the Bremen flame troopers. Flame troopers were often\nused in city warfare where they would scorch everything in sight.
+\nSlash 91%  Pierce 91%  Blunt 91%  Fire 91%\n\n\n\n\n<Picture: icon_bremen_gasmask>
+Bremen elite helmet
+The helmet clearly takes inspiration from ancient Lombardia\nwhere fighters clad in armor would duel for people's entertainment.
+\nSlash 85%  Pierce 85%  Blunt 85%  Fire 85%\n\n\n\n\n<Picture: icon_bremen_elite_helmet>
+Chac chac
+A seemingly simple shaker instrument. The combination of the\npebbles inside and the various pearls tied onto it create a
+\nhypnotic rhytm that helps one to focus on the otherwordly.\n\n\n\n<Picture: icon_chac_chac>
+Yggaegetsu amulet
+An eastern style amulet that is said to have belonged to the deity\nof the wandering warriors, Yggaegetsu. The amulet boosts confidence
+\nin your own prowess and increases the chance of critical hits.\n\n\n\n<Picture: icon_yggaegetsu_amulet>
+Molded doll
+Enchanted doll that is covered in a white substance that can\nonly be described as mold.
+\nOtherworldly 87%\n\n\n\n\n\n<Picture: icon_doll>
+Smelter key
+A key that has seemingly melt in high temperatures. The key feels\nheavier than it's supposed to as if something is attached to it.
+\nA spirit protects the wearer from fire and flames.\n\n\n\n\n<Picture: icon_smelter_key>
+Epee mask
+A simple mask used in competitive fencing. It isn't particularly\ndefensive except against piercing attacks.
+\nSlash 97%  Pierce 87%  Blunt 97%  Fire 97%\n\n\n\n\n<Picture: icon_epee_mask>
+Fencing gambeson
+A traditional armor used in fencing. The armor offers decent\nprotection, but it is vulnerable against fire.
+\nSlash 90%  Pierce 77%  Blunt 93%  Fire 110%\n\n\n\n\n\n<Picture: icon_fencing_gambeson>\n<Not Independent Item>\n
+The darkness
+A living and seeping darkness that attaches itself to whoever\ndares to touch it and live in symbiosis with it.
+\nSlash 55%  Pierce 65%  Blunt 65%  Fire 93%  Otherworldly 68%\n\n\n\n\n\n<Picture: icon_darkness2>
+A military grade ballistic shield. Used often in riots. If\nyou are lucky, it might even stop bullets.
+\nSlash 80%  Pierce 80%  Blunt 80%  Fire 80%\n\n\n\n\n<Picture: icon_ballistic_shield>
+Artificial soul
+There are rumours that Bremen experimented with creating artificial\nsouls to power their unholy rituals. If this truly is one of those
+\nit could be used to channel otherwordly more efficiently.\n\n\n\n\n\n<Picture: icon_artificial_soul>\n
+Eye of Sylvian
+Said to be an eye of the older god Sylvian herself. How it could\nhave ended up here is a mystery. You have your doubts. It does
+\nseem to boost the recovery effect of healing items and magic...\n\n\n\n\n\n<Picture: icon_eye_of_sylvian>
+Leather armor
+Simple armor made from hardened leather. Offers decent protection\nand it's not too heavy.
+\nSlash 87%  Pierce 75%  Blunt 90%  Fire 93%\n\n\n\n\n<Picture: icon_leather_armor>\n<Not Independent Item>\n
+Makeshift armor
+A makeshift armor made from random kitchenware. The breastplate\nis an old stove lid. Desperate times breed creativity.
+\nSlash 68%  Pierce 69%  Blunt 79%  Fire 95%\n\n\n\n\n<Armor Recipe: 93>\n<Picture: icon_makeshift>\n<Not Independent Item>\n
+99 eyes mask
+A mysterious skull mask from a faraway continent of Vinland.\nThe mask is said to raise one's perception.
+\nSlash 89%  Pierce 89%  Blunt 89%\n\n\n\n\n<Picture: icon_skull_mask>
+Makeshift full armor
+\nSlash 66%  Pierce 67%  Blunt 77%  Fire 80%\n\n\n\n\n<Synthesis Ingredients>\narmor 91\nitem 225: 2\nitem 224\n</Synthesis Ingredients>\n<Picture: icon_makeshift2>\n<Not Independent Item>\n
+Death mask
+A burial mask used in old Bohemia. The mask is designed so that\nthe death gurgle of its wearer sounds more like laughter of joy. Because
+\nof its connection to death, the mask has otherwordly properties.\n\n\n\n\n<Picture: icon_death_mask>
+Chainmail dress
+An armor consisting of small metal rings linked together to form\na mesh that protects its wearer.
+\nSlash 65%  Pierce 70%  Blunt 92%  Fire 98%\n\n\n\n\n\n<Picture: icon_chainmail>
+Pinecone pig
+Your very own pinecone pig. It's an old traditional children's trinket\nfrom the northern land of Oldergård. You can craft one by attaching
+\n4 sticks to a pinecone and adding a hint of love to the mix.\n\n\n\n\n\n\n<Picture: icon_pinecone_pig>
+One-winged necklace
+A necklace in the shape of a wing of a butterfly. There is a carving\non the other side: "You cannot have something new before you rip a
+\nwing of a butterfly and sacrifice something in return."\n\n\n\n\n\n\n\n<Armor Recipe: 102>\n<Picture: icon_one_winged_necklace>\n<Passive State: 146>
+It's an old vintage necklace. You and your sister both have one of\nof the wings. It has always been a bit too flashy and big for your 
+\ntaste. You prefer more modest jewelry.\n\n\n\n\n\n\n<Armor Recipe: 102>\n<Picture: icon_one_winged_necklace>\n<Passive State: 146>
+Blue noctuid necklace
+Combining the two wings into one makes it a complete moth necklace.\nThe necklace eminates special aura that protects from the otherwordly.
+\nAura that only manifest when one is low on health.\n\n\n\n\n\n\n\n<Synthesis Ingredients>\narmor 100\narmor 101\n</Synthesis Ingredients>\n<Picture: icon_butterfly_necklace>\n<Passive State: 224>
+Joy mask
+A leathery mask from ancient times. It is trying to mimic human face\nwith mixed results. The mask does bring joy to whoever wears it.
+\nSlash 87%  Pierce 97%  Blunt 97%  Fire 97% Otherworldly 97%\n\n\n\n\n<Picture: icon_joy_mask>\n<Passive State: 225>

@@ -1,0 +1,121 @@
+Item: 1, Equip: 2, Synthesis: 3, kill: 4, St: 5, Options: 7, uit Game: 6
+User
+Ally
+Allies
+Enemy
+Enemies
+All %1
+%2 Random %1
+General
+General settings that alter the way the game behaves.
+Command Remember
+Game remembers the last command selected during battle.
+Filter Effects
+Enable and disable filter effects.
+Message Sounds
+Enable and disable the message sounds.
+Message Speed
+Changes the speed text is displayed during messages.
+Video files
+Enable and disable video files. Videos are known to cause problems for some.
+Videos are replaced by animated shots when disabled.
+Static Effect
+Enable and disable the static effect.
+Audio
+Adjust the audio settings for the game.
+Master Volume
+Adjusts the overall volume of the game.
+BGM Volume
+Adjusts the volume of the background music.
+BGS Volume
+Adjusts the volume of the background sound effects.
+ME Volume
+Adjusts the volume of the melody effects
+such as fanfares.
+SE Volume
+Adjusts the volume of the sound effects.
+Controls
+Change the way you can control the game.
+Gamepad Config
+Configure the game's gamepad settings.
+Keyboard Config
+Configure the game's keyboard settings.
+All
+"A list of all of the game's settings."
+Exit
+"Exit the Settings Menu."
+A,B,C,D,E,a,b,c,d,e
+F,G,H,I,J,f,g,h,i,j
+K,L,M,N,O,k,l,m,n,o
+P,Q,R,S,T,p,q,r,s,t
+U,V,W,X,Y,u,v,w,x,y
+Z,[,],^,_,z,{,},|,~
+0,1,2,3,4,!,#,$,%,&
+5,6,7,8,9,(,),*,+,-
+/,=,?,<,>,:,;, ,Page,OK
+Á,É,Í,Ó,Ú,á,é,í,ó,ú
+À,È,Ì,Ò,Ù,à,è,ì,ò,ù
+Â,Ê,Î,Ô,Û,â,ê,î,ô,û
+Ä,Ë,Ï,Ö,Ü,ä,ë,ï,ö,ü
+Ā,Ē,Ī,Ō,Ū,ā,ē,ī,ō,ū
+Ã,Å,Æ,Ç,Ð,ã,å,æ,ç,ð
+Ñ,Õ,Ø,Š,Ŵ,ñ,õ,ø,š,ŵ
+Ý,Ŷ,Ÿ,Ž,Þ,ý,ÿ,ŷ,ž,þ
+Ĳ,Œ,ĳ,œ,ß,«,»,,Page,OK
+Change the configuration of this key?
+Default Keyboard Layout
+Reverts your keyboard setting to the default setup.
+WASD Movement Layout
+Changes your keyboard to WASD movement.
+Finish Configuration
+Are you done configuring your keyboard?
+Clear
+OK
+OK / Interact
+X
+Cancel / Menu
+Cancel
+Cancel
+Menu
+Menu
+Shoot/Run
+Shoot/Run
+PgUp
+Page Up
+PgDn
+Page Down
+◄
+Move ◄ Left
+▲
+Move ▲ Up
+►
+Move ► Right
+▼
+Move ▼ Down
++State
++Buff
+-State
+-Buff
+Use %1
+Discard %1 %2
+Are you sure you want to discard %1 %2?
+Yes
+No
+Finish
+Remove
+Synthesis
+Craft Item
+Craft Weapon
+Craft Armor
+Finish
+Collected Recipes
+Crafted Items
+Crafted Weapons
+Crafted Armors
+This item has not been crafted yet.
+Ingredients
+Quantity
+Item: 1, quip: 2, Synthesis: 3, kill: 4, St: 5, Options: 7, uit Game: 6
+Category:Items, Category:Healing, Category:Food, KeyItems, Weapons, Armors, Category:Body bag
+Rev up
+%1 Heal
