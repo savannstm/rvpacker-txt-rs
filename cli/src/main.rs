@@ -19,7 +19,7 @@ struct Paths {
 }
 
 fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
-    let mut first: i16 = -1;
+    let mut first: Option<u16> = None;
     let mut number: i8 = -1;
     let mut prev: bool = false;
     let mut string_vec: Vec<String> = Vec::new();
@@ -30,24 +30,25 @@ fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
         let code: u16 = object["code"].as_u64().unwrap() as u16;
 
         if code == 401 {
-            if first == -1 {
-                first = i as i16;
+            if first.is_none() {
+                first = Some(i as u16);
             }
 
             number += 1;
             string_vec.push(object["parameters"][0].as_str().unwrap().to_string());
             prev = true;
-        } else if i > 0 && prev && first != -1 && number != -1 {
-            json[first as usize]["parameters"][0] = to_value(string_vec.join("\n")).unwrap();
+        } else if i > 0 && prev && first.is_some() && number != -1 {
+            json[first.unwrap() as usize]["parameters"][0] =
+                to_value(string_vec.join("\n")).unwrap();
 
-            let start_index: usize = first as usize + 1;
+            let start_index: usize = first.unwrap() as usize + 1;
             let items_to_delete: usize = start_index + number as usize;
             json.par_drain(start_index..items_to_delete);
 
             string_vec.clear();
             i -= number as usize;
             number = -1;
-            first = -1;
+            first = None;
             prev = false;
         }
 
@@ -299,8 +300,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                         && hashmap.get(value.as_str().unwrap()).is_some()
                                     {
                                         *value =
-                                            to_value(hashmap[value.as_str().unwrap()].to_string())
-                                                .unwrap();
+                                            to_value(hashmap[value.as_str().unwrap()]).unwrap();
                                     }
                                 });
                         } else {
@@ -367,8 +367,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                                                 {
                                                                     *param = to_value(
                                                                         hashmap
-                                                                            [param_text.as_str()]
-                                                                        .to_string(),
+                                                                            [param_text.as_str()],
                                                                     )
                                                                     .unwrap();
                                                                 }
@@ -397,11 +396,9 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                                         .get(parameter_text.as_ref().unwrap())
                                                         .is_some()
                                                 {
-                                                    *parameter = to_value(
-                                                        hashmap[parameter_text.as_ref().unwrap()]
-                                                            .to_string(),
-                                                    )
-                                                    .unwrap();
+                                                    *parameter =
+                                                        to_value(hashmap[parameter_text.unwrap()])
+                                                            .unwrap();
                                                 }
                                             }
                                         }
@@ -557,7 +554,7 @@ fn write_plugins(
                                 param = param.replacen(text, translated_text.as_str(), 1);
                             }
 
-                            *value = to_value(param.as_str()).unwrap();
+                            *value = to_value(param).unwrap();
                         } else {
                             let param: &str = value.as_str().unwrap();
 
