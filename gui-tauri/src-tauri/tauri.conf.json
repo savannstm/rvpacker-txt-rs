@@ -1,0 +1,107 @@
+{
+    "build": {
+        "devPath": "../src",
+        "distDir": "../src",
+        "withGlobalTauri": true
+    },
+    "package": {
+        "productName": "fh-termina-json-writer",
+        "version": "2.0.0"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": false,
+            "shell": {
+                "all": false,
+                "open": true
+            },
+            "fs": {
+                "all": false,
+                "copyFile": true,
+                "createDir": true,
+                "exists": true,
+                "readDir": true,
+                "readFile": true,
+                "removeDir": true,
+                "removeFile": true,
+                "renameFile": false,
+                "scope": ["$RESOURCE/**/*"],
+                "writeFile": true
+            },
+            "path": {
+                "all": true
+            },
+            "process": {
+                "all": false,
+                "exit": true
+            },
+            "dialog": {
+                "all": false,
+                "ask": true,
+                "confirm": false,
+                "message": true,
+                "open": false,
+                "save": false
+            },
+            "window": {
+                "all": false,
+                "center": false,
+                "close": true,
+                "create": true,
+                "hide": false,
+                "maximize": false,
+                "minimize": false,
+                "print": false,
+                "requestUserAttention": false,
+                "setAlwaysOnTop": false,
+                "setClosable": false,
+                "setContentProtected": false,
+                "setCursorGrab": false,
+                "setCursorIcon": false,
+                "setCursorPosition": false,
+                "setCursorVisible": false,
+                "setDecorations": false,
+                "setFocus": false,
+                "setFullscreen": false,
+                "setIcon": false,
+                "setIgnoreCursorEvents": false,
+                "setMaxSize": false,
+                "setMaximizable": false,
+                "setMinSize": false,
+                "setMinimizable": false,
+                "setPosition": false,
+                "setResizable": false,
+                "setSize": false,
+                "setSkipTaskbar": false,
+                "setTitle": false,
+                "show": false,
+                "startDragging": false,
+                "unmaximize": false,
+                "unminimize": false
+            }
+        },
+        "windows": [
+            {
+                "title": "F&H2 Text Editor",
+                "maximized": true,
+                "url": "main.html"
+            }
+        ],
+        "security": {
+            "csp": null
+        },
+        "bundle": {
+            "active": true,
+            "targets": ["msi", "appimage", "deb"],
+            "identifier": "com.savannstm.fh-termina-json-writer",
+            "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+            ],
+            "resources": ["res/**/*"]
+        }
+    }
+}
