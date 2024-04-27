@@ -94,6 +94,22 @@
         "bundle": {
             "active": true,
             "targets": ["msi", "appimage", "deb"],
+            "windows": {
+                "allowDowngrades": true,
+                "certificateThumbprint": null,
+                "digestAlgorithm": null,
+                "nsis": null,
+                "timestampUrl": null,
+                "tsp": false,
+                "webviewFixedRuntimePath": null,
+                "webviewInstallMode": {
+                    "silent": true,
+                    "type": "downloadBootstrapper"
+                },
+                "wix": {
+                    "language": ["en-US", "ru-RU"]
+                }
+            },
             "identifier": "com.savannstm.fh-termina-json-writer",
             "icon": [
                 "icons/32x32.png",
