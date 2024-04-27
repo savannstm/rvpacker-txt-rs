@@ -1,6 +1,6 @@
 {
     "build": {
-        "devPath": "../src",
+        "devPath": "../src-dev",
         "distDir": "../src",
         "withGlobalTauri": true
     },
@@ -83,8 +83,9 @@
         "windows": [
             {
                 "title": "F&H2 Text Editor",
-                "maximized": true,
-                "url": "main.html"
+                "url": "main.html",
+                "label": "main",
+                "maximized": true
             }
         ],
         "security": {

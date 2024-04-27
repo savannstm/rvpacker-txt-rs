@@ -55,57 +55,63 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    async function selectLanguage() {
-        const settings = JSON.parse(
-            await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
-        );
+    async function getSettings() {
+        if (await exists(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })) {
+            const settings = JSON.parse(
+                await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
+            );
+
+            mainLanguage =
+                settings.lang === "ru"
+                    ? JSON.parse(
+                          await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })
+                      ).main
+                    : JSON.parse(
+                          await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })
+                      ).main;
+
+            return settings;
+        }
 
         const askTranslation = await ask(
             "Использовать русский язык? При отказе, будет использоваться английский.\nUse Russian language? If you decline, English will be used."
         );
 
-        askTranslation
-            ? await writeTextFile(await join(resourceDir, settingsFile), JSON.stringify({ ...settings, lang: "ru" }), {
-                  dir: BaseDirectory.Resource,
-              })
-            : await writeTextFile(await join(resourceDir, settingsFile), JSON.stringify({ ...settings, lang: "en" }), {
-                  dir: BaseDirectory.Resource,
-              });
+        let language;
+        if (askTranslation) {
+            mainLanguage = JSON.parse(
+                await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })
+            ).main;
+            language = "ru";
+        } else {
+            mainLanguage = JSON.parse(
+                await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })
+            ).main;
+            language = "en";
+        }
 
-        return askTranslation ? "ru" : "en";
-    }
+        await message(mainLanguage.cannotGetSettings);
+        const askCreateSettings = await ask(mainLanguage.askCreateSettings);
 
-    async function getSettings() {
-        try {
+        if (askCreateSettings) {
+            await writeTextFile(
+                await join(resourceDir, settingsFile),
+                JSON.stringify({ backup: { enabled: true, period: 60, max: 99 }, lang: language }),
+                {
+                    dir: BaseDirectory.Resource,
+                }
+            );
+
+            alert(mainLanguage.createdSettings);
             return JSON.parse(
                 await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
             );
-        } catch (err) {
-            await message(mainLanguage.cannotGetSettings);
-            const askCreateSettings = await ask(mainLanguage.askCreateSettings);
-
-            if (askCreateSettings) {
-                await writeTextFile(
-                    await join(resourceDir, settingsFile),
-                    JSON.stringify({ backup: { enabled: true, period: 60, max: 99 } }),
-                    {
-                        dir: BaseDirectory.Resource,
-                    }
-                );
-
-                alert(mainLanguage.createdSettings);
-                return JSON.parse(
-                    await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
-                ).backup;
-            } else {
-                await exit(0);
-            }
+        } else {
+            await exit(0);
         }
     }
 
     async function cloneRepository() {
-        appWindow.emit("clone_repository");
-
         function animateEllipsis() {
             if (!progressText.textContent.endsWith("...")) {
                 progressText.textContent += ".";
@@ -133,6 +139,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 downloading = false;
             }
         });
+        await appWindow.emit("clone");
 
         async function awaitDownload() {
             try {
@@ -1241,12 +1248,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function compile() {
         compileButton.firstElementChild.classList.add("animate-spin");
 
-        appWindow.emit("compile");
-        let unlistenCompile = await appWindow.listen("compile", (message) => {
+        const unlistenCompile = await appWindow.listen("compile-finished", (message) => {
             compileButton.firstElementChild.classList.remove("animate-spin");
             alert(message.payload);
             unlistenCompile();
         });
+        await appWindow.emit("compile");
     }
 
     function preventKeyDefaults(event) {
@@ -1408,9 +1415,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         searchLocationButton.classList.toggle("bg-zinc-500");
     }
 
-    await ensureStart();
-    await createFilesCopies();
-
     const contentContainer = document.getElementById("content-container");
     const searchInput = document.getElementById("search-input");
     const replaceInput = document.getElementById("replace-input");
@@ -1422,6 +1426,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const saveButton = document.getElementById("save-button");
     const compileButton = document.getElementById("compile-button");
     const optionsButton = document.getElementById("options-button");
+    const searchButton = document.getElementById("search-button");
+    const replaceButton = document.getElementById("replace-button");
     const searchCaseButton = document.getElementById("case-button");
     const searchWholeButton = document.getElementById("whole-button");
     const searchRegexButton = document.getElementById("regex-button");
@@ -1432,23 +1438,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     const fileMenuButton = document.getElementById("file");
     const helpMenuButton = document.getElementById("help");
     const languageMenuButton = document.getElementById("language");
+    const fileMenu = document.getElementById("file-menu");
+    const reloadButton = document.getElementById("reload-button");
+    const exitButton = document.getElementById("exit-button");
+    const helpMenu = document.getElementById("help-menu");
+    const helpButtonSub = document.getElementById("help-button-sub");
+    const aboutButton = document.getElementById("about-button");
+    const hotkeysButton = document.getElementById("hotkeys-button");
+    const languageMenu = document.getElementById("language-menu");
 
     const replaced = new Map();
     const activeGhostLines = [];
 
+    let mainLanguage;
+
     let settings = await getSettings();
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
-    const language = settings.lang ? settings.lang : await selectLanguage();
 
     settings = null;
 
-    const languageObj =
-        language === "ru"
-            ? JSON.parse(await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource }))
-            : JSON.parse(await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource }));
-
-    const mainLanguage = languageObj.main;
+    await ensureStart();
+    await createFilesCopies();
 
     menuButton.title = mainLanguage.menuButtonTitle;
     saveButton.title = mainLanguage.saveButtonTitle;
@@ -1464,6 +1475,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     fileMenuButton.innerHTML = mainLanguage.fileMenu;
     helpMenuButton.innerHTML = mainLanguage.helpMenu;
     languageMenuButton.innerHTML = mainLanguage.languageMenu;
+
+    reloadButton.textContent = mainLanguage.reloadButton;
+    exitButton.textContent = mainLanguage.exitButton;
+
+    helpButtonSub.textContent = mainLanguage.helpButton;
+    aboutButton.textContent = mainLanguage.aboutButton;
+    hotkeysButton.textContent = mainLanguage.hotkeysButton;
 
     let searchRegex = false;
     let searchWhole = false;
@@ -1537,7 +1555,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     appWindow.onCloseRequested(async (event) => {
         await awaitSaving();
+        (await exitProgram()) ? null : event.preventDefault();
+    });
 
+    searchInput.addEventListener("keydown", async (event) => await handleKeypressSearch(event));
+    leftPanel.addEventListener("click", (event) => {
+        const newState = Array.from(leftPanel.children).includes(event.target)
+            ? event.target.textContent
+            : event.target.parentElement.textContent;
+        changeState(newState, true);
+    });
+
+    menuButton.addEventListener("click", () => leftPanel.toggleMultiple("translate-x-0", "-translate-x-full"));
+
+    searchButton.addEventListener("click", async () => {
+        if (searchInput.value) {
+            searchPanelFound.innerHTML = "";
+            await displaySearchResults(searchInput.value, false);
+        } else if (document.activeElement === document.body) {
+            searchInput.focus();
+        }
+    });
+
+    replaceButton.addEventListener("click", async () => {
+        if (searchInput.value && replaceInput.value) {
+            await replaceText(searchInput.value, true);
+        }
+    });
+
+    searchCaseButton.addEventListener("click", switchCase);
+    searchWholeButton.addEventListener("click", switchWhole);
+    searchRegexButton.addEventListener("click", switchRegExp);
+    searchTranslationButton.addEventListener("click", switchTranslation);
+    searchLocationButton.addEventListener("click", switchLocation);
+    saveButton.addEventListener("click", async () => await save());
+    compileButton.addEventListener("click", async () => await compile());
+
+    async function exitProgram() {
         let askExitUnsaved;
         if (saved) {
             askExitUnsaved = true;
@@ -1553,140 +1607,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (!askExit) {
-            event.preventDefault();
+            return;
         } else {
             await exit(0);
         }
-    });
-
-    searchInput.addEventListener("keydown", async (event) => await handleKeypressSearch(event));
-    leftPanel.addEventListener("click", (event) => {
-        const newState = Array.from(leftPanel.children).includes(event.target)
-            ? event.target.textContent
-            : event.target.parentElement.textContent;
-        changeState(newState, true);
-    });
-
-    menuButton.addEventListener("click", () => leftPanel.toggleMultiple("translate-x-0", "-translate-x-full"));
-
-    document.getElementById("search-button").addEventListener("click", async () => {
-        if (searchInput.value) {
-            searchPanelFound.innerHTML = "";
-            await displaySearchResults(searchInput.value, false);
-        } else if (document.activeElement === document.body) {
-            searchInput.focus();
-        }
-    });
-
-    document.getElementById("replace-button").addEventListener("click", async () => {
-        if (searchInput.value && replaceInput.value) {
-            await replaceText(searchInput.value, true);
-        }
-    });
-
-    function createDropdownMenu() {
-        const fileMenu = document.createElement("div");
-        fileMenu.id = "file-menu";
-        fileMenu.classList.add("dropdown-menu");
-        fileMenu.style.top = `${fileMenuButton.offsetTop + fileMenuButton.offsetHeight}px`;
-        fileMenu.style.left = `${fileMenuButton.offsetLeft}px`;
-
-        const reloadButton = document.createElement("button");
-        const exitButton = document.createElement("button");
-
-        reloadButton.classList.add("dropdown-menu-button");
-        exitButton.classList.add("dropdown-menu-button");
-
-        reloadButton.id = "reload-button";
-        exitButton.id = "exit-button";
-
-        reloadButton.textContent = mainLanguage.reloadButton;
-        exitButton.textContent = mainLanguage.exitButton;
-
-        fileMenu.appendChild(reloadButton);
-        fileMenu.appendChild(exitButton);
-
-        fileMenu.classList.add("hidden");
-        menuBar.appendChild(fileMenu);
-
-        const helpMenu = document.createElement("div");
-        helpMenu.id = "help-menu";
-        helpMenu.classList.add("dropdown-menu");
-        helpMenu.style.top = `${helpMenuButton.offsetTop + helpMenuButton.offsetHeight}px`;
-        helpMenu.style.left = `${helpMenuButton.offsetLeft}px`;
-
-        const helpButtonSub = document.createElement("button");
-        const aboutButton = document.createElement("button");
-        const hotkeysButton = document.createElement("button");
-
-        helpButtonSub.id = "help-button-sub";
-        aboutButton.id = "about-button";
-        hotkeysButton.id = "hotkeys-button";
-
-        helpButtonSub.classList.add("dropdown-menu-button");
-        aboutButton.classList.add("dropdown-menu-button");
-        hotkeysButton.classList.add("dropdown-menu-button");
-
-        helpButtonSub.textContent = mainLanguage.helpButton;
-        aboutButton.textContent = mainLanguage.aboutButton;
-        hotkeysButton.textContent = mainLanguage.hotkeysButton;
-
-        helpMenu.appendChild(helpButtonSub);
-        helpMenu.appendChild(aboutButton);
-        helpMenu.appendChild(hotkeysButton);
-
-        helpMenu.classList.add("hidden");
-        menuBar.appendChild(helpMenu);
-
-        const languageMenu = document.createElement("div");
-        languageMenu.id = "language-menu";
-        languageMenu.classList.add("dropdown-menu");
-        languageMenu.style.top = `${languageMenuButton.offsetTop + languageMenuButton.offsetHeight}px`;
-        languageMenu.style.left = `${languageMenuButton.offsetLeft}px`;
-
-        const ruButton = document.createElement("button");
-        const enButton = document.createElement("button");
-
-        ruButton.id = "ru-button";
-        enButton.id = "en-button";
-
-        ruButton.classList.add("dropdown-menu-button");
-        enButton.classList.add("dropdown-menu-button");
-
-        ruButton.textContent = "Русский/Russian";
-        enButton.textContent = "English/Английский";
-
-        languageMenu.appendChild(ruButton);
-        languageMenu.appendChild(enButton);
-
-        languageMenu.classList.add("hidden");
-        menuBar.appendChild(languageMenu);
     }
-    createDropdownMenu();
-
-    searchCaseButton.addEventListener("click", switchCase);
-    searchWholeButton.addEventListener("click", switchWhole);
-    searchRegexButton.addEventListener("click", switchRegExp);
-    searchTranslationButton.addEventListener("click", switchTranslation);
-    searchLocationButton.addEventListener("click", switchLocation);
-    saveButton.addEventListener("click", async () => await save());
-    compileButton.addEventListener("click", async () => await compile());
-
     async function fileMenuClick(target) {
-        document.getElementById("file-menu").classList.replace("flex", "hidden");
+        fileMenu.classList.replace("flex", "hidden");
 
         switch (target.id) {
             case "reload-button":
+                await awaitSaving();
+                await exitProgram();
+
                 location.reload();
                 break;
             case "exit-button":
+                await awaitSaving();
+                await exitProgram();
+
                 await exit(0);
                 break;
         }
     }
 
     function helpMenuClick(target) {
-        document.getElementById("help-menu").classList.replace("flex", "hidden");
+        helpMenu.classList.replace("flex", "hidden");
 
         switch (target.id) {
             case "help-button-sub":
@@ -1720,7 +1666,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function languageMenuClick(target) {
-        document.getElementById("language-menu").classList.replace("flex", "hidden");
+        languageMenu.classList.replace("flex", "hidden");
 
         switch (target.id) {
             case "ru-button":
@@ -1732,8 +1678,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    menuBar.addEventListener("click", (event) => {
-        const fileMenu = document.getElementById("file-menu");
+    function menuBarClick(event) {
         const helpMenu = document.getElementById("help-menu");
         const languageMenu = document.getElementById("language-menu");
 
@@ -1742,6 +1687,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fileMenu.toggleMultiple("hidden", "flex");
                 helpMenu.classList.replace("flex", "hidden");
                 languageMenu.classList.replace("flex", "hidden");
+
+                fileMenu.style.top = `${fileMenuButton.offsetTop + fileMenuButton.offsetHeight}px`;
+                fileMenu.style.left = `${fileMenuButton.offsetLeft}px`;
 
                 fileMenu.addEventListener("click", async (event) => await fileMenuClick(event.target), {
                     once: true,
@@ -1752,6 +1700,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fileMenu.classList.replace("flex", "hidden");
                 languageMenu.classList.replace("flex", "hidden");
 
+                helpMenu.style.top = `${helpMenuButton.offsetTop + helpMenuButton.offsetHeight}px`;
+                helpMenu.style.left = `${helpMenuButton.offsetLeft}px`;
+
                 helpMenu.addEventListener("click", (event) => helpMenuClick(event.target), { once: true });
                 break;
             case "language":
@@ -1759,14 +1710,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                 helpMenu.classList.replace("flex", "hidden");
                 fileMenu.classList.replace("flex", "hidden");
 
+                languageMenu.style.top = `${languageMenuButton.offsetTop + languageMenuButton.offsetHeight}px`;
+                languageMenu.style.left = `${languageMenuButton.offsetLeft}px`;
+
                 languageMenu.addEventListener("click", async (event) => await languageMenuClick(event.target), {
                     once: true,
                 });
                 break;
         }
+    }
+    menuBar.addEventListener("click", (event) => {
+        menuBarClick(event);
     });
 
-    optionsButton.addEventListener("click", async () => {
+    function createOptionsWindow() {
         new WebviewWindow("options", {
             url: "./options.html",
             title: mainLanguage.optionsButtonTitle,
@@ -1774,7 +1731,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             height: 600,
             center: true,
         });
-    });
+    }
+    optionsButton.addEventListener("click", createOptionsWindow);
 
     document.addEventListener("keydown", (event) => preventKeyDefaults(event));
     document.addEventListener("keydown", async (event) => {
