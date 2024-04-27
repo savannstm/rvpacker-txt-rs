@@ -18,10 +18,6 @@ json-writer поддерживает аргументы - чтобы получ�
 
 Сообщения об ошибках и коммиты приветствуются.
 
-## Директория gui
-
-В этой директории хранится исходный код старой версии программы, написанной на Electron.
-
 ### Билдинг приложения
 
 Клонируйте репозиторий с помощью\
@@ -39,6 +35,10 @@ json-writer поддерживает аргументы - чтобы получ�
 Если вы хотите внести какие-то изменения в код проекта - вносите его в фронтенд файлы из директории `src-dev`, либо бэкенд файлы из директории `src-tauri/src`.
 
 После билдинга в директории `gui-tauri/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
+
+## Директория gui
+
+В этой директории хранится исходный код старой версии программы, написанной на Electron.
 
 ## Директория translation
 
@@ -79,10 +79,6 @@ This directory contains the source code of new program version, written with Tau
 
 Issues and commits are welcome.
 
-## gui Directory
-
-This folder contains the source code of old program version, written with Electron.
-
 ### Program manual building
 
 Clone the repository with\
@@ -100,6 +96,10 @@ to build the program for your current OS.
 If you want to make some edits to the source code - edit frontend files in `src-dev` directory, or backend files in `src-tauri/src` directory.
 
 After the build, `target` directory will be created in the `gui-tauri/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
+
+## gui Directory
+
+This folder contains the source code of old program version, written with Electron.
 
 ## translation Directory
 
