@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (askCreateSettings) {
             await writeTextFile(
                 await join(resourceDir, settingsFile),
-                JSON.stringify({ backup: { enabled: true, period: 60, max: 99 }, lang: language }),
+                JSON.stringify({ backup: { enabled: true, period: 60, max: 99 }, lang: language, firstLaunch: true }),
                 {
                     dir: BaseDirectory.Resource,
                 }
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const unlistenProgress = await appWindow.listen("progress", (event) => {
             if (event.payload !== "ended") {
-                progressStatus.innerHTML = `${event.payload}МБ`;
+                progressStatus.innerHTML = `${event.payload} MB`;
             } else {
                 downloading = false;
             }
@@ -1456,10 +1456,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
 
-    settings = null;
+    const language = settings.lang;
 
     await ensureStart();
     await createFilesCopies();
+
+    if (settings.firstLaunch) {
+        new WebviewWindow("help", {
+            url: "./help.html",
+            title: mainLanguage.helpButton,
+            width: 640,
+            height: 480,
+            center: true,
+            alwaysOnTop: true,
+        });
+
+        await writeTextFile(
+            await join(resourceDir, settingsFile),
+            JSON.stringify({ ...settings, firstLaunch: false }),
+            { dir: BaseDirectory.Resource }
+        );
+    }
+
+    settings = null;
 
     menuButton.title = mainLanguage.menuButtonTitle;
     saveButton.title = mainLanguage.saveButtonTitle;
@@ -1670,10 +1689,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         switch (target.id) {
             case "ru-button":
-                await changeLanguage("ru");
+                await awaitSaving();
+                await exitProgram();
+                if (language !== "ru") {
+                    await changeLanguage("ru");
+                }
                 break;
             case "en-button":
-                await changeLanguage("en");
+                await awaitSaving();
+                await exitProgram();
+                if (language !== "en") {
+                    await changeLanguage("en");
+                }
                 break;
         }
     }
