@@ -173,35 +173,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function changeLanguage(language) {
         await awaitSaving();
 
-        let askExitUnsaved;
-        if (saved) {
-            askExitUnsaved = true;
-        } else {
-            askExitUnsaved = await ask(mainLanguage.unsavedChanges);
-        }
-
-        let askExit;
-        if (!askExitUnsaved) {
-            askExit = await ask(mainLanguage.exit);
-        } else {
-            const settings = JSON.parse(
-                await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
-            );
-
-            await writeTextFile(
-                await join(resourceDir, settingsFile),
-                JSON.stringify({ ...settings, lang: language }),
-                {
-                    dir: BaseDirectory.Resource,
-                }
-            );
-
-            location.reload();
-        }
-
-        if (!askExit) {
-            return;
-        } else {
+        if (await exitProgram()) {
             const settings = JSON.parse(
                 await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
             );
@@ -598,6 +570,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         return;
     }
+
     function showSearchPanel(hide = true) {
         if (JSON.parse(searchPanel.getAttribute("moving")) === false) {
             if (hide) {
@@ -1152,7 +1125,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             case "F4":
                 if (event.altKey) {
                     await awaitSaving();
-                    await exitProgram();
+                    if (await exitProgram()) {
+                        await exit(0);
+                    }
                 }
                 break;
         }
@@ -1459,13 +1434,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!askExitUnsaved) {
             askExit = await ask(mainLanguage.exit);
         } else {
-            await exit(0);
+            return true;
         }
 
         if (!askExit) {
-            return;
+            return false;
         } else {
-            await exit(0);
+            return true;
         }
     }
 
@@ -1475,15 +1450,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         switch (target.id) {
             case "reload-button":
                 await awaitSaving();
-                await exitProgram();
 
-                location.reload();
+                if (await exitProgram()) {
+                    location.reload();
+                }
                 break;
             case "exit-button":
                 await awaitSaving();
-                await exitProgram();
 
-                await exit(0);
+                if (await exitProgram()) {
+                    await exit(0);
+                }
                 break;
         }
     }
@@ -1528,15 +1505,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         switch (target.id) {
             case "ru-button":
                 await awaitSaving();
-                await exitProgram();
-                if (language !== "ru") {
+
+                if (language !== "ru" && (await exitProgram())) {
                     await changeLanguage("ru");
                 }
                 break;
             case "en-button":
                 await awaitSaving();
-                await exitProgram();
-                if (language !== "en") {
+
+                if (language !== "en" && (await exitProgram())) {
                     await changeLanguage("en");
                 }
                 break;
@@ -1811,6 +1788,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await appWindow.onCloseRequested(async (event) => {
         await awaitSaving();
-        (await exitProgram()) ? null : event.preventDefault();
+        (await exitProgram()) ? await exit(0) : event.preventDefault();
     });
 });
