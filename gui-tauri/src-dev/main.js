@@ -28,6 +28,18 @@ HTMLElement.prototype.toggleMultiple = function (...classes) {
     }
 };
 
+HTMLElement.prototype.secondHighestParent = function (childElement) {
+    let parent = childElement;
+    let previous;
+
+    while (parent !== this) {
+        previous = parent;
+        parent = parent.parentElement;
+    }
+
+    return previous;
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
     const resourceDir = "res";
     const translationDir = "translation";
@@ -44,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const repoDir = "repo";
 
     async function copyDir(sourceDir, targetDir, fsOptions) {
-        await createDir(targetDir, { ...fsOptions, recursive: true });
+        await createDir(targetDir, fsOptions);
 
         for (const file of await readDir(sourceDir, fsOptions)) {
             if (file.children) {
@@ -235,6 +247,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             await join(resourceDir, entry.name),
                             {
                                 dir: BaseDirectory.Resource,
+                                recursive: true,
                             }
                         );
                     }
@@ -265,6 +278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 await join(resourceDir, entry.name),
                                 {
                                     dir: BaseDirectory.Resource,
+                                    recursive: true,
                                 }
                             );
                         }
@@ -279,17 +293,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                         for (const file of dir.children) {
                             if (file.name.endsWith("_trans.txt")) {
                                 const numberOfLines = (
-                                    await readTextFile(await join(resourceDir, translationDir, dir, file.name), {
+                                    await readTextFile(await join(resourceDir, translationDir, dir.name, file.name), {
                                         dir: BaseDirectory.Resource,
                                     })
                                 ).countChars("\n");
 
-                                await removeFile(await join(resourceDir, translationDir, dir, file.name), {
+                                await removeFile(await join(resourceDir, translationDir, dir.name, file.name), {
                                     dir: BaseDirectory.Resource,
                                 });
 
                                 await writeTextFile(
-                                    await join(resourceDir, translationDir, dir, file.name),
+                                    await join(resourceDir, translationDir, dir.name, file.name),
                                     "\n".repeat(numberOfLines),
                                     {
                                         dir: BaseDirectory.Resource,
@@ -404,7 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const arrow = document.createElement("div");
         arrow.classList.add("search-result-arrow");
-        arrow.textContent = "arrow_downward";
+        arrow.innerHTML = "arrow_downward";
         mainDiv.appendChild(arrow);
 
         const counterpart = document.createElement("div");
@@ -482,7 +496,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const elementText = node[1].innerHTML.replaceAllMultiple({ "<": "&lt;", ">": "&gt;" });
                 const matches = elementText.match(regexp);
 
-                if (!matches) continue;
+                if (!matches) {
+                    continue;
+                }
 
                 const result = createMatchesContainer(elementText, matches);
                 appendMatch(node[1], result);
@@ -767,7 +783,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
             const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
 
-            await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject, null, 4), {
+            await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject), {
                 dir: BaseDirectory.Resource,
             });
             replaced.clear();
@@ -809,29 +825,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
         const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
 
-        await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject, null, 4), {
+        await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject), {
             dir: BaseDirectory.Resource,
         });
         replaced.clear();
     }
 
     async function isFilesCopied() {
-        for (const dir of [mapsDir, otherDir, pluginsDir]) {
-            await createDir(await join(resourceDir, copiesDir, dir), {
+        for (const dir of await readDir(await join(resourceDir, translationDir), {
+            dir: BaseDirectory.Resource,
+            recursive: true,
+        })) {
+            await createDir(await join(resourceDir, copiesDir, dir.name), {
                 dir: BaseDirectory.Resource,
                 recursive: true,
             });
 
             if (
-                (await readDir(await join(resourceDir, translationDir, dir), { dir: BaseDirectory.Resource }))
-                    .length ===
-                (await readDir(await join(resourceDir, copiesDir, dir), { dir: BaseDirectory.Resource })).length
+                dir.children.length !==
+                (
+                    await readDir(await join(resourceDir, copiesDir, dir.name), {
+                        dir: BaseDirectory.Resource,
+                    })
+                ).length
             ) {
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     async function createFilesCopies() {
@@ -841,10 +863,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         for (const folder of await readDir(await join(resourceDir, translationDir), {
             dir: BaseDirectory.Resource,
+            recursive: true,
         })) {
-            for (const file of await readDir(await join(resourceDir, translationDir, folder.name), {
-                dir: BaseDirectory.Resource,
-            })) {
+            for (const file of folder.children) {
                 await copyFile(
                     await join(resourceDir, translationDir, folder.name, file.name),
                     await join(resourceDir, copiesDir, folder.name, file.name),
@@ -906,10 +927,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             saved = true;
         }
 
-        setTimeout(() => {
-            saveButton.firstElementChild.classList.remove("animate-spin");
-            saving = false;
-        }, 1000);
+        saveButton.firstElementChild.classList.remove("animate-spin");
+        saving = false;
     }
 
     function backup(s) {
@@ -933,8 +952,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const contentParent = document.getElementById(newState);
         contentParent.classList.replace("hidden", "flex");
 
-        if (previousState) {
-            const previousStateContainer = document.getElementById(previousState);
+        if (statePrevious) {
+            const previousStateContainer = document.getElementById(statePrevious);
 
             if (previousStateContainer) {
                 previousStateContainer.toggleMultiple("flex", "hidden");
@@ -968,7 +987,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 break;
             default:
-                previousState = state;
+                statePrevious = state;
                 state = newState;
                 updateState(newState, slide);
                 break;
@@ -1132,8 +1151,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 break;
             case "F4":
                 if (event.altKey) {
-                    event.preventDefault();
-                    await exit(0);
+                    await awaitSaving();
+                    await exitProgram();
                 }
                 break;
         }
@@ -1183,7 +1202,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             recursive: true,
         })) {
             for (const file of folder.children) {
-                if (!file.name.endsWith(".txt")) continue;
+                if (!file.name.endsWith(".txt")) {
+                    continue;
+                }
 
                 contentNames.push(file.name.slice(0, -4));
                 content.push(
@@ -1253,6 +1274,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert(message.payload);
             unlistenCompile();
         });
+
         await appWindow.emit("compile");
     }
 
@@ -1305,7 +1327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const { left, top } = object;
             const ghostNewLine = document.createElement("div");
             ghostNewLine.classList.add("ghost-new-line");
-            ghostNewLine.textContent = "\\n";
+            ghostNewLine.innerHTML = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
 
@@ -1315,12 +1337,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function calculateTextAreaHeight(target) {
-        let lineBreaks = target.value.countChars("\n");
+        const lineBreaks = target.value.countChars("\n");
 
         const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
             window.getComputedStyle(target);
 
-        let newHeight =
+        const newHeight =
             lineBreaks * parseFloat(lineHeight) +
             parseFloat(paddingTop) +
             parseFloat(paddingBottom) +
@@ -1415,200 +1437,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         searchLocationButton.classList.toggle("bg-zinc-500");
     }
 
-    const contentContainer = document.getElementById("content-container");
-    const searchInput = document.getElementById("search-input");
-    const replaceInput = document.getElementById("replace-input");
-    const menuButton = document.getElementById("menu-button");
-    const leftPanel = document.getElementById("left-panel");
-    const searchPanel = document.getElementById("search-results");
-    const searchPanelFound = document.getElementById("search-content");
-    const searchPanelReplaced = document.getElementById("replace-content");
-    const saveButton = document.getElementById("save-button");
-    const compileButton = document.getElementById("compile-button");
-    const optionsButton = document.getElementById("options-button");
-    const searchButton = document.getElementById("search-button");
-    const replaceButton = document.getElementById("replace-button");
-    const searchCaseButton = document.getElementById("case-button");
-    const searchWholeButton = document.getElementById("whole-button");
-    const searchRegexButton = document.getElementById("regex-button");
-    const searchTranslationButton = document.getElementById("translate-button");
-    const searchLocationButton = document.getElementById("location-button");
-    const goToRowInput = document.getElementById("goto-row-input");
-    const menuBar = document.getElementById("menu-bar");
-    const fileMenuButton = document.getElementById("file");
-    const helpMenuButton = document.getElementById("help");
-    const languageMenuButton = document.getElementById("language");
-    const fileMenu = document.getElementById("file-menu");
-    const reloadButton = document.getElementById("reload-button");
-    const exitButton = document.getElementById("exit-button");
-    const helpMenu = document.getElementById("help-menu");
-    const helpButtonSub = document.getElementById("help-button-sub");
-    const aboutButton = document.getElementById("about-button");
-    const hotkeysButton = document.getElementById("hotkeys-button");
-    const languageMenu = document.getElementById("language-menu");
-
-    const replaced = new Map();
-    const activeGhostLines = [];
-
-    let mainLanguage;
-
-    let settings = await getSettings();
-
-    const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
-
-    const language = settings.lang;
-
-    await ensureStart();
-    await createFilesCopies();
-
-    if (settings.firstLaunch) {
-        new WebviewWindow("help", {
-            url: "./help.html",
-            title: mainLanguage.helpButton,
-            width: 640,
-            height: 480,
+    function createOptionsWindow() {
+        new WebviewWindow("options", {
+            url: "./options.html",
+            title: mainLanguage.optionsButtonTitle,
+            width: 800,
+            height: 600,
             center: true,
-            alwaysOnTop: true,
         });
-
-        await writeTextFile(
-            await join(resourceDir, settingsFile),
-            JSON.stringify({ ...settings, firstLaunch: false }),
-            { dir: BaseDirectory.Resource }
-        );
     }
-
-    settings = null;
-
-    menuButton.title = mainLanguage.menuButtonTitle;
-    saveButton.title = mainLanguage.saveButtonTitle;
-    compileButton.title = mainLanguage.compileButtonTitle;
-    optionsButton.title = mainLanguage.optionsButtonTitle;
-
-    searchCaseButton.title = mainLanguage.caseButtonTitle;
-    searchWholeButton.title = mainLanguage.wholeButtonTitle;
-    searchRegexButton.title = mainLanguage.regexButtonTitle;
-    searchTranslationButton.title = mainLanguage.translationButtonTitle;
-    searchLocationButton.title = mainLanguage.locationButtonTitle;
-
-    fileMenuButton.innerHTML = mainLanguage.fileMenu;
-    helpMenuButton.innerHTML = mainLanguage.helpMenu;
-    languageMenuButton.innerHTML = mainLanguage.languageMenu;
-
-    reloadButton.textContent = mainLanguage.reloadButton;
-    exitButton.textContent = mainLanguage.exitButton;
-
-    helpButtonSub.textContent = mainLanguage.helpButton;
-    aboutButton.textContent = mainLanguage.aboutButton;
-    hotkeysButton.textContent = mainLanguage.hotkeysButton;
-
-    let searchRegex = false;
-    let searchWhole = false;
-    let searchCase = false;
-    let searchTranslation = false;
-    let searchLocation = false;
-
-    let state = null;
-    let previousState = null;
-
-    let saved = true;
-    let saving = false;
-    let currentFocusedElement = [];
-
-    leftPanel.style.height = `${window.innerHeight - 88}px`;
-
-    if (!(await exists(await join(resourceDir, logFile), { dir: BaseDirectory.Resource }))) {
-        await writeTextFile(await join(resourceDir, logFile), "{}", { dir: BaseDirectory.Resource });
-    }
-
-    await createDir(await join(resourceDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
-
-    let nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
-    if (backupEnabled) {
-        backup(backupPeriod);
-    }
-
-    await createContent();
-    arrangeElements();
-
-    const observerMain = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            entry.isIntersecting
-                ? entry.target.firstElementChild.classList.remove("hidden")
-                : entry.target.firstElementChild.classList.add("hidden");
-        }
-    });
-
-    const observerFound = new IntersectionObserver(
-        (entries) => {
-            for (const entry of entries) {
-                entry.isIntersecting
-                    ? entry.target.firstElementChild.classList.remove("hidden")
-                    : entry.target.firstElementChild.classList.add("hidden");
-            }
-        },
-        { root: searchPanelFound, threshold: 0.1 }
-    );
-
-    const observerReplaced = new IntersectionObserver(
-        (entries) => {
-            for (const entry of entries) {
-                entry.isIntersecting
-                    ? entry.target.firstElementChild.classList.remove("hidden")
-                    : entry.target.firstElementChild.classList.add("hidden");
-            }
-        },
-        { root: searchPanelReplaced, threshold: 0.1 }
-    );
-
-    async function awaitSaving() {
-        try {
-            if (saving) {
-                throw null;
-            }
-        } catch (err) {
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            await awaitSaving();
-        }
-    }
-
-    appWindow.onCloseRequested(async (event) => {
-        await awaitSaving();
-        (await exitProgram()) ? null : event.preventDefault();
-    });
-
-    searchInput.addEventListener("keydown", async (event) => await handleKeypressSearch(event));
-    leftPanel.addEventListener("click", (event) => {
-        const newState = Array.from(leftPanel.children).includes(event.target)
-            ? event.target.textContent
-            : event.target.parentElement.textContent;
-        changeState(newState, true);
-    });
-
-    menuButton.addEventListener("click", () => leftPanel.toggleMultiple("translate-x-0", "-translate-x-full"));
-
-    searchButton.addEventListener("click", async () => {
-        if (searchInput.value) {
-            searchPanelFound.innerHTML = "";
-            await displaySearchResults(searchInput.value, false);
-        } else if (document.activeElement === document.body) {
-            searchInput.focus();
-        }
-    });
-
-    replaceButton.addEventListener("click", async () => {
-        if (searchInput.value && replaceInput.value) {
-            await replaceText(searchInput.value, true);
-        }
-    });
-
-    searchCaseButton.addEventListener("click", switchCase);
-    searchWholeButton.addEventListener("click", switchWhole);
-    searchRegexButton.addEventListener("click", switchRegExp);
-    searchTranslationButton.addEventListener("click", switchTranslation);
-    searchLocationButton.addEventListener("click", switchLocation);
-    saveButton.addEventListener("click", async () => await save());
-    compileButton.addEventListener("click", async () => await compile());
 
     async function exitProgram() {
         let askExitUnsaved;
@@ -1631,6 +1468,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             await exit(0);
         }
     }
+
     async function fileMenuClick(target) {
         fileMenu.classList.replace("flex", "hidden");
 
@@ -1705,11 +1543,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    function menuBarClick(event) {
-        const helpMenu = document.getElementById("help-menu");
-        const languageMenu = document.getElementById("language-menu");
-
-        switch (event.target.id) {
+    function menuBarClick(target) {
+        switch (target.id) {
             case "file":
                 fileMenu.toggleMultiple("hidden", "flex");
                 helpMenu.classList.replace("flex", "hidden");
@@ -1746,29 +1581,236 @@ document.addEventListener("DOMContentLoaded", async () => {
                 break;
         }
     }
-    menuBar.addEventListener("click", (event) => {
-        menuBarClick(event);
+
+    async function awaitSaving() {
+        try {
+            if (saving) {
+                throw null;
+            }
+        } catch (err) {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await awaitSaving();
+        }
+    }
+
+    async function createLogFile() {
+        const logPath = await join(resourceDir, logFile);
+        if (!(await exists(logPath, { dir: BaseDirectory.Resource }))) {
+            await writeTextFile(logPath, "{}", { dir: BaseDirectory.Resource });
+        }
+    }
+
+    const contentContainer = document.getElementById("content-container");
+    const searchInput = document.getElementById("search-input");
+    const replaceInput = document.getElementById("replace-input");
+    const menuButton = document.getElementById("menu-button");
+    const leftPanel = document.getElementById("left-panel");
+    const searchPanel = document.getElementById("search-results");
+    const searchPanelFound = document.getElementById("search-content");
+    const searchPanelReplaced = document.getElementById("replace-content");
+    const topPanel = document.getElementById("top-panel");
+    const topPanelButtons = document.getElementById("top-panel-buttons");
+    const saveButton = document.getElementById("save-button");
+    const compileButton = document.getElementById("compile-button");
+    const optionsButton = document.getElementById("options-button");
+    const searchCaseButton = document.getElementById("case-button");
+    const searchWholeButton = document.getElementById("whole-button");
+    const searchRegexButton = document.getElementById("regex-button");
+    const searchTranslationButton = document.getElementById("translate-button");
+    const searchLocationButton = document.getElementById("location-button");
+    const goToRowInput = document.getElementById("goto-row-input");
+    const menuBar = document.getElementById("menu-bar");
+    const fileMenuButton = document.getElementById("file");
+    const helpMenuButton = document.getElementById("help");
+    const languageMenuButton = document.getElementById("language");
+    const fileMenu = document.getElementById("file-menu");
+    const reloadButton = document.getElementById("reload-button");
+    const exitButton = document.getElementById("exit-button");
+    const helpMenu = document.getElementById("help-menu");
+    const helpButtonSub = document.getElementById("help-button-sub");
+    const aboutButton = document.getElementById("about-button");
+    const hotkeysButton = document.getElementById("hotkeys-button");
+    const languageMenu = document.getElementById("language-menu");
+
+    const replaced = new Map();
+    const activeGhostLines = [];
+
+    let mainLanguage;
+
+    let settings = await getSettings();
+
+    const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
+
+    const language = settings.lang;
+
+    await ensureStart();
+    await createFilesCopies();
+
+    if (settings.firstLaunch) {
+        new WebviewWindow("help", {
+            url: "./help.html",
+            title: mainLanguage.helpButton,
+            width: 640,
+            height: 480,
+            center: true,
+            alwaysOnTop: true,
+        });
+
+        await writeTextFile(
+            await join(resourceDir, settingsFile),
+            JSON.stringify({ ...settings, firstLaunch: false }),
+            { dir: BaseDirectory.Resource }
+        );
+    }
+
+    settings = null;
+
+    menuButton.title = mainLanguage.menuButtonTitle;
+    saveButton.title = mainLanguage.saveButtonTitle;
+    compileButton.title = mainLanguage.compileButtonTitle;
+    optionsButton.title = mainLanguage.optionsButtonTitle;
+
+    searchCaseButton.title = mainLanguage.caseButtonTitle;
+    searchWholeButton.title = mainLanguage.wholeButtonTitle;
+    searchRegexButton.title = mainLanguage.regexButtonTitle;
+    searchTranslationButton.title = mainLanguage.translationButtonTitle;
+    searchLocationButton.title = mainLanguage.locationButtonTitle;
+
+    fileMenuButton.innerHTML = mainLanguage.fileMenu;
+    helpMenuButton.innerHTML = mainLanguage.helpMenu;
+    languageMenuButton.innerHTML = mainLanguage.languageMenu;
+
+    reloadButton.innerHTML = mainLanguage.reloadButton;
+    exitButton.innerHTML = mainLanguage.exitButton;
+
+    helpButtonSub.innerHTML = mainLanguage.helpButton;
+    aboutButton.innerHTML = mainLanguage.aboutButton;
+    hotkeysButton.innerHTML = mainLanguage.hotkeysButton;
+
+    let searchRegex = false;
+    let searchWhole = false;
+    let searchCase = false;
+    let searchTranslation = false;
+    let searchLocation = false;
+
+    let state = null;
+    let statePrevious = null;
+
+    let saved = true;
+    let saving = false;
+    let currentFocusedElement = [];
+
+    leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
+
+    await createLogFile();
+    await createDir(await join(resourceDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
+
+    let nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
+    if (backupEnabled) {
+        backup(backupPeriod);
+    }
+
+    await createContent();
+    arrangeElements();
+
+    const observerMain = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            entry.target.firstElementChild.classList.toggle("hidden", !entry.isIntersecting);
+        }
     });
 
-    function createOptionsWindow() {
-        new WebviewWindow("options", {
-            url: "./options.html",
-            title: mainLanguage.optionsButtonTitle,
-            width: 800,
-            height: 600,
-            center: true,
-        });
-    }
-    optionsButton.addEventListener("click", createOptionsWindow);
+    const observerFound = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                entry.target.firstElementChild.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        { root: searchPanelFound, threshold: 0.1 }
+    );
 
-    document.addEventListener("keydown", (event) => preventKeyDefaults(event));
+    const observerReplaced = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                entry.target.firstElementChild.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        { root: searchPanelReplaced, threshold: 0.1 }
+    );
+
+    leftPanel.addEventListener("click", (event) => {
+        const newState = leftPanel.secondHighestParent(event.target).textContent;
+        changeState(newState, true);
+    });
+
+    topPanelButtons.addEventListener("click", async (event) => {
+        const target = topPanelButtons.secondHighestParent(event.target);
+
+        switch (target.id) {
+            case "menu-button":
+                leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
+                break;
+            case "save-button":
+                await save();
+                break;
+            case "compile-button":
+                await compile();
+                break;
+            case "options-button":
+                createOptionsWindow();
+                break;
+            case "search-button":
+                if (searchInput.value) {
+                    searchPanelFound.innerHTML = "";
+                    await displaySearchResults(searchInput.value, false);
+                } else if (document.activeElement === document.body) {
+                    searchInput.focus();
+                }
+                break;
+            case "replace-button":
+                if (searchInput.value && replaceInput.value) {
+                    await replaceText(searchInput.value, true);
+                }
+                break;
+            case "case-button":
+                switchCase();
+                break;
+            case "whole-button":
+                switchWhole();
+                break;
+            case "regex-button":
+                switchRegExp();
+                break;
+            case "translation-button":
+                switchTranslation();
+                break;
+            case "location-button":
+                switchLocation();
+                break;
+        }
+    });
+
+    searchInput.addEventListener("blur", () => (searchInput.value = searchInput.value.trim()));
+    replaceInput.addEventListener("blur", () => (replaceInput.value = replaceInput.value.trim()));
+
+    searchInput.addEventListener("keydown", async (event) => await handleKeypressSearch(event));
+
+    menuBar.addEventListener("click", (event) => menuBarClick(event.target));
+
     document.addEventListener("keydown", async (event) => {
+        preventKeyDefaults(event);
+
         if (document.activeElement === document.body) {
             await handleKeypressBody(event);
         }
+
         await handleKeypressGlobal(event);
     });
 
     document.addEventListener("focus", handleFocus, true);
     document.addEventListener("blur", handleBlur, true);
+
+    await appWindow.onCloseRequested(async (event) => {
+        await awaitSaving();
+        (await exitProgram()) ? null : event.preventDefault();
+    });
 });

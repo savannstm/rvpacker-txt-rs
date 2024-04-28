@@ -1,6 +1,6 @@
 {
     "name": "gui-tauri",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "devDependencies": {
         "@tauri-apps/cli": "^1",
         "tailwindcss": "^3.4.3",
@@ -12,7 +12,7 @@
         "tauri": "bun run minify-html && bun run minify-js && tauri",
         "tw": "tailwindcss -i ./input.css -o ./src/style.css -w --minify",
         "minify-html": "html-minifier-terser --input-dir ./src-dev --output-dir ./src --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --file-ext html",
-        "minify-js": "terser ./src-dev/main.js -c -m -o ./src/main.js && terser ./src-dev/about.js -c -m -o ./src/about.js && terser ./src-dev/options.js -c -m -o ./src/options.js && terser ./src-dev/hotkeys.js -c -m -o ./src/hotkeys.js && terser ./src-dev/help.js -c -m -o ./src/help.js"
+        "minify-js": "terser ./src-dev/main.js -c toplevel -m -o ./src/main.js && terser ./src-dev/about.js -c toplevel -m -o ./src/about.js && terser ./src-dev/options.js -c toplevel -m -o ./src/options.js && terser ./src-dev/hotkeys.js -c toplevel -m -o ./src/hotkeys.js && terser ./src-dev/help.js -c toplevel -m -o ./src/help.js"
     },
     "type": "module"
 }

@@ -37,33 +37,33 @@
             </div>
             <div id="top-panel" class="flex sticky top-6 z-30 items-center w-full h-16 bg-zinc-800">
                 <div id="top-panel-buttons" class="flex items-center w-full h-16">
-                    <div id="menu-button" class="button"><div>menu</div></div>
-                    <div id="save-button" class="button">
+                    <button id="menu-button" class="button">
+                        <div>menu</div>
+                    </button>
+                    <button id="save-button" class="button">
                         <div>save</div>
-                    </div>
-                    <div id="compile-button" class="button">
+                    </button>
+                    <button id="compile-button" class="button">
                         <div>upload</div>
-                    </div>
-                    <div id="options-button" class="button">
+                    </button>
+                    <button id="options-button" class="button">
                         <div>settings</div>
-                    </div>
+                    </button>
                     <div class="w-16"></div>
-                    <div id="search-button" class="button">
-                        <div>search</div>
-                    </div>
+                    <button id="search-button" class="button">search</button>
                     <div id="search-field" class="flex flex-row items-center p-4">
                         <textarea id="search-input" rows="1" cols="50" class="input"></textarea>
                     </div>
-                    <div id="replace-button" class="button">arrow_right_alt</div>
+                    <button id="replace-button" class="button">arrow_right_alt</button>
                     <div id="replace-field" class="flex flex-row items-center p-4">
                         <textarea id="replace-input" rows="1" cols="50" class="input"></textarea>
                     </div>
-                    <div id="case-button" class="button">match_case</div>
-                    <div id="whole-button" class="button">match_word</div>
-                    <div id="regex-button" class="button">regular_expression</div>
-                    <div id="translate-button" class="button">translate</div>
-                    <div id="location-button" class="button">location_on</div>
-                    <div id="current-state" class="flex justify-center items-center p-4"></div>
+                    <button id="case-button" class="button">match_case</button>
+                    <button id="whole-button" class="button">match_word</button>
+                    <button id="regex-button" class="button">regular_expression</button>
+                    <button id="translate-button" class="button">translate</button>
+                    <button id="location-button" class="button">location_on</button>
+                    <button id="current-state" class="flex justify-center items-center p-4"></button>
                 </div>
             </div>
 
@@ -78,22 +78,22 @@
                     id="left-panel"
                     class="flex fixed z-30 flex-col w-16 text-xs transition-all duration-500 -translate-x-full bg-zinc-700"
                 >
-                    <div class="menu-button" title="1">maps</div>
-                    <div class="menu-button" title="2">names</div>
-                    <div class="menu-button" title="3">actors</div>
-                    <div class="menu-button" title="4">armors</div>
-                    <div class="menu-button" title="5">classes</div>
-                    <div class="menu-button" title="6">
+                    <button class="menu-button" title="1">maps</button>
+                    <button class="menu-button" title="2">names</button>
+                    <button class="menu-button" title="3">actors</button>
+                    <button class="menu-button" title="4">armors</button>
+                    <button class="menu-button" title="5">classes</button>
+                    <button class="menu-button" title="6">
                         <div>common</div>
                         <div>events</div>
-                    </div>
-                    <div class="menu-button" title="7">enemies</div>
-                    <div class="menu-button" title="8">items</div>
-                    <div class="menu-button" title="9">skills</div>
-                    <div class="menu-button" title="0">system</div>
-                    <div class="menu-button" title="-">troops</div>
-                    <div class="menu-button" title="+">weapons</div>
-                    <div class="menu-button" title="Backspace">plugins</div>
+                    </button>
+                    <button class="menu-button" title="7">enemies</button>
+                    <button class="menu-button" title="8">items</button>
+                    <button class="menu-button" title="9">skills</button>
+                    <button class="menu-button" title="0">system</button>
+                    <button class="menu-button" title="-">troops</button>
+                    <button class="menu-button" title="+">weapons</button>
+                    <button class="menu-button" title="Backspace">plugins</button>
                 </div>
 
                 <div id="content-container" class="flex flex-col justify-start p-8 w-full text-lg"></div>
@@ -104,12 +104,12 @@
                     shown="false"
                     moving="false"
                 >
-                    <div
+                    <button
                         id="switch-search-content"
                         class="flex justify-center items-center mb-2 w-full h-12 text-3xl cursor-pointer select-none font-material hover:bg-zinc-600"
                     >
                         search
-                    </div>
+                    </button>
                     <div id="search-content" class="flex flex-col w-full"></div>
                     <div id="replace-content" class="hidden flex-col w-full"></div>
                 </div>
