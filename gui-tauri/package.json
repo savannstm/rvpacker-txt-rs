@@ -1,6 +1,6 @@
 {
     "name": "gui-tauri",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "devDependencies": {
         "@tauri-apps/cli": "^1",
         "tailwindcss": "^3.4.3",

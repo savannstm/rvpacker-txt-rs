@@ -1,6 +1,6 @@
 [package]
 name = "fh-temina-json-writer"
-version = "2.1.0"
+version = "2.2.0"
 description = "Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать их в .json файлы"
 authors = ["savannstm"]
 edition = "2021"

@@ -178,14 +178,16 @@ fn write_maps(
                                                                         .unwrap()
                                                                         .replace("\\n[", "\\N[");
 
+                                                                    let param_text_str: &str =
+                                                                        param_text.as_str();
+
                                                                     if text_hashmap
-                                                                        .get(param_text.as_str())
+                                                                        .get(param_text_str)
                                                                         .is_some()
                                                                     {
                                                                         *param = to_value(
                                                                             text_hashmap
-                                                                                [param_text
-                                                                                    .as_str()],
+                                                                                [param_text_str],
                                                                         )
                                                                         .unwrap();
                                                                     }
@@ -194,29 +196,21 @@ fn write_maps(
                                                     }
                                                 }
                                                 Some(_) => {
+                                                    let parameter_text_ref: &str =
+                                                        parameter_text.as_ref().unwrap();
+
                                                     if (code == 401
                                                         || code == 402
                                                         || code == 324
                                                         || (code == 356
-                                                            && (parameter_text
-                                                                .as_ref()
-                                                                .unwrap()
+                                                            && (parameter_text_ref
                                                                 .starts_with("GabText")
-                                                                || (parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
+                                                                || (parameter_text_ref
                                                                     .starts_with("choice_text")
-                                                                    && !parameter_text
-                                                                        .as_ref()
-                                                                        .unwrap()
+                                                                    && !parameter_text_ref
                                                                         .ends_with("????")))))
                                                         && text_hashmap
-                                                            .get(
-                                                                parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
-                                                                    .as_str(),
-                                                            )
+                                                            .get(parameter_text_ref)
                                                             .is_some()
                                                     {
                                                         *parameter = to_value(
@@ -295,12 +289,13 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                         return;
                                     }
 
-                                    if !value.is_null()
-                                        && !value.as_str().unwrap().is_empty()
-                                        && hashmap.get(value.as_str().unwrap()).is_some()
-                                    {
-                                        *value =
-                                            to_value(hashmap[value.as_str().unwrap()]).unwrap();
+                                    if !value.is_null() {
+                                        let value_str: &str = value.as_str().unwrap();
+
+                                        if !value_str.is_empty() && hashmap.get(value_str).is_some()
+                                        {
+                                            *value = to_value(hashmap[value_str]).unwrap();
+                                        }
                                     }
                                 });
                         } else {
@@ -361,13 +356,15 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                                                     .unwrap()
                                                                     .replace("\\n[", "\\N[");
 
+                                                                let param_text_str: &str =
+                                                                    param_text.as_str();
+
                                                                 if hashmap
-                                                                    .get(param_text.as_str())
+                                                                    .get(param_text_str)
                                                                     .is_some()
                                                                 {
                                                                     *param = to_value(
-                                                                        hashmap
-                                                                            [param_text.as_str()],
+                                                                        hashmap[param_text_str],
                                                                     )
                                                                     .unwrap();
                                                                 }
@@ -376,25 +373,20 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                                 }
                                             }
                                             Some(_) => {
+                                                let parameter_text_ref: &str =
+                                                    parameter_text.as_ref().unwrap();
+
                                                 if (code == 401
                                                     || code == 402
                                                     || code == 324
                                                     || (code == 356
-                                                        && (parameter_text
-                                                            .as_ref()
-                                                            .unwrap()
+                                                        && (parameter_text_ref
                                                             .starts_with("GabText")
-                                                            || (parameter_text
-                                                                .as_ref()
-                                                                .unwrap()
+                                                            || (parameter_text_ref
                                                                 .starts_with("choice_text")
-                                                                && !parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
+                                                                && !parameter_text_ref
                                                                     .ends_with("????")))))
-                                                    && hashmap
-                                                        .get(parameter_text.as_ref().unwrap())
-                                                        .is_some()
+                                                    && hashmap.get(parameter_text_ref).is_some()
                                                 {
                                                     *parameter =
                                                         to_value(hashmap[parameter_text.unwrap()])
@@ -417,8 +409,12 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
+            if !element.is_null() {
+                let element_str: &str = element.as_str().unwrap();
+
+                if system_text_hashmap.get(element_str).is_some() {
+                    *element = to_value(system_text_hashmap[element_str]).unwrap();
+                }
             }
         });
 
@@ -427,8 +423,12 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
+            if !element.is_null() {
+                let element_str: &str = element.as_str().unwrap();
+
+                if system_text_hashmap.get(element_str).is_some() {
+                    *element = to_value(system_text_hashmap[element_str]).unwrap();
+                }
             }
         });
 
@@ -437,9 +437,11 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if element.as_str().unwrap().ends_with("phobia") {
-                if system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                    *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
+            let element_str: &str = element.as_str().unwrap();
+
+            if element_str.ends_with("phobia") {
+                if system_text_hashmap.get(element_str).is_some() {
+                    *element = to_value(system_text_hashmap[element_str]).unwrap();
                 }
 
                 if element.as_str().unwrap().starts_with("Pan") {}
@@ -458,11 +460,12 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
                     .unwrap()
                     .par_iter_mut()
                     .for_each(|string: &mut Value| {
-                        if !string.is_null()
-                            && system_text_hashmap.get(string.as_str().unwrap()).is_some()
-                        {
-                            *string =
-                                to_value(system_text_hashmap[string.as_str().unwrap()]).unwrap();
+                        if !string.is_null() {
+                            let string_as_str: &str = string.as_str().unwrap();
+
+                            if system_text_hashmap.get(string_as_str).is_some() {
+                                *string = to_value(system_text_hashmap[string_as_str]).unwrap();
+                            }
                         }
                     });
             } else {
@@ -476,14 +479,13 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
                     .values_mut()
                     .par_bridge()
                     .for_each(|message_value: &mut Value| {
-                        if !message_value.is_null()
-                            && system_text_hashmap
-                                .get(message_value.as_str().unwrap())
-                                .is_some()
-                        {
-                            *message_value =
-                                to_value(system_text_hashmap[message_value.as_str().unwrap()])
-                                    .unwrap();
+                        if !message_value.is_null() {
+                            let message_value_str = message_value.as_str().unwrap();
+
+                            if system_text_hashmap.get(message_value_str).is_some() {
+                                *message_value =
+                                    to_value(system_text_hashmap[message_value_str]).unwrap();
+                            }
                         }
                     });
             }

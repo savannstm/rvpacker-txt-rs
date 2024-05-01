@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const originalDir = "original";
     const copiesDir = "copies";
     const backupDir = "backups";
+    const repoDir = "repo";
 
     const mapsDir = "maps";
     const otherDir = "other";
@@ -53,7 +54,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const settingsFile = "settings.json";
     const logFile = "replacement-log.json";
-    const repoDir = "repo";
 
     async function copyDir(sourceDir, targetDir, fsOptions) {
         await createDir(targetDir, fsOptions);
@@ -146,11 +146,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const unlistenProgress = await appWindow.listen("progress", (event) => {
             if (event.payload !== "ended") {
-                progressStatus.innerHTML = `${event.payload} MB`;
+                progressStatus.innerHTML = `${event.payload} ${mainLanguage.mb}`;
             } else {
                 downloading = false;
             }
         });
+
         await appWindow.emit("clone");
 
         async function awaitDownload() {
@@ -190,104 +191,77 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    async function ensureStart() {
-        if (
-            !(await exists(await join(resourceDir, translationDir, mapsDir), { dir: BaseDirectory.Resource })) ||
-            !(await exists(await join(resourceDir, translationDir, otherDir), { dir: BaseDirectory.Resource })) ||
-            !(await exists(await join(resourceDir, translationDir, pluginsDir), { dir: BaseDirectory.Resource }))
-        ) {
-            await message(mainLanguage.cannotGetTranslation);
-            const askDownloadTranslation = await ask(mainLanguage.askDownloadTranslation);
+    async function prepareTranslation() {
+        const dirsToLeave = [translationDir, originalDir];
 
-            if (askDownloadTranslation) {
-                if (await exists(await join(resourceDir, repoDir), { dir: BaseDirectory.Resource })) {
-                    await removeDir(await join(resourceDir, repoDir), {
+        const repoDirPath = await join(resourceDir, repoDir);
+        const repositoryExists = await exists(repoDirPath, {
+            dir: BaseDirectory.Resource,
+        });
+
+        if (repositoryExists) {
+            await removeDir(repoDirPath, {
+                dir: BaseDirectory.Resource,
+                recursive: true,
+            });
+        }
+
+        await cloneRepository();
+
+        for (const dir of await readDir(repoDirPath, {
+            dir: BaseDirectory.Resource,
+        })) {
+            if (dirsToLeave.includes(dir.name)) {
+                await copyDir(await join(repoDirPath, dir.name), await join(resourceDir, dir.name), {
+                    dir: BaseDirectory.Resource,
+                    recursive: true,
+                });
+            }
+        }
+
+        await removeDir(repoDirPath, { dir: BaseDirectory.Resource, recursive: true });
+    }
+
+    async function ensureStart() {
+        const dirs = [mapsDir, otherDir, pluginsDir];
+
+        for (const dir of dirs) {
+            if (!(await exists(await join(resourceDir, translationDir, dir), { dir: BaseDirectory.Resource }))) {
+                if (await ask(mainLanguage.askDownloadTranslation)) {
+                    await prepareTranslation();
+                    alert(mainLanguage.downloadedTranslation);
+                } else if (await ask(mainLanguage.startBlankProject)) {
+                    await prepareTranslation();
+
+                    const files = await readDir(await join(resourceDir, translationDir, dir), {
                         dir: BaseDirectory.Resource,
                         recursive: true,
                     });
-                }
 
-                await cloneRepository();
-
-                const pathsToLeave = [translationDir, originalDir];
-                for (const entry of await readDir(await join(resourceDir, repoDir), {
-                    dir: BaseDirectory.Resource,
-                })) {
-                    if (pathsToLeave.includes(entry.name)) {
-                        await copyDir(
-                            await join(resourceDir, repoDir, entry.name),
-                            await join(resourceDir, entry.name),
-                            {
+                    for (const file of files
+                        .flatMap((dir) => dir.children)
+                        .filter((file) => file.name.endsWith("_trans.txt"))) {
+                        const numberOfLines = (
+                            await readTextFile(await join(resourceDir, translationDir, dir, file.name), {
                                 dir: BaseDirectory.Resource,
-                                recursive: true,
-                            }
-                        );
-                    }
-                }
+                            })
+                        ).countChars("\n");
 
-                await removeDir(await join(resourceDir, repoDir), { dir: BaseDirectory.Resource, recursive: true });
-                alert(mainLanguage.downloadedTranslation);
-            } else {
-                const startBlankProject = await ask(mainLanguage.startBlankProject);
-
-                if (startBlankProject) {
-                    if (await exists(await join(resourceDir, repoDir), { dir: BaseDirectory.Resource })) {
-                        await removeDir(await join(resourceDir, repoDir), {
+                        await removeFile(await join(resourceDir, translationDir, dir, file.name), {
                             dir: BaseDirectory.Resource,
-                            recursive: true,
                         });
-                    }
 
-                    await cloneRepository();
-
-                    const pathsToLeave = [translationDir, originalDir];
-                    for (const entry of await readDir(await join(resourceDir, repoDir), {
-                        dir: BaseDirectory.Resource,
-                    })) {
-                        if (pathsToLeave.includes(entry.name)) {
-                            await copyDir(
-                                await join(resourceDir, repoDir, entry.name),
-                                await join(resourceDir, entry.name),
-                                {
-                                    dir: BaseDirectory.Resource,
-                                    recursive: true,
-                                }
-                            );
-                        }
-                    }
-
-                    await removeDir(await join(resourceDir, repoDir), { dir: BaseDirectory.Resource, recursive: true });
-
-                    for (const dir of await readDir(await join(resourceDir, translationDir), {
-                        dir: BaseDirectory.Resource,
-                        recursive: true,
-                    })) {
-                        for (const file of dir.children) {
-                            if (file.name.endsWith("_trans.txt")) {
-                                const numberOfLines = (
-                                    await readTextFile(await join(resourceDir, translationDir, dir.name, file.name), {
-                                        dir: BaseDirectory.Resource,
-                                    })
-                                ).countChars("\n");
-
-                                await removeFile(await join(resourceDir, translationDir, dir.name, file.name), {
-                                    dir: BaseDirectory.Resource,
-                                });
-
-                                await writeTextFile(
-                                    await join(resourceDir, translationDir, dir.name, file.name),
-                                    "\n".repeat(numberOfLines),
-                                    {
-                                        dir: BaseDirectory.Resource,
-                                    }
-                                );
-                            }
-                        }
+                        await writeTextFile(
+                            await join(resourceDir, translationDir, dir, file.name),
+                            "\n".repeat(numberOfLines),
+                            { dir: BaseDirectory.Resource }
+                        );
                     }
                 } else {
                     await message(mainLanguage.whatNext);
                     await exit(0);
                 }
+                return;
             }
         }
     }
@@ -306,12 +280,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             i = 0;
             for (const node of child.children) {
-                node.style.height = `${heights[i] + 8}px`;
+                node.style.minHeight = `${heights[i] + 8}px`;
                 node.firstElementChild.style.minHeight = `${heights[i]}px`;
 
                 for (const child of node.firstElementChild.children) {
                     child.style.minHeight = `${heights[i]}px`;
-                    child.style.height = `${heights[i]}px`;
                 }
 
                 node.firstElementChild.classList.add("hidden");
@@ -651,7 +624,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         } else if (button === 2) {
             if (element.id.includes(originalDir)) {
-                message(mainLanguage.originalTextIrreplacable);
+                alert(mainLanguage.originalTextIrreplacable);
                 return;
             } else {
                 if (replaceInput.value.trim()) {
@@ -918,8 +891,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function updateState(newState, slide = true) {
-        const currentState = document.getElementById("current-state");
-
         currentState.innerHTML = newState;
 
         const contentParent = document.getElementById(newState);
@@ -952,7 +923,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         switch (newState) {
             case null:
                 state = null;
-                document.getElementById("current-state").innerHTML = "";
+                currentState.innerHTML = "";
 
                 observerMain.disconnect();
                 for (const child of contentContainer.children) {
@@ -1054,7 +1025,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function jumpToRow(key) {
         const focusedElement = document.activeElement;
-        if (!focusedElement || !focusedElement.id || (key !== "alt" && key !== "ctrl")) {
+        if (!contentContainer.contains(focusedElement) && focusedElement.tagName !== "TEXTAREA") {
             return;
         }
 
@@ -1209,13 +1180,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const textContainer = document.createElement("div");
                 textContainer.classList.add("flex", "content-child");
 
-                //* Original text field
                 const originalTextElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
                 originalTextElement.textContent = originalText.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
                 originalTextElement.classList.add("original-text-div");
 
-                //* Translation text field
                 const translationTextElement = document.createElement("textarea");
                 const translationTextSplitted = translationText.split("\\n");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
@@ -1223,13 +1192,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 translationTextElement.value = translationTextSplitted.join("\n");
                 translationTextElement.classList.add("translation-text-input");
 
-                //* Row field
                 const rowElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = j + 1;
                 rowElement.classList.add("row");
 
-                //* Append elements to containers
                 textContainer.appendChild(rowElement);
                 textContainer.appendChild(originalTextElement);
                 textContainer.appendChild(translationTextElement);
@@ -1312,7 +1279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function calculateTextAreaHeight(target) {
-        const lineBreaks = target.value.countChars("\n");
+        const lineBreaks = target.value.countChars("\n") + 1;
 
         const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
             window.getComputedStyle(target);
@@ -1336,20 +1303,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             ghost.remove();
         }
 
-        if (target.tagName === "TEXTAREA" && target.id !== "search-input" && target.id !== currentFocusedElement[0]) {
+        if (
+            contentContainer.contains(target) &&
+            target.tagName === "TEXTAREA" &&
+            target.id !== currentFocusedElement[0]
+        ) {
             currentFocusedElement = [target.id, target.value];
 
-            if (target.tagName === "TEXTAREA") {
-                target.addEventListener("keyup", () => {
-                    calculateTextAreaHeight(target);
-                });
+            target.addEventListener("keyup", () => {
+                calculateTextAreaHeight(target);
+            });
 
-                target.addEventListener("input", () => {
-                    trackFocus(target);
-                });
-
+            target.addEventListener("input", () => {
                 trackFocus(target);
-            }
+            });
+
+            trackFocus(target);
         }
     }
 
@@ -1367,7 +1336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             currentFocusedElement = [];
 
-            if (target.tagName === "TEXTAREA") {
+            if (contentContainer.contains(target) && target.tagName === "TEXTAREA") {
                 target.removeEventListener("input", () => {
                     trackFocus(target);
                 });
@@ -1504,17 +1473,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         switch (target.id) {
             case "ru-button":
-                await awaitSaving();
+                if (language !== "ru") {
+                    await awaitSaving();
 
-                if (language !== "ru" && (await exitProgram())) {
-                    await changeLanguage("ru");
+                    if (await exitProgram()) {
+                        await changeLanguage("ru");
+                    }
                 }
                 break;
             case "en-button":
-                await awaitSaving();
+                if (language !== "en") {
+                    await awaitSaving();
 
-                if (language !== "en" && (await exitProgram())) {
-                    await changeLanguage("en");
+                    if (await exitProgram()) {
+                        await changeLanguage("en");
+                    }
                 }
                 break;
         }
@@ -1608,6 +1581,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const aboutButton = document.getElementById("about-button");
     const hotkeysButton = document.getElementById("hotkeys-button");
     const languageMenu = document.getElementById("language-menu");
+    const currentState = document.getElementById("current-state");
 
     const replaced = new Map();
     const activeGhostLines = [];

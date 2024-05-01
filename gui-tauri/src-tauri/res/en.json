@@ -3,8 +3,7 @@
         "cannotGetSettings": "Cannot find program's settings.",
         "askCreateSettings": "Create settings?",
         "createdSettings": "Settings created.\nBackups: Enabled\nBackup period: 60 secs.\nMaximum backups: 99.",
-        "cannotGetTranslation": "Cannot find translation files.",
-        "askDownloadTranslation": "Download translation files? (Downloads Russian translation files)",
+        "askDownloadTranslation": "Cannot find translation files. Download translation files? Note: If you agree, this will install Russian translation files. If you want to start a project from scratch, disagree.",
         "downloadingTranslation": "Downloading translation files",
         "downloadedTranslation": "Translation files downloaded.",
         "startBlankProject": "Start a new project?\n(You'll get a completely empty project and start from scratch)\nYou'll have to install a translation files anyway (some of them which is unused will be deleted).",
@@ -36,7 +35,8 @@
         "translationButtonTitle": "Search only by translation (Alt + T)",
         "locationButtonTitle": "Search only in the current file (Alt + L)",
         "noMatches": "No matches",
-        "tooManyMatches": "Number of matches exceeds 20000. Search was stopped to prevent memory leak."
+        "tooManyMatches": "Number of matches exceeds 20000. Search was stopped to prevent memory leak.",
+        "mb": "MB"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",
