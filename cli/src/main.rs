@@ -499,21 +499,15 @@ fn write_plugins(
                     .par_bridge()
                     .for_each(|(key, value): (&String, &mut Value)| {
                         if key == "OptionsCategories" {
-                            let mut param: Option<String> = None;
+                            let mut param: String = value.as_str().unwrap().to_string();
 
                             for (text, translated_text) in
                                 original_text_vec.iter().zip(translated_text_vec.iter())
                             {
-                                param = Some(value.as_str().unwrap().replacen(
-                                    text,
-                                    translated_text.as_str(),
-                                    1,
-                                ));
+                                param = param.replacen(text, translated_text.as_str(), 1);
                             }
 
-                            if let Some(text) = param {
-                                *value = to_value(text).unwrap();
-                            }
+                            *value = to_value(param).unwrap();
                         } else if let Some(param) = hashmap.get(value.as_str().unwrap()) {
                             *value = to_value(param).unwrap();
                         }
