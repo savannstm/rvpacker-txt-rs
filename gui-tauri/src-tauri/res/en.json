@@ -8,7 +8,7 @@
         "downloadedTranslation": "Translation files downloaded.",
         "startBlankProject": "Start a new project?\n(You'll get a completely empty project and start from scratch)\nYou'll have to install a translation files anyway (some of them which is unused will be deleted).",
         "whatNext": "If you want to edit an already existing translation made by me, you should download translation files when program's asking or manually download them from repository.",
-        "unsavedChanges": "You have unsaved changes.\nDo you really want to quit?",
+        "unsavedChanges": "You have unsaved changes. Save progress and quit?",
         "originalTextIrreplacable": "Original text is irreplacable.",
         "invalidRegexp": "Invalid regular expression.",
         "textReverted": "Text was reverted to the original state",

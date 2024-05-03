@@ -1,5 +1,5 @@
 {
-    "name": "gui-tauri",
+    "name": "fh-termina-json-writer",
     "version": "2.2.0",
     "devDependencies": {
         "@tauri-apps/cli": "^1",

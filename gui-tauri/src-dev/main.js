@@ -5,6 +5,7 @@ const { ask, message } = window.__TAURI__.dialog;
 const { invoke } = window.__TAURI__.tauri;
 const { exit } = window.__TAURI__.process;
 const { appWindow, WebviewWindow } = window.__TAURI__.window;
+const { writeText: clipboardWrite, readText: clipboardRead } = window.__TAURI__.clipboard;
 
 String.prototype.replaceAllMultiple = function (replacementObj) {
     return this.replaceAll(Object.keys(replacementObj).join("|"), (match) => replacementObj[match]);
@@ -13,8 +14,8 @@ String.prototype.replaceAllMultiple = function (replacementObj) {
 String.prototype.countChars = function (char) {
     let occurrences = 0;
 
-    for (const ch of this) {
-        if (char === ch) {
+    for (let i = 0; i < this.length; i++) {
+        if (char === this[i]) {
             occurrences++;
         }
     }
@@ -29,8 +30,8 @@ HTMLElement.prototype.toggleMultiple = function (...classes) {
 };
 
 HTMLElement.prototype.secondHighestParent = function (childElement) {
-    let parent = childElement;
-    let previous;
+    let parent = childElement.parentElement;
+    let previous = childElement;
 
     while (parent !== this) {
         previous = parent;
@@ -38,6 +39,23 @@ HTMLElement.prototype.secondHighestParent = function (childElement) {
     }
 
     return previous;
+};
+
+HTMLTextAreaElement.prototype.calculateHeight = function () {
+    const lineBreaks = this.value.countChars("\n") + 1;
+
+    const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } = window.getComputedStyle(this);
+
+    const newHeight =
+        lineBreaks * parseFloat(lineHeight) +
+        parseFloat(paddingTop) +
+        parseFloat(paddingBottom) +
+        parseFloat(borderTopWidth) +
+        parseFloat(borderBottomWidth);
+
+    for (const child of this.parentElement.children) {
+        child.style.height = `${newHeight}px`;
+    }
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -415,52 +433,81 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
+        for (const file of await readDir(resourceDir, { dir: BaseDirectory.Resource })) {
+            if (file.name.startsWith("matches")) {
+                await removeFile(await join(resourceDir, file.name), { dir: BaseDirectory.Resource });
+            }
+        }
+
         let results = new Map();
+        let objectToWrite = {};
+        let count = 1;
+        let file = 0;
+
         for (const child of searchLocation
             ? [...document.getElementById(state).children]
             : [...contentContainer.children].flatMap((parent) => [...parent.children])) {
             const node = child.firstElementChild.children;
 
-            const elementText = node[2].value.replaceAllMultiple({ "<": "&lt;", ">": "&gt;" });
-            const matches = elementText.match(regexp);
+            {
+                const elementText = node[2].value.replaceAllMultiple({ "<": "&lt;", ">": "&gt;" });
+                const matches = elementText.match(regexp);
 
-            let count = 0;
-            if (matches) {
-                const result = createMatchesContainer(elementText, matches);
-                appendMatch(node[2], result);
+                if (matches) {
+                    const result = createMatchesContainer(elementText, matches);
 
-                if (replace) {
-                    results.set(node[2], result);
-                } else if (results) {
-                    results = false;
+                    if (replace) {
+                        results.set(node[2], result);
+                    } else {
+                        objectToWrite[node[2].id] = result;
+                        results = false;
+                    }
+
+                    count++;
                 }
-                count++;
             }
 
             if (!searchTranslation) {
                 const elementText = node[1].innerHTML.replaceAllMultiple({ "<": "&lt;", ">": "&gt;" });
                 const matches = elementText.match(regexp);
 
-                if (!matches) {
-                    continue;
+                if (matches) {
+                    const result = createMatchesContainer(elementText, matches);
+
+                    if (replace) {
+                        results.set(node[1], result);
+                    } else {
+                        objectToWrite[node[1].id] = result;
+                        results = false;
+                    }
+
+                    count++;
                 }
-
-                const result = createMatchesContainer(elementText, matches);
-                appendMatch(node[1], result);
-
-                if (replace) {
-                    results.set(node[1], result);
-                } else if (results) {
-                    results = false;
-                }
-
-                count++;
             }
 
-            if (count > 20000) {
-                message(mainLanguage.tooManyMatches);
-                break;
+            if (count % 1000 === 0) {
+                await writeTextFile(`matches-${file}.json`, JSON.stringify(objectToWrite), {
+                    dir: BaseDirectory.Resource,
+                });
+
+                objectToWrite = {};
+                file++;
             }
+        }
+
+        if (file === 0) {
+            await writeTextFile("matches-0.json", JSON.stringify(objectToWrite), {
+                dir: BaseDirectory.Resource,
+            });
+        }
+
+        searchTotalPages.textContent = file;
+        searchCurrentPage.textContent = "0";
+
+        for (const [id, result] of Object.entries(
+            JSON.parse(await readTextFile("matches-0.json", { dir: BaseDirectory.Resource }))
+        )) {
+            appendMatch(document.getElementById(id), result);
         }
 
         return results;
@@ -500,50 +547,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    async function handleSearchSwitch(searchSwitch) {
-        searchPanelFound.toggleMultiple("hidden", "flex");
-        searchPanelReplaced.toggleMultiple("hidden", "flex");
-
-        if (searchSwitch.innerHTML.trim() === "search") {
-            searchSwitch.innerHTML = "menu_book";
-
-            const replacementLogContent = JSON.parse(
-                await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
-            );
-
-            for (const [key, value] of Object.entries(replacementLogContent)) {
-                const replacedContainer = document.createElement("div");
-
-                const replacedElement = document.createElement("div");
-                replacedElement.classList.add("replaced-element");
-
-                replacedElement.innerHTML = `<div class="text-base text-zinc-400">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl text-zinc-300 font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
-
-                replacedContainer.appendChild(replacedElement);
-                searchPanelReplaced.appendChild(replacedContainer);
-            }
-
-            observerFound.disconnect();
-            searchPanelReplaced.style.height = `${searchPanelReplaced.scrollHeight}px`;
-
-            for (const container of searchPanelReplaced.children) {
-                container.style.width = `${container.clientWidth}px`;
-                container.style.height = `${container.clientHeight}px`;
-
-                observerReplaced.observe(container);
-                container.firstElementChild.classList.add("hidden");
-            }
-
-            searchPanelReplaced.addEventListener("mousedown", async (event) => await handleReplacedClick(event));
-        } else {
-            searchSwitch.innerHTML = "search";
-            searchPanelReplaced.innerHTML = "";
-
-            searchPanelReplaced.removeEventListener("mousedown", async (event) => await handleReplacedClick(event));
-        }
-        return;
-    }
-
     function showSearchPanel(hide = true) {
         if (JSON.parse(searchPanel.getAttribute("moving")) === false) {
             if (hide) {
@@ -553,8 +556,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
             searchPanel.setAttribute("moving", true);
         }
-
-        const searchSwitch = document.getElementById("switch-search-content");
 
         let loadingContainer;
         if (searchPanelFound.children.length > 0 && searchPanelFound.firstElementChild.id !== "no-results") {
@@ -574,7 +575,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (loadingContainer) {
                         searchPanelFound.removeChild(loadingContainer);
                     }
-                    searchSwitch.addEventListener("click", async () => await handleSearchSwitch(searchSwitch));
                     searchPanel.setAttribute("shown", true);
                     searchPanel.setAttribute("moving", false);
                 },
@@ -585,7 +585,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 searchPanel.setAttribute("shown", false);
                 searchPanel.setAttribute("moving", true);
 
-                searchSwitch.removeEventListener("click", async () => await handleSearchSwitch(searchSwitch));
                 searchPanel.addEventListener("transitionend", () => searchPanel.setAttribute("moving", false), {
                     once: true,
                 });
@@ -822,6 +821,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function save(backup = false) {
+        if (saving) {
+            return;
+        }
+
         saving = true;
         saveButton.firstElementChild.classList.add("animate-spin");
 
@@ -972,57 +975,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             { once: true }
         );
     }
-
-    async function handleKeypressBody(event) {
-        switch (event.code) {
-            case "Escape":
-                changeState(null);
-                break;
-            case "Tab":
-                leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
-                break;
-            case "KeyR":
-                await displaySearchResults();
-                break;
-            case "Digit1":
-                changeState(mapsDir);
-                break;
-            case "Digit2":
-                changeState("names");
-                break;
-            case "Digit3":
-                changeState("actors");
-                break;
-            case "Digit4":
-                changeState("armors");
-                break;
-            case "Digit5":
-                changeState("classes");
-                break;
-            case "Digit6":
-                changeState("commonevents");
-                break;
-            case "Digit7":
-                changeState("enemies");
-                break;
-            case "Digit8":
-                changeState("items");
-                break;
-            case "Digit9":
-                changeState("skills");
-                break;
-            case "Digit0":
-                changeState("system");
-                break;
-            case "Minus":
-                changeState("troops");
-                break;
-            case "Equal":
-                changeState("weapons");
-                break;
-        }
-    }
-
     function jumpToRow(key) {
         const focusedElement = document.activeElement;
         if (!contentContainer.contains(focusedElement) && focusedElement.tagName !== "TEXTAREA") {
@@ -1053,54 +1005,208 @@ document.addEventListener("DOMContentLoaded", async () => {
         nextElement.setSelectionRange(0, 0);
     }
 
-    async function handleKeypressGlobal(event) {
-        switch (event.code) {
-            case "Escape":
-                document.activeElement.blur();
-                break;
-            case "Enter":
-                if (event.altKey) {
-                    jumpToRow("alt");
-                } else if (event.ctrlKey) {
-                    jumpToRow("ctrl");
-                }
-                break;
-            case "KeyS":
-                if (event.ctrlKey) {
-                    await save();
-                }
-                break;
-            case "KeyF":
-                if (event.ctrlKey) {
-                    event.preventDefault();
-                    searchInput.focus();
-                }
-                break;
-            case "KeyC":
-                if (document.activeElement !== searchInput && event.altKey) {
-                    await compile();
-                }
-                break;
-            case "KeyG":
-                if (event.ctrlKey) {
-                    event.preventDefault();
-                    if (state) {
-                        if (goToRowInput.classList.contains("hidden")) {
-                            goToRow();
-                        } else {
-                            goToRowInput.classList.add("hidden");
+    async function handleKeypress(event) {
+        if (event.key === "Tab") {
+            event.preventDefault();
+        }
+
+        if (document.activeElement === document.body) {
+            switch (event.code) {
+                case "Escape":
+                    changeState(null);
+                    break;
+                case "Tab":
+                    leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
+                    break;
+                case "KeyR":
+                    await displaySearchResults();
+                    break;
+                case "KeyZ":
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+
+                        for (const key of selectedTextareas.keys()) {
+                            const textarea = document.getElementById(key);
+                            textarea.value = selectedTextareas.get(key);
+                        }
+
+                        for (const key of replacedTextareas.keys()) {
+                            const textarea = document.getElementById(key);
+                            textarea.value = replacedTextareas.get(key);
+                            textarea.calculateHeight();
+                        }
+
+                        replacedTextareas.clear();
+                    }
+                    break;
+                case "KeyS":
+                    if (event.ctrlKey) {
+                        await save();
+                    }
+                    break;
+                case "Digit1":
+                    changeState(mapsDir);
+                    break;
+                case "Digit2":
+                    changeState("names");
+                    break;
+                case "Digit3":
+                    changeState("actors");
+                    break;
+                case "Digit4":
+                    changeState("armors");
+                    break;
+                case "Digit5":
+                    changeState("classes");
+                    break;
+                case "Digit6":
+                    changeState("commonevents");
+                    break;
+                case "Digit7":
+                    changeState("enemies");
+                    break;
+                case "Digit8":
+                    changeState("items");
+                    break;
+                case "Digit9":
+                    changeState("skills");
+                    break;
+                case "Digit0":
+                    changeState("system");
+                    break;
+                case "Minus":
+                    changeState("troops");
+                    break;
+                case "Equal":
+                    changeState("weapons");
+                    break;
+            }
+        } else {
+            switch (event.code) {
+                case "Escape":
+                    document.activeElement.blur();
+                    break;
+                case "Enter":
+                    if (event.altKey) {
+                        jumpToRow("alt");
+                    } else if (event.ctrlKey) {
+                        jumpToRow("ctrl");
+                    }
+                    break;
+                case "KeyF":
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        searchInput.focus();
+                    }
+                    break;
+                case "KeyC":
+                    if (document.activeElement !== searchInput && event.altKey) {
+                        await compile();
+                    } else if (event.ctrlKey) {
+                        if (
+                            contentContainer.contains(document.activeElement) &&
+                            document.activeElement.tagName === "TEXTAREA"
+                        ) {
+                            if (!selectedMultiple) {
+                                return;
+                            }
+
+                            event.preventDefault();
+
+                            selectedTextareas.set(document.activeElement.id, document.activeElement.value);
+                            await clipboardWrite(Array.from(selectedTextareas.values()).join("#"));
+
+                            for (const key of selectedTextareas.keys()) {
+                                const textarea = document.getElementById(key);
+                                textarea.classList.replace("outline-zinc-500", "outline-zinc-700");
+                            }
                         }
                     }
-                }
-                break;
-            case "F4":
-                if (event.altKey) {
-                    await awaitSaving();
-                    if (await exitProgram()) {
-                        await exit(0);
+                    break;
+                case "KeyX":
+                    if (event.ctrlKey) {
+                        if (
+                            contentContainer.contains(document.activeElement) &&
+                            document.activeElement.tagName === "TEXTAREA"
+                        ) {
+                            event.preventDefault();
+
+                            selectedTextareas.set(document.activeElement.id, document.activeElement.value);
+                            await clipboardWrite(Array.from(selectedTextareas.values()).join("#"));
+
+                            for (const key of selectedTextareas.keys()) {
+                                const textarea = document.getElementById(key);
+                                textarea.classList.replace("outline-zinc-500", "outline-zinc-700");
+                                textarea.value = "";
+                            }
+
+                            saved = false;
+                        }
                     }
-                }
-                break;
+                    break;
+                case "KeyG":
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        if (state) {
+                            if (goToRowInput.classList.contains("hidden")) {
+                                goToRow();
+                            } else {
+                                goToRowInput.classList.add("hidden");
+                            }
+                        }
+                    }
+                    break;
+                case "F4":
+                    if (event.altKey) {
+                        await appWindow.emit("tauri://close");
+                    }
+                    break;
+                case "KeyV":
+                    if (event.ctrlKey) {
+                        if (
+                            contentContainer.contains(document.activeElement) &&
+                            document.activeElement.tagName === "TEXTAREA"
+                        ) {
+                            const clipboardText = await clipboardRead();
+                            if (!clipboardText.includes("#")) {
+                                return;
+                            }
+
+                            const clipboardTextSplitted = clipboardText.split("#");
+                            const textRows = clipboardTextSplitted.length;
+
+                            if (textRows <= 0) {
+                                return;
+                            } else {
+                                const focusedElement = document.activeElement;
+                                const focusedElementId = focusedElement.id.split("-");
+                                const focusedElementNumber = Number.parseInt(focusedElementId.pop());
+
+                                for (let i = 0; i < textRows; i++) {
+                                    const elementToReplace = document.getElementById(
+                                        `${focusedElementId.join("-")}-${focusedElementNumber + i}`
+                                    );
+
+                                    replacedTextareas.set(
+                                        elementToReplace.id,
+                                        elementToReplace.value.replaceAll(clipboardText, "")
+                                    );
+                                    elementToReplace.value = clipboardTextSplitted[i];
+                                    elementToReplace.calculateHeight();
+                                }
+
+                                saved = false;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if (event.key === "Shift") {
+            if (!event.repeat) {
+                shiftPressed = true;
+            }
         }
     }
 
@@ -1190,7 +1296,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplitted.length;
                 translationTextElement.value = translationTextSplitted.join("\n");
-                translationTextElement.classList.add("translation-text-input");
+                translationTextElement.classList.add("translation-text-input", "outline-zinc-700");
 
                 const rowElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
@@ -1218,14 +1324,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         await appWindow.emit("compile");
-    }
-
-    function preventKeyDefaults(event) {
-        switch (event.key) {
-            case "Tab":
-                event.preventDefault();
-                break;
-        }
     }
 
     function getNewLinePositions(textarea) {
@@ -1278,24 +1376,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    function calculateTextAreaHeight(target) {
-        const lineBreaks = target.value.countChars("\n") + 1;
-
-        const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } =
-            window.getComputedStyle(target);
-
-        const newHeight =
-            lineBreaks * parseFloat(lineHeight) +
-            parseFloat(paddingTop) +
-            parseFloat(paddingBottom) +
-            parseFloat(borderTopWidth) +
-            parseFloat(borderBottomWidth);
-
-        for (const child of target.parentElement.children) {
-            child.style.height = `${newHeight}px`;
-        }
-    }
-
     function handleFocus(event) {
         const target = event.target;
 
@@ -1311,7 +1391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             currentFocusedElement = [target.id, target.value];
 
             target.addEventListener("keyup", () => {
-                calculateTextAreaHeight(target);
+                target.calculateHeight();
             });
 
             target.addEventListener("input", () => {
@@ -1342,19 +1422,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 target.removeEventListener("keyup", () => {
-                    calculateTextAreaHeight(target);
+                    target.calculateHeight();
                 });
             }
         }
     }
+
     function switchCase() {
-        searchCase = !searchCase;
-        searchCaseButton.classList.toggle("bg-zinc-500");
+        if (!searchRegex) {
+            searchCase = !searchCase;
+            searchCaseButton.classList.toggle("bg-zinc-500");
+        }
     }
 
     function switchWhole() {
-        searchWhole = !searchWhole;
-        searchWholeButton.classList.toggle("bg-zinc-500");
+        if (!searchRegex) {
+            searchWhole = !searchWhole;
+            searchWholeButton.classList.toggle("bg-zinc-500");
+        }
     }
 
     function switchRegExp() {
@@ -1403,6 +1488,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!askExitUnsaved) {
             askExit = await ask(mainLanguage.exit);
         } else {
+            if (!saved) {
+                await save();
+            }
             return true;
         }
 
@@ -1425,11 +1513,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
                 break;
             case "exit-button":
-                await awaitSaving();
-
-                if (await exitProgram()) {
-                    await exit(0);
-                }
+                //! for some reason that doesn't fucking work, but smh works when alt+f4 is fired
+                await appWindow.emit("tauri://close");
                 break;
         }
     }
@@ -1558,6 +1643,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchPanel = document.getElementById("search-results");
     const searchPanelFound = document.getElementById("search-content");
     const searchPanelReplaced = document.getElementById("replace-content");
+    const searchCurrentPage = document.getElementById("search-current-page");
+    const searchTotalPages = document.getElementById("search-total-pages");
     const topPanel = document.getElementById("top-panel");
     const topPanelButtons = document.getElementById("top-panel-buttons");
     const saveButton = document.getElementById("save-button");
@@ -1651,6 +1738,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     let saving = false;
     let currentFocusedElement = [];
 
+    let shiftPressed = false;
+
+    let selectedMultiple = false;
+    const selectedTextareas = new Map();
+    const replacedTextareas = new Map();
+
     leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
 
     await createLogFile();
@@ -1694,6 +1787,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     topPanelButtons.addEventListener("click", async (event) => {
+        if (event.target === topPanelButtons) {
+            return;
+        }
+
         const target = topPanelButtons.secondHighestParent(event.target);
 
         switch (target.id) {
@@ -1740,25 +1837,164 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    searchPanel.addEventListener("click", async (event) => {
+        switch (event.target.id) {
+            case "switch-search-content":
+                searchPanelFound.toggleMultiple("hidden", "flex");
+                searchPanelReplaced.toggleMultiple("hidden", "flex");
+
+                const searchSwitch = event.target;
+
+                if (searchSwitch.innerHTML.trim() === "search") {
+                    searchSwitch.innerHTML = "menu_book";
+
+                    const replacementLogContent = JSON.parse(
+                        await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
+                    );
+
+                    for (const [key, value] of Object.entries(replacementLogContent)) {
+                        const replacedContainer = document.createElement("div");
+
+                        const replacedElement = document.createElement("div");
+                        replacedElement.classList.add("replaced-element");
+
+                        replacedElement.innerHTML = `<div class="text-base text-zinc-400">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl text-zinc-300 font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+
+                        replacedContainer.appendChild(replacedElement);
+                        searchPanelReplaced.appendChild(replacedContainer);
+                    }
+
+                    observerFound.disconnect();
+                    searchPanelReplaced.style.height = `${searchPanelReplaced.scrollHeight}px`;
+
+                    for (const container of searchPanelReplaced.children) {
+                        container.style.width = `${container.clientWidth}px`;
+                        container.style.height = `${container.clientHeight}px`;
+
+                        observerReplaced.observe(container);
+                        container.firstElementChild.classList.add("hidden");
+                    }
+
+                    searchPanelReplaced.addEventListener(
+                        "mousedown",
+                        async (event) => await handleReplacedClick(event)
+                    );
+                } else {
+                    searchSwitch.innerHTML = "search";
+                    searchPanelReplaced.innerHTML = "";
+
+                    searchPanelReplaced.removeEventListener(
+                        "mousedown",
+                        async (event) => await handleReplacedClick(event)
+                    );
+                }
+                break;
+            case "previous-page-button":
+                if (Number.parseInt(searchCurrentPage.textContent) > 1) {
+                    searchCurrentPage.textContent = page - 1;
+
+                    searchPanelFound.innerHTML = "";
+
+                    for (const [id, result] of Object.entries(
+                        JSON.parse(
+                            await readTextFile(`matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`, {
+                                dir: BaseDirectory.Resource,
+                            })
+                        )
+                    )) {
+                        appendMatch(document.getElementById(id), result);
+                    }
+                }
+                break;
+            case "next-page-button":
+                const page = Number.parseInt(searchCurrentPage.textContent);
+
+                if (Number.parseInt(searchCurrentPage.textContent) < searchTotalPages.textContent) {
+                    searchCurrentPage.textContent = page + 1;
+
+                    searchPanelFound.innerHTML = "";
+
+                    for (const [id, result] of Object.entries(
+                        JSON.parse(
+                            await readTextFile(`matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`, {
+                                dir: BaseDirectory.Resource,
+                            })
+                        )
+                    )) {
+                        appendMatch(document.getElementById(id), result);
+                    }
+                }
+                break;
+        }
+    });
+
     searchInput.addEventListener("blur", () => (searchInput.value = searchInput.value.trim()));
     replaceInput.addEventListener("blur", () => (replaceInput.value = replaceInput.value.trim()));
 
     searchInput.addEventListener("keydown", async (event) => await handleKeypressSearch(event));
-
     menuBar.addEventListener("click", (event) => menuBarClick(event.target));
 
-    document.addEventListener("keydown", async (event) => {
-        preventKeyDefaults(event);
-
-        if (document.activeElement === document.body) {
-            await handleKeypressBody(event);
+    document.addEventListener("keydown", async (event) => await handleKeypress(event));
+    document.addEventListener("keyup", (event) => {
+        if (event.key === "Shift") {
+            shiftPressed = false;
         }
-
-        await handleKeypressGlobal(event);
     });
 
     document.addEventListener("focus", handleFocus, true);
     document.addEventListener("blur", handleBlur, true);
+
+    function handleMousedown(event) {
+        if (event.button === 0) {
+            if (shiftPressed) {
+                if (
+                    contentContainer.contains(document.activeElement) &&
+                    document.activeElement.tagName === "TEXTAREA"
+                ) {
+                    event.preventDefault();
+                    selectedTextareas.clear();
+
+                    selectedMultiple = true;
+
+                    const targetId = event.target.id.split("-");
+                    const targetRow = targetId.pop();
+
+                    const focusedElementId = document.activeElement.id.split("-");
+                    const focusedElementRow = focusedElementId.pop();
+
+                    let rowsRange = targetRow - focusedElementRow;
+                    let rowsToSelect = Math.abs(rowsRange);
+
+                    for (let i = 1; i < rowsToSelect + 1; i++) {
+                        if (rowsRange > 0) {
+                            const nextElement = document.getElementById(
+                                `${targetId.join("-")}-${Number.parseInt(focusedElementRow) + i}`
+                            );
+
+                            nextElement.classList.replace("outline-zinc-700", "outline-zinc-500");
+                            selectedTextareas.set(nextElement.id, nextElement.value);
+                        } else if (rowsRange < 0) {
+                            const nextElement = document.getElementById(
+                                `${targetId.join("-")}-${Number.parseInt(focusedElementRow) - i}`
+                            );
+
+                            nextElement.classList.replace("outline-zinc-700", "outline-zinc-500");
+                            selectedTextareas.set(nextElement.id, nextElement.value);
+                        }
+                    }
+                }
+            } else {
+                selectedMultiple = false;
+
+                for (const key of selectedTextareas.keys()) {
+                    const textarea = document.getElementById(key);
+                    textarea.classList.replace("outline-zinc-500", "outline-zinc-700");
+                }
+            }
+        }
+    }
+
+    document.addEventListener("mousedown", (event) => handleMousedown(event));
 
     await appWindow.onCloseRequested(async (event) => {
         await awaitSaving();
