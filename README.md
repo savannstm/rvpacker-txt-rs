@@ -36,10 +36,6 @@ json-writer поддерживает аргументы - чтобы получ�
 
 После билдинга в директории `gui-tauri/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
 
-## Директория gui
-
-В этой директории хранится исходный код старой версии программы, написанной на Electron.
-
 ## Директория translation
 
 В этой директории хранятся файлы локализации в формате .txt. Если вы хотите что-то изменить - вы должны отредактировать именно их, а затем записать используя бинарные CLI файлы, либо скомпилировать используя программу с графическим интерфейсом.
@@ -96,10 +92,6 @@ to build the program for your current OS.
 If you want to make some edits to the source code - edit frontend files in `src-dev` directory, or backend files in `src-tauri/src` directory.
 
 After the build, `target` directory will be created in the `gui-tauri/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
-
-## gui Directory
-
-This folder contains the source code of old program version, written with Electron.
 
 ## translation Directory
 
