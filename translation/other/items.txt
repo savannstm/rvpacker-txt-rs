@@ -419,10 +419,10 @@ Master key
 Master key found from the landlord's office in the apartment\nbuilding on the residential neighbourhood. A special key designed
 \nto open all the apartments in the building when necessary.\n\n\n\n<Picture: icon_prison_keys>\n<Menu Category: Items>
 Fellatio Effigy
-A small effigy of man hunched over on a throne. It's carved \nfrom an unknown material. 
+A small effigy of man hunched over on a throne. It's carved \nfrom an unknown material.
 \n\n\n\n\n<Picture: icon_fellatio_idol>\n<Menu Category: Items>
 Hunger Effigy
-A small effigy of an deity with its gaping mouth open. It's carved \nfrom an unknown material. 
+A small effigy of an deity with its gaping mouth open. It's carved \nfrom an unknown material.
 \n\n\n\n\n<Picture: icon_hunger_idol>\n<Menu Category: Items>
 Martyr Effigy
 A small effigy resembling crucified Alll-mer with a snake curled\nover him. It's carved from an unknown material.
