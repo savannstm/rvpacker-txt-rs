@@ -2864,8 +2864,6 @@ GabText This must be it for you...
 \>\i[64]\}UGUST\{\<\n"Good luck."
 There are pigs standing in the pen. They look well-fed.
 There are fishes hanging from a drying rope. They seem to be\ncoated in yellow substance...
-try
-It works!
 Chained up coffins. The chains seem reinforced and really\ndiffifult to open up.
 Knock on the coffin
 No reaction. You cannot hear anything from inside.

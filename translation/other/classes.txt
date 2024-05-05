@@ -2,7 +2,6 @@ Ex-Soldier
 Mercenary\n<Equip Slot>\nWeapon\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
 Ghoul
 <Equip Slot>\nHead\nBody\nAccessory\nAccessory\nAccessory\n</Equip Slot>
-Girl
 Mercenary
 Priest
 Occultist

@@ -17,16 +17,13 @@ Level
 Lv
 Body
 Mind
-TP
 Hunger
 Fight
 Run!
 Attack
 Guard
 Item
-kill
 Equip
-St
 Formation
 Save
 Options

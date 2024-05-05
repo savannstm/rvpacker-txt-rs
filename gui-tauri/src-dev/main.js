@@ -486,7 +486,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (count % 1000 === 0) {
-                await writeTextFile(`matches-${file}.json`, JSON.stringify(objectToWrite), {
+                await writeTextFile(await join(resourceDir, `matches-${file}.json`), JSON.stringify(objectToWrite), {
                     dir: BaseDirectory.Resource,
                 });
 
@@ -496,7 +496,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (file === 0) {
-            await writeTextFile("matches-0.json", JSON.stringify(objectToWrite), {
+            await writeTextFile(await join(resourceDir, "matches-0.json"), JSON.stringify(objectToWrite), {
                 dir: BaseDirectory.Resource,
             });
         }
@@ -505,7 +505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         searchCurrentPage.textContent = "0";
 
         for (const [id, result] of Object.entries(
-            JSON.parse(await readTextFile("matches-0.json", { dir: BaseDirectory.Resource }))
+            JSON.parse(await readTextFile(await join(resourceDir, "matches-0.json"), { dir: BaseDirectory.Resource }))
         )) {
             appendMatch(document.getElementById(id), result);
         }
@@ -1897,9 +1897,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     for (const [id, result] of Object.entries(
                         JSON.parse(
-                            await readTextFile(`matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`, {
-                                dir: BaseDirectory.Resource,
-                            })
+                            await readTextFile(
+                                await join(
+                                    resourceDir,
+                                    `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
+                                ),
+                                {
+                                    dir: BaseDirectory.Resource,
+                                }
+                            )
                         )
                     )) {
                         appendMatch(document.getElementById(id), result);
@@ -1916,9 +1922,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     for (const [id, result] of Object.entries(
                         JSON.parse(
-                            await readTextFile(`matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`, {
-                                dir: BaseDirectory.Resource,
-                            })
+                            await readTextFile(
+                                await join(
+                                    resourceDir,
+                                    `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
+                                ),
+                                {
+                                    dir: BaseDirectory.Resource,
+                                }
+                            )
                         )
                     )) {
                         appendMatch(document.getElementById(id), result);

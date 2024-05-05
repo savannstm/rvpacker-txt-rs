@@ -118,7 +118,6 @@ Ghoul
 Cancer 1
 Cancer 2
 Cancer 3
-Spank Tank
 Owl cultist [arms]
 Owl cultist [torso]
 Owl cultist [head]

@@ -29,36 +29,27 @@ A syringe with neurotoxins attached to an officer sword.\nEach thrust of the swo
 Reaper's rake
 Four sickles attached to a broomstick. A 2-handed slashing\nweapon that causes severe bleeding.
 Lantern flail
-A makeshift weapon that is a bit hard to wield, but hard to\nread properly as well making it an unpredictable weapon with
-\nheavy mass. Can cause burns as well.\n\n\n\n\n\n<Picture: icon_lantern_flail>\n<Replace Attack: 1>\n<Synthesis Ingredients>\nitem 224\nitem 240\nitem 172\n</Synthesis Ingredients>
+A makeshift weapon that is a bit hard to wield, but hard to\nread properly as well making it an unpredictable weapon with\nheavy mass. Can cause burns as well.
 Meat grinder
 A violent and fierce weapon. A saw blade attached to a bench\ngrinder that is customized to work without being plugged in.
 Gaelian greatsword
-An old greatsword from the highlands north of Rondon. These\nswords were nicknamed 'the king's bane' because of how effective
-\nthey were against Rondon knights in the 12th century.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_gaelian_greatsword>\n<Replace Attack: 1>
+An old greatsword from the highlands north of Rondon. These\nswords were nicknamed 'the king's bane' because of how effective\nthey were against Rondon knights in the 12th century.
 Meat mallet
-A tool used in kitchen that makes up one brutal weapon.\nSwinging this will surely score you critical hits every now
-\nand then.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_meat_mallet>\n<Replace Attack: 1>
+A tool used in kitchen that makes up one brutal weapon.\nSwinging this will surely score you critical hits every now\nand then.
 Iron spear
-An old iron spear that was still used by the cavalry of Bohemia\nfew decades ago. Up until firearms became more prevalent in this
-\nregion.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_javelin>\n<Replace Attack: 1>
+An old iron spear that was still used by the cavalry of Bohemia\nfew decades ago. Up until firearms became more prevalent in this\nregion.
 Sergal spear
-A finely decorated ornament spear from the warrior tribes\nof northern Vinland. The decoration suggests highly advanced
-\ncultures, but sergals remain largely unknown in the old continent.\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_sergal_spear>\n<Replace Attack: 1>
+A finely decorated ornament spear from the warrior tribes\nof northern Vinland. The decoration suggests highly advanced\ncultures, but sergals remain largely unknown in the old continent.
 Red virtue
-A masterfully forged light sword. The sword is very light and\nso excels in finesse. It is said that Red virtue is one of the 
-\ntwo swords forged for the ancient king of Ma'habre.\n\n\n\n\n<skill_id:776>\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_red_virtue>\n<Replace Attack: 1>
+A masterfully forged light sword. The sword is very light and\nso excels in finesse. It is said that Red virtue is one of the\ntwo swords forged for the ancient king of Ma'habre.
 Briefcase
 Blood sword
 A sword forged from the blood of Alll-mer.
 Longinus
-The spear that punctured Alll-mer's side as he was chained and\ncrucified. A faint trace of the shadow that was cast away for
-\nAlll-mer to reach his ascension.\n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_javelin>\n<Replace Attack: 1>
+The spear that punctured Alll-mer's side as he was chained and\ncrucified. A faint trace of the shadow that was cast away for\nAlll-mer to reach his ascension.
 Miasma
 An otherwordly sword that oozes toxic gasses. The sword\nis said to house the strength of 6 men.
 Sabbath
-To counter the rising threats of the witch and vampire hunts of\nthe 1700s the Vatican city developed this otherwordly sword to be
-\nused by the penance knights as their new main weapon.\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_crucifix>\n<Replace Attack: 1>
+To counter the rising threats of the witch and vampire hunts of\nthe 1700s the Vatican city developed this otherwordly sword to be\nused by the penance knights as their new main weapon.
 Black steel
-An eastern style sword that is delicate and sharp. Prone to\ncritical hits. The blade as ancient writing, it translates to:
-\n"The Black Steel of the East".\n\n\n\n\n\n<Critical Multiplier: 20%>\n<Random Variance: 2>\n<Picture: icon_black_steel>\n<Replace Attack: 1>
+An eastern style sword that is delicate and sharp. Prone to\ncritical hits. The blade as ancient writing, it translates to:\n"The Black Steel of the East".
