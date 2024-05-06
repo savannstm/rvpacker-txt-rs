@@ -273,6 +273,10 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                             &mut element["list"]
                         };
 
+                        if !iterable_object.is_array() {
+                            continue;
+                        }
+
                         iterable_object
                             .as_array_mut()
                             .unwrap()
