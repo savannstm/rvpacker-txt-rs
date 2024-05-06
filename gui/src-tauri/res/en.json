@@ -13,7 +13,6 @@
         "invalidRegexp": "Invalid regular expression.",
         "textReverted": "Text was reverted to the original state",
         "reloadButton": "Reload (F5)",
-        "exitButton": "Exit (Alt + F4)",
         "helpButton": "Help",
         "aboutButton": "About",
         "hotkeysButton": "Hotkeys",

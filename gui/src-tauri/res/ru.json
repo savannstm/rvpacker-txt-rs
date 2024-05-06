@@ -13,7 +13,6 @@
         "invalidRegexp": "Некорректное регулярное выражение",
         "textReverted": "Текст был возвращён к исходному значению",
         "reloadButton": "Перезагрузить (F5)",
-        "exitButton": "Выход (Alt + F4)",
         "helpButton": "Помощь",
         "aboutButton": "О программе",
         "hotkeysButton": "Горячие клавиши",

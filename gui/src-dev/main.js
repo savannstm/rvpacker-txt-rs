@@ -6,6 +6,7 @@ const { invoke } = window.__TAURI__.tauri;
 const { exit } = window.__TAURI__.process;
 const { appWindow, WebviewWindow } = window.__TAURI__.window;
 const { writeText: clipboardWrite, readText: clipboardRead } = window.__TAURI__.clipboard;
+const { locale } = window.__TAURI__.os;
 
 String.prototype.replaceAllMultiple = function (replacementObj) {
     return this.replaceAll(Object.keys(replacementObj).join("|"), (match) => replacementObj[match]);
@@ -47,11 +48,11 @@ HTMLTextAreaElement.prototype.calculateHeight = function () {
     const { lineHeight, paddingTop, paddingBottom, borderTopWidth, borderBottomWidth } = window.getComputedStyle(this);
 
     const newHeight =
-        lineBreaks * parseFloat(lineHeight) +
-        parseFloat(paddingTop) +
-        parseFloat(paddingBottom) +
-        parseFloat(borderTopWidth) +
-        parseFloat(borderBottomWidth);
+        lineBreaks * Number.parseFloat(lineHeight) +
+        Number.parseFloat(paddingTop) +
+        Number.parseFloat(paddingBottom) +
+        Number.parseFloat(borderTopWidth) +
+        Number.parseFloat(borderBottomWidth);
 
     for (const child of this.parentElement.children) {
         child.style.height = `${newHeight}px`;
@@ -103,22 +104,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             return settings;
         }
 
-        const askTranslation = await ask(
-            "Использовать русский язык? При отказе, будет использоваться английский.\nUse Russian language? If you decline, English will be used."
-        );
-
-        let language;
-        if (askTranslation) {
-            mainLanguage = JSON.parse(
-                await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })
-            ).main;
-            language = "ru";
-        } else {
-            mainLanguage = JSON.parse(
-                await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })
-            ).main;
-            language = "en";
-        }
+        const systemLocale = await locale();
+        mainLanguage = systemLocale.startsWith("ru")
+            ? JSON.parse(await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })).main
+            : JSON.parse(await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })).main;
 
         await message(mainLanguage.cannotGetSettings);
         const askCreateSettings = await ask(mainLanguage.askCreateSettings);
@@ -126,7 +115,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (askCreateSettings) {
             await writeTextFile(
                 await join(resourceDir, settingsFile),
-                JSON.stringify({ backup: { enabled: true, period: 60, max: 99 }, lang: language, firstLaunch: true }),
+                JSON.stringify({
+                    backup: { enabled: true, period: 60, max: 99 },
+                    lang: systemLocale.split("-")[0],
+                    firstLaunch: true,
+                }),
                 {
                     dir: BaseDirectory.Resource,
                 }
@@ -327,31 +320,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        /*
+        const regexp = await invoke("unescape_text", {
+            text: text,
+            option: searchRegex ? "regex" : searchWhole ? "whole" : "none",
+        }).then((regexp) => regexp);
+
+        const attr = searchCase ? "g" : "gi";
+
         try {
-            if (text.startsWith("/")) {
-                const first = text.indexOf("/");
-                const last = text.lastIndexOf("/");
-                const expression = text.slice(first + 1, last);
-                const flags = text.slice(last + 1);
-                return new RegExp(expression, flags);
-            }
-
-            const expressionProperties = {
-                text: searchRegex
-                    ? text
-                    : searchWhole
-                    ? `\\b${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`
-                    : text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-                attr: searchRegex ? "g" : searchCase ? "g" : "gi",
-            };
-
-            return new RegExp(expressionProperties.text, expressionProperties.attr);
+            return new RegExp(regexp, attr);
         } catch (err) {
-            await message(`${mainLanguage.invalidRegexp} (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}): ${err}`);
+            await message(`${mainLanguage.invalidRegexp} (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}), err`);
+            return;
         }
-        */
-        return await invoke("create_regexp", { text: text }).then((regexp) => new RegExp(regexp));
     }
 
     function appendMatch(element, result) {
@@ -780,6 +761,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function isFilesCopied() {
+        let copied = true;
+
         for (const dir of await readDir(await join(resourceDir, translationDir), {
             dir: BaseDirectory.Resource,
             recursive: true,
@@ -797,11 +780,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     })
                 ).length
             ) {
-                return false;
+                copied = false;
             }
         }
 
-        return true;
+        return copied;
     }
 
     async function createFilesCopies() {
@@ -1048,7 +1031,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     break;
                 case "KeyC":
-                    if (event.ctrlKey) {
+                    if (event.altKey) {
                         await compile();
                     }
                     break;
@@ -1164,7 +1147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     break;
                 case "F4":
                     if (event.altKey) {
-                        await appWindow.emit("tauri://close");
+                        await appWindow.close();
                     }
                     break;
                 case "KeyV":
@@ -1335,11 +1318,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     function getNewLinePositions(textarea) {
         const positions = [];
         const lines = textarea.value.split("\n");
-        const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
+        const lineHeight = Number.parseFloat(window.getComputedStyle(textarea).lineHeight);
 
-        const textareaRect = textarea.getBoundingClientRect();
-        const y = textareaRect.y + window.scrollY;
-        const x = textareaRect.x;
+        const y = textarea.offsetTop + window.scrollY;
+        const x = textarea.offsetLeft;
 
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -1435,30 +1417,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function switchCase() {
-        if (!searchRegex) {
-            searchCase = !searchCase;
-            searchCaseButton.classList.toggle("bg-zinc-500");
-        }
+        searchCase = !searchCase;
+        searchCaseButton.classList.toggle("bg-zinc-500");
     }
 
     function switchWhole() {
-        if (!searchRegex) {
-            searchWhole = !searchWhole;
-            searchWholeButton.classList.toggle("bg-zinc-500");
-        }
+        searchWhole = !searchWhole;
+        searchWholeButton.classList.toggle("bg-zinc-500");
     }
 
     function switchRegExp() {
         searchRegex = !searchRegex;
-
-        if (searchRegex) {
-            searchCase = false;
-            searchCaseButton.classList.remove("bg-zinc-500");
-
-            searchWhole = false;
-            searchWholeButton.classList.remove("bg-zinc-500");
-        }
-
         searchRegexButton.classList.toggle("bg-zinc-500");
     }
 
@@ -1517,10 +1486,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (await exitProgram()) {
                     location.reload();
                 }
-                break;
-            case "exit-button":
-                //! for some reason that doesn't fucking work, but smh works when alt+f4 is fired
-                await appWindow.emit("tauri://close");
                 break;
         }
     }
@@ -1668,7 +1633,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const languageMenuButton = document.getElementById("language");
     const fileMenu = document.getElementById("file-menu");
     const reloadButton = document.getElementById("reload-button");
-    const exitButton = document.getElementById("exit-button");
     const helpMenu = document.getElementById("help-menu");
     const helpButtonSub = document.getElementById("help-button-sub");
     const aboutButton = document.getElementById("about-button");
@@ -1725,7 +1689,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     languageMenuButton.innerHTML = mainLanguage.languageMenu;
 
     reloadButton.innerHTML = mainLanguage.reloadButton;
-    exitButton.innerHTML = mainLanguage.exitButton;
 
     helpButtonSub.innerHTML = mainLanguage.helpButton;
     aboutButton.innerHTML = mainLanguage.aboutButton;

@@ -5,15 +5,15 @@ use std::fs::{create_dir_all, read_dir, read_to_string, write};
 use std::time::Instant;
 
 struct Paths {
-    original: String,
-    output: String,
-    maps: String,
-    maps_trans: String,
-    names: String,
-    names_trans: String,
-    other: String,
-    plugins: String,
-    plugins_output: String,
+    original: &'static str,
+    output: &'static str,
+    maps: &'static str,
+    maps_trans: &'static str,
+    names: &'static str,
+    names_trans: &'static str,
+    other: &'static str,
+    plugins: &'static str,
+    plugins_output: &'static str,
 }
 
 fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
@@ -61,7 +61,7 @@ fn merge_map(mut json: Value) -> Value {
         .unwrap()
         .par_iter_mut()
         .for_each(|event: &mut Value| {
-            if event.is_null() || event["pages"].is_null() {
+            if !event["pages"].is_array() {
                 return;
             }
 
@@ -82,7 +82,7 @@ fn merge_other(mut json: Value) -> Value {
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element["pages"].is_null() {
+            if element["pages"].is_array() {
                 element["pages"]
                     .as_array_mut()
                     .unwrap()
@@ -90,7 +90,7 @@ fn merge_other(mut json: Value) -> Value {
                     .for_each(|page: &mut Value| {
                         page["list"] = Array(merge_401(page["list"].as_array().unwrap().to_vec()));
                     });
-            } else if !element["list"].is_null() {
+            } else if element["list"].is_array() {
                 element["list"] = Array(merge_401(element["list"].as_array().unwrap().to_vec()));
             }
         });
@@ -105,13 +105,11 @@ fn write_maps(
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
-            let output_path: String = format!("{}\\{}", output_dir, f);
-
-            if !file["displayName"].is_null() {
-                let location_name: &str = file["displayName"].as_str().unwrap();
-
-                if names_hashmap.get(location_name).is_some() {
-                    file["displayName"] = to_value(names_hashmap[location_name]).unwrap();
+            if file["displayName"].is_string() {
+                if let Some(location_name) =
+                    names_hashmap.get(file["displayName"].as_str().unwrap())
+                {
+                    file["displayName"] = to_value(location_name).unwrap();
                 }
             }
 
@@ -120,7 +118,7 @@ fn write_maps(
                 .unwrap()
                 .par_iter_mut()
                 .for_each(|event: &mut Value| {
-                    if event["pages"].is_null() {
+                    if !event["pages"].is_array() {
                         return;
                     }
 
@@ -129,7 +127,7 @@ fn write_maps(
                         .unwrap()
                         .par_iter_mut()
                         .for_each(|page: &mut Value| {
-                            if page["list"].is_null() {
+                            if !page["list"].is_array() {
                                 return;
                             }
 
@@ -138,9 +136,7 @@ fn write_maps(
                                 .unwrap()
                                 .par_iter_mut()
                                 .for_each(|item: &mut Value| {
-                                    if item["parameters"].is_null()
-                                        || item["parameters"].as_array().is_none()
-                                    {
+                                    if !item["parameters"].is_array() {
                                         return;
                                     }
 
@@ -151,85 +147,50 @@ fn write_maps(
                                         .unwrap()
                                         .par_iter_mut()
                                         .for_each(|parameter: &mut Value| {
-                                            let mut parameter_text: Option<String> = None;
-
                                             if parameter.is_string() {
-                                                parameter_text = Some(
-                                                    parameter
-                                                        .as_str()
-                                                        .unwrap()
-                                                        .replace("\\n[", "\\N["),
-                                                );
-                                            }
+                                                let parameter_str: &str =
+                                                    parameter.as_str().unwrap();
 
-                                            match parameter_text {
-                                                None => {
-                                                    if code == 102 && parameter.is_array() {
-                                                        parameter
-                                                            .as_array_mut()
-                                                            .unwrap()
-                                                            .par_iter_mut()
-                                                            .for_each(|param: &mut Value| {
-                                                                if param.is_string() {
-                                                                    let param_text: String = param
-                                                                        .as_str()
-                                                                        .unwrap()
-                                                                        .replace("\\n[", "\\N[");
-
-                                                                    if text_hashmap
-                                                                        .get(param_text.as_str())
-                                                                        .is_some()
-                                                                    {
-                                                                        *param = to_value(
-                                                                            text_hashmap
-                                                                                [param_text
-                                                                                    .as_str()],
-                                                                        )
-                                                                        .unwrap();
-                                                                    }
-                                                                }
-                                                            });
-                                                    }
-                                                }
-                                                Some(_) => {
-                                                    if (code == 401
-                                                        || code == 402
-                                                        || code == 324
-                                                        || (code == 356
-                                                            && (parameter_text
-                                                                .as_ref()
-                                                                .unwrap()
-                                                                .starts_with("GabText")
-                                                                || (parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
-                                                                    .starts_with("choice_text")
-                                                                    && !parameter_text
-                                                                        .as_ref()
-                                                                        .unwrap()
-                                                                        .ends_with("????")))))
-                                                        && text_hashmap
-                                                            .get(
-                                                                parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
-                                                                    .as_str(),
-                                                            )
-                                                            .is_some()
+                                                if code == 401
+                                                    || code == 402
+                                                    || code == 324
+                                                    || (code == 356
+                                                        && (parameter_str.starts_with("GabText")
+                                                            || (parameter_str
+                                                                .starts_with("choice_text")
+                                                                && !parameter_str
+                                                                    .ends_with("????"))))
+                                                {
+                                                    if let Some(text) =
+                                                        text_hashmap.get(parameter_str)
                                                     {
-                                                        *parameter = to_value(
-                                                            text_hashmap
-                                                                [parameter_text.unwrap().as_str()],
-                                                        )
-                                                        .unwrap();
+                                                        *parameter = to_value(text).unwrap();
                                                     }
                                                 }
+                                            } else if code == 102 && parameter.is_array() {
+                                                parameter
+                                                    .as_array_mut()
+                                                    .unwrap()
+                                                    .par_iter_mut()
+                                                    .for_each(|param: &mut Value| {
+                                                        if param.is_string() {
+                                                            if let Some(text) = text_hashmap.get(
+                                                                param
+                                                                    .as_str()
+                                                                    .unwrap()
+                                                                    .replace("\\n[", "\\N[")
+                                                                    .as_str(),
+                                                            ) {
+                                                                *param = to_value(text).unwrap();
+                                                            }
+                                                        }
+                                                    });
                                             }
                                         });
                                 });
                         });
                 });
-            write(output_path, file.to_string()).unwrap();
+            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
         });
 }
 
@@ -237,14 +198,14 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
             let other_original_text: Vec<String> =
-                read_to_string(format!("{}\\{}.txt", other_dir, &f[..f.len() - 5]))
+                read_to_string(format!("{}/{}.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
                     .par_split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
 
             let other_translated_text: Vec<String> =
-                read_to_string(format!("{}\\{}_trans.txt", other_dir, &f[..f.len() - 5]))
+                read_to_string(format!("{}/{}_trans.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
                     .par_split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
@@ -268,48 +229,38 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                     },
                 );
 
-            let output_path: String = format!("{}\\{}", output_dir, f);
-
             file.as_array_mut()
                 .unwrap()
                 .par_iter_mut()
                 .for_each(|element: &mut Value| {
-                    if element.is_null() {
+                    if !element.is_object() {
                         return;
                     }
 
-                    if element["pages"].is_null() {
-                        if element["list"].is_null() {
-                            const ATTRS: [&str; 3] = ["name", "description", "note"];
-
-                            element
-                                .as_object_mut()
-                                .unwrap()
-                                .iter_mut()
-                                .par_bridge()
-                                .for_each_with(ATTRS, |attrs, (key, value)| {
+                    if f != "commonevents.txt" && f != "troops.txt" {
+                        element
+                            .as_object_mut()
+                            .unwrap()
+                            .iter_mut()
+                            .par_bridge()
+                            .for_each_with(
+                                ["name", "description", "note"],
+                                |attrs: &mut [&str; 3], (key, value): (&String, &mut Value)| {
                                     if !attrs.contains(&key.as_str()) {
                                         return;
                                     }
 
-                                    if !value.is_null()
-                                        && !value.as_str().unwrap().is_empty()
-                                        && hashmap.get(value.as_str().unwrap()).is_some()
-                                    {
-                                        *value =
-                                            to_value(hashmap[value.as_str().unwrap()]).unwrap();
+                                    if value.is_string() {
+                                        if let Some(text) = hashmap.get(value.as_str().unwrap()) {
+                                            *value = to_value(text).unwrap();
+                                        }
                                     }
-                                });
-                        } else {
-                            let name: &str = element["name"].as_str().unwrap();
-
-                            if !name.is_empty() && hashmap.get(name).is_some() {
-                                element["name"] = to_value(hashmap[name]).unwrap();
-                            }
-                        }
+                                },
+                            );
+                        return;
                     }
 
-                    let pages_length: usize = if !element["pages"].is_null() {
+                    let pages_length: usize = if f == "commonevents.txt" {
                         element["pages"].as_array().unwrap().len()
                     } else {
                         1
@@ -322,88 +273,62 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                             &mut element["list"]
                         };
 
-                        if iterable_object.is_null() {
-                            continue;
-                        }
-
                         iterable_object
                             .as_array_mut()
                             .unwrap()
                             .par_iter_mut()
                             .for_each(|list: &mut Value| {
+                                if !list["parameters"].is_array() {
+                                    return;
+                                }
+
                                 let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                                 list["parameters"]
                                     .as_array_mut()
                                     .unwrap()
-                                    .iter_mut()
+                                    .par_iter_mut()
                                     .for_each(|parameter: &mut Value| {
-                                        let mut parameter_text: Option<&str> = None;
-
                                         if parameter.is_string() {
-                                            parameter_text = Some(parameter.as_str().unwrap());
-                                        }
+                                            let parameter_str: &str = parameter.as_str().unwrap();
 
-                                        match parameter_text {
-                                            None => {
-                                                if code == 102 && parameter.is_array() {
-                                                    parameter
-                                                        .as_array_mut()
-                                                        .unwrap()
-                                                        .par_iter_mut()
-                                                        .for_each(|param: &mut Value| {
-                                                            if param.is_string() {
-                                                                let param_text: String = param
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .replace("\\n[", "\\N[");
-
-                                                                if hashmap
-                                                                    .get(param_text.as_str())
-                                                                    .is_some()
-                                                                {
-                                                                    *param = to_value(
-                                                                        hashmap
-                                                                            [param_text.as_str()],
-                                                                    )
-                                                                    .unwrap();
-                                                                }
-                                                            }
-                                                        });
+                                            if code == 401
+                                                || code == 402
+                                                || code == 324
+                                                || (code == 356
+                                                    && (parameter_str.starts_with("GabText")
+                                                        || (parameter_str
+                                                            .starts_with("choice_text")
+                                                            && !parameter_str.ends_with("????"))))
+                                            {
+                                                if let Some(text) = hashmap.get(parameter_str) {
+                                                    *parameter = to_value(text).unwrap();
                                                 }
                                             }
-                                            Some(_) => {
-                                                if (code == 401
-                                                    || code == 402
-                                                    || code == 324
-                                                    || (code == 356
-                                                        && (parameter_text
-                                                            .as_ref()
-                                                            .unwrap()
-                                                            .starts_with("GabText")
-                                                            || (parameter_text
-                                                                .as_ref()
+                                        } else if code == 102 && parameter.is_array() {
+                                            parameter
+                                                .as_array_mut()
+                                                .unwrap()
+                                                .par_iter_mut()
+                                                .for_each(|param: &mut Value| {
+                                                    if param.is_string() {
+                                                        if let Some(text) = hashmap.get(
+                                                            param
+                                                                .as_str()
                                                                 .unwrap()
-                                                                .starts_with("choice_text")
-                                                                && !parameter_text
-                                                                    .as_ref()
-                                                                    .unwrap()
-                                                                    .ends_with("????")))))
-                                                    && hashmap
-                                                        .get(parameter_text.as_ref().unwrap())
-                                                        .is_some()
-                                                {
-                                                    *parameter =
-                                                        to_value(hashmap[parameter_text.unwrap()])
-                                                            .unwrap();
-                                                }
-                                            }
+                                                                .replace("\\n[", "\\N[")
+                                                                .as_str(),
+                                                        ) {
+                                                            *param = to_value(text).unwrap();
+                                                        }
+                                                    }
+                                                });
                                         }
                                     });
                             });
                     }
                 });
-            write(output_path, file.to_string()).unwrap();
+            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
         });
 }
 
@@ -413,8 +338,10 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
+            if element.is_string() {
+                if let Some(text) = system_text_hashmap.get(element.as_str().unwrap()) {
+                    *element = to_value(text).unwrap();
+                }
             }
         });
 
@@ -423,8 +350,10 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if !element.is_null() && system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
+            if element.is_string() {
+                if let Some(text) = system_text_hashmap.get(element.as_str().unwrap()) {
+                    *element = to_value(text).unwrap();
+                }
             }
         });
 
@@ -433,12 +362,16 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         .unwrap()
         .par_iter_mut()
         .for_each(|element: &mut Value| {
-            if element.as_str().unwrap().ends_with("phobia") {
-                if system_text_hashmap.get(element.as_str().unwrap()).is_some() {
-                    *element = to_value(system_text_hashmap[element.as_str().unwrap()]).unwrap();
-                }
+            if element.is_string() {
+                let element_str: &str = element.as_str().unwrap();
 
-                if element.as_str().unwrap().starts_with("Pan") {}
+                if element_str.ends_with("phobia") {
+                    if let Some(text) = system_text_hashmap.get(element_str) {
+                        *element = to_value(text).unwrap();
+                    }
+
+                    if element.as_str().unwrap().starts_with("Pan") {}
+                }
             }
         });
 
@@ -454,15 +387,14 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
                     .unwrap()
                     .par_iter_mut()
                     .for_each(|string: &mut Value| {
-                        if !string.is_null()
-                            && system_text_hashmap.get(string.as_str().unwrap()).is_some()
-                        {
-                            *string =
-                                to_value(system_text_hashmap[string.as_str().unwrap()]).unwrap();
+                        if string.is_string() {
+                            if let Some(text) = system_text_hashmap.get(string.as_str().unwrap()) {
+                                *string = to_value(text).unwrap();
+                            }
                         }
                     });
             } else {
-                if value["messages"].is_null() {
+                if !value["messages"].is_object() {
                     return;
                 }
 
@@ -472,21 +404,19 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
                     .values_mut()
                     .par_bridge()
                     .for_each(|message_value: &mut Value| {
-                        if !message_value.is_null()
-                            && system_text_hashmap
-                                .get(message_value.as_str().unwrap())
-                                .is_some()
-                        {
-                            *message_value =
-                                to_value(system_text_hashmap[message_value.as_str().unwrap()])
-                                    .unwrap();
+                        if message_value.is_string() {
+                            if let Some(text) =
+                                system_text_hashmap.get(message_value.as_str().unwrap())
+                            {
+                                *message_value = to_value(text).unwrap();
+                            }
                         }
                     });
             }
         });
 
     write(
-        format!("{}\\System.json", output_path),
+        format!("{}/System.json", output_path),
         to_string(&json).unwrap(),
     )
     .unwrap();
@@ -517,7 +447,6 @@ fn write_plugins(
         );
 
     json.par_iter_mut().for_each(|obj: &mut Value| {
-        let name: &str = obj["name"].as_str().unwrap();
         let plugin_names: HashSet<&str> = HashSet::from([
             "YEP_BattleEngineCore",
             "YEP_OptionsCore",
@@ -532,6 +461,7 @@ fn write_plugins(
             "Olivia_OctoBattle",
         ]);
 
+        let name: &str = obj["name"].as_str().unwrap();
         if plugin_names.contains(name) {
             if name == "YEP_OptionsCore" {
                 obj["parameters"]
@@ -550,12 +480,8 @@ fn write_plugins(
                             }
 
                             *value = to_value(param).unwrap();
-                        } else {
-                            let param: &str = value.as_str().unwrap();
-
-                            if hashmap.get(param).is_some() {
-                                *value = to_value(hashmap[param]).unwrap();
-                            }
+                        } else if let Some(param) = hashmap.get(value.as_str().unwrap()) {
+                            *value = to_value(param).unwrap();
                         }
                     });
             } else {
@@ -565,58 +491,63 @@ fn write_plugins(
                     .values_mut()
                     .par_bridge()
                     .for_each(|value: &mut Value| {
-                        let param: &str = value.as_str().unwrap();
-
-                        if hashmap.get(param).is_some() {
-                            *value = to_value(hashmap[param]).unwrap();
+                        if value.is_string() {
+                            if let Some(param) = hashmap.get(value.as_str().unwrap()) {
+                                *value = to_value(param).unwrap();
+                            }
                         }
                     });
             }
         }
     });
 
-    const PREFIX: &str =
-        "// Generated by RPG Maker.\n// Do not edit this file directly.\nvar $plugins =";
+    const PREFIX: &str = "var $plugins =";
 
     write(
-        format!("{}\\plugins.js", output_path),
+        format!("{}/plugins.js", output_path),
         format!("{}\n{}", PREFIX, to_string(&json).unwrap()),
     )
     .unwrap();
 }
 
-pub fn main(resource_path: &str) -> String {
+pub fn main() -> String {
     let start_time: Instant = Instant::now();
 
     let dir_paths: Paths = Paths {
-        original: format!("{}\\original", resource_path),
-        output: format!("{}\\data", resource_path),
-        maps: format!("{}\\translation\\maps\\maps.txt", resource_path),
-        maps_trans: format!("{}\\translation\\maps\\maps_trans.txt", resource_path),
-        names: format!("{}\\translation\\maps\\names.txt", resource_path),
-        names_trans: format!("{}\\translation\\maps\\names_trans.txt", resource_path),
-        other: format!("{}\\translation\\other", resource_path),
-        plugins: format!("{}\\translation\\plugins", resource_path),
-        plugins_output: format!("{}\\js", resource_path),
+        original: "./res/original",
+        output: "./res/data",
+        maps: "./res/copies/maps/maps.txt",
+        maps_trans: "./res/copies/maps/maps_trans.txt",
+        names: "./res/copies/maps/names.txt",
+        names_trans: "./res/copies/maps/names_trans.txt",
+        other: "./res/copies/other",
+        plugins: "./res/copies/plugins",
+        plugins_output: "./res/js",
     };
 
-    create_dir_all(&dir_paths.output).unwrap();
-    create_dir_all(&dir_paths.plugins_output).unwrap();
+    create_dir_all(dir_paths.output).unwrap();
+    create_dir_all(dir_paths.plugins_output).unwrap();
 
-    let maps_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+    let maps_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
         .unwrap()
         .par_bridge()
-        .fold(HashMap::new, |mut hashmap: HashMap<String, Value>, path| {
-            let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
+        .fold(
+            HashMap::new,
+            |mut hashmap: HashMap<String, Value>,
+             path: Result<std::fs::DirEntry, std::io::Error>| {
+                let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
 
-            if filename.starts_with("Map") {
-                hashmap.insert(
-                    filename,
-                    merge_map(from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap()),
-                );
-            }
-            hashmap
-        })
+                if filename.starts_with("Map") {
+                    hashmap.insert(
+                        filename,
+                        merge_map(
+                            from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
+                        ),
+                    );
+                }
+                hashmap
+            },
+        )
         .reduce(
             HashMap::new,
             |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
@@ -687,27 +618,33 @@ pub fn main(resource_path: &str) -> String {
 
     write_maps(
         maps_hashmap,
-        &dir_paths.output,
+        dir_paths.output,
         maps_text_hashmap,
         maps_names_hashmap,
     );
 
     const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
 
-    let other_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+    let other_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
         .unwrap()
         .par_bridge()
-        .fold(HashMap::new, |mut hashmap: HashMap<String, Value>, path| {
-            let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
+        .fold(
+            HashMap::new,
+            |mut hashmap: HashMap<String, Value>,
+             path: Result<std::fs::DirEntry, std::io::Error>| {
+                let filename: String = path.as_ref().unwrap().file_name().into_string().unwrap();
 
-            if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
-                hashmap.insert(
-                    filename,
-                    merge_other(from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap()),
-                );
-            }
-            hashmap
-        })
+                if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
+                    hashmap.insert(
+                        filename,
+                        merge_other(
+                            from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
+                        ),
+                    );
+                }
+                hashmap
+            },
+        )
         .reduce(
             HashMap::new,
             |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
@@ -716,20 +653,20 @@ pub fn main(resource_path: &str) -> String {
             },
         );
 
-    write_other(other_hashmap, &dir_paths.output, &dir_paths.other);
+    write_other(other_hashmap, dir_paths.output, dir_paths.other);
 
     let system_json: Value =
-        from_str(&read_to_string(format!("{}\\System.json", dir_paths.original)).unwrap()).unwrap();
+        from_str(&read_to_string(format!("{}/System.json", dir_paths.original)).unwrap()).unwrap();
 
     let system_original_text: Vec<String> =
-        read_to_string(format!("{}\\System.txt", dir_paths.other))
+        read_to_string(format!("{}/System.txt", dir_paths.other))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
             .collect();
 
     let system_translated_text: Vec<String> =
-        read_to_string(format!("{}\\System_trans.txt", dir_paths.other))
+        read_to_string(format!("{}/System_trans.txt", dir_paths.other))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
@@ -753,20 +690,20 @@ pub fn main(resource_path: &str) -> String {
             },
         );
 
-    write_system(system_json, &dir_paths.output, system_text_hashmap);
+    write_system(system_json, dir_paths.output, system_text_hashmap);
 
     let plugins_json: Vec<Value> =
-        from_str(&read_to_string(format!("{}\\plugins.json", dir_paths.plugins)).unwrap()).unwrap();
+        from_str(&read_to_string(format!("{}/plugins.json", dir_paths.plugins)).unwrap()).unwrap();
 
     let plugins_original_text_vec: Vec<String> =
-        read_to_string(format!("{}\\plugins.txt", dir_paths.plugins))
+        read_to_string(format!("{}/plugins.txt", dir_paths.plugins))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
             .collect();
 
     let plugins_translated_text_vec: Vec<String> =
-        read_to_string(format!("{}\\plugins_trans.txt", dir_paths.plugins))
+        read_to_string(format!("{}/plugins_trans.txt", dir_paths.plugins))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
@@ -774,7 +711,7 @@ pub fn main(resource_path: &str) -> String {
 
     write_plugins(
         plugins_json,
-        &dir_paths.plugins_output,
+        dir_paths.plugins_output,
         plugins_original_text_vec,
         plugins_translated_text_vec,
     );

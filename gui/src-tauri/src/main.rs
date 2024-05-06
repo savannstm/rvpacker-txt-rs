@@ -2,26 +2,26 @@
 
 use git2::build::RepoBuilder;
 use git2::{FetchOptions, Progress, RemoteCallbacks};
-use regex::{escape, Regex};
+use regex::escape;
 use std::path::PathBuf;
 use tauri::{generate_context, App, AppHandle, Builder, Event, Manager};
 mod writer;
 
 #[tauri::command]
-fn create_regex(text: String) -> String {
-    let escaped_text = escape(&text);
-    let re = Regex::new(&escaped_text);
+fn unescape_text(text: String, option: String) -> String {
+    let re: String = match option.as_str() {
+        "regex" => text,
+        "whole" => format!("\\b{}\\b", &escape(&text)),
+        "none" => escape(&text),
+        _ => String::new(),
+    };
 
-    if let Ok(re) = re {
-        re.to_string()
-    } else {
-        String::new()
-    }
+    re
 }
 
 fn main() {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![create_regex])
+        .invoke_handler(tauri::generate_handler![unescape_text])
         .setup(|app: &mut App| {
             let handle: AppHandle = app.handle();
 
@@ -32,8 +32,6 @@ fn main() {
 
             let path_to_clone: PathBuf =
                 handle.path_resolver().resolve_resource("res/repo").unwrap();
-
-            let path_to_resource: PathBuf = handle.path_resolver().resolve_resource("res").unwrap();
 
             let handle_clone: AppHandle = handle.clone();
             handle_clone
@@ -78,7 +76,7 @@ fn main() {
                 .get_window("main")
                 .unwrap()
                 .listen("compile", move |_event: Event| {
-                    let result: String = writer::main(path_to_resource.to_str().unwrap());
+                    let result: String = writer::main();
 
                     handle
                         .get_window("main")
