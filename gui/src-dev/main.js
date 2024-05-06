@@ -105,9 +105,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const systemLocale = await locale();
-        mainLanguage = systemLocale.startsWith("ru")
-            ? JSON.parse(await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })).main
-            : JSON.parse(await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })).main;
+
+        const language = systemLocale.startsWith("ru") ? "ru" : "en";
+
+        mainLanguage =
+            language === "ru"
+                ? JSON.parse(await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource }))
+                      .main
+                : JSON.parse(await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource }))
+                      .main;
 
         await message(mainLanguage.cannotGetSettings);
         const askCreateSettings = await ask(mainLanguage.askCreateSettings);
@@ -117,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await join(resourceDir, settingsFile),
                 JSON.stringify({
                     backup: { enabled: true, period: 60, max: 99 },
-                    lang: systemLocale.split("-")[0],
+                    lang: language,
                     firstLaunch: true,
                 }),
                 {
