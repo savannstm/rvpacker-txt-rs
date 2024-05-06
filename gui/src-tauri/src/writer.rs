@@ -237,7 +237,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                         return;
                     }
 
-                    if f != "commonevents.txt" && f != "troops.txt" {
+                    if f != "CommonEvents.json" && f != "Troops.json" {
                         element
                             .as_object_mut()
                             .unwrap()
@@ -260,7 +260,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                         return;
                     }
 
-                    let pages_length: usize = if f == "commonevents.txt" {
+                    let pages_length: usize = if element["pages"].is_array() {
                         element["pages"].as_array().unwrap().len()
                     } else {
                         1
