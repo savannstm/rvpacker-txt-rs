@@ -243,36 +243,30 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                         return;
                     }
 
-                    if element["pages"].is_null() {
-                        if element["list"].is_null() {
-                            const ATTRS: [&str; 3] = ["name", "description", "note"];
+                    if f != "commonevents.txt" && f != "troops.txt" {
+                        element
+                            .as_object_mut()
+                            .unwrap()
+                            .iter_mut()
+                            .par_bridge()
+                            .for_each_with(
+                                ["name", "description", "note"],
+                                |attrs: &mut [&str; 3], (key, value): (&String, &mut Value)| {
+                                    if !attrs.contains(&key.as_str()) {
+                                        return;
+                                    }
 
-                            element
-                                .as_object_mut()
-                                .unwrap()
-                                .iter_mut()
-                                .par_bridge()
-                                .for_each_with(
-                                    ATTRS,
-                                    |attrs: &mut [&str; 3], (key, value): (&String, &mut Value)| {
-                                        if !attrs.par_iter().any(|string| string == &key.as_str()) {
-                                            return;
+                                    if value.is_string() {
+                                        if let Some(text) = hashmap.get(value.as_str().unwrap()) {
+                                            *value = to_value(text).unwrap();
                                         }
-
-                                        if value.is_string() {
-                                            if let Some(text) = hashmap.get(value.as_str().unwrap())
-                                            {
-                                                *value = to_value(text).unwrap();
-                                            }
-                                        }
-                                    },
-                                );
-                        } else if let Some(name) = hashmap.get(element["name"].as_str().unwrap()) {
-                            element["name"] = to_value(name).unwrap();
-                        }
+                                    }
+                                },
+                            );
+                        return;
                     }
 
-                    let pages_length: usize = if element["pages"].is_array() {
+                    let pages_length: usize = if f == "commonevents.txt" {
                         element["pages"].as_array().unwrap().len()
                     } else {
                         1
@@ -284,10 +278,6 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                         } else {
                             &mut element["list"]
                         };
-
-                        if iterable_object.is_null() {
-                            continue;
-                        }
 
                         iterable_object
                             .as_array_mut()
