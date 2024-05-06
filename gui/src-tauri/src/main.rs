@@ -2,13 +2,26 @@
 
 use git2::build::RepoBuilder;
 use git2::{FetchOptions, Progress, RemoteCallbacks};
+use regex::{escape, Regex};
 use std::path::PathBuf;
 use tauri::{generate_context, App, AppHandle, Builder, Event, Manager};
 mod writer;
 
+#[tauri::command]
+fn create_regex(text: String) -> String {
+    let escaped_text = escape(&text);
+    let re = Regex::new(&escaped_text);
+
+    if let Ok(re) = re {
+        re.to_string()
+    } else {
+        String::new()
+    }
+}
+
 fn main() {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![create_regex])
         .setup(|app: &mut App| {
             let handle: AppHandle = app.handle();
 

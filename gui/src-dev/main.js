@@ -327,6 +327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
+        /*
         try {
             if (text.startsWith("/")) {
                 const first = text.indexOf("/");
@@ -349,6 +350,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (err) {
             await message(`${mainLanguage.invalidRegexp} (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}): ${err}`);
         }
+        */
+        return await invoke("create_regexp", { text: text }).then((regexp) => new RegExp(regexp));
     }
 
     function appendMatch(element, result) {
@@ -1044,6 +1047,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                         await save();
                     }
                     break;
+                case "KeyC":
+                    if (event.ctrlKey) {
+                        await compile();
+                    }
+                    break;
                 case "Digit1":
                     changeState(mapsDir);
                     break;
@@ -1100,9 +1108,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                     break;
                 case "KeyC":
-                    if (document.activeElement !== searchInput && event.altKey) {
-                        await compile();
-                    } else if (event.ctrlKey) {
+                    if (event.ctrlKey) {
                         if (
                             contentContainer.contains(document.activeElement) &&
                             document.activeElement.tagName === "TEXTAREA"
