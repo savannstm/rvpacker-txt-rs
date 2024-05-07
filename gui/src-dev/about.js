@@ -1,9 +1,11 @@
 const { open: openLink } = window.__TAURI__.shell;
 const { readTextFile } = window.__TAURI__.fs;
 const { BaseDirectory, join } = window.__TAURI__.path;
+const { getVersion } = window.__TAURI__.app;
 
 window.addEventListener("DOMContentLoaded", async () => {
     const version = document.getElementById("version");
+    const versionNumber = document.getElementById("version-number");
     const about = document.getElementById("about");
     const socials = document.getElementById("socials");
     const vkLink = document.getElementById("vk-link");
@@ -23,6 +25,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             : JSON.parse(await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })).about;
 
     version.innerHTML = aboutLanguage.version;
+    versionNumber.innerHTML = await getVersion();
     about.innerHTML = aboutLanguage.about;
     socials.innerHTML = aboutLanguage.socials;
     vkLink.innerHTML = aboutLanguage.vkLink;

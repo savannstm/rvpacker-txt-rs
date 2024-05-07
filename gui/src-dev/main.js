@@ -73,6 +73,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const settingsFile = "settings.json";
     const logFile = "replacement-log.json";
+    const ruTranslation = "ru.json";
+    const enTranslation = "en.json";
 
     async function copyDir(sourceDir, targetDir, fsOptions) {
         await createDir(targetDir, fsOptions);
@@ -86,35 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    async function getSettings() {
-        if (await exists(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })) {
-            const settings = JSON.parse(
-                await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
-            );
-
-            mainLanguage =
-                settings.lang === "ru"
-                    ? JSON.parse(
-                          await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource })
-                      ).main
-                    : JSON.parse(
-                          await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource })
-                      ).main;
-
-            return settings;
-        }
-
-        const systemLocale = await locale();
-
-        const language = systemLocale.startsWith("ru") ? "ru" : "en";
-
-        mainLanguage =
-            language === "ru"
-                ? JSON.parse(await readTextFile(await join(resourceDir, "ru.json"), { dir: BaseDirectory.Resource }))
-                      .main
-                : JSON.parse(await readTextFile(await join(resourceDir, "en.json"), { dir: BaseDirectory.Resource }))
-                      .main;
-
+    async function createSettings() {
         await message(mainLanguage.cannotGetSettings);
         const askCreateSettings = await ask(mainLanguage.askCreateSettings);
 
@@ -172,11 +146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await appWindow.emit("clone");
 
         async function awaitDownload() {
-            try {
-                if (downloading) {
-                    throw null;
-                }
-            } catch (err) {
+            if (downloading) {
                 await new Promise((resolve) => setTimeout(resolve, 2000));
                 await awaitDownload();
             }
@@ -1124,6 +1094,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                             contentContainer.contains(document.activeElement) &&
                             document.activeElement.tagName === "TEXTAREA"
                         ) {
+                            if (!selectedMultiple) {
+                                return;
+                            }
+
                             event.preventDefault();
 
                             selectedTextareas.set(document.activeElement.id, document.activeElement.value);
@@ -1595,11 +1569,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function awaitSaving() {
-        try {
-            if (saving) {
-                throw null;
-            }
-        } catch (err) {
+        if (saving) {
             await new Promise((resolve) => setTimeout(resolve, 2000));
             await awaitSaving();
         }
@@ -1649,13 +1619,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     const replaced = new Map();
     const activeGhostLines = [];
 
-    let mainLanguage;
+    let settings = (await exists(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource }))
+        ? JSON.parse(await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource }))
+        : null;
 
-    let settings = await getSettings();
+    const language = settings ? settings.lang : (await locale()).startsWith("ru") ? "ru" : "en";
+
+    const mainLanguage =
+        language === "ru"
+            ? JSON.parse(await readTextFile(await join(resourceDir, ruTranslation), { dir: BaseDirectory.Resource }))
+                  .main
+            : JSON.parse(await readTextFile(await join(resourceDir, enTranslation), { dir: BaseDirectory.Resource }))
+                  .main;
+
+    if (!settings) {
+        settings = await createSettings();
+    }
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
-
-    const language = settings.lang;
 
     await ensureStart();
     await createFilesCopies();
