@@ -911,32 +911,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         const lastRow = element.lastElementChild.id.split("-").at(-1);
 
         goToRowInput.placeholder = `Перейти к строке... от 1 до ${lastRow}`;
-        goToRowInput.addEventListener(
-            "keydown",
-            (event) => {
-                if (event.code === "Enter") {
-                    const rowNumber = goToRowInput.value;
-                    const targetRow = document.getElementById(`${state}-${rowNumber}`);
-
-                    if (targetRow) {
-                        targetRow.scrollIntoView({
-                            block: "center",
-                            inline: "center",
-                        });
-                    }
-
-                    goToRowInput.value = "";
-                    goToRowInput.classList.add("hidden");
-                }
-
-                if (event.code === "Escape") {
-                    goToRowInput.value = "";
-                    goToRowInput.classList.add("hidden");
-                }
-            },
-            { once: true }
-        );
     }
+
     function jumpToRow(key) {
         const focusedElement = document.activeElement;
         if (!contentContainer.contains(focusedElement) && focusedElement.tagName !== "TEXTAREA") {
@@ -1011,6 +987,28 @@ document.addEventListener("DOMContentLoaded", async () => {
                         await compile();
                     }
                     break;
+                case "KeyG":
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+
+                        if (state && goToRowInput.classList.contains("hidden")) {
+                            goToRow();
+                        } else if (!goToRowInput.classList.contains("hidden")) {
+                            goToRowInput.classList.add("hidden");
+                        }
+                    }
+                    break;
+                case "KeyF":
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        searchInput.focus();
+                    }
+                    break;
+                case "F4":
+                    if (event.altKey) {
+                        await appWindow.close();
+                    }
+                    break;
                 case "Digit1":
                     changeState(mapsDir);
                     break;
@@ -1060,12 +1058,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         jumpToRow("ctrl");
                     }
                     break;
-                case "KeyF":
-                    if (event.ctrlKey) {
-                        event.preventDefault();
-                        searchInput.focus();
-                    }
-                    break;
                 case "KeyC":
                     if (event.ctrlKey) {
                         if (
@@ -1111,23 +1103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                             saved = false;
                         }
-                    }
-                    break;
-                case "KeyG":
-                    if (event.ctrlKey) {
-                        event.preventDefault();
-                        if (state) {
-                            if (goToRowInput.classList.contains("hidden")) {
-                                goToRow();
-                            } else {
-                                goToRowInput.classList.add("hidden");
-                            }
-                        }
-                    }
-                    break;
-                case "F4":
-                    if (event.altKey) {
-                        await appWindow.close();
                     }
                     break;
                 case "KeyV":
@@ -1961,6 +1936,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     }
+
+    goToRowInput.addEventListener("keydown", (event) => {
+        if (event.code === "Enter") {
+            const rowNumber = goToRowInput.value;
+            const targetRow = document.getElementById(`${state}-${rowNumber}`);
+
+            if (targetRow) {
+                targetRow.scrollIntoView({
+                    block: "center",
+                    inline: "center",
+                });
+            }
+
+            goToRowInput.value = "";
+            goToRowInput.classList.add("hidden");
+        }
+
+        if (event.code === "Escape") {
+            goToRowInput.value = "";
+            goToRowInput.classList.add("hidden");
+        }
+    });
 
     document.addEventListener("mousedown", (event) => handleMousedown(event));
 
