@@ -1275,7 +1275,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const lines = textarea.value.split("\n");
         const lineHeight = Number.parseFloat(window.getComputedStyle(textarea).lineHeight);
 
-        const y = textarea.offsetTop + window.scrollY;
+        const y = textarea.offsetTop;
         const x = textarea.offsetLeft;
 
         const canvas = document.createElement("canvas");
