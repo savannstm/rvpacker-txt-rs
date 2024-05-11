@@ -76,7 +76,14 @@ fn main() {
                 .get_window("main")
                 .unwrap()
                 .listen("compile", move |_event: Event| {
-                    let result: String = writer::main();
+                    let result: String = writer::main(
+                        handle
+                            .path_resolver()
+                            .resource_dir()
+                            .unwrap()
+                            .to_str()
+                            .unwrap(),
+                    );
 
                     handle
                         .get_window("main")

@@ -5,15 +5,15 @@ use std::fs::{create_dir_all, read_dir, read_to_string, write};
 use std::time::Instant;
 
 struct Paths {
-    original: &'static str,
-    output: &'static str,
-    maps: &'static str,
-    maps_trans: &'static str,
-    names: &'static str,
-    names_trans: &'static str,
-    other: &'static str,
-    plugins: &'static str,
-    plugins_output: &'static str,
+    original: String,
+    output: String,
+    maps: String,
+    maps_trans: String,
+    names: String,
+    names_trans: String,
+    other: String,
+    plugins: String,
+    plugins_output: String,
 }
 
 fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
@@ -190,7 +190,7 @@ fn write_maps(
                                 });
                         });
                 });
-            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
+            write(format!("{}\\{}", output_dir, f), file.to_string()).unwrap();
         });
 }
 
@@ -198,14 +198,14 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
             let other_original_text: Vec<String> =
-                read_to_string(format!("{}/{}.txt", other_dir, &f[..f.len() - 5]))
+                read_to_string(format!("{}\\{}.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
                     .par_split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
 
             let other_translated_text: Vec<String> =
-                read_to_string(format!("{}/{}_trans.txt", other_dir, &f[..f.len() - 5]))
+                read_to_string(format!("{}\\{}_trans.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
                     .par_split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
@@ -332,7 +332,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                             });
                     }
                 });
-            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
+            write(format!("{}\\{}", output_dir, f), file.to_string()).unwrap();
         });
 }
 
@@ -420,7 +420,7 @@ fn write_system(mut json: Value, output_path: &str, system_text_hashmap: HashMap
         });
 
     write(
-        format!("{}/System.json", output_path),
+        format!("{}\\System.json", output_path),
         to_string(&json).unwrap(),
     )
     .unwrap();
@@ -508,31 +508,31 @@ fn write_plugins(
     const PREFIX: &str = "var $plugins =";
 
     write(
-        format!("{}/plugins.js", output_path),
+        format!("{}\\plugins.js", output_path),
         format!("{}\n{}", PREFIX, to_string(&json).unwrap()),
     )
     .unwrap();
 }
 
-pub fn main() -> String {
+pub fn main(resource_path: &str) -> String {
     let start_time: Instant = Instant::now();
 
     let dir_paths: Paths = Paths {
-        original: "./res/original",
-        output: "./res/data",
-        maps: "./res/copies/maps/maps.txt",
-        maps_trans: "./res/copies/maps/maps_trans.txt",
-        names: "./res/copies/maps/names.txt",
-        names_trans: "./res/copies/maps/names_trans.txt",
-        other: "./res/copies/other",
-        plugins: "./res/copies/plugins",
-        plugins_output: "./res/js",
+        original: format!("{}\\res\\original", resource_path),
+        output: format!("{}\\res\\data", resource_path),
+        maps: format!("{}\\res\\copies\\maps\\maps.txt", resource_path),
+        maps_trans: format!("{}\\res\\copies\\maps\\maps_trans.txt", resource_path),
+        names: format!("{}\\res\\copies\\maps\\names.txt", resource_path),
+        names_trans: format!("{}\\res\\copies\\maps\\names_trans.txt", resource_path),
+        other: format!("{}\\res\\copies\\other", resource_path),
+        plugins: format!("{}\\res\\copies\\plugins", resource_path),
+        plugins_output: format!("{}\\res\\js", resource_path),
     };
 
-    create_dir_all(dir_paths.output).unwrap();
-    create_dir_all(dir_paths.plugins_output).unwrap();
+    create_dir_all(&dir_paths.output).unwrap();
+    create_dir_all(&dir_paths.plugins_output).unwrap();
 
-    let maps_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
+    let maps_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
         .unwrap()
         .par_bridge()
         .fold(
@@ -560,25 +560,25 @@ pub fn main() -> String {
             },
         );
 
-    let maps_original_text_vec: Vec<String> = read_to_string(dir_paths.maps)
+    let maps_original_text_vec: Vec<String> = read_to_string(&dir_paths.maps)
         .unwrap()
         .par_split('\n')
         .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
         .collect();
 
-    let maps_translated_text_vec: Vec<String> = read_to_string(dir_paths.maps_trans)
+    let maps_translated_text_vec: Vec<String> = read_to_string(&dir_paths.maps_trans)
         .unwrap()
         .par_split('\n')
         .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
         .collect();
 
-    let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
+    let maps_original_names_vec: Vec<String> = read_to_string(&dir_paths.names)
         .unwrap()
         .par_split('\n')
         .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
         .collect();
 
-    let maps_translated_names_vec: Vec<String> = read_to_string(dir_paths.names_trans)
+    let maps_translated_names_vec: Vec<String> = read_to_string(&dir_paths.names_trans)
         .unwrap()
         .par_split('\n')
         .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
@@ -622,14 +622,14 @@ pub fn main() -> String {
 
     write_maps(
         maps_hashmap,
-        dir_paths.output,
+        &dir_paths.output,
         maps_text_hashmap,
         maps_names_hashmap,
     );
 
     const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
 
-    let other_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
+    let other_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
         .unwrap()
         .par_bridge()
         .fold(
@@ -642,7 +642,8 @@ pub fn main() -> String {
                     hashmap.insert(
                         filename,
                         merge_other(
-                            from_str(&read_to_string(path.unwrap().path()).unwrap()).unwrap(),
+                            from_str(&read_to_string(path.as_ref().unwrap().path()).unwrap())
+                                .unwrap(),
                         ),
                     );
                 }
@@ -657,20 +658,21 @@ pub fn main() -> String {
             },
         );
 
-    write_other(other_hashmap, dir_paths.output, dir_paths.other);
+    write_other(other_hashmap, &dir_paths.output, &dir_paths.other);
 
     let system_json: Value =
-        from_str(&read_to_string(format!("{}/System.json", dir_paths.original)).unwrap()).unwrap();
+        from_str(&read_to_string(format!("{}\\System.json", &dir_paths.original)).unwrap())
+            .unwrap();
 
     let system_original_text: Vec<String> =
-        read_to_string(format!("{}/System.txt", dir_paths.other))
+        read_to_string(format!("{}\\System.txt", &dir_paths.other))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
             .collect();
 
     let system_translated_text: Vec<String> =
-        read_to_string(format!("{}/System_trans.txt", dir_paths.other))
+        read_to_string(format!("{}\\System_trans.txt", &dir_paths.other))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
@@ -694,20 +696,21 @@ pub fn main() -> String {
             },
         );
 
-    write_system(system_json, dir_paths.output, system_text_hashmap);
+    write_system(system_json, &dir_paths.output, system_text_hashmap);
 
     let plugins_json: Vec<Value> =
-        from_str(&read_to_string(format!("{}/plugins.json", dir_paths.plugins)).unwrap()).unwrap();
+        from_str(&read_to_string(format!("{}\\plugins.json", &dir_paths.plugins)).unwrap())
+            .unwrap();
 
     let plugins_original_text_vec: Vec<String> =
-        read_to_string(format!("{}/plugins.txt", dir_paths.plugins))
+        read_to_string(format!("{}\\plugins.txt", &dir_paths.plugins))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
             .collect();
 
     let plugins_translated_text_vec: Vec<String> =
-        read_to_string(format!("{}/plugins_trans.txt", dir_paths.plugins))
+        read_to_string(format!("{}\\plugins_trans.txt", &dir_paths.plugins))
             .unwrap()
             .par_split('\n')
             .map(|x: &str| x.to_string())
@@ -715,7 +718,7 @@ pub fn main() -> String {
 
     write_plugins(
         plugins_json,
-        dir_paths.plugins_output,
+        &dir_paths.plugins_output,
         plugins_original_text_vec,
         plugins_translated_text_vec,
     );
