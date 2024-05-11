@@ -6,6 +6,14 @@
 /cli/target
 /cli/data
 /cli/js
+/gui/node_modules
+/gui/bun.lockb
+/gui/input.css
+/gui/tailwind.config.js
+/gui/src/*.html
+/gui/src/*.js
+/gui/src-tauri/Cargo.lock
+/gui/src-tauri/target
 /img
 /*.zip
 /data
