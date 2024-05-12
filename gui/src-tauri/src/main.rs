@@ -82,7 +82,9 @@ fn main() {
                             .resource_dir()
                             .unwrap()
                             .to_str()
-                            .unwrap(),
+                            .unwrap()
+                            .replace('\\', "/")
+                            .as_str(),
                     );
 
                     handle
