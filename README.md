@@ -12,7 +12,7 @@ json-writer поддерживает аргументы - чтобы получ�
 
 **Через несколько секунд, он создаст конечные файлы в директориях `data` и `js`, которые вы можете скопировать в директорию `www`, находящуюся в корне игры `(C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www)` с заменой.**
 
-## Директория gui-tauri
+## Директория gui
 
 В этой директории хранится исходный код новой версии программы, написанной на Tauri.
 
@@ -23,7 +23,7 @@ json-writer поддерживает аргументы - чтобы получ�
 Клонируйте репозиторий с помощью\
 `git clone https://github.com/savannstm/fh-termina-json-writer.git`.
 
-Перейдите в директорию `gui-tauri` и установите все необходимые Node.js библиотеки с помощью\
+Перейдите в директорию `gui` и установите все необходимые Node.js библиотеки с помощью\
 `npm install`.
 
 Запустите\
@@ -34,7 +34,7 @@ json-writer поддерживает аргументы - чтобы получ�
 
 Если вы хотите внести какие-то изменения в код проекта - вносите его в фронтенд файлы из директории `src-dev`, либо бэкенд файлы из директории `src-tauri/src`.
 
-После билдинга в директории `gui-tauri/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
+После билдинга в директории `gui/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
 
 ## Директория translation
 
@@ -69,7 +69,7 @@ json-writer supports arguments - to receive help, use `json-writer -h` or `json-
 
 **After a few seconds, it'll create compiled files in `data` and `js` directories, which you can copy and replace to the `www` directory which in the game's root directory (C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www).**
 
-## gui-tauri Directory
+## gui Directory
 
 This directory contains the source code of new program version, written with Tauri.
 
@@ -80,7 +80,7 @@ Issues and commits are welcome.
 Clone the repository with\
 `git clone https://github.com/savannstm/fh-termina-json-writer.git`.
 
-cd to the `gui-tauri` directory and install all needed node.js dependencies with\
+cd to the `gui` directory and install all needed node.js dependencies with\
 `npm install`.
 
 Run\
@@ -91,7 +91,7 @@ to build the program for your current OS.
 
 If you want to make some edits to the source code - edit frontend files in `src-dev` directory, or backend files in `src-tauri/src` directory.
 
-After the build, `target` directory will be created in the `gui-tauri/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
+After the build, `target` directory will be created in the `gui/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
 
 ## translation Directory
 
