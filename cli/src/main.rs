@@ -108,20 +108,17 @@ fn write_maps(
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
-            if file["displayName"].is_string() {
-                if let Some(location_name) =
-                    names_hashmap.get(file["displayName"].as_str().unwrap())
-                {
-                    file["displayName"] = to_value(location_name).unwrap();
-                }
+            if let Some(location_name) = names_hashmap.get(file["displayName"].as_str().unwrap()) {
+                file["displayName"] = to_value(location_name).unwrap();
             }
 
             file["events"]
                 .as_array_mut()
                 .unwrap()
                 .par_iter_mut()
+                .skip(1)
                 .for_each(|event: &mut Value| {
-                    if !event["pages"].is_array() {
+                    if event.is_null() {
                         return;
                     }
 
@@ -130,19 +127,11 @@ fn write_maps(
                         .unwrap()
                         .par_iter_mut()
                         .for_each(|page: &mut Value| {
-                            if !page["list"].is_array() {
-                                return;
-                            }
-
                             page["list"]
                                 .as_array_mut()
                                 .unwrap()
                                 .par_iter_mut()
                                 .for_each(|item: &mut Value| {
-                                    if !item["parameters"].is_array() {
-                                        return;
-                                    }
-
                                     let code: u16 = item["code"].as_u64().unwrap() as u16;
 
                                     item["parameters"]
@@ -238,31 +227,37 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
             file.as_array_mut()
                 .unwrap()
                 .par_iter_mut()
+                .skip(1)
                 .for_each(|element: &mut Value| {
-                    if !element.is_object() {
-                        return;
-                    }
-
                     if f != "CommonEvents.json" && f != "Troops.json" {
-                        element
-                            .as_object_mut()
-                            .unwrap()
-                            .iter_mut()
-                            .par_bridge()
-                            .for_each_with(
-                                ["name", "description", "note"],
-                                |attrs: &mut [&str; 3], (key, value): (&String, &mut Value)| {
-                                    if !attrs.contains(&key.as_str()) {
-                                        return;
-                                    }
+                        if let Some(text) = hashmap.get(element["name"].as_str().unwrap()) {
+                            element["name"] = to_value(text).unwrap();
 
-                                    if value.is_string() {
-                                        if let Some(text) = hashmap.get(value.as_str().unwrap()) {
-                                            *value = to_value(text).unwrap();
-                                        }
-                                    }
-                                },
-                            );
+                            if element["description"].is_string() {
+                                if let Some(text) =
+                                    hashmap.get(element["description"].as_str().unwrap())
+                                {
+                                    element["description"] = to_value(text).unwrap();
+                                }
+                            }
+
+                            const TO_REPLACE: [&str; 4] = [
+                                "<Menu Category: Items>",
+                                "<Menu Category: Food>",
+                                "<Menu Category: Healing>",
+                                "<Menu Category: Body bag>",
+                            ];
+
+                            let note_str: String = element["note"].to_string();
+
+                            for text in TO_REPLACE {
+                                if note_str.contains(text) {
+                                    element["note"] =
+                                        to_value(note_str.replace(text, hashmap[text])).unwrap();
+                                    break;
+                                }
+                            }
+                        }
                         return;
                     }
 
@@ -288,10 +283,6 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                             .unwrap()
                             .par_iter_mut()
                             .for_each(|list: &mut Value| {
-                                if !list["parameters"].is_array() {
-                                    return;
-                                }
-
                                 let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                                 list["parameters"]
