@@ -248,7 +248,7 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
                                 "<Menu Category: Body bag>",
                             ];
 
-                            let note_str: String = element["note"].to_string();
+                            let note_str: &str = element["note"].as_str().unwrap();
 
                             for text in TO_REPLACE {
                                 if note_str.contains(text) {
