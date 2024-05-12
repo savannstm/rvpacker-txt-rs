@@ -1,3 +1,7 @@
+<Menu Category: Items>
+<Menu Category: Food>
+<Menu Category: Healing>
+<Menu Category: Body bag>
 Prehevil map
 A map of Prehevil.
 Photo album
