@@ -1,12 +1,13 @@
-const { copyFile, exists, readDir, readTextFile, removeDir, removeFile, writeTextFile, createDir } =
+const { copyFile, exists, readDir, readTextFile, removeDir, removeFile, writeTextFile, writeBinaryFile, createDir } =
     window.__TAURI__.fs;
-const { BaseDirectory, join } = window.__TAURI__.path;
+const { BaseDirectory, resourceDir, join } = window.__TAURI__.path;
 const { ask, message } = window.__TAURI__.dialog;
 const { invoke } = window.__TAURI__.tauri;
 const { exit } = window.__TAURI__.process;
 const { appWindow, WebviewWindow } = window.__TAURI__.window;
+const { Command } = window.__TAURI__.shell;
 const { writeText: clipboardWrite, readText: clipboardRead } = window.__TAURI__.clipboard;
-const { locale } = window.__TAURI__.os;
+const { platform, locale } = window.__TAURI__.os;
 
 String.prototype.replaceAllMultiple = function (replacementObj) {
     return this.replaceAll(Object.keys(replacementObj).join("|"), (match) => replacementObj[match]);
@@ -60,7 +61,7 @@ HTMLTextAreaElement.prototype.calculateHeight = function () {
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const resourceDir = "res";
+    const resDir = "res";
     const translationDir = "translation";
     const originalDir = "original";
     const copiesDir = "copies";
@@ -94,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (askCreateSettings) {
             await writeTextFile(
-                await join(resourceDir, settingsFile),
+                await join(resDir, settingsFile),
                 JSON.stringify({
                     backup: { enabled: true, period: 60, max: 99 },
                     lang: language,
@@ -106,9 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
 
             alert(mainLanguage.createdSettings);
-            return JSON.parse(
-                await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
-            );
+            return JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }));
         } else {
             await exit(0);
         }
@@ -132,26 +131,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         progressDisplay.classList.replace("hidden", "flex");
         animateEllipsis();
 
-        let downloading = true;
+        let command = (await platform()) === "win32" ? "powershell" : "sh";
+        await new Command(command, [], { cwd: await join(await resourceDir(), resDir) }).execute();
 
-        const unlistenProgress = await appWindow.listen("progress", (event) => {
-            if (event.payload === "ended") {
-                downloading = false;
-            }
+        await invoke("unzip", {
+            path: await join(await resourceDir(), resDir, "main.zip"),
+            dest: await join(await resourceDir(), resDir, "main"),
         });
 
-        await appWindow.emit("download_repo");
-
-        async function awaitDownload() {
-            if (downloading) {
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-                await awaitDownload();
-            }
-        }
-
-        await awaitDownload();
-
-        unlistenProgress();
         progressDisplay.remove();
     }
 
@@ -160,16 +147,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (await exitProgram()) {
             const settings = JSON.parse(
-                await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
             );
 
-            await writeTextFile(
-                await join(resourceDir, settingsFile),
-                JSON.stringify({ ...settings, lang: language }),
-                {
-                    dir: BaseDirectory.Resource,
-                }
-            );
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, lang: language }), {
+                dir: BaseDirectory.Resource,
+            });
 
             location.reload();
         }
@@ -178,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function prepareTranslation() {
         const dirsToLeave = [translationDir, originalDir];
 
-        const repoPath = await join(resourceDir, repoDir);
+        const repoPath = await join(resDir, repoDir);
         const repositoryExists = await exists(repoPath, {
             dir: BaseDirectory.Resource,
         });
@@ -192,11 +175,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         await cloneRepository();
 
+        if (!(await exists(repoPath, { dir: BaseDirectory.Resource }))) {
+            throw "govno";
+        }
+
         for (const dir of await readDir(repoPath, {
             dir: BaseDirectory.Resource,
         })) {
+            console.log(dir.name);
+
             if (dirsToLeave.includes(dir.name)) {
-                await copyDir(await join(repoPath, dir.name), await join(resourceDir, dir.name), {
+                await copyDir(await join(repoPath, dir.name), await join(resDir, dir.name), {
                     dir: BaseDirectory.Resource,
                     recursive: true,
                 });
@@ -210,14 +199,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const dirs = [mapsDir, otherDir, pluginsDir];
 
         for (const dir of dirs) {
-            if (!(await exists(await join(resourceDir, translationDir, dir), { dir: BaseDirectory.Resource }))) {
+            if (!(await exists(await join(resDir, translationDir, dir), { dir: BaseDirectory.Resource }))) {
                 if (await ask(mainLanguage.askDownloadTranslation)) {
                     await prepareTranslation();
                     alert(mainLanguage.downloadedTranslation);
                 } else if (await ask(mainLanguage.startBlankProject)) {
                     await prepareTranslation();
 
-                    const files = await readDir(await join(resourceDir, translationDir, dir), {
+                    const files = await readDir(await join(resDir, translationDir, dir), {
                         dir: BaseDirectory.Resource,
                         recursive: true,
                     });
@@ -226,17 +215,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                         .flatMap((dir) => dir.children)
                         .filter((file) => file.name.endsWith("_trans.txt"))) {
                         const numberOfLines = (
-                            await readTextFile(await join(resourceDir, translationDir, dir, file.name), {
+                            await readTextFile(await join(resDir, translationDir, dir, file.name), {
                                 dir: BaseDirectory.Resource,
                             })
                         ).countChars("\n");
 
-                        await removeFile(await join(resourceDir, translationDir, dir, file.name), {
+                        await removeFile(await join(resDir, translationDir, dir, file.name), {
                             dir: BaseDirectory.Resource,
                         });
 
                         await writeTextFile(
-                            await join(resourceDir, translationDir, dir, file.name),
+                            await join(resDir, translationDir, dir, file.name),
                             "\n".repeat(numberOfLines),
                             { dir: BaseDirectory.Resource }
                         );
@@ -283,7 +272,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function determineLastBackupNumber() {
-        const backups = await readDir(await join(resourceDir, backupDir), { dir: BaseDirectory.Resource });
+        const backups = await readDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource });
         return backups.length === 0 ? "00" : backups.map((backup) => backup.name.slice(-2)).sort((a, b) => b - a)[0];
     }
 
@@ -390,9 +379,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        for (const file of await readDir(resourceDir, { dir: BaseDirectory.Resource })) {
+        for (const file of await readDir(resDir, { dir: BaseDirectory.Resource })) {
             if (file.name.startsWith("matches")) {
-                await removeFile(await join(resourceDir, file.name), { dir: BaseDirectory.Resource });
+                await removeFile(await join(resDir, file.name), { dir: BaseDirectory.Resource });
             }
         }
 
@@ -443,7 +432,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (count % 1000 === 0) {
-                await writeTextFile(await join(resourceDir, `matches-${file}.json`), JSON.stringify(objectToWrite), {
+                await writeTextFile(await join(resDir, `matches-${file}.json`), JSON.stringify(objectToWrite), {
                     dir: BaseDirectory.Resource,
                 });
 
@@ -453,7 +442,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (file === 0) {
-            await writeTextFile(await join(resourceDir, "matches-0.json"), JSON.stringify(objectToWrite), {
+            await writeTextFile(await join(resDir, "matches-0.json"), JSON.stringify(objectToWrite), {
                 dir: BaseDirectory.Resource,
             });
         }
@@ -462,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         searchCurrentPage.textContent = "0";
 
         for (const [id, result] of Object.entries(
-            JSON.parse(await readTextFile(await join(resourceDir, "matches-0.json"), { dir: BaseDirectory.Resource }))
+            JSON.parse(await readTextFile(await join(resDir, "matches-0.json"), { dir: BaseDirectory.Resource }))
         )) {
             appendMatch(document.getElementById(id), result);
         }
@@ -493,12 +482,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             element.setAttribute("reverted", "");
 
             const replacementLogContent = JSON.parse(
-                await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
             );
 
             delete replacementLogContent[clicked.id];
 
-            await writeTextFile(await join(resourceDir, logFile), JSON.stringify(replacementLogContent), {
+            await writeTextFile(await join(resDir, logFile), JSON.stringify(replacementLogContent), {
                 dir: BaseDirectory.Resource,
             });
         }
@@ -681,11 +670,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             replaced.set(text.id, { original: text.value, translation: newValue });
             const prevFile = JSON.parse(
-                await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
             );
             const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
 
-            await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject), {
+            await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
                 dir: BaseDirectory.Resource,
             });
             replaced.clear();
@@ -722,12 +711,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        const prevFile = JSON.parse(
-            await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
-        );
+        const prevFile = JSON.parse(await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource }));
         const newObject = { ...prevFile, ...Object.fromEntries([...replaced]) };
 
-        await writeTextFile(await join(resourceDir, logFile), JSON.stringify(newObject), {
+        await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
             dir: BaseDirectory.Resource,
         });
         replaced.clear();
@@ -736,11 +723,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function isFilesCopied() {
         let copied = true;
 
-        for (const dir of await readDir(await join(resourceDir, translationDir), {
+        for (const dir of await readDir(await join(resDir, translationDir), {
             dir: BaseDirectory.Resource,
             recursive: true,
         })) {
-            await createDir(await join(resourceDir, copiesDir, dir.name), {
+            await createDir(await join(resDir, copiesDir, dir.name), {
                 dir: BaseDirectory.Resource,
                 recursive: true,
             });
@@ -748,7 +735,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (
                 dir.children.length !==
                 (
-                    await readDir(await join(resourceDir, copiesDir, dir.name), {
+                    await readDir(await join(resDir, copiesDir, dir.name), {
                         dir: BaseDirectory.Resource,
                     })
                 ).length
@@ -765,14 +752,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        for (const folder of await readDir(await join(resourceDir, translationDir), {
+        for (const folder of await readDir(await join(resDir, translationDir), {
             dir: BaseDirectory.Resource,
             recursive: true,
         })) {
             for (const file of folder.children) {
                 await copyFile(
-                    await join(resourceDir, translationDir, folder.name, file.name),
-                    await join(resourceDir, copiesDir, folder.name, file.name),
+                    await join(resDir, translationDir, folder.name, file.name),
+                    await join(resDir, copiesDir, folder.name, file.name),
                     { dir: BaseDirectory.Resource }
                 );
             }
@@ -787,7 +774,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         saving = true;
         saveButton.firstElementChild.classList.add("animate-spin");
 
-        let dirName = await join(resourceDir, copiesDir);
+        let dirName = await join(resDir, copiesDir);
 
         if (backup) {
             const date = new Date();
@@ -802,11 +789,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             nextBackupNumber = (nextBackupNumber % backupMax) + 1;
 
-            dirName = await join(
-                resourceDir,
-                backupDir,
-                `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`
-            );
+            dirName = await join(resDir, backupDir, `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`);
 
             for (const subDir of [mapsDir, otherDir, pluginsDir]) {
                 await createDir(await join(dirName, subDir), { dir: BaseDirectory.Resource, recursive: true });
@@ -1190,7 +1173,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const contentNames = [];
         const content = [];
 
-        for (const folder of await readDir(await join(resourceDir, copiesDir), {
+        for (const folder of await readDir(await join(resDir, copiesDir), {
             dir: BaseDirectory.Resource,
             recursive: true,
         })) {
@@ -1202,7 +1185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 contentNames.push(file.name.slice(0, -4));
                 content.push(
                     (
-                        await readTextFile(await join(resourceDir, copiesDir, folder.name, file.name), {
+                        await readTextFile(await join(resDir, copiesDir, folder.name, file.name), {
                             dir: BaseDirectory.Resource,
                         })
                     ).split("\n")
@@ -1548,7 +1531,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function createLogFile() {
-        const logPath = await join(resourceDir, logFile);
+        const logPath = await join(resDir, logFile);
         if (!(await exists(logPath, { dir: BaseDirectory.Resource }))) {
             await writeTextFile(logPath, "{}", { dir: BaseDirectory.Resource });
         }
@@ -1591,18 +1574,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const replaced = new Map();
     const activeGhostLines = [];
 
-    let settings = (await exists(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource }))
-        ? JSON.parse(await readTextFile(await join(resourceDir, settingsFile), { dir: BaseDirectory.Resource }))
+    let settings = (await exists(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
+        ? JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
         : null;
 
     const language = settings ? settings.lang : (await locale()).startsWith("ru") ? "ru" : "en";
 
     const mainLanguage =
         language === "ru"
-            ? JSON.parse(await readTextFile(await join(resourceDir, ruTranslation), { dir: BaseDirectory.Resource }))
-                  .main
-            : JSON.parse(await readTextFile(await join(resourceDir, enTranslation), { dir: BaseDirectory.Resource }))
-                  .main;
+            ? JSON.parse(await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })).main
+            : JSON.parse(await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })).main;
 
     if (!settings) {
         settings = await createSettings();
@@ -1623,11 +1604,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             alwaysOnTop: true,
         });
 
-        await writeTextFile(
-            await join(resourceDir, settingsFile),
-            JSON.stringify({ ...settings, firstLaunch: false }),
-            { dir: BaseDirectory.Resource }
-        );
+        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, firstLaunch: false }), {
+            dir: BaseDirectory.Resource,
+        });
     }
 
     settings = null;
@@ -1675,7 +1654,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
 
     await createLogFile();
-    await createDir(await join(resourceDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
+    await createDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
 
     let nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
     if (backupEnabled) {
@@ -1777,7 +1756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     searchSwitch.innerHTML = "menu_book";
 
                     const replacementLogContent = JSON.parse(
-                        await readTextFile(await join(resourceDir, logFile), { dir: BaseDirectory.Resource })
+                        await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
                     );
 
                     for (const [key, value] of Object.entries(replacementLogContent)) {
@@ -1827,7 +1806,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resourceDir,
+                                    resDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
                                 ),
                                 {
@@ -1852,7 +1831,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resourceDir,
+                                    resDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
                                 ),
                                 {
