@@ -33,8 +33,7 @@
         "regexButtonTitle": "Search by regular expressions (Alt + R)",
         "translationButtonTitle": "Search only by translation (Alt + T)",
         "locationButtonTitle": "Search only in the current file (Alt + L)",
-        "noMatches": "No matches",
-        "tooManyMatches": "Number of matches exceeds 20000. Search was stopped to prevent memory leak."
+        "noMatches": "No matches"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",

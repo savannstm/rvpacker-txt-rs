@@ -33,8 +33,7 @@
         "regexButtonTitle": "Поиск по регулярным выражениям (Alt + R)",
         "translationButtonTitle": "Поиск только по переводу (Alt + T)",
         "locationButtonTitle": "Поиск только в текущем файле (Alt + L)",
-        "noMatches": "Нет совпадений",
-        "tooManyMatches": "Количество совпадений превышает 20000. Для избежания утечки памяти поиск был остановлен."
+        "noMatches": "Нет совпадений"
     },
     "options": {
         "backupPeriodLabel": "Создавать резервные копии каждые:",

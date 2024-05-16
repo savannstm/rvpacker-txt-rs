@@ -1,4 +1,4 @@
-const { copyFile, exists, readDir, readTextFile, removeDir, removeFile, writeTextFile, writeBinaryFile, createDir } =
+const { copyFile, exists, readDir, readTextFile, removeDir, removeFile, writeTextFile, createDir } =
     window.__TAURI__.fs;
 const { BaseDirectory, resourceDir, join } = window.__TAURI__.path;
 const { ask, message } = window.__TAURI__.dialog;

@@ -1,5 +1,4 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-#![cfg_attr(debug_assertions, windows_subsystem = "windows")]
 
 use regex::escape;
 use std::fs::remove_file;
