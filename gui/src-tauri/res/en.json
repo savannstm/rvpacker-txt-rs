@@ -33,7 +33,9 @@
         "regexButtonTitle": "Search by regular expressions (Alt + R)",
         "translationButtonTitle": "Search only by translation (Alt + T)",
         "locationButtonTitle": "Search only in the current file (Alt + L)",
-        "noMatches": "No matches"
+        "noMatches": "No matches",
+        "currentPage": "None",
+        "separator": "of"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",

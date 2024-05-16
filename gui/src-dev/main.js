@@ -131,12 +131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         progressDisplay.classList.replace("hidden", "flex");
         animateEllipsis();
 
-        let command = (await platform()) === "win32" ? "powershell" : "sh";
-        await new Command(command, [], { cwd: await join(await resourceDir(), resDir) }).execute();
+        const command = (await platform()) === "win32" ? "powershell" : "sh";
+        const resourcePath = await join(await resourceDir(), resDir);
+        await new Command(command, [], { cwd: resourcePath }).execute();
 
         await invoke("unzip", {
-            path: await join(await resourceDir(), resDir, "main.zip"),
-            dest: await join(await resourceDir(), resDir, "main"),
+            path: await join(resourcePath, "main.zip"),
+            dest: await join(resourcePath, "main"),
         });
 
         progressDisplay.remove();
@@ -175,15 +176,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         await cloneRepository();
 
-        if (!(await exists(repoPath, { dir: BaseDirectory.Resource }))) {
-            throw "govno";
-        }
-
         for (const dir of await readDir(repoPath, {
             dir: BaseDirectory.Resource,
         })) {
-            console.log(dir.name);
-
             if (dirsToLeave.includes(dir.name)) {
                 await copyDir(await join(repoPath, dir.name), await join(resDir, dir.name), {
                     dir: BaseDirectory.Resource,
@@ -1546,6 +1541,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchPanelFound = document.getElementById("search-content");
     const searchPanelReplaced = document.getElementById("replace-content");
     const searchCurrentPage = document.getElementById("search-current-page");
+    const searchSeparator = document.getElementById("search-separator");
     const searchTotalPages = document.getElementById("search-total-pages");
     const topPanel = document.getElementById("top-panel");
     const topPanelButtons = document.getElementById("top-panel-buttons");
@@ -1631,6 +1627,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     helpButtonSub.innerHTML = mainLanguage.helpButton;
     aboutButton.innerHTML = mainLanguage.aboutButton;
     hotkeysButton.innerHTML = mainLanguage.hotkeysButton;
+
+    searchCurrentPage.innerHTML = mainLanguage.currentPage;
+    searchSeparator.innerHTML = mainLanguage.separator;
 
     let searchRegex = false;
     let searchWhole = false;

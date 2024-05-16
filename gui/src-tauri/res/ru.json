@@ -33,7 +33,9 @@
         "regexButtonTitle": "Поиск по регулярным выражениям (Alt + R)",
         "translationButtonTitle": "Поиск только по переводу (Alt + T)",
         "locationButtonTitle": "Поиск только в текущем файле (Alt + L)",
-        "noMatches": "Нет совпадений"
+        "noMatches": "Нет совпадений",
+        "currentPage": "Нет",
+        "separator": "из"
     },
     "options": {
         "backupPeriodLabel": "Создавать резервные копии каждые:",
