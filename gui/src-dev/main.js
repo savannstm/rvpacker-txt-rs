@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const originalDir = "original";
     const copiesDir = "copies";
     const backupDir = "backups";
-    const repoDir = "repo";
+    const repoDir = "main/fh-termina-json-writer-main";
 
     const mapsDir = "maps";
     const otherDir = "other";
@@ -127,7 +127,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const progressDisplay = document.getElementById("progress-display");
         const progressText = document.getElementById("progress-text");
-        const progressStatus = document.getElementById("progress-status");
         progressText.innerHTML = mainLanguage.downloadingTranslation;
 
         progressDisplay.classList.replace("hidden", "flex");
@@ -136,14 +135,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         let downloading = true;
 
         const unlistenProgress = await appWindow.listen("progress", (event) => {
-            if (event.payload !== "ended") {
-                progressStatus.innerHTML = `${event.payload} ${mainLanguage.mb}`;
-            } else {
+            if (event.payload === "ended") {
                 downloading = false;
             }
         });
 
-        await appWindow.emit("clone");
+        await appWindow.emit("download_repo");
 
         async function awaitDownload() {
             if (downloading) {
@@ -181,13 +178,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function prepareTranslation() {
         const dirsToLeave = [translationDir, originalDir];
 
-        const repoDirPath = await join(resourceDir, repoDir);
-        const repositoryExists = await exists(repoDirPath, {
+        const repoPath = await join(resourceDir, repoDir);
+        const repositoryExists = await exists(repoPath, {
             dir: BaseDirectory.Resource,
         });
 
         if (repositoryExists) {
-            await removeDir(repoDirPath, {
+            await removeDir(repoPath, {
                 dir: BaseDirectory.Resource,
                 recursive: true,
             });
@@ -195,18 +192,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         await cloneRepository();
 
-        for (const dir of await readDir(repoDirPath, {
+        for (const dir of await readDir(repoPath, {
             dir: BaseDirectory.Resource,
         })) {
             if (dirsToLeave.includes(dir.name)) {
-                await copyDir(await join(repoDirPath, dir.name), await join(resourceDir, dir.name), {
+                await copyDir(await join(repoPath, dir.name), await join(resourceDir, dir.name), {
                     dir: BaseDirectory.Resource,
                     recursive: true,
                 });
             }
         }
 
-        await removeDir(repoDirPath, { dir: BaseDirectory.Resource, recursive: true });
+        await removeDir(repoPath, { dir: BaseDirectory.Resource, recursive: true });
     }
 
     async function ensureStart() {

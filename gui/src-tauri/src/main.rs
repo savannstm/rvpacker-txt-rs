@@ -1,10 +1,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use git2::build::RepoBuilder;
-use git2::{FetchOptions, Progress, RemoteCallbacks};
 use regex::escape;
-use std::path::PathBuf;
+use std::io::Cursor;
+use std::path::Path;
+use std::process::{Command, Stdio};
 use tauri::{generate_context, App, AppHandle, Builder, Event, Manager};
+use zip_extract::extract;
 mod writer;
 
 #[tauri::command]
@@ -30,35 +31,28 @@ fn main() {
                 app.get_window("main").unwrap().open_devtools();
             }
 
-            let path_to_clone: PathBuf =
-                handle.path_resolver().resolve_resource("res/repo").unwrap();
-
             let handle_clone: AppHandle = handle.clone();
             handle_clone
                 .get_window("main")
                 .unwrap()
-                .listen("clone", move |event: Event| {
-                    let mut cb: RemoteCallbacks<'_> = RemoteCallbacks::new();
-                    cb.transfer_progress(|stats: Progress<'_>| {
-                        let progress: usize = stats.received_bytes() / 1024;
-                        (handle_clone)
-                            .get_window("main")
-                            .unwrap()
-                            .emit("progress", progress)
-                            .unwrap();
-                        true
-                    });
+                .listen("download_repo", move |event: Event| {
+                    let output_path: String = format!("{}/res", handle_clone.path_resolver().resource_dir().unwrap().to_str().unwrap().replace('\\', "/"));
 
-                    let mut fo: FetchOptions<'_> = FetchOptions::new();
-                    fo.remote_callbacks(cb);
+                    let program: &str;
+                    let arg: String;
 
-                    RepoBuilder::new()
-                        .fetch_options(fo)
-                        .clone(
-                            "https://github.com/savannstm/fh-termina-json-writer",
-                            path_to_clone.as_path(),
-                        )
-                        .unwrap();
+                    if std::env::consts::OS == "windows" {
+                        program = "powershell";
+                        arg = format!("cd {}; iwr https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip -OutFile main.zip", output_path);
+                    } else {
+                        program = "sh";
+                        arg = format!("cd {}; wget https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip -O main.zip", output_path);
+                    }
+
+                    Command::new(program).arg(arg).stdout(Stdio::null()).spawn().unwrap().wait().unwrap();
+
+                    let zip_file_bytes: Vec<u8> = std::fs::read(format!("{}/main.zip", output_path)).unwrap();
+                    extract(Cursor::new(&zip_file_bytes), Path::new(&format!("{}/main", output_path)), false).unwrap();
 
                     handle_clone
                         .get_window("main")
