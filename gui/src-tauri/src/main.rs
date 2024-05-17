@@ -4,7 +4,7 @@ use regex::escape;
 use std::fs::remove_file;
 use std::io::Cursor;
 use std::path::Path;
-use tauri::{generate_context, App, AppHandle, Builder, Event, Manager};
+use tauri::{generate_context, App, Builder, Event, Manager};
 use zip_extract::extract;
 mod writer;
 
@@ -31,33 +31,25 @@ fn main() {
     Builder::default()
         .invoke_handler(tauri::generate_handler![unescape_text, unzip])
         .setup(|app: &mut App| {
-            let handle: AppHandle = app.handle();
+            let main_window: tauri::Window = app.get_window("main").unwrap();
+            let resource_path: String = app
+                .path_resolver()
+                .resource_dir()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .replace('\\', "/");
 
             #[cfg(debug_assertions)]
             {
-                app.get_window("main").unwrap().open_devtools();
+                main_window.open_devtools();
             }
 
-            handle
-                .get_window("main")
+            app.get_window("main")
                 .unwrap()
                 .listen("compile", move |_event: Event| {
-                    let result: String = writer::main(
-                        handle
-                            .path_resolver()
-                            .resource_dir()
-                            .unwrap()
-                            .to_str()
-                            .unwrap()
-                            .replace('\\', "/")
-                            .as_str(),
-                    );
-
-                    handle
-                        .get_window("main")
-                        .unwrap()
-                        .emit("compile-finished", result)
-                        .unwrap();
+                    let result: String = writer::main(&resource_path);
+                    main_window.emit("compile-finished", result).unwrap();
                 });
 
             Ok(())

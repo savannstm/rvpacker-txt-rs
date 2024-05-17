@@ -280,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const regexp = await invoke("unescape_text", {
             text: text,
             option: searchRegex ? "regex" : searchWhole ? "whole" : "none",
-        }).then((regexp) => regexp);
+        });
 
         const attr = searchCase ? "g" : "gi";
 
