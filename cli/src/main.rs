@@ -250,11 +250,18 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
 
                             let note_str: &str = element["note"].as_str().unwrap();
 
-                            for text in TO_REPLACE {
-                                if note_str.contains(text) {
-                                    element["note"] =
-                                        to_value(note_str.replace(text, hashmap[text])).unwrap();
-                                    break;
+                            if f == "Classes.json" {
+                                if let Some(text) = hashmap.get(note_str) {
+                                    element["note"] = to_value(text).unwrap();
+                                }
+                            } else {
+                                for text in TO_REPLACE {
+                                    if note_str.contains(text) {
+                                        element["note"] =
+                                            to_value(note_str.replace(text, hashmap[text]))
+                                                .unwrap();
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -403,22 +410,19 @@ fn write_system(
                         }
                     });
             } else {
-                if !value["messages"].is_object() {
+                if !value.is_object() {
                     return;
                 }
 
-                value["messages"]
+                value
                     .as_object_mut()
                     .unwrap()
                     .values_mut()
                     .par_bridge()
                     .for_each(|message_value: &mut Value| {
-                        if message_value.is_string() {
-                            if let Some(text) =
-                                system_text_hashmap.get(message_value.as_str().unwrap())
-                            {
-                                *message_value = to_value(text).unwrap();
-                            }
+                        if let Some(text) = system_text_hashmap.get(message_value.as_str().unwrap())
+                        {
+                            *message_value = to_value(text).unwrap();
                         }
                     });
             }
