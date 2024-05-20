@@ -30,16 +30,6 @@ Between all this romance and betreyal you find recipes of \nchef Andérs' famous
 "Gro-goroth offers the mankind the blessing of blood magick.\nConstant sacrifices in his name will maintain the relationship."
 "The Mark of Gro-goroth raises the physical strength of its\nwearer."
 The text includes the sigil of the Gro-goroth and instructions\non how to use it.
-"The fellowship chapter 1 -\nThe following pages tell of the events that took place\nin the year 809 after the birth of our christ,\nthe ascended one."
-"The tale of the fellowship is familiar to many\nbut few know the factual story of which all the\npoems and songs are made of."
-"The fellowship consisted of 5 people:\nFrancóis - the dominating one,\nNilvan - the endless one,\nValteil - the enlightened one,"
-"Chambara - the tormented one,\nand then there was the fifth one - he who never aspired\nfor the same greatness as the rest of the party - whose \nstory bears no listeners. The forgotten one."
-"The fellowship was formed to seek the older gods, who\nleft humanity without guidance, without aid in the\ntimes of great peril."
-"The great kingdoms were slowly rotting away and the grand\nvalues mankind once aimed for were displaced by defiled\nprincipals and practises."
-"Back then, there existed an ancient tomb to\nancient city of Mahavre that worked as a hub for \nmultiple different planes of existance. A place\nwhere a man could meet his maker."
-"Those who would set their foot inside, would end\nup in a forever-going turmoil of godly dimensions and\nplanes of afterlife."
-"It is here, that the fellowship would demand the\nrights of self-governing for mankind."
-"Freedom to choose our own destiny and build the future\nwe deserve."
 "Very much like the sun - the moon is one of the primordial entities \nand thus it has lore and beliefs written since the dawn of time."
 "This makes it difficult to separate facts from fiction and mad\nramblings from hidden truths."
 "Consistent details among the myriad of stories seem to hint of a \ngod called Rher. Also knowns as the Trickster God and the Moon God."
@@ -311,7 +301,6 @@ Gro-goroth
 Sylvian
 Alll-mer
 Which god do you pray?
-.\|.\|.\|.
 You finish praying.
 You find a \c[2]Meatpie\c[0]!
 You find an \c[2]Egg\c[0]!
@@ -397,14 +386,6 @@ You find a \c[2]Ballistic shield\c[0]!
 "'This appeared on the front door just before you came. \nIt was directed to young mister Willem.'"
 "Slowly Willem unwrapped the decorated paper with small\nmouse prints on it..."
 "Inside the parcel, there was catnip."
-"The New Poems of Love and Torment -\nWritten by Ronn Chambara"
-"The book contains age-old writings of the famed poet\nRonn Chambara. This book concentrates on the latter half\nof his lifetime and production."
-"Poem I - 'The blackened heart'\nStakes are high, you are also and more so -\nLive your lie and play with my blood torso."
-"Who would believe all your tries -\nTo blacken my name, dead crow as a prize."
-"They say that a tear, only dries -\nSo I want to see the day, even Gro-goroth cries."
-"They will come know this day as the cruel age."
-"They will come know this page as the fourth phase."
-"Won't you die."
 "-The Four Ages of Modern History-"\n"The modern age and modern chronology begins from the birth \nof our lord , the ascended one, Alll-mer."
 "There are many fabricated religious text about Alll-mer, but\nthere is enough evidence to prove that Alll-mer did indeed\nexist as a real person at the time.
 "His birth would mark as the first age. The second age started\nfrom the reign of the so-called New gods in the year 410."

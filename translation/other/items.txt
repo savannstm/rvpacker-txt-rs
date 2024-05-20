@@ -125,8 +125,8 @@ A shell that is loaded with multiple lead shots. These shells\nare used with Tre
 Round-nosed, copper-nickel full-metal-jacketed bullet with\na lead core. Ammo meant for rifles. Shoot with [SHIFT].
 Explosive vial
 A vial full of explosive liquids. Can be used to clear\ncave-ins or other rocks and rubble.
-The Tale of the Pocketcat I
-A childrens fairy tale about the Pocketcat. It's the \nfirst chapter.
+The Tale of the Pocketcat Ch. 1
+The first chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
 Stone
 A small rock.
 Water vial
@@ -208,8 +208,8 @@ Saw blade
 A saw blade that is used in table saws. The blade has been\ngathering a little bit rust.
 Ornament lantern
 A simple lantern with ornament decorations. Can be used to\nthrow at the enemies for a small fire attack.
-The Tale of the Pocketcat II
-A childrens fairy tale about the Pocketcat. It's the \nsecond chapter.
+The Tale of the Pocketcat Ch. 2
+The second chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
 Fallen cherub head
 The severed head of a fallen cherub. The head feels hollow and its\nskin feels crispy.
 Throwing dart
@@ -480,8 +480,6 @@ Taking board instructions
 Instructions on how to operate a talking board to communicate\nwith spirits and others alike.
 God manifesto
 A short manifesto on godhood. Written by renowned occultist\nDonnovan Hugo.
-The first chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
-The second chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
 Death mask head
 The severed head of a death mask.
 Meat grinder head
