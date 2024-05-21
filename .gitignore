@@ -1,9 +1,9 @@
 /.vscode
 /copies
 /backups
-/cli/read
-/cli/cargo.lock
+/cli/Cargo.lock
 /cli/target
+/cli/parsed
 /cli/data
 /cli/js
 /gui/node_modules
