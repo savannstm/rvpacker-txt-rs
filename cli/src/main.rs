@@ -514,7 +514,7 @@ fn main() {
 
             println!(
                 "Все файлы были записаны успешно.\nПотрачено {} секунд.",
-                Instant::now().duration_since(start_time).as_secs_f64()
+                start_time.elapsed().as_secs_f64()
             );
         }
 
@@ -538,7 +538,7 @@ fn main() {
 
             println!(
                 "Весь игровой текст был успешно запарсен.\nПотрачено {} секунд.",
-                Instant::now().duration_since(start_time).as_secs_f64()
+                start_time.elapsed().as_secs_f64()
             );
         }
 
