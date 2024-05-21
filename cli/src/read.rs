@@ -6,7 +6,7 @@ use std::{
     fs::{read_dir, read_to_string, write, DirEntry},
 };
 
-pub fn read_map(input_dir: &str, output_dir: &str, logging: bool) {
+pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
@@ -91,7 +91,11 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool) {
             }
         }
         if logging {
-            println!("Распарсен файл {filename}.");
+            if language == "ru" {
+                println!("Распарсен файл {filename}.");
+            } else {
+                println!("Parsed file {filename}.");
+            }
         }
     }
 
@@ -102,7 +106,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool) {
     .unwrap();
 }
 
-pub fn read_other(input_dir: &str, output_dir: &str, logging: bool) {
+pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
@@ -260,12 +264,16 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool) {
         .unwrap();
 
         if logging {
-            println!("Распарсен файл {filename}");
+            if language == "ru" {
+                println!("Распарсен файл {filename}");
+            } else {
+                println!("Parsed file {filename}");
+            }
         }
     }
 }
 
-pub fn read_system(input_dir: &str, output_dir: &str, logging: bool) {
+pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
     let system_file = format!("{}/System.json", input_dir);
 
     let json: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
@@ -327,6 +335,10 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool) {
     .unwrap();
 
     if logging {
-        println!("Распарсен файл System.json.");
+        if language == "ru" {
+            println!("Распарсен файл System.json.");
+        } else {
+            println!("Parsed file System.json.");
+        }
     }
 }
