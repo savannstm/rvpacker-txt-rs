@@ -1,6 +1,6 @@
 {
     "name": "fh-termina-json-writer",
-    "version": "2.4.0",
+    "version": "2.4.1",
     "devDependencies": {
         "@tauri-apps/cli": "^1",
         "html-minifier-terser": "^7.2.0",
