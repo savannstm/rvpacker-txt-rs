@@ -28,7 +28,7 @@ json-writer поддерживает различные команды и арг
 
 Запустите\
 `npm run tauri dev`,\
-чтобы запустить приложения в девелопер режиме, либо\
+чтобы запустить приложение в девелопер режиме, либо\
 `npm run tauri build`,\
 чтобы забилдить приложение под вашу текущую ОС.
 
@@ -63,9 +63,9 @@ json-writer поддерживает различные команды и арг
 
 This directory contains program's CLI verison. This is your choice, if you want to quickly edit .txt files and quickly compile them using .exe (or binary without extension on linux).
 
-After you edited the \_trans.txt files in `translation` directory - **run json-writer binary**.
+After you edited the \_trans.txt files in `translation` directory - **run json-writer binary with write command**.
 
-json-writer supports arguments - to receive help, use `json-writer -h` or `json-writer --help`.
+json-writer supports different commands and arguments - to receive help, use `json-writer -h` or `json-writer --help`.
 
 **After a few seconds, it'll create compiled files in `data` and `js` directories, which you can copy and replace to the `www` directory which in the game's root directory (C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www).**
 
