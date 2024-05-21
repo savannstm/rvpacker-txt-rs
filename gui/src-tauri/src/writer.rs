@@ -244,11 +244,18 @@ fn write_other(mut json: HashMap<String, Value>, output_dir: &str, other_dir: &s
 
                             let note_str: &str = element["note"].as_str().unwrap();
 
-                            for text in TO_REPLACE {
-                                if note_str.contains(text) {
-                                    element["note"] =
-                                        to_value(note_str.replace(text, hashmap[text])).unwrap();
-                                    break;
+                            if f == "Classes.json" {
+                                if let Some(text) = hashmap.get(note_str) {
+                                    element["note"] = to_value(text).unwrap();
+                                }
+                            } else {
+                                for text in TO_REPLACE {
+                                    if note_str.contains(text) {
+                                        element["note"] =
+                                            to_value(note_str.replace(text, hashmap[text]))
+                                                .unwrap();
+                                        break;
+                                    }
                                 }
                             }
                         }
