@@ -48,7 +48,8 @@ fn main() {
             app.get_window("main")
                 .unwrap()
                 .listen("compile", move |_event: Event| {
-                    let result: String = writer::main(&resource_path);
+                    let result: String =
+                        writer::main(&resource_path, tauri::api::os::locale().unwrap().as_str());
                     main_window.emit("compile-finished", result).unwrap();
                 });
 

@@ -1574,7 +1574,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
         : null;
 
-    const language = settings ? settings.lang : (await locale()).startsWith("ru") ? "ru" : "en";
+    const language = settings
+        ? settings.lang
+        : ["ru", "uk", "be"].some(async (x) => (await locale()).startsWith(x))
+        ? "ru"
+        : "en";
 
     const mainLanguage =
         language === "ru"
