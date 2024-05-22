@@ -307,6 +307,7 @@ Bury your trauma and fears. This reduces your sanity decline while \nexploring. 
 Order, Charge!
 Give orders to your team to charge and attack the enemy without\nwasting their turns.
 Order, Defend!
+Lockpicking
 An ability to open any simple lock with your trusty lockpick.
 Persuade
 Persuade your opponents with greater intellect and wit. The effects\nvary between enemy to enemy depending on their persona. Used with\nTalk skill.
