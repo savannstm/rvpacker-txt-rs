@@ -22,136 +22,115 @@ impl<T: AsRef<str> + Colorize> Gray for T {
 }
 
 fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, bool), String) {
-    let mut write_options = (true, true, true, true, false);
+    let mut write_options: (bool, bool, bool, bool, bool) = (true, true, true, true, false);
+    let args_len: usize = args.len();
 
-    if args.len() < 2 {
-        if language == "ru" {
-            println!("\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.");
-        } else {
-            println!("\nCommand not specified. Exiting. For help, call json-writer -h.");
-        }
-        exit(1);
-    }
-
-    const SPACES: usize = 48;
-
-    let (
-        desc,
-        usage,
-        commands,
-        read_command_text,
-        write_command_text,
-        options,
-        help_command_text,
-        no_command_text,
-        log_command_text,
-    ) = if language == "ru" {
-        (
-            "Данный CLI инструмент записывает .txt файлы перевода в .json файлы игры.".bold(),
-            format!(
-                "{}: {} {} {}",
-                "Использование".bold(),
-                "json-writer",
-                "команда".purple(),
-                "[ОПЦИИ]".gray()
-            ),
-            "Команды:",
-            "Читает и парсит оригинальный текст из файлов игры. (кроме файла plugins.js).",
-            "Записывает перевод в файлы игры.",
-            "Опции:",
-            "Выводит эту справку.".gray(),
-            "Отключает компиляцию указанных файлов.".gray(),
-            "Включает логирование.".gray(),
-        )
-    } else {
-        (
-            "This CLI tool writes .txt translation files to .json game files.".bold(),
-            format!(
-                "{}: {} {} {}",
-                "Usage".bold(),
-                "json-writer",
-                "command".purple(),
-                "[OPTIONS]".gray()
-            ),
-            "Commands:",
-            "Reads and parses the original text from game files. (except plugins.js).",
-            "Writes the translation to game files.",
-            "Options:",
-            "Prints this help message.".gray(),
-            "Disables compilation of the specified files.".gray(),
-            "Enables logging.".gray(),
-        )
-    };
-
-    let read_command: ColoredString = "read".bold();
-    let write_command: ColoredString = "write".bold();
-    let help_command: String = format!("{}, {}", "-h".bold(), "--help".gray());
-    let no_command: ColoredString = "-no={maps,other,system,plugins}".bold();
-    let log_command: ColoredString = "--log".bold();
-
-    let mode: String = match args[1].as_str() {
-        "-h" | "--help" => {
-            println!("\n{desc}\n\n{usage}\n\n{commands}");
-            println!(
-                "{read_command} {}{}",
-                " ".repeat(SPACES - read_command.len() - 1),
-                read_command_text.gray()
-            );
-            println!(
-                "{write_command} {}{}",
-                " ".repeat(SPACES - write_command.len() - 1),
-                write_command_text.gray()
-            );
-            println!("\n{options}");
-            println!(
-                "{help_command} {}{}",
-                " ".repeat(SPACES - 10 - 1),
-                help_command_text
-            );
-            println!(
-                "{no_command} {}{}",
-                " ".repeat(SPACES - no_command.len() - 1),
-                no_command_text
-            );
-            println!(
-                "{log_command} {}{}",
-                " ".repeat(SPACES - log_command.len() - 1),
-                log_command_text
-            );
-            exit(0);
-        }
-        "write" => "write".to_string(),
-        "read" => "read".to_string(),
-        _ => {
+    match args_len {
+        1 => {
             if language == "ru" {
-                println!("Неверное значение аргумента.\nДопустимые значения: write, read.");
+                println!("\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.");
             } else {
-                println!("Incorrect argument value.\nAvailable values: write, read.");
+                println!("\nCommand not specified. Exiting. For help, call json-writer -h.");
             }
             exit(1);
         }
-    };
-
-    for arg in args.iter().skip(2) {
-        match arg.as_str() {
-            "-h" | "--help" => {
-                if mode == "read" {
-                    let read_no_command = no_command.replace(",plugins}", "}");
-                    println!("\n{}", read_command_text.trim().bold());
-                    println!("\n{options}");
+        2 => match args[1].as_str() {
+            "read" => (write_options, String::from("read")),
+            "write" => (write_options, String::from("write")),
+            _ => {
+                if language == "ru" {
                     println!(
-                        "{help_command} {}{}",
-                        " ".repeat(SPACES - 10 - 1),
-                        help_command_text
-                    );
-                    println!(
-                        "{} {}{}",
-                        read_no_command,
-                        " ".repeat(SPACES - read_no_command.len() - 1),
-                        no_command_text
-                    );
+                        "{}",
+                        "Неверное значение команды.\nДопустимые значения: write, read.".red()
+                    )
                 } else {
-                    println!("\n{}", write_command_text.trim().bold());
+                    println!(
+                        "{}",
+                        "Incorrect command value.\nAvailable values: write, read.".red()
+                    )
+                }
+
+                exit(1);
+            }
+        },
+        _ => {
+            const SPACES: usize = 48;
+
+            let (
+                desc,
+                usage,
+                commands,
+                read_command_text,
+                write_command_text,
+                options,
+                help_command_text,
+                no_command_text,
+                log_command_text,
+                incorrect_command,
+                incorrect_no,
+            ) = if language == "ru" {
+                (
+                    "Данный CLI инструмент записывает .txt файлы перевода в .json файлы игры.".bold(),
+                    format!(
+                        "{}: {} {} {}",
+                        "Использование".bold(),
+                        "json-writer",
+                        "команда".purple(),
+                        "[ОПЦИИ]".gray()
+                    ),
+                    "Команды:",
+                    "Читает и парсит оригинальный текст из файлов игры. (кроме файла plugins.js).",
+                    "Записывает перевод в файлы игры.",
+                    "Опции:",
+                    "Выводит эту справку.".gray(),
+                    "Отключает компиляцию указанных файлов.".gray(),
+                    "Включает логирование.".gray(),
+                    "Неверное значение команды.\nДопустимые значения: write, read.".red(),
+                    "Неверные значения аргумента -no. Допустимые значения: maps, other, system, plugins."
+                .red(),
+                )
+            } else {
+                (
+                    "This CLI tool writes .txt translation files to .json game files.".bold(),
+                    format!(
+                        "{}: {} {} {}",
+                        "Usage".bold(),
+                        "json-writer",
+                        "command".purple(),
+                        "[OPTIONS]".gray()
+                    ),
+                    "Commands:",
+                    "Reads and parses the original text from game files. (except plugins.js).",
+                    "Writes the translation to game files.",
+                    "Options:",
+                    "Prints this help message.".gray(),
+                    "Disables compilation of the specified files.".gray(),
+                    "Enables logging.".gray(),
+                    "Incorrect command value.\nAvailable values: write, read.".red(),
+                    "Incorrect value of the -no argument. Available values: maps, other, system, plugins."
+                        .red(),
+            )
+            };
+
+            let read_command: ColoredString = "read".bold();
+            let write_command: ColoredString = "write".bold();
+            let help_command: String = format!("{}, {}", "-h".bold(), "--help".gray());
+            let no_command: ColoredString = "-no={maps,other,system,plugins}".bold();
+            let log_command: ColoredString = "--log".bold();
+
+            let mode: String = match args[1].as_str() {
+                "-h" | "--help" => {
+                    println!("\n{desc}\n\n{usage}\n\n{commands}");
+                    println!(
+                        "{read_command} {}{}",
+                        " ".repeat(SPACES - read_command.len() - 1),
+                        read_command_text.gray()
+                    );
+                    println!(
+                        "{write_command} {}{}",
+                        " ".repeat(SPACES - write_command.len() - 1),
+                        write_command_text.gray()
+                    );
                     println!("\n{options}");
                     println!(
                         "{help_command} {}{}",
@@ -163,39 +142,83 @@ fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, b
                         " ".repeat(SPACES - no_command.len() - 1),
                         no_command_text
                     );
+                    println!(
+                        "{log_command} {}{}",
+                        " ".repeat(SPACES - log_command.len() - 1),
+                        log_command_text
+                    );
+                    exit(0);
                 }
-                println!(
-                    "{log_command} {}{}",
-                    " ".repeat(SPACES - log_command.len() - 1),
-                    log_command_text
-                );
-                exit(0);
-            }
+                "write" => "write".to_string(),
+                "read" => "read".to_string(),
+                _ => {
+                    println!("{incorrect_command}");
+                    exit(1);
+                }
+            };
 
-            arg if arg.starts_with("-no=") => {
-                for opt in arg[4..].split(',') {
-                    match opt {
-                        "maps" => write_options.0 = false,
-                        "other" => write_options.1 = false,
-                        "system" => write_options.2 = false,
-                        "plugins" => write_options.3 = false,
-                        _ => {
-                            if language == "ru" {
-                                println!("\nНеверные значения аргумента -no.\nДопустимые значения: maps, other, system, plugins.");
-                            } else {
-                                println!("\nIncorrect -no argument values.\nAvailable values: maps, other, system, plugins.");
+            for arg in args.iter().skip(2) {
+                match arg.as_str() {
+                    "-h" | "--help" => {
+                        if mode == "read" {
+                            let read_no_command: String = no_command.replace(",plugins}", "}");
+                            println!("\n{}", read_command_text.trim().bold());
+                            println!("\n{options}");
+                            println!(
+                                "{help_command} {}{}",
+                                " ".repeat(SPACES - 10 - 1),
+                                help_command_text
+                            );
+                            println!(
+                                "{} {}{}",
+                                read_no_command,
+                                " ".repeat(SPACES - read_no_command.len() - 1),
+                                no_command_text
+                            );
+                        } else {
+                            println!("\n{}", write_command_text.trim().bold());
+                            println!("\n{options}");
+                            println!(
+                                "{help_command} {}{}",
+                                " ".repeat(SPACES - 10 - 1),
+                                help_command_text
+                            );
+                            println!(
+                                "{no_command} {}{}",
+                                " ".repeat(SPACES - no_command.len() - 1),
+                                no_command_text
+                            );
+                        }
+                        println!(
+                            "{log_command} {}{}",
+                            " ".repeat(SPACES - log_command.len() - 1),
+                            log_command_text
+                        );
+                        exit(0);
+                    }
+
+                    arg if arg.starts_with("-no=") => {
+                        for opt in arg[4..].split(',') {
+                            match opt {
+                                "maps" => write_options.0 = false,
+                                "other" => write_options.1 = false,
+                                "system" => write_options.2 = false,
+                                "plugins" => write_options.3 = false,
+                                _ => {
+                                    println!("{incorrect_no}");
+                                    exit(1);
+                                }
                             }
-                            exit(1);
                         }
                     }
+                    "--log" => write_options.4 = true,
+                    _ => {}
                 }
             }
-            "--log" => write_options.4 = true,
-            _ => {}
+
+            (write_options, mode)
         }
     }
-
-    (write_options, mode)
 }
 
 fn main() {
@@ -207,7 +230,7 @@ fn main() {
 
     const RU_LOCALES: [&str; 3] = ["ru", "uk", "be"];
 
-    let language: &str = if RU_LOCALES.iter().any(|&x| locale.starts_with(x)) {
+    let language: &str = if RU_LOCALES.iter().any(|x: &&str| locale.starts_with(x)) {
         "ru"
     } else {
         "en"
@@ -469,12 +492,12 @@ fn main() {
 
             if language == "ru" {
                 println!(
-                    "Все файлы были записаны успешно.\nПотрачено {} секунд.",
+                    "Все файлы были записаны успешно.\nПотрачено (в секундах): {}.",
                     start_time.elapsed().as_secs_f64()
                 );
             } else {
                 println!(
-                    "All files were successfully written.\nTime spent: {} seconds.",
+                    "All files were successfully written.\nTime spent (in seconds): {}.",
                     start_time.elapsed().as_secs_f64()
                 );
             }
