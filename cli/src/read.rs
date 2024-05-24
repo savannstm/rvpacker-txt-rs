@@ -15,7 +15,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
 
     let json_data: HashMap<String, Value> = files
         .iter()
-        .map(|f| {
+        .map(|f: &DirEntry| {
             (
                 f.file_name().into_string().unwrap(),
                 from_str(&read_to_string(f.path()).unwrap()).unwrap(),
@@ -39,51 +39,47 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                     for parameter in list["parameters"].as_array().unwrap() {
-                        match code {
-                            401 => {
-                                in_401_seq = true;
+                        if code == 401 {
+                            in_401_seq = true;
 
-                                if parameter.is_string() {
-                                    let parameter_str: &str = parameter.as_str().unwrap();
-                                    line.push(parameter_str.to_string());
-                                }
+                            if parameter.is_string() {
+                                let parameter_str: &str = parameter.as_str().unwrap();
+                                line.push(parameter_str.to_string());
+                            }
+                        } else {
+                            if in_401_seq {
+                                let line_joined: String = line.join("\\n");
+                                lines.insert(line_joined);
+                                line.clear();
+                                in_401_seq = false;
                             }
 
-                            _ => {
-                                if in_401_seq {
-                                    let line_joined: String = line.join("\\n");
-                                    lines.insert(line_joined);
-                                    line.clear();
-                                    in_401_seq = false;
-                                }
-
-                                match code {
-                                    102 => {
-                                        if parameter.is_array() {
-                                            for param in parameter.as_array().unwrap() {
-                                                if param.is_string() {
-                                                    let param_str: &str = param.as_str().unwrap();
-                                                    lines.insert(param_str.to_string());
-                                                }
+                            match code {
+                                102 => {
+                                    if parameter.is_array() {
+                                        for param in parameter.as_array().unwrap() {
+                                            if param.is_string() {
+                                                let param_str: &str = param.as_str().unwrap();
+                                                lines.insert(param_str.to_string());
                                             }
                                         }
                                     }
+                                }
 
-                                    356 => {
-                                        if parameter.is_string() {
-                                            let parameter_str: &str = parameter.as_str().unwrap();
+                                356 => {
+                                    if parameter.is_string() {
+                                        let parameter_str: &str = parameter.as_str().unwrap();
 
-                                            if parameter_str.starts_with("GabText")
-                                                && (parameter_str.starts_with("choice_text")
-                                                    && !parameter_str.ends_with("????"))
-                                            {
-                                                lines.insert(parameter_str.to_string());
-                                            }
+                                        if parameter_str.starts_with("GabText")
+                                            && (parameter_str.starts_with("choice_text")
+                                                && !parameter_str.ends_with("????"))
+                                        {
+                                            lines.insert(parameter_str.to_string());
                                         }
                                     }
-
-                                    _ => {}
                                 }
+
+                                _ => {}
                             }
                         }
                     }
@@ -200,52 +196,48 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                     for parameter in list["parameters"].as_array().unwrap() {
-                        match code {
-                            401 => {
-                                in_401_seq = true;
+                        if code == 401 {
+                            in_401_seq = true;
 
-                                if parameter.is_string() {
-                                    let parameter_str: &str = parameter.as_str().unwrap();
-                                    line.push(parameter_str.to_string());
-                                }
+                            if parameter.is_string() {
+                                let parameter_str: &str = parameter.as_str().unwrap();
+                                line.push(parameter_str.to_string());
+                            }
+                        } else {
+                            if in_401_seq {
+                                let line_joined: String = line.join("\\n");
+                                lines.insert(line_joined);
+
+                                line.clear();
+                                in_401_seq = false;
                             }
 
-                            _ => {
-                                if in_401_seq {
-                                    let line_joined: String = line.join("\\n");
-                                    lines.insert(line_joined);
-
-                                    line.clear();
-                                    in_401_seq = false;
-                                }
-
-                                match code {
-                                    102 => {
-                                        if parameter.is_array() {
-                                            for param in parameter.as_array().unwrap() {
-                                                if param.is_string() {
-                                                    let param_str: &str = param.as_str().unwrap();
-                                                    lines.insert(param_str.to_string());
-                                                }
+                            match code {
+                                102 => {
+                                    if parameter.is_array() {
+                                        for param in parameter.as_array().unwrap() {
+                                            if param.is_string() {
+                                                let param_str: &str = param.as_str().unwrap();
+                                                lines.insert(param_str.to_string());
                                             }
                                         }
                                     }
+                                }
 
-                                    356 => {
-                                        if parameter.is_string() {
-                                            let parameter_str: &str = parameter.as_str().unwrap();
+                                356 => {
+                                    if parameter.is_string() {
+                                        let parameter_str: &str = parameter.as_str().unwrap();
 
-                                            if parameter_str.starts_with("GabText")
-                                                && (parameter_str.starts_with("choice_text")
-                                                    && !parameter_str.ends_with("????"))
-                                            {
-                                                lines.insert(parameter_str.to_string());
-                                            }
+                                        if parameter_str.starts_with("GabText")
+                                            && (parameter_str.starts_with("choice_text")
+                                                && !parameter_str.ends_with("????"))
+                                        {
+                                            lines.insert(parameter_str.to_string());
                                         }
                                     }
-
-                                    _ => {}
                                 }
+
+                                _ => {}
                             }
                         }
                     }
@@ -274,7 +266,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
 }
 
 pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
-    let system_file = format!("{}/System.json", input_dir);
+    let system_file: String = format!("{}/System.json", input_dir);
 
     let json: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
 

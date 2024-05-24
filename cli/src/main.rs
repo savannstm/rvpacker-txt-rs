@@ -28,9 +28,15 @@ fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, b
     match args_len {
         1 => {
             if language == "ru" {
-                println!("\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.");
+                println!(
+                    "{}",
+                    "\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.".yellow()
+                );
             } else {
-                println!("\nCommand not specified. Exiting. For help, call json-writer -h.");
+                println!(
+                    "{}",
+                    "\nCommand not specified. Exiting. For help, call json-writer -h.".yellow()
+                );
             }
             exit(1);
         }
@@ -87,7 +93,7 @@ fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, b
                     "Включает логирование.".gray(),
                     "Неверное значение команды.\nДопустимые значения: write, read.".red(),
                     "Неверные значения аргумента -no. Допустимые значения: maps, other, system, plugins."
-                .red(),
+                        .red(),
                 )
             } else {
                 (
