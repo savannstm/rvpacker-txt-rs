@@ -1527,11 +1527,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
         : null;
 
+    let system_locale = await locale();
+
     const language = settings
         ? settings.lang
-        : ["ru", "uk", "be"].some(async (x) => (await locale()).startsWith(x))
+        : ["ru", "uk", "be"].some((x) => system_locale.startsWith(x))
         ? "ru"
         : "en";
+
+    system_locale = null;
 
     const mainLanguage =
         language === "ru"
