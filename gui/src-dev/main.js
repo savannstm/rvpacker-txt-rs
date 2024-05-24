@@ -64,7 +64,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const resDir = "res";
     const translationDir = "translation";
     const originalDir = "original";
-    const copiesDir = "copies";
     const backupDir = "backups";
     const repoDir = "main/fh-termina-json-writer-main";
 
@@ -187,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
 
-        await removeDir(repoPath, { dir: BaseDirectory.Resource, recursive: true });
+        await removeDir(await join(resDir, "main"), { dir: BaseDirectory.Resource, recursive: true });
     }
 
     async function ensureStart() {
@@ -715,52 +714,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         replaced.clear();
     }
 
-    async function isFilesCopied() {
-        let copied = true;
-
-        for (const dir of await readDir(await join(resDir, translationDir), {
-            dir: BaseDirectory.Resource,
-            recursive: true,
-        })) {
-            await createDir(await join(resDir, copiesDir, dir.name), {
-                dir: BaseDirectory.Resource,
-                recursive: true,
-            });
-
-            if (
-                dir.children.length !==
-                (
-                    await readDir(await join(resDir, copiesDir, dir.name), {
-                        dir: BaseDirectory.Resource,
-                    })
-                ).length
-            ) {
-                copied = false;
-            }
-        }
-
-        return copied;
-    }
-
-    async function createFilesCopies() {
-        if (await isFilesCopied()) {
-            return;
-        }
-
-        for (const folder of await readDir(await join(resDir, translationDir), {
-            dir: BaseDirectory.Resource,
-            recursive: true,
-        })) {
-            for (const file of folder.children) {
-                await copyFile(
-                    await join(resDir, translationDir, folder.name, file.name),
-                    await join(resDir, copiesDir, folder.name, file.name),
-                    { dir: BaseDirectory.Resource }
-                );
-            }
-        }
-    }
-
     async function save(backup = false) {
         if (saving) {
             return;
@@ -769,7 +722,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         saving = true;
         saveButton.firstElementChild.classList.add("animate-spin");
 
-        let dirName = await join(resDir, copiesDir);
+        let dirName = await join(resDir, translationDir);
 
         if (backup) {
             const date = new Date();
@@ -1168,7 +1121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const contentNames = [];
         const content = [];
 
-        for (const folder of await readDir(await join(resDir, copiesDir), {
+        for (const folder of await readDir(await join(resDir, translationDir), {
             dir: BaseDirectory.Resource,
             recursive: true,
         })) {
@@ -1180,7 +1133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 contentNames.push(file.name.slice(0, -4));
                 content.push(
                     (
-                        await readTextFile(await join(resDir, copiesDir, folder.name, file.name), {
+                        await readTextFile(await join(resDir, translationDir, folder.name, file.name), {
                             dir: BaseDirectory.Resource,
                         })
                     ).split("\n")
@@ -1551,7 +1504,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchCaseButton = document.getElementById("case-button");
     const searchWholeButton = document.getElementById("whole-button");
     const searchRegexButton = document.getElementById("regex-button");
-    const searchTranslationButton = document.getElementById("translate-button");
+    const searchTranslationButton = document.getElementById("translation-button");
     const searchLocationButton = document.getElementById("location-button");
     const goToRowInput = document.getElementById("goto-row-input");
     const menuBar = document.getElementById("menu-bar");
@@ -1592,7 +1545,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax } = settings.backup;
 
     await ensureStart();
-    await createFilesCopies();
 
     if (settings.firstLaunch) {
         new WebviewWindow("help", {
