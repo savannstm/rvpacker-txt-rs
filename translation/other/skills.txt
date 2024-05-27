@@ -1,6 +1,8 @@
 Attack
 Guard
 Hatchet
+Bite
+Pummel
 The appendage skitters away...
 The appendage is pulsating...
 Tackle
