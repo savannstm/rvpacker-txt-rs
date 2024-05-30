@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ru" class="bg-zinc-900">
+<html lang="en" class="bg-zinc-900">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self'" />
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
         <link rel="stylesheet" href="style.css" />
-        <script src="main.js"></script>
+        <link rel="stylesheet" href="material.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>F&H2 Termina JSON Writer</title>
+        <script type="module" src="main.ts" defer></script>
     </head>
+
     <body class="overflow-x-hidden p-0 m-0 text-2xl text-zinc-300">
         <div class="invisible">
             <div id="menu-bar" class="flex sticky top-0 z-40 items-center mr-2 w-full h-6 text-sm bg-zinc-800">
@@ -61,7 +61,7 @@
                     <button id="regex-button" class="button">regular_expression</button>
                     <button id="translation-button" class="button">translate</button>
                     <button id="location-button" class="button">location_on</button>
-                    <button id="current-state" class="flex justify-center items-center p-4"></button>
+                    <div id="current-state" class="flex justify-center items-center p-4"></div>
                 </div>
             </div>
 

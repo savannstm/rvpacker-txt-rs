@@ -1,7 +1,7 @@
 [package]
 name = "fh-termina-json-writer"
-version = "2.5.0"
-description = "Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать их в .json файлы"
+version = "3.0.0"
+description = "Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать его в .json файлы"
 authors = ["savannstm"]
 edition = "2021"
 

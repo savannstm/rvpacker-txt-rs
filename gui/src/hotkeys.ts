@@ -1,15 +1,15 @@
-const { readTextFile } = window.__TAURI__.fs;
-const { BaseDirectory, join } = window.__TAURI__.path;
+import { readTextFile } from "@tauri-apps/api/fs";
+import { BaseDirectory, join } from "@tauri-apps/api/path";
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const hotkeysTitle = document.getElementById("hotkeys-title");
-    const hotkeys = document.getElementById("hotkeys");
+document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
+    const hotkeysTitle: HTMLDivElement = document.getElementById("hotkeys-title") as HTMLDivElement;
+    const hotkeys: HTMLDivElement = document.getElementById("hotkeys") as HTMLDivElement;
 
-    const settings = JSON.parse(
+    const settings: Settings = JSON.parse(
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
     );
 
-    const hotkeysLanguage =
+    const hotkeysLanguage: hotkeysTranslation =
         settings.lang === "ru"
             ? JSON.parse(await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })).hotkeys
             : JSON.parse(await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })).hotkeys;

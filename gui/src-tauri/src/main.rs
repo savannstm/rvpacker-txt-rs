@@ -9,15 +9,8 @@ use zip_extract::extract;
 mod writer;
 
 #[tauri::command]
-fn unescape_text(text: String, option: String) -> String {
-    let re: String = match option.as_str() {
-        "regex" => text,
-        "whole" => format!("\\b{}\\b", &escape(&text)),
-        "none" => escape(&text),
-        _ => String::new(),
-    };
-
-    re
+fn escape_text(text: String) -> String {
+    escape(&text)
 }
 
 #[tauri::command]
@@ -29,7 +22,7 @@ fn unzip(path: &str, dest: &str) {
 
 fn main() {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![unescape_text, unzip])
+        .invoke_handler(tauri::generate_handler![escape_text, unzip])
         .setup(|app: &mut App| {
             let main_window: tauri::Window = app.get_window("main").unwrap();
             let resource_path: String = app

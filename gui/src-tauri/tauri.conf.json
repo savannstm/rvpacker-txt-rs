@@ -1,12 +1,14 @@
 {
     "build": {
-        "devPath": "../src-dev",
-        "distDir": "../src",
-        "withGlobalTauri": true
+        "devPath": "../src/dist",
+        "distDir": "../src/dist",
+        "beforeBuildCommand": "bun run build",
+        "beforeDevCommand": "bun run build",
+        "withGlobalTauri": false
     },
     "package": {
         "productName": "fh-termina-json-writer",
-        "version": "2.5.0"
+        "version": "3.0.0"
     },
     "tauri": {
         "allowlist": {

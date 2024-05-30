@@ -6,12 +6,12 @@
 /cli/parsed
 /cli/data
 /cli/js
+/gui-old
 /gui/node_modules
 /gui/bun.lockb
 /gui/input.css
 /gui/tailwind.config.js
-/gui/src/*.html
-/gui/src/*.js
+/gui/src/dist
 /gui/src-tauri/Cargo.lock
 /gui/src-tauri/target
 /img
