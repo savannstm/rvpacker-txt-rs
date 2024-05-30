@@ -486,7 +486,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     function showSearchPanel(hide: boolean = true): void {
-        if ((searchPanel.getAttribute("moving") as string) === "false") {
+        if (searchPanel.getAttribute("moving") === "false") {
             if (hide) {
                 searchPanel.toggleMultiple("translate-x-0", "translate-x-full");
             } else {
@@ -510,7 +510,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         if (searchPanel.getAttribute("shown") === "false") {
             searchPanel.addEventListener(
                 "transitionend",
-                () => {
+                (): void => {
                     if (loadingContainer) {
                         searchPanelFound.removeChild(loadingContainer);
                     }
@@ -524,7 +524,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 searchPanel.setAttribute("shown", "false");
                 searchPanel.setAttribute("moving", "true");
 
-                searchPanel.addEventListener("transitionend", () => searchPanel.setAttribute("moving", "false"), {
+                searchPanel.addEventListener("transitionend", (): void => searchPanel.setAttribute("moving", "false"), {
                     once: true,
                 });
                 return;
@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         element: HTMLElement,
         resultElement: HTMLDivElement,
         counterpartIndex: number
-    ) {
+    ): Promise<void> {
         if (button === 0) {
             changeState(currentState.id as State);
 
@@ -576,7 +576,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                     if (newText) {
                         saved = false;
-                        const index = counterpartIndex === 1 ? 3 : 0;
+                        const index: number = counterpartIndex === 1 ? 3 : 0;
                         resultElement.children[index].innerHTML = newText;
                     }
                     return;
@@ -585,7 +585,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
     }
 
-    async function handleResultSelecting(event: MouseEvent) {
+    async function handleResultSelecting(event: MouseEvent): Promise<void> {
         const target: HTMLDivElement = event.target as HTMLDivElement;
 
         const resultElement: HTMLDivElement = (
@@ -600,11 +600,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        const [thirdParent, element, counterpartIndex] = resultElement.getAttribute("data")?.split(",") as [
-            string,
-            string,
-            string
-        ];
+        const [thirdParent, element, counterpartIndex]: string[] = resultElement
+            .getAttribute("data")
+            ?.split(",") as string[];
 
         await handleResultClick(
             event.button,
@@ -615,7 +613,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         );
     }
 
-    async function displaySearchResults(text: string | null = null, hide: boolean = true) {
+    async function displaySearchResults(text: string | null = null, hide: boolean = true): Promise<void> {
         if (!text) {
             showSearchPanel(hide);
             return;
@@ -654,7 +652,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         searchPanelFound.addEventListener("mousedown", async (event) => await handleResultSelecting(event));
     }
 
-    async function replaceText(text: string | HTMLTextAreaElement, replaceAll: boolean) {
+    async function replaceText(text: string | HTMLTextAreaElement, replaceAll: boolean): Promise<string | undefined> {
         if (!replaceAll && text instanceof HTMLTextAreaElement) {
             const regexp: RegExp | undefined = await createRegExp(searchInput.value);
             if (!regexp) {
@@ -798,7 +796,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        setTimeout(async () => {
+        setTimeout(async (): Promise<void> => {
             if (backupEnabled) {
                 await save(true);
                 backup(s);
@@ -1681,11 +1679,17 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     await createContent();
     arrangeElements();
 
-    const observerMain: IntersectionObserver = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
+    const observerMain: IntersectionObserver = new IntersectionObserver(
+        (entries) => {
+            for (const entry of entries) {
+                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        {
+            root: document.body,
+            rootMargin: "128px",
         }
-    });
+    );
 
     const observerFound: IntersectionObserver = new IntersectionObserver(
         (entries) => {
