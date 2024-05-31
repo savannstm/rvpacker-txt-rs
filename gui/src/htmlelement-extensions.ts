@@ -1,10 +1,10 @@
-HTMLElement.prototype.toggleMultiple = function (...classes) {
+HTMLElement.prototype.toggleMultiple = function (...classes: string[]): void {
     for (const className of classes) {
         this.classList.toggle(className);
     }
 };
 
-HTMLElement.prototype.secondHighestParent = function (childElement: HTMLElement) {
+HTMLElement.prototype.secondHighestParent = function (childElement: HTMLElement): HTMLElement {
     if (!childElement) {
         return childElement;
     }
@@ -20,7 +20,7 @@ HTMLElement.prototype.secondHighestParent = function (childElement: HTMLElement)
     return previous;
 };
 
-HTMLTextAreaElement.prototype.calculateHeight = function () {
+HTMLTextAreaElement.prototype.calculateHeight = function (): void {
     const lineBreaks: number = this.value.count("\n") + 1;
 
     const {
@@ -44,7 +44,7 @@ HTMLTextAreaElement.prototype.calculateHeight = function () {
         Number.parseFloat(borderTopWidth) +
         Number.parseFloat(borderBottomWidth);
 
-    for (const child of this?.parentElement?.children ?? []) {
-        (child as HTMLElement).style.height = `${newHeight}px`;
+    for (const child of (this?.parentElement?.children as HTMLCollectionOf<HTMLElement>) ?? []) {
+        child.style.height = `${newHeight}px`;
     }
 };

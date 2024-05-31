@@ -19,7 +19,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { exit } from "@tauri-apps/api/process";
 import { appWindow, CloseRequestedEvent, WebviewWindow } from "@tauri-apps/api/window";
 import { Command } from "@tauri-apps/api/shell";
-import { writeText as clipboardWrite, readText as clipboardRead } from "@tauri-apps/api/clipboard";
+import { writeText as writeToClipboard, readText as readFromClipboard } from "@tauri-apps/api/clipboard";
 import { platform, locale as getLocale } from "@tauri-apps/api/os";
 import { Event, UnlistenFn } from "@tauri-apps/api/event";
 
@@ -170,28 +170,25 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         recursive: true,
                     });
 
-                    for (const file of files
-                        .flatMap((dir) => dir.children)
-                        .filter((file) => file?.name?.endsWith("_trans.txt"))) {
-                        if (!file || !file.name) {
-                            continue;
-                        }
+                    for (const file of (files
+                        .flatMap((dir: FileEntry) => dir.children)
+                        .filter((file: FileEntry | undefined) => file?.name?.endsWith("_trans.txt")) as FileEntry[]) ??
+                        []) {
+                        const name = file.name as string;
 
                         const numberOfLines: number = (
-                            await readTextFile(await join(resDir, translationDir, dir, file.name), {
+                            await readTextFile(await join(resDir, translationDir, dir, name), {
                                 dir: BaseDirectory.Resource,
                             })
                         ).count("\n");
 
-                        await removeFile(await join(resDir, translationDir, dir, file.name), {
+                        await removeFile(await join(resDir, translationDir, dir, name), {
                             dir: BaseDirectory.Resource,
                         });
 
-                        await writeTextFile(
-                            await join(resDir, translationDir, dir, file.name),
-                            "\n".repeat(numberOfLines),
-                            { dir: BaseDirectory.Resource }
-                        );
+                        await writeTextFile(await join(resDir, translationDir, dir, name), "\n".repeat(numberOfLines), {
+                            dir: BaseDirectory.Resource,
+                        });
                     }
                 } else {
                     await message(mainLanguage.whatNext);
@@ -203,8 +200,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     function arrangeElements(): void {
-        for (const child of contentContainer?.children ?? []) {
-            (child as HTMLDivElement).toggleMultiple("hidden", "flex");
+        for (const child of (contentContainer?.children as HTMLCollectionOf<HTMLDivElement>) ?? []) {
+            child.toggleMultiple("hidden", "flex");
 
             const heights: Uint32Array = new Uint32Array(child.children.length);
             let i: number = 0;
@@ -215,20 +212,20 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
 
             i = 0;
-            for (const node of child.children) {
-                (node as HTMLDivElement).style.minHeight = `${heights[i] + 8}px`;
+            for (const node of child.children as HTMLCollectionOf<HTMLDivElement>) {
+                node.style.minHeight = `${heights[i] + 8}px`;
                 (node.firstElementChild as HTMLDivElement).style.minHeight = `${heights[i]}px`;
 
-                for (const child of node.firstElementChild?.children ?? []) {
-                    (child as HTMLDivElement).style.minHeight = `${heights[i]}px`;
+                for (const child of (node.firstElementChild?.children as HTMLCollectionOf<HTMLDivElement>) ?? []) {
+                    child.style.minHeight = `${heights[i]}px`;
                 }
 
                 node.firstElementChild?.classList.add("hidden");
                 i++;
             }
 
-            (child as HTMLDivElement).style.minHeight = `${child.scrollHeight}px`;
-            (child as HTMLDivElement).toggleMultiple("hidden", "flex");
+            child.style.minHeight = `${child.scrollHeight}px`;
+            child.toggleMultiple("hidden", "flex");
 
             document.body.firstElementChild?.classList.remove("invisible");
         }
@@ -457,7 +454,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         const clicked: HTMLTextAreaElement = document.getElementById(
-            element.firstElementChild?.textContent as string
+            element.firstElementChild?.textContent!
         ) as HTMLTextAreaElement;
 
         if (event.button === 0) {
@@ -468,7 +465,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 inline: "center",
             });
         } else if (event.button === 2) {
-            clicked.value = element.children[1].textContent as string;
+            clicked.value = element.children[1].textContent!;
 
             element.innerHTML = `<span class="text-base"><code>${element.firstElementChild?.textContent}</code>\n${mainLanguage.textReverted}\n<code>${element.children[1].textContent}</code></span>`;
             element.setAttribute("reverted", "");
@@ -635,21 +632,27 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         observerFound.disconnect();
         searchPanelFound.style.height = `${searchPanelFound.scrollHeight}px`;
 
-        for (const container of searchPanelFound.children) {
-            (container as HTMLDivElement).style.width = `${container.clientWidth}px`;
-            (container as HTMLDivElement).style.height = `${container.clientHeight}px`;
+        for (const container of (searchPanelFound.children as HTMLCollectionOf<HTMLDivElement>) ?? []) {
+            container.style.width = `${container.clientWidth}px`;
+            container.style.height = `${container.clientHeight}px`;
 
             observerFound.observe(container);
         }
 
-        for (const container of searchPanelFound.children) {
+        for (const container of (searchPanelFound.children as HTMLCollectionOf<HTMLDivElement>) ?? []) {
             container.firstElementChild?.classList.add("hidden");
         }
 
         showSearchPanel(hide);
 
-        searchPanelFound.removeEventListener("mousedown", async (event) => await handleResultSelecting(event));
-        searchPanelFound.addEventListener("mousedown", async (event) => await handleResultSelecting(event));
+        searchPanelFound.removeEventListener(
+            "mousedown",
+            async (event): Promise<void> => await handleResultSelecting(event)
+        );
+        searchPanelFound.addEventListener(
+            "mousedown",
+            async (event): Promise<void> => await handleResultSelecting(event)
+        );
     }
 
     async function replaceText(text: string | HTMLTextAreaElement, replaceAll: boolean): Promise<string | undefined> {
@@ -836,21 +839,18 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        switch (newState) {
-            case null:
-                state = null;
-                currentState.innerHTML = "";
+        if (newState === null) {
+            state = null;
+            currentState.innerHTML = "";
 
-                observerMain.disconnect();
-                for (const child of contentContainer.children) {
-                    child.classList.replace("flex", "hidden");
-                }
-                break;
-            default:
-                statePrevious = state;
-                state = newState;
-                updateState(newState, slide);
-                break;
+            observerMain.disconnect();
+            for (const child of contentContainer.children) {
+                child.classList.replace("flex", "hidden");
+            }
+        } else {
+            statePrevious = state;
+            state = newState;
+            updateState(newState, slide);
         }
     }
 
@@ -1028,7 +1028,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 document.activeElement.id,
                                 (document.activeElement as HTMLTextAreaElement).value
                             );
-                            await clipboardWrite(Array.from(selectedTextareas.values()).join("#"));
+                            await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
 
                             for (const key of selectedTextareas.keys()) {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
@@ -1055,7 +1055,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 document.activeElement.id,
                                 (document.activeElement as HTMLTextAreaElement).value
                             );
-                            await clipboardWrite(Array.from(selectedTextareas.values()).join("#"));
+                            await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
 
                             for (const key of selectedTextareas.keys()) {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
@@ -1075,7 +1075,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                             contentContainer.contains(document.activeElement) &&
                             document.activeElement?.tagName === "TEXTAREA"
                         ) {
-                            const clipboardText: string | null = await clipboardRead();
+                            const clipboardText: string | null = await readFromClipboard();
 
                             if (!clipboardText || !clipboardText.includes("#")) {
                                 return;
@@ -1162,15 +1162,19 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             dir: BaseDirectory.Resource,
             recursive: true,
         })) {
+            const f = folder.name as string;
+
             for (const file of folder.children ?? []) {
-                if (!file.name || !file.name.endsWith(".txt")) {
+                const name = file.name as string;
+
+                if (!name.endsWith(".txt")) {
                     continue;
                 }
 
-                contentNames.push(file.name.slice(0, -4));
+                contentNames.push(name.slice(0, -4));
                 content.push(
                     (
-                        await readTextFile(await join(resDir, translationDir, folder.name as string, file.name), {
+                        await readTextFile(await join(resDir, translationDir, f, name), {
                             dir: BaseDirectory.Resource,
                         })
                     ).split("\n")
@@ -1226,11 +1230,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     async function compile(): Promise<void> {
         compileButton.firstElementChild?.classList.add("animate-spin");
 
-        const unlistenCompile: UnlistenFn = await appWindow.listen("compile-finished", (message: Event<string>) => {
-            compileButton.firstElementChild?.classList.remove("animate-spin");
-            alert(message.payload);
-            unlistenCompile();
-        });
+        const unlistenCompile: UnlistenFn = await appWindow.listen(
+            "compile-finished",
+            (message: Event<string>): void => {
+                compileButton.firstElementChild?.classList.remove("animate-spin");
+                alert(message.payload);
+                unlistenCompile();
+            }
+        );
 
         await appWindow.emit("compile");
     }
@@ -1298,11 +1305,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         ) {
             currentFocusedElement = [target.id, target.value];
 
-            target.addEventListener("keyup", () => {
+            target.addEventListener("keyup", (): void => {
                 target.calculateHeight();
             });
 
-            target.addEventListener("input", () => {
+            target.addEventListener("input", (): void => {
                 trackFocus(target);
             });
 
@@ -1586,7 +1593,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const language: string = locale
         ? settings
             ? settings.lang
-            : ["ru", "uk", "be"].some((x) => locale!.startsWith(x))
+            : ["ru", "uk", "be"].some((x: string): boolean => locale!.startsWith(x))
             ? "ru"
             : "en"
         : "en";
@@ -1680,7 +1687,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     arrangeElements();
 
     const observerMain: IntersectionObserver = new IntersectionObserver(
-        (entries) => {
+        (entries: IntersectionObserverEntry[]): void => {
             for (const entry of entries) {
                 entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
             }
@@ -1692,7 +1699,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     );
 
     const observerFound: IntersectionObserver = new IntersectionObserver(
-        (entries) => {
+        (entries: IntersectionObserverEntry[]): void => {
             for (const entry of entries) {
                 entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
             }
@@ -1701,7 +1708,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     );
 
     const observerReplaced: IntersectionObserver = new IntersectionObserver(
-        (entries) => {
+        (entries: IntersectionObserverEntry[]): void => {
             for (const entry of entries) {
                 entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
             }
@@ -1710,7 +1717,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     );
 
     leftPanel.addEventListener("click", (event: MouseEvent): void => {
-        const newState: State = leftPanel.secondHighestParent(event.target as HTMLElement).textContent as State;
+        const newState: State = leftPanel.secondHighestParent(event.target as HTMLElement).textContent! as State;
         changeState(newState, true);
     });
 
@@ -1818,14 +1825,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                     searchPanelReplaced.removeEventListener(
                         "mousedown",
-                        async (event) => await handleReplacedClick(event)
+                        async (event): Promise<void> => await handleReplacedClick(event)
                     );
                 }
                 break;
             case "previous-page-button":
-                page = Number.parseInt(searchCurrentPage.textContent as string);
+                page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (Number.parseInt(searchCurrentPage.textContent as string) > 1) {
+                if (Number.parseInt(searchCurrentPage.textContent!) > 1) {
                     searchCurrentPage.textContent = (page - 1).toString();
 
                     searchPanelFound.innerHTML = "";
@@ -1848,12 +1855,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
                 break;
             case "next-page-button":
-                page = Number.parseInt(searchCurrentPage.textContent as string);
+                page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (
-                    Number.parseInt(searchCurrentPage.textContent as string) <
-                    Number.parseInt(searchTotalPages.textContent as string)
-                ) {
+                if (Number.parseInt(searchCurrentPage.textContent!) < Number.parseInt(searchTotalPages.textContent!)) {
                     searchCurrentPage.textContent = (page + 1).toString();
                     searchPanelFound.innerHTML = "";
 

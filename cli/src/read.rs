@@ -10,7 +10,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
-        .filter(|f| f.file_name().into_string().unwrap().starts_with("Map"))
+        .filter(|f: &DirEntry| f.file_name().into_string().unwrap().starts_with("Map"))
         .collect();
 
     let json_data: HashMap<String, Value> = files
@@ -86,6 +86,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
                 }
             }
         }
+
         if logging {
             if language == "ru" {
                 println!("Распарсен файл {filename}.");
@@ -120,7 +121,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
 
     let json_data: HashMap<String, Value> = files
         .par_iter()
-        .map(|f| {
+        .map(|f: &DirEntry| {
             (
                 f.file_name().into_string().unwrap(),
                 from_str(&read_to_string(f.path()).unwrap()).unwrap(),

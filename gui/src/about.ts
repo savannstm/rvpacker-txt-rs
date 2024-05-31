@@ -33,7 +33,7 @@ window.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     githubLink.innerHTML = aboutLanguage.githubLink;
     license.innerHTML = aboutLanguage.license;
 
-    const links: Map<HTMLElement, string> = new Map([
+    const links: Map<HTMLAnchorElement, string> = new Map([
         [vkLink, "https://vk.com/stivhuis228"],
         [tgLink, "https://t.me/Arsen1337Curduke"],
         [githubLink, "https://github.com/savannstm/fh-termina-json-writer"],
