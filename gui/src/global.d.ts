@@ -19,7 +19,7 @@ interface Backup {
 }
 
 interface Settings {
-    lang: string;
+    lang: Language;
     backup: Backup;
     firstLaunch: boolean;
 }
@@ -98,6 +98,8 @@ interface Translation {
     hotkeys: hotkeysTranslation;
     help: helpTranslation;
 }
+
+type Language = "en" | "ru";
 
 type State =
     | null

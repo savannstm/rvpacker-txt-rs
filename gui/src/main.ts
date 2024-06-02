@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         progressDisplay.remove();
     }
 
-    async function changeLanguage(language: string): Promise<void> {
+    async function changeLanguage(language: Language): Promise<void> {
         await awaitSaving();
 
         if (await exitProgram()) {
@@ -253,18 +253,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                   text: text,
               });
 
-        regexp = searchWhole
-            ? /[а-яА-ЯЁё]/.test(regexp)
-                ? `(?<![\w\u{4E00}-\u{9FFF}])(${regexp})(?![\w\u{4E00}-\u{9FFF}])`
-                : `\\b(${regexp})\\b`
-            : regexp;
+        //fuck boundaries, they aren't working with symbols other than from ascii
+        regexp = searchWhole ? `(?<!\w)${regexp}(?!\w)` : regexp;
 
         const attr: string = searchCase ? "gu" : "giu";
 
         try {
             return new RegExp(regexp, attr);
         } catch (err) {
-            await message(`${mainLanguage.invalidRegexp} (${text.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&")}), err`);
+            await message(`${mainLanguage.invalidRegexp} (${text}), ${err}`);
             return;
         }
     }
@@ -569,7 +566,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 return;
             } else {
                 if (replaceInput.value.trim()) {
-                    const newText = await replaceText(element as HTMLTextAreaElement, false);
+                    const newText: string | undefined = await replaceText(element as HTMLTextAreaElement, false);
 
                     if (newText) {
                         saved = false;
@@ -647,11 +644,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
         searchPanelFound.removeEventListener(
             "mousedown",
-            async (event): Promise<void> => await handleResultSelecting(event)
+            async (event: MouseEvent): Promise<void> => await handleResultSelecting(event)
         );
         searchPanelFound.addEventListener(
             "mousedown",
-            async (event): Promise<void> => await handleResultSelecting(event)
+            async (event: MouseEvent): Promise<void> => await handleResultSelecting(event)
         );
     }
 
@@ -668,8 +665,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             highlightedReplacement.classList.add("bg-red-600");
             highlightedReplacement.textContent = replacementValue;
 
-            const newText = text.value.split(regexp);
-            const newTextParts = newText.flatMap((part, i) => [
+            const newText: string[] = text.value.split(regexp);
+            const newTextParts: (string | HTMLSpanElement)[] = newText.flatMap((part: string, i: number) => [
                 part,
                 i < newText.length - 1 ? highlightedReplacement : "",
             ]);
@@ -858,7 +855,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         goToRowInput.classList.remove("hidden");
         goToRowInput.focus();
 
-        const element: HTMLElement = document.getElementById(state as string) as HTMLElement;
+        const element: HTMLDivElement = document.getElementById(state as string) as HTMLDivElement;
         const lastRow: string = element?.lastElementChild?.id.split("-").at(-1) as string;
 
         goToRowInput.placeholder = `Перейти к строке... от 1 до ${lastRow}`;
@@ -1081,8 +1078,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 return;
                             }
 
-                            const clipboardTextSplitted: string[] = clipboardText.split("#");
-                            const textRows: number = clipboardTextSplitted.length;
+                            const clipboardTextSplit: string[] = clipboardText.split("#");
+                            const textRows: number = clipboardTextSplit.length;
 
                             if (textRows <= 0) {
                                 return;
@@ -1100,7 +1097,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                         elementToReplace.id,
                                         elementToReplace.value.replaceAll(clipboardText, "")
                                     );
-                                    elementToReplace.value = clipboardTextSplitted[i];
+                                    elementToReplace.value = clipboardTextSplit[i];
                                     elementToReplace.calculateHeight();
                                 }
 
@@ -1205,10 +1202,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 originalTextElement.classList.add("original-text-div");
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
-                const translationTextSplitted: string[] = translationText.split("\\n");
+                const translationTextSplit: string[] = translationText.split("\\n");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
-                translationTextElement.rows = translationTextSplitted.length;
-                translationTextElement.value = translationTextSplitted.join("\n");
+                translationTextElement.rows = translationTextSplit.length;
+                translationTextElement.value = translationTextSplit.join("\n");
                 translationTextElement.classList.add("translation-text-input", "outline-zinc-700");
 
                 const rowElement: HTMLDivElement = document.createElement("div");
@@ -1375,6 +1372,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             width: 800,
             height: 600,
             center: true,
+            resizable: false,
         });
     }
 
@@ -1437,6 +1435,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     width: 640,
                     height: 480,
                     center: true,
+                    resizable: false,
                 });
                 break;
             case "hotkeys-button":
@@ -1590,13 +1589,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     let locale: string | null = await getLocale();
 
-    const language: string = locale
-        ? settings
-            ? settings.lang
-            : ["ru", "uk", "be"].some((x: string): boolean => locale!.startsWith(x))
-            ? "ru"
+    const language: Language = (
+        locale
+            ? settings
+                ? settings.lang
+                : ["ru", "uk", "be"].some((x: string): boolean => locale!.startsWith(x))
+                ? "ru"
+                : "en"
             : "en"
-        : "en";
+    ) as Language;
 
     locale = null;
 
@@ -1693,8 +1694,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
         },
         {
-            root: document.body,
-            rootMargin: "128px",
+            root: document,
+            rootMargin: "384px",
+            threshold: 0,
         }
     );
 
