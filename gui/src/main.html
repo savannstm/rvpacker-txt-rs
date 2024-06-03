@@ -8,58 +8,70 @@
         <script type="module" src="main.ts" defer></script>
     </head>
 
-    <body class="overflow-x-hidden p-0 m-0 text-2xl text-zinc-300 bg-zinc-900">
+    <body class="overflow-x-hidden p-0 m-0 text-2xl textPrimary background">
         <div class="invisible">
-            <div id="menu-bar" class="flex sticky top-0 z-40 items-center mr-2 w-full h-6 text-sm bg-zinc-800">
-                <div class="menu-bar-button">
+            <div id="menu-bar" class="flex sticky top-0 z-40 items-center mr-2 w-full h-6 text-sm primary">
+                <div class="menu-bar-button hoverSecondary">
                     <button id="file" class="px-2"></button>
                 </div>
-                <div class="menu-bar-button">
+                <div class="menu-bar-button hoverSecondary">
                     <button id="help" class="px-2"></button>
                 </div>
-                <div class="menu-bar-button">
+                <div class="menu-bar-button hoverSecondary">
                     <button id="language" class="px-2"></button>
                 </div>
-                <div id="file-menu" class="hidden dropdown-menu">
-                    <button id="reload-button" class="dropdown-menu-button"></button>
+                <div id="file-menu" class="hidden dropdown-menu secondary">
+                    <button id="reload-button" class="dropdown-menu-button primary hoverPrimary"></button>
                 </div>
-                <div id="help-menu" class="hidden dropdown-menu">
-                    <button id="help-button-sub" class="dropdown-menu-button"></button>
-                    <button id="about-button" class="dropdown-menu-button"></button>
-                    <button id="hotkeys-button" class="dropdown-menu-button"></button>
+                <div id="help-menu" class="hidden dropdown-menu secondary">
+                    <button id="help-button-sub" class="dropdown-menu-button primary hoverPrimary"></button>
+                    <button id="about-button" class="dropdown-menu-button primary hoverPrimary"></button>
+                    <button id="hotkeys-button" class="dropdown-menu-button primary hoverPrimary"></button>
                 </div>
-                <div id="language-menu" class="hidden dropdown-menu">
-                    <button id="ru-button" class="dropdown-menu-button">Русский/Russian</button>
-                    <button id="en-button" class="dropdown-menu-button">English/Английский</button>
+                <div id="language-menu" class="hidden dropdown-menu secondary">
+                    <button id="ru-button" class="dropdown-menu-button primary hoverPrimary">Русский/Russian</button>
+                    <button id="en-button" class="dropdown-menu-button primary hoverPrimary">English/Английский</button>
                 </div>
             </div>
-            <div id="top-panel" class="flex sticky top-6 z-30 items-center w-full h-16 bg-zinc-800">
+            <div id="top-panel" class="flex sticky top-6 z-30 items-center w-full h-16 primary">
                 <div id="top-panel-buttons" class="flex items-center w-full h-16">
-                    <button id="menu-button" class="button">
+                    <button id="menu-button" class="button hoverPrimary textTertiary primary">
                         <div>menu</div>
                     </button>
-                    <button id="save-button" class="button">
+                    <button id="save-button" class="button hoverPrimary textTertiary">
                         <div>save</div>
                     </button>
-                    <button id="compile-button" class="button">
+                    <button id="compile-button" class="button hoverPrimary textTertiary">
                         <div>upload</div>
                     </button>
-                    <button id="options-button" class="mr-16 button">
+                    <button id="options-button" class="button hoverPrimary textTertiary">
                         <div>settings</div>
                     </button>
-                    <button id="search-button" class="button">search</button>
+                    <button id="theme-button" class="mr-16 button hoverPrimary textTertiary">
+                        <div>palette</div>
+                    </button>
+                    <div id="theme-menu" class="hidden dropdown-menu secondary">
+                        <button id="cool-zinc" class="dropdown-menu-button primary hoverPrimary">Zinc</button>
+                        <button id="fuflo-light" class="dropdown-menu-button primary hoverPrimary">Light</button>
+                    </div>
+                    <button id="search-button" class="button hoverPrimary textTertiary">search</button>
                     <div id="search-field" class="flex flex-row items-center p-4">
-                        <textarea id="search-input" rows="1" cols="50" class="input"></textarea>
+                        <textarea id="search-input" rows="1" cols="50" class="input textSecondary secondary"></textarea>
                     </div>
-                    <button id="replace-button" class="button">arrow_right_alt</button>
+                    <button id="replace-button" class="button hoverPrimary textTertiary">arrow_right_alt</button>
                     <div id="replace-field" class="flex flex-row items-center p-4">
-                        <textarea id="replace-input" rows="1" cols="50" class="input"></textarea>
+                        <textarea
+                            id="replace-input"
+                            rows="1"
+                            cols="50"
+                            class="input textSecondary secondary"
+                        ></textarea>
                     </div>
-                    <button id="case-button" class="button">match_case</button>
-                    <button id="whole-button" class="button">match_word</button>
-                    <button id="regex-button" class="button">regular_expression</button>
-                    <button id="translation-button" class="button">translate</button>
-                    <button id="location-button" class="button">location_on</button>
+                    <button id="case-button" class="button hoverPrimary textTertiary">match_case</button>
+                    <button id="whole-button" class="button hoverPrimary textTertiary">match_word</button>
+                    <button id="regex-button" class="button hoverPrimary textTertiary">regular_expression</button>
+                    <button id="translation-button" class="button hoverPrimary textTertiary">translate</button>
+                    <button id="location-button" class="button hoverPrimary textTertiary">location_on</button>
                     <div id="current-state" class="flex justify-center items-center p-4"></div>
                 </div>
             </div>
@@ -67,43 +79,43 @@
             <input
                 type="number"
                 id="goto-row-input"
-                class="hidden fixed top-8 right-1/4 z-50 p-1 w-6/12 h-12 text-base bg-zinc-800 rounded-md border-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-zinc-700 border-solid outline-none focus:border-zinc-600"
+                class="hidden fixed top-8 right-1/4 z-50 p-1 w-6/12 h-12 text-base primary rounded-md border-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none borderSecondary border-solid outline-none borderFocus"
             />
 
             <div id="main" class="flex flex-row justify-start">
                 <div
                     id="left-panel"
-                    class="flex fixed z-30 flex-col w-16 text-xs transition-all duration-500 -translate-x-full bg-zinc-700"
+                    class="flex fixed z-30 flex-col w-16 text-xs transition-all duration-500 -translate-x-full secondary"
                 >
-                    <button class="menu-button" title="1">maps</button>
-                    <button class="menu-button" title="2">names</button>
-                    <button class="menu-button" title="3">actors</button>
-                    <button class="menu-button" title="4">armors</button>
-                    <button class="menu-button" title="5">classes</button>
-                    <button class="menu-button" title="6">
+                    <button class="menu-button primary hoverPrimary" title="1">maps</button>
+                    <button class="menu-button primary hoverPrimary" title="2">names</button>
+                    <button class="menu-button primary hoverPrimary" title="3">actors</button>
+                    <button class="menu-button primary hoverPrimary" title="4">armors</button>
+                    <button class="menu-button primary hoverPrimary" title="5">classes</button>
+                    <button class="menu-button primary hoverPrimary" title="6">
                         <div>common</div>
                         <div>events</div>
                     </button>
-                    <button class="menu-button" title="7">enemies</button>
-                    <button class="menu-button" title="8">items</button>
-                    <button class="menu-button" title="9">skills</button>
-                    <button class="menu-button" title="0">system</button>
-                    <button class="menu-button" title="-">troops</button>
-                    <button class="menu-button" title="+">weapons</button>
-                    <button class="menu-button" title="Backspace">plugins</button>
+                    <button class="menu-button primary hoverPrimary" title="7">enemies</button>
+                    <button class="menu-button primary hoverPrimary" title="8">items</button>
+                    <button class="menu-button primary hoverPrimary" title="9">skills</button>
+                    <button class="menu-button primary hoverPrimary" title="0">system</button>
+                    <button class="menu-button primary hoverPrimary" title="-">troops</button>
+                    <button class="menu-button primary hoverPrimary" title="+">weapons</button>
+                    <button class="menu-button primary hoverPrimary" title="Backspace">plugins</button>
                 </div>
 
                 <div id="content-container" class="flex flex-col justify-start p-8 w-full text-lg"></div>
 
                 <div
                     id="search-results"
-                    class="flex overflow-y-auto fixed top-0 right-0 z-40 flex-col p-4 w-64 h-screen transition-transform duration-500 translate-x-full bg-zinc-800 outline-2 outline outline-zinc-600"
+                    class="flex overflow-y-auto fixed top-0 right-0 z-40 flex-col p-4 w-64 h-screen transition-transform duration-500 translate-x-full primary outline-2 outline outlineTertiary"
                     shown="false"
                     moving="false"
                 >
                     <button
                         id="switch-search-content"
-                        class="flex justify-center items-center mb-2 w-full h-12 text-3xl cursor-pointer select-none font-material hover:bg-zinc-600"
+                        class="flex justify-center items-center mb-2 w-full h-12 text-3xl cursor-pointer select-none font-material hoverPrimary"
                     >
                         search
                     </button>

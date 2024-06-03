@@ -2,7 +2,7 @@
     "main": {
         "cannotGetSettings": "Cannot find program's settings.",
         "askCreateSettings": "Create settings?",
-        "createdSettings": "Settings created.\nBackups: Enabled\nBackup period: 60 secs.\nMaximum backups: 99.",
+        "createdSettings": "Settings created.\nBackups: Enabled\nBackup period: 60 secs.\nMaximum backups: 99.\nTheme: Cool Zinc",
         "askDownloadTranslation": "Cannot find translation files. Download translation files? Note: If you agree, this will install Russian translation files. If you want to start a project from scratch, disagree.",
         "downloadingTranslation": "Downloading translation files",
         "downloadedTranslation": "Translation files downloaded.",
@@ -35,7 +35,8 @@
         "locationButtonTitle": "Search only in the current file (Alt + L)",
         "noMatches": "No matches",
         "currentPage": "None",
-        "separator": "of"
+        "separator": "of",
+        "goToRow": "Go to row... from 1 to"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",

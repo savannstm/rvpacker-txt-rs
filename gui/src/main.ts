@@ -1,5 +1,6 @@
 import "./string-extensions";
 import "./htmlelement-extensions";
+import { Theme } from "./themes";
 
 import {
     FileEntry,
@@ -63,6 +64,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 JSON.stringify({
                     backup: { enabled: true, period: 60, max: 99 },
                     lang: language,
+                    theme: "cool-zinc",
                     firstLaunch: true,
                 }),
                 {
@@ -254,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
               });
 
         //fuck boundaries, they aren't working with symbols other than from ascii
-        regexp = searchWhole ? `(?<!\w)${regexp}(?!\w)` : regexp;
+        regexp = searchWhole ? `(?<!\\w)${regexp}(?!\\w)` : regexp;
 
         const attr: string = searchCase ? "gu" : "giu";
 
@@ -270,7 +272,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const resultContainer: HTMLDivElement = document.createElement("div");
 
         const resultElement: HTMLDivElement = document.createElement("div");
-        resultElement.classList.add("search-result");
+        resultElement.classList.add(
+            "search-result",
+            current_theme.textSecondary,
+            "textSecondary",
+            current_theme.borderPrimary,
+            "borderPrimary",
+            current_theme.secondary,
+            "secondary"
+        );
 
         const thirdParent: HTMLDivElement = element.parentElement?.parentElement?.parentElement as HTMLDivElement;
 
@@ -285,7 +295,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(resultDiv);
 
         const originalInfo: HTMLDivElement = document.createElement("div");
-        originalInfo.classList.add("text-xs", "text-zinc-400");
+        originalInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
 
         const currentFile: string = element.parentElement?.parentElement?.id.slice(
             0,
@@ -295,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(originalInfo);
 
         const arrow: HTMLDivElement = document.createElement("div");
-        arrow.classList.add("search-result-arrow");
+        arrow.classList.add("search-result-arrow", current_theme.textSecondary, "textSecondary");
         arrow.innerHTML = "arrow_downward";
         mainDiv.appendChild(arrow);
 
@@ -307,7 +317,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(counterpart);
 
         const counterpartInfo: HTMLDivElement = document.createElement("div");
-        counterpartInfo.classList.add("text-xs", "text-zinc-400");
+        counterpartInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
 
         counterpartInfo.innerHTML = `${currentFile} - ${sourceIndex === 0 ? "original" : "translation"} - ${row}`;
         mainDiv.appendChild(counterpartInfo);
@@ -328,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             const end: number = start + match.length;
 
             const beforeDiv: string = `<span>${elementText.slice(lastIndex, start)}</span>`;
-            const matchDiv: string = `<span class="bg-zinc-500">${match}</span>`;
+            const matchDiv: string = `<span class="${current_theme.tertiary} tertiary">${match}</span>`;
 
             result.push(beforeDiv);
             result.push(matchDiv);
@@ -351,6 +361,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
+        console.log(regexp);
+
         for (const file of await readDir(resDir, { dir: BaseDirectory.Resource })) {
             if (file.name?.startsWith("matches")) {
                 await removeFile(await join(resDir, file.name), { dir: BaseDirectory.Resource });
@@ -365,7 +377,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const searchArray: HTMLElement[] = (
             searchLocation && state
                 ? [...(document.getElementById(state)?.children as HTMLCollectionOf<HTMLElement>)]
-                : [...contentContainer.children].flatMap((parent) => [...parent.children])
+                : [...(contentContainer.children as HTMLCollectionOf<HTMLElement>)].flatMap((parent: HTMLElement) => [
+                      ...parent.children,
+                  ])
         ) as HTMLElement[];
 
         for (const child of searchArray) {
@@ -380,10 +394,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 const matches: RegExpMatchArray | null = elementText.match(regexp);
 
                 if (matches) {
+                    console.log(matches);
                     const result: string = createMatchesContainer(elementText, matches);
 
                     if (replace) {
-                        (results as Map<HTMLElement, string>).set(node[2], result);
+                        results!.set(node[2], result);
                     } else {
                         objectToWrite[node[2].id] = result;
                         results = null;
@@ -398,10 +413,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 const matches: RegExpMatchArray | null = elementText.match(regexp);
 
                 if (matches) {
+                    console.log(elementText);
                     const result: string = createMatchesContainer(elementText, matches);
 
                     if (replace) {
-                        (results as Map<HTMLElement, string>).set(node[1], result);
+                        results!.set(node[1], result);
                     } else {
                         objectToWrite[node[1].id] = result;
                         results = null;
@@ -531,7 +547,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
     }
 
-    function findCounterpart(id: string): [HTMLElement | HTMLTextAreaElement, number] {
+    function findCounterpart(id: string): [HTMLElement, number] {
         if (id.includes(originalDir)) {
             return [document.getElementById(id.replace(originalDir, translationDir)) as HTMLElement, 1];
         } else {
@@ -858,7 +874,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const element: HTMLDivElement = document.getElementById(state as string) as HTMLDivElement;
         const lastRow: string = element?.lastElementChild?.id.split("-").at(-1) as string;
 
-        goToRowInput.placeholder = `Перейти к строке... от 1 до ${lastRow}`;
+        goToRowInput.placeholder = `${mainLanguage.goToRow} ${lastRow}`;
     }
 
     function jumpToRow(key: string): void {
@@ -1031,7 +1047,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea?.classList.replace("outline-zinc-500", "outline-zinc-700");
+                                textarea?.classList.replace(
+                                    current_theme.outlineSecondary,
+                                    current_theme.outlinePrimary
+                                );
                             }
                         }
                     }
@@ -1058,7 +1077,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea.classList.replace("outline-zinc-500", "outline-zinc-700");
+                                textarea.classList.replace(
+                                    current_theme.outlineSecondary,
+                                    current_theme.outlinePrimary
+                                );
                                 textarea.value = "";
                             }
 
@@ -1199,19 +1221,33 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 const originalTextElement: HTMLDivElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
                 originalTextElement.textContent = originalText.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
-                originalTextElement.classList.add("original-text-div");
+                originalTextElement.classList.add(
+                    "original-text-div",
+                    current_theme.primary,
+                    "primary",
+                    current_theme.outlinePrimary,
+                    "outlinePrimary"
+                );
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
                 const translationTextSplit: string[] = translationText.split("\\n");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplit.length;
                 translationTextElement.value = translationTextSplit.join("\n");
-                translationTextElement.classList.add("translation-text-input", "outline-zinc-700");
+                translationTextElement.classList.add(
+                    "translation-text-input",
+                    current_theme.outlinePrimary,
+                    "outlinePrimary",
+                    current_theme.primary,
+                    "primary",
+                    current_theme.outlineFocus,
+                    "outlineFocus"
+                );
 
                 const rowElement: HTMLDivElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = (j + 1).toString();
-                rowElement.classList.add("row");
+                rowElement.classList.add("row", current_theme.primary, "primary");
 
                 textContainer.appendChild(rowElement);
                 textContainer.appendChild(originalTextElement);
@@ -1278,7 +1314,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         for (const object of result) {
             const { left, top }: { left: number; top: number } = object;
             const ghostNewLine: HTMLDivElement = document.createElement("div");
-            ghostNewLine.classList.add("ghost-new-line");
+            ghostNewLine.classList.add("ghost-new-line", current_theme.textTertiary, "textTertiary");
             ghostNewLine.innerHTML = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
@@ -1342,27 +1378,27 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function switchCase(): void {
         searchCase = !searchCase;
-        searchCaseButton.classList.toggle("bg-zinc-500");
+        searchCaseButton.classList.toggle(current_theme.tertiary);
     }
 
     function switchWhole(): void {
         searchWhole = !searchWhole;
-        searchWholeButton.classList.toggle("bg-zinc-500");
+        searchWholeButton.classList.toggle(current_theme.tertiary);
     }
 
     function switchRegExp(): void {
         searchRegex = !searchRegex;
-        searchRegexButton.classList.toggle("bg-zinc-500");
+        searchRegexButton.classList.toggle(current_theme.tertiary);
     }
 
     function switchTranslation(): void {
         searchTranslation = !searchTranslation;
-        searchTranslationButton.classList.toggle("bg-zinc-500");
+        searchTranslationButton.classList.toggle(current_theme.tertiary);
     }
 
     function switchLocation(): void {
         searchLocation = !searchLocation;
-        searchLocationButton.classList.toggle("bg-zinc-500");
+        searchLocationButton.classList.toggle(current_theme.tertiary);
     }
 
     function createOptionsWindow(): void {
@@ -1543,6 +1579,48 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
     }
 
+    async function setTheme(theme: Theme): Promise<void> {
+        if (Object.keys(current_theme).length === 0) {
+            for (const [key, value] of Object.entries(theme)) {
+                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
+                    `.${key}`
+                ) as NodeListOf<HTMLElement>;
+
+                for (const element of elements) {
+                    element.classList.add(value);
+                }
+
+                current_theme[key as ThemeKey] = value;
+            }
+        } else {
+            if (theme.name === current_theme.name) {
+                return;
+            }
+
+            for (const [key, value] of Object.entries(theme)) {
+                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
+                    `.${key}`
+                ) as NodeListOf<HTMLElement>;
+
+                for (const element of elements) {
+                    element.classList.replace(current_theme[key as ThemeKey], value);
+                }
+
+                current_theme[key as ThemeKey] = value;
+            }
+        }
+
+        const settings: Settings = JSON.parse(
+            await readTextFile(await join(resDir, settingsFile), {
+                dir: BaseDirectory.Resource,
+            })
+        );
+
+        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, theme: theme.name }), {
+            dir: BaseDirectory.Resource,
+        });
+    }
+
     const contentContainer: HTMLDivElement = document.getElementById("content-container") as HTMLDivElement;
     const searchInput: HTMLTextAreaElement = document.getElementById("search-input") as HTMLTextAreaElement;
     const replaceInput: HTMLTextAreaElement = document.getElementById("replace-input") as HTMLTextAreaElement;
@@ -1559,6 +1637,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const saveButton: HTMLButtonElement = document.getElementById("save-button") as HTMLButtonElement;
     const compileButton: HTMLButtonElement = document.getElementById("compile-button") as HTMLButtonElement;
     const optionsButton: HTMLButtonElement = document.getElementById("options-button") as HTMLButtonElement;
+    const themeButton: HTMLButtonElement = document.getElementById("theme-button") as HTMLButtonElement;
+    const themeMenu: HTMLDivElement = document.getElementById("theme-menu") as HTMLDivElement;
     const searchCaseButton: HTMLButtonElement = document.getElementById("case-button") as HTMLButtonElement;
     const searchWholeButton: HTMLButtonElement = document.getElementById("whole-button") as HTMLButtonElement;
     const searchRegexButton: HTMLButtonElement = document.getElementById("regex-button") as HTMLButtonElement;
@@ -1611,6 +1691,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
+
+    let theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
+
+    let current_theme: {
+        [key in ThemeKey]: string;
+    } = {} as { [key in ThemeKey]: string };
+
+    await setTheme(theme);
 
     await ensureStart();
 
@@ -1743,6 +1831,26 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "options-button":
                 createOptionsWindow();
                 break;
+            case "theme-button":
+                themeMenu.toggleMultiple("hidden", "flex");
+
+                themeMenu.style.top = `${themeButton.offsetTop + themeButton.offsetHeight}px`;
+                themeMenu.style.left = `${themeButton.offsetLeft}px`;
+
+                themeMenu.addEventListener(
+                    "click",
+                    async (event: MouseEvent): Promise<void> => {
+                        const target: HTMLButtonElement = event.target as HTMLButtonElement;
+
+                        if (!themeMenu.contains(target)) {
+                            return;
+                        }
+
+                        await setTheme(new Theme(target.id));
+                    },
+                    { once: true }
+                );
+                break;
             case "search-button":
                 if (searchInput.value) {
                     searchPanelFound.innerHTML = "";
@@ -1795,9 +1903,17 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         const replacedContainer: HTMLDivElement = document.createElement("div");
 
                         const replacedElement: HTMLDivElement = document.createElement("div");
-                        replacedElement.classList.add("replaced-element");
+                        replacedElement.classList.add(
+                            "replaced-element",
+                            current_theme.textSecondary,
+                            "textSecondary",
+                            current_theme.borderPrimary,
+                            "borderPrimary",
+                            current_theme.secondary,
+                            "secondary"
+                        );
 
-                        replacedElement.innerHTML = `<div class="text-base text-zinc-400">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl text-zinc-300 font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+                        replacedElement.innerHTML = `<div class="text-base ${current_theme.textTertiary} textTertiary">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl ${current_theme.textPrimary} textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
 
                         replacedContainer.appendChild(replacedElement);
                         searchPanelReplaced.appendChild(replacedContainer);
@@ -1827,7 +1943,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                     searchPanelReplaced.removeEventListener(
                         "mousedown",
-                        async (event): Promise<void> => await handleReplacedClick(event)
+                        async (event: MouseEvent): Promise<void> => await handleReplacedClick(event)
                     );
                 }
                 break;
@@ -1921,8 +2037,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     const focusedElementId: string[] = document.activeElement.id.split("-");
                     const focusedElementRow: number = Number.parseInt(focusedElementId.pop() as string);
 
-                    let rowsRange: number = targetRow - focusedElementRow;
-                    let rowsToSelect: number = Math.abs(rowsRange);
+                    const rowsRange: number = targetRow - focusedElementRow;
+                    const rowsToSelect: number = Math.abs(rowsRange);
 
                     for (let i = 1; i < rowsToSelect + 1; i++) {
                         if (rowsRange > 0) {
@@ -1930,14 +2046,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 `${targetId.join("-")}-${focusedElementRow + i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace("outline-zinc-700", "outline-zinc-500");
+                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         } else if (rowsRange < 0) {
                             const nextElement: HTMLTextAreaElement = document.getElementById(
                                 `${targetId.join("-")}-${focusedElementRow - i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace("outline-zinc-700", "outline-zinc-500");
+                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         }
                     }
@@ -1947,7 +2063,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 for (const key of selectedTextareas.keys()) {
                     const textarea: HTMLTextAreaElement = document.getElementById(key) as HTMLTextAreaElement;
-                    textarea.classList.replace("outline-zinc-500", "outline-zinc-700");
+                    textarea.classList.replace(current_theme.outlineSecondary, current_theme.outlinePrimary);
                 }
             }
         }

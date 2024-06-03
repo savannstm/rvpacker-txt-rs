@@ -7,7 +7,7 @@
     },
     "package": {
         "productName": "fh-termina-json-writer",
-        "version": "3.1.0"
+        "version": "3.2.0"
     },
     "tauri": {
         "allowlist": {

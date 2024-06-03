@@ -21,6 +21,7 @@ interface Backup {
 interface Settings {
     lang: Language;
     backup: Backup;
+    theme: ThemeName;
     firstLaunch: boolean;
 }
 
@@ -61,6 +62,7 @@ interface mainTranslation {
     noMatches: string;
     currentPage: string;
     separator: string;
+    goToRow: string;
 }
 
 interface optionsTranslation {
@@ -97,6 +99,32 @@ interface Translation {
     about: aboutTranslation;
     hotkeys: hotkeysTranslation;
     help: helpTranslation;
+}
+
+type ThemeKey =
+    | "name"
+    | "background"
+    | "primary"
+    | "outlinePrimary"
+    | "outlineSecondary"
+    | "outlineTertiary"
+    | "outlineFocus"
+    | "borderPrimary"
+    | "borderSecondary"
+    | "borderFocus"
+    | "secondary"
+    | "hoverPrimary"
+    | "hoverSecondary"
+    | "textPrimary"
+    | "textSecondary"
+    | "textTertiary"
+    | "tertiary";
+
+type ThemeName = "cool-zinc" | "fuflo-light";
+
+interface Theme {
+    name: ThemeName;
+    [key: ThemeKey]: string;
 }
 
 type Language = "en" | "ru";
