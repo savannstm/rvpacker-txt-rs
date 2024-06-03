@@ -363,8 +363,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        console.log(regexp);
-
         for (const file of await readDir(resDir, { dir: BaseDirectory.Resource })) {
             if (file.name?.startsWith("matches")) {
                 await removeFile(await join(resDir, file.name), { dir: BaseDirectory.Resource });
@@ -396,7 +394,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 const matches: RegExpMatchArray | null = elementText.match(regexp);
 
                 if (matches) {
-                    console.log(matches);
                     const result: string = createMatchesContainer(elementText, matches);
 
                     if (replace) {
@@ -415,7 +412,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 const matches: RegExpMatchArray | null = elementText.match(regexp);
 
                 if (matches) {
-                    console.log(elementText);
                     const result: string = createMatchesContainer(elementText, matches);
 
                     if (replace) {
