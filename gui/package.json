@@ -13,7 +13,8 @@
         "build-i686": "tauri build --target i686-pc-windows-msvc"
     },
     "dependencies": {
-        "@tauri-apps/api": "^1"
+        "@tauri-apps/api": "^1",
+        "xregexp": "^5.1.1"
     },
     "devDependencies": {
         "@tauri-apps/cli": "^1",

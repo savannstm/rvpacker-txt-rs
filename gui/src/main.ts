@@ -24,6 +24,8 @@ import { writeText as writeToClipboard, readText as readFromClipboard } from "@t
 import { platform, locale as getLocale } from "@tauri-apps/api/os";
 import { Event, UnlistenFn } from "@tauri-apps/api/event";
 
+import XRegExp from "xregexp";
+
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const resDir: string = "res";
     const translationDir: string = "translation";
@@ -256,12 +258,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
               });
 
         //fuck boundaries, they aren't working with symbols other than from ascii
-        regexp = searchWhole ? `(?<!\\w)${regexp}(?!\\w)` : regexp;
+        regexp = searchWhole ? `(?<!\\p{L})${regexp}(?!\\p{L})` : regexp;
 
-        const attr: string = searchCase ? "gu" : "giu";
+        const attr: string = searchCase ? "g" : "gi";
 
         try {
-            return new RegExp(regexp, attr);
+            return XRegExp(regexp, attr);
         } catch (err) {
             await message(`${mainLanguage.invalidRegexp} (${text}), ${err}`);
             return;
