@@ -1,34 +1,38 @@
 use rayon::prelude::*;
-use serde_json::{to_string, to_value, Value, Value::Array};
-use std::collections::{HashMap, HashSet};
-use std::fs::{read_to_string, write};
+use serde_json::{to_string, to_value, Value};
+use std::{
+    collections::{HashMap, HashSet},
+    fs::{read_to_string, write},
+};
 
-fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
-    let mut first: Option<u16> = None;
+fn merge_401(json: &mut Value) {
+    let mut first: Option<usize> = None;
     let mut number: i8 = -1;
     let mut prev: bool = false;
     let mut string_vec: Vec<String> = Vec::new();
 
     let mut i: usize = 0;
-    while i < json.len() {
-        let object: &Value = &json[i];
+
+    let json_array: &mut Vec<Value> = json.as_array_mut().unwrap();
+
+    while i < json_array.len() {
+        let object: &Value = &json_array[i];
         let code: u16 = object["code"].as_u64().unwrap() as u16;
 
         if code == 401 {
             if first.is_none() {
-                first = Some(i as u16);
+                first = Some(i);
             }
 
             number += 1;
             string_vec.push(object["parameters"][0].as_str().unwrap().to_string());
             prev = true;
         } else if i > 0 && prev && first.is_some() && number != -1 {
-            json[first.unwrap() as usize]["parameters"][0] =
-                to_value(string_vec.join("\n")).unwrap();
+            json_array[first.unwrap()]["parameters"][0] = to_value(string_vec.join("\n")).unwrap();
 
-            let start_index: usize = first.unwrap() as usize + 1;
+            let start_index: usize = first.unwrap() + 1;
             let items_to_delete: usize = start_index + number as usize;
-            json.par_drain(start_index..items_to_delete);
+            json_array.par_drain(start_index..items_to_delete);
 
             string_vec.clear();
             i -= number as usize;
@@ -39,7 +43,6 @@ fn merge_401(mut json: Vec<Value>) -> Vec<Value> {
 
         i += 1;
     }
-    json
 }
 
 pub fn merge_map(mut json: Value) -> Value {
@@ -47,6 +50,7 @@ pub fn merge_map(mut json: Value) -> Value {
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
+        .skip(1)
         .for_each(|event: &mut Value| {
             if !event["pages"].is_array() {
                 return;
@@ -56,9 +60,7 @@ pub fn merge_map(mut json: Value) -> Value {
                 .as_array_mut()
                 .unwrap()
                 .par_iter_mut()
-                .for_each(|page: &mut Value| {
-                    page["list"] = Array(merge_401(page["list"].as_array().unwrap().to_vec()))
-                });
+                .for_each(|page: &mut Value| merge_401(&mut page["list"]));
         });
 
     json
@@ -75,10 +77,10 @@ pub fn merge_other(mut json: Value) -> Value {
                     .unwrap()
                     .par_iter_mut()
                     .for_each(|page: &mut Value| {
-                        page["list"] = Array(merge_401(page["list"].as_array().unwrap().to_vec()));
+                        merge_401(&mut page["list"]);
                     });
             } else if element["list"].is_array() {
-                element["list"] = Array(merge_401(element["list"].as_array().unwrap().to_vec()));
+                merge_401(&mut element["list"]);
             }
         });
     json
