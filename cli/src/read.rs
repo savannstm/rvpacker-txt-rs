@@ -107,7 +107,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
-        .filter(|f| {
+        .filter(|f: &DirEntry| {
             const FILENAMES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
             for filename in FILENAMES {
                 if f.file_name().into_string().unwrap().starts_with(filename) {
@@ -235,6 +235,14 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
                                         {
                                             lines.insert(parameter_str.to_string());
                                         }
+                                    }
+                                }
+
+                                405 => {
+                                    if parameter.is_string() {
+                                        let parameter_str: &str = parameter.as_str().unwrap();
+
+                                        lines.insert(parameter_str.to_string());
                                     }
                                 }
 

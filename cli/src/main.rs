@@ -1,298 +1,221 @@
-use colored::{ColoredString, Colorize, CustomColor};
+use clap::{Arg, ArgMatches, Command};
+use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng};
 use rayon::prelude::*;
 use serde_json::{from_str, Value};
-use std::collections::HashMap;
-use std::env::args;
-use std::fs::{create_dir_all, read_dir, read_to_string};
-use std::process::exit;
-use std::time::Instant;
+use std::{
+    collections::HashMap,
+    fs::{create_dir_all, read_dir, read_to_string, DirEntry},
+    path::Path,
+    process::exit,
+    time::Instant,
+};
 use sys_locale::get_locale;
 
 mod read;
 mod write;
 
-trait Gray {
-    fn gray(&self) -> ColoredString;
-}
-
-impl<T: AsRef<str> + Colorize> Gray for T {
-    fn gray(&self) -> ColoredString {
-        self.as_ref().custom_color(CustomColor::new(33, 33, 33))
-    }
-}
-
-fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, bool), String) {
-    let mut write_options: (bool, bool, bool, bool, bool) = (true, true, true, true, false);
-    let args_len: usize = args.len();
-
-    match args_len {
-        1 => {
-            if language == "ru" {
-                println!(
-                    "{}",
-                    "\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.".yellow()
-                );
-            } else {
-                println!(
-                    "{}",
-                    "\nCommand not specified. Exiting. For help, call json-writer -h.".yellow()
-                );
-            }
-            exit(1);
-        }
-        2 => match args[1].as_str() {
-            "read" => (write_options, String::from("read")),
-            "write" => (write_options, String::from("write")),
-            _ => {
-                if language == "ru" {
-                    println!(
-                        "{}",
-                        "Неверное значение команды.\nДопустимые значения: write, read.".red()
-                    )
-                } else {
-                    println!(
-                        "{}",
-                        "Incorrect command value.\nAvailable values: write, read.".red()
-                    )
-                }
-
-                exit(1);
-            }
-        },
-        _ => {
-            const SPACES: usize = 48;
-
-            let (
-                desc,
-                usage,
-                commands,
-                read_command_text,
-                write_command_text,
-                options,
-                help_command_text,
-                no_command_text,
-                log_command_text,
-                incorrect_command,
-                incorrect_no,
-            ) = if language == "ru" {
-                (
-                    "Данный CLI инструмент записывает .txt файлы перевода в .json файлы игры.".bold(),
-                    format!(
-                        "{}: {} {} {}",
-                        "Использование".bold(),
-                        "json-writer",
-                        "команда".purple(),
-                        "[ОПЦИИ]".gray()
-                    ),
-                    "Команды:",
-                    "Читает и парсит оригинальный текст из файлов игры. (кроме файла plugins.js).",
-                    "Записывает перевод в файлы игры.",
-                    "Опции:",
-                    "Выводит эту справку.".gray(),
-                    "Отключает компиляцию указанных файлов.".gray(),
-                    "Включает логирование.".gray(),
-                    "Неверное значение команды.\nДопустимые значения: write, read.".red(),
-                    "Неверные значения аргумента -no. Допустимые значения: maps, other, system, plugins."
-                        .red(),
-                )
-            } else {
-                (
-                    "This CLI tool writes .txt translation files to .json game files.".bold(),
-                    format!(
-                        "{}: {} {} {}",
-                        "Usage".bold(),
-                        "json-writer",
-                        "command".purple(),
-                        "[OPTIONS]".gray()
-                    ),
-                    "Commands:",
-                    "Reads and parses the original text from game files. (except plugins.js).",
-                    "Writes the translation to game files.",
-                    "Options:",
-                    "Prints this help message.".gray(),
-                    "Disables compilation of the specified files.".gray(),
-                    "Enables logging.".gray(),
-                    "Incorrect command value.\nAvailable values: write, read.".red(),
-                    "Incorrect value of the -no argument. Available values: maps, other, system, plugins."
-                        .red(),
-            )
-            };
-
-            let read_command: ColoredString = "read".bold();
-            let write_command: ColoredString = "write".bold();
-            let help_command: String = format!("{}, {}", "-h".bold(), "--help".gray());
-            let no_command: ColoredString = "-no={maps,other,system,plugins}".bold();
-            let log_command: ColoredString = "--log".bold();
-
-            let mode: String = match args[1].as_str() {
-                "-h" | "--help" => {
-                    println!("\n{desc}\n\n{usage}\n\n{commands}");
-                    println!(
-                        "{read_command} {}{}",
-                        " ".repeat(SPACES - read_command.len() - 1),
-                        read_command_text.gray()
-                    );
-                    println!(
-                        "{write_command} {}{}",
-                        " ".repeat(SPACES - write_command.len() - 1),
-                        write_command_text.gray()
-                    );
-                    println!("\n{options}");
-                    println!(
-                        "{help_command} {}{}",
-                        " ".repeat(SPACES - 10 - 1),
-                        help_command_text
-                    );
-                    println!(
-                        "{no_command} {}{}",
-                        " ".repeat(SPACES - no_command.len() - 1),
-                        no_command_text
-                    );
-                    println!(
-                        "{log_command} {}{}",
-                        " ".repeat(SPACES - log_command.len() - 1),
-                        log_command_text
-                    );
-                    exit(0);
-                }
-                "write" => "write".to_string(),
-                "read" => "read".to_string(),
-                _ => {
-                    println!("{incorrect_command}");
-                    exit(1);
-                }
-            };
-
-            for arg in args.iter().skip(2) {
-                match arg.as_str() {
-                    "-h" | "--help" => {
-                        if mode == "read" {
-                            let read_no_command: String = no_command.replace(",plugins}", "}");
-                            println!("\n{}", read_command_text.trim().bold());
-                            println!("\n{options}");
-                            println!(
-                                "{help_command} {}{}",
-                                " ".repeat(SPACES - 10 - 1),
-                                help_command_text
-                            );
-                            println!(
-                                "{} {}{}",
-                                read_no_command,
-                                " ".repeat(SPACES - read_no_command.len() - 1),
-                                no_command_text
-                            );
-                        } else {
-                            println!("\n{}", write_command_text.trim().bold());
-                            println!("\n{options}");
-                            println!(
-                                "{help_command} {}{}",
-                                " ".repeat(SPACES - 10 - 1),
-                                help_command_text
-                            );
-                            println!(
-                                "{no_command} {}{}",
-                                " ".repeat(SPACES - no_command.len() - 1),
-                                no_command_text
-                            );
-                        }
-                        println!(
-                            "{log_command} {}{}",
-                            " ".repeat(SPACES - log_command.len() - 1),
-                            log_command_text
-                        );
-                        exit(0);
-                    }
-
-                    arg if arg.starts_with("-no=") => {
-                        for opt in arg[4..].split(',') {
-                            match opt {
-                                "maps" => write_options.0 = false,
-                                "other" => write_options.1 = false,
-                                "system" => write_options.2 = false,
-                                "plugins" => write_options.3 = false,
-                                _ => {
-                                    println!("{incorrect_no}");
-                                    exit(1);
-                                }
-                            }
-                        }
-                    }
-                    "--log" => write_options.4 = true,
-                    _ => {}
-                }
-            }
-
-            (write_options, mode)
-        }
-    }
-}
+use read::*;
+use write::*;
 
 fn main() {
     let start_time: Instant = Instant::now();
 
-    let args: Vec<String> = args().collect();
-
     let locale: String = get_locale().unwrap_or_else(|| String::from("en_US"));
 
-    const RU_LOCALES: [&str; 3] = ["ru", "uk", "be"];
-
-    let language: &str = if RU_LOCALES.iter().any(|x: &&str| locale.starts_with(x)) {
-        "ru"
-    } else {
-        "en"
+    let language: &str = match locale.as_str() {
+        "ru" => "ru",
+        "uk" => "ru",
+        "be" => "ru",
+        _ => "en",
     };
 
-    let settings: ((bool, bool, bool, bool, bool), String) = handle_args(args, language);
+    let (about_text, read_text, write_text, no_text, log_text, incorrect_no, input_dir_text, output_dir_text, drunk_text) = match language {
+        "ru" => (
+            "Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать его в .json файлы",
+            "Читает и парсит оригинальный текст из файлов игры.",
+            "Записывает текстовые файлы в .json файлы игры.",
+            "Не обрабатывает указанные файлы. Использование:",
+            "Включает логирование.",
+            "Некорректное значение аргумента --no. Допустимые значения: maps, other, system, plugins.",
+            "Входная директория, содержащая папки original и translation, с оригинальным текстом игры и .txt файлами с переводом соответственно.",
+            "Выходная директория, в которой будут созданы папки data и js, содержащие скомпилированные файлы с переводом.",
+            "Перемешивает все строки перевода, создавая на выходе неиграбельный перевод игры."
+        ),
+        "en" => (
+            "Repository with tools for editing F&H2: Termina text and compiling it into .json files",
+            "Reads and parses the original text from the game files.",
+            "Writes the parsed text to the .json files of the game.",
+            "Skips processing the specified files. Usage:",
+            "Enables logging.",
+            "Incorrect value of the --no argument. Available values: maps, other, system, plugins.",
+            "Input directory, containing original and translation folders with the original game text and translation .txt files respectively.",
+            "Output directory, where the data and js folders will be created with compiled translation files.",
+            "Shuffles all translation lines, creating an unplayable translation of the game."
+        ),
+        _ => unreachable!(),
+    };
 
-    let write_options: (bool, bool, bool, bool, bool) = settings.0;
-    let mode: String = settings.1;
+    let matches: ArgMatches = Command::new("fh-termina-json-writer")
+        .disable_version_flag(true)
+        .about(about_text)
+        .subcommands([
+            Command::new("read").about(read_text).arg(
+                Arg::new("no")
+                    .long("no")
+                    .value_delimiter(',')
+                    .help(format!("{no_text} --no=maps,other,system"))
+                    .value_name("maps,other,system"),
+            ),
+            Command::new("write")
+                .about(write_text)
+                .arg(
+                    Arg::new("no")
+                        .long("no")
+                        .value_delimiter(',')
+                        .help(format!("{no_text} --no=maps,other,system,plugins"))
+                        .value_name("maps,other,system,plugins"),
+                )
+                .arg(
+                    Arg::new("drunk")
+                        .short('d')
+                        .long("drunk")
+                        .action(clap::ArgAction::SetTrue)
+                        .default_value("false")
+                        .help(drunk_text),
+                ),
+        ])
+        .arg(
+            Arg::new("log")
+                .long("log")
+                .default_value("false")
+                .action(clap::ArgAction::SetTrue)
+                .global(true)
+                .help(log_text),
+        )
+        .arg(
+            Arg::new("input_dir")
+                .short('i')
+                .long("input-dir")
+                .global(true)
+                .help(input_dir_text),
+        )
+        .arg(
+            Arg::new("output_dir")
+                .short('o')
+                .long("output-dir")
+                .global(true)
+                .help(output_dir_text),
+        )
+        .get_matches();
 
-    match mode.as_str() {
+    let mode: &str = if let Some(subcommand) = matches.subcommand_name() {
+        subcommand
+    } else {
+        exit(1);
+    };
+
+    let mut write_options: (bool, bool, bool, bool, bool) = (true, true, true, true, false);
+
+    if let Some(no_values) = matches
+        .subcommand_matches("write")
+        .unwrap()
+        .get_one::<String>("no")
+    {
+        for no_value in no_values.split(',').collect::<Vec<&str>>() {
+            match no_value {
+                "maps" => write_options.0 = false,
+                "other" => write_options.1 = false,
+                "system" => write_options.2 = false,
+                "plugins" => write_options.3 = false,
+                _ => {
+                    println!("{incorrect_no}");
+                    exit(1);
+                }
+            }
+        }
+    }
+
+    if matches.get_flag("log") {
+        write_options.4 = true;
+    }
+
+    match mode {
         "write" => {
+            let drunk: bool = matches
+                .subcommand_matches("write")
+                .unwrap()
+                .get_flag("drunk");
+
+            let input_dir: String = if let Some(input_dir) = matches.get_one::<String>("input_dir")
+            {
+                input_dir
+            } else {
+                "../"
+            }
+            .replace('\\', "/");
+
+            if !Path::new(&input_dir).exists()
+                || !Path::new(format!("{input_dir}/original").as_str()).exists()
+                || !Path::new(format!("{input_dir}/translation").as_str()).exists()
+            {
+                if language == "ru" {
+                    println!("Путь к входной директории, либо папкам original/translation, которая должна находится внутри входной директории, не существует.");
+                } else {
+                    println!("The path to the input directory, or the directories original/translation, which should be in the input directory, does not exist.");
+                }
+                return;
+            }
+
+            let output_dir: String =
+                if let Some(output_dir) = matches.get_one::<String>("output_dir") {
+                    output_dir
+                } else {
+                    "./output"
+                }
+                .replace('\\', "/");
+
             struct Paths {
-                original: &'static str,
-                output: &'static str,
-                maps: &'static str,
-                maps_trans: &'static str,
-                names: &'static str,
-                names_trans: &'static str,
-                other: &'static str,
-                plugins: &'static str,
-                plugins_output: &'static str,
+                original: String,
+                output: String,
+                maps: String,
+                maps_trans: String,
+                names: String,
+                names_trans: String,
+                other: String,
+                plugins: String,
+                plugins_output: String,
             }
 
             let dir_paths: Paths = Paths {
-                original: "../original",
-                output: "./data",
-                maps: "../translation/maps/maps.txt",
-                maps_trans: "../translation/maps/maps_trans.txt",
-                names: "../translation/maps/names.txt",
-                names_trans: "../translation/maps/names_trans.txt",
-                other: "../translation/other",
-                plugins: "../translation/plugins",
-                plugins_output: "./js",
+                original: format!("{input_dir}/original"),
+                output: format!("{output_dir}/data"),
+                maps: format!("{input_dir}/translation/maps/maps.txt"),
+                maps_trans: format!("{input_dir}/translation/maps/maps_trans.txt"),
+                names: format!("{input_dir}/translation/maps/names.txt"),
+                names_trans: format!("{input_dir}/translation/maps/names_trans.txt"),
+                other: format!("{input_dir}/translation/other"),
+                plugins: format!("{input_dir}/translation/plugins"),
+                plugins_output: format!("{output_dir}/js"),
             };
 
-            create_dir_all(dir_paths.output).unwrap();
-            create_dir_all(dir_paths.plugins_output).unwrap();
+            create_dir_all(&dir_paths.output).unwrap();
+            create_dir_all(&dir_paths.plugins_output).unwrap();
 
             if write_options.0 {
-                let maps_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
+                let maps_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
                     .unwrap()
                     .par_bridge()
+                    .flatten()
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<String, Value>,
-                         path: Result<std::fs::DirEntry, std::io::Error>| {
-                            let filename: String =
-                                path.as_ref().unwrap().file_name().into_string().unwrap();
+                        |mut hashmap: HashMap<String, Value>, path: DirEntry| {
+                            let filename: String = path.file_name().into_string().unwrap();
 
                             if filename.starts_with("Map") {
                                 hashmap.insert(
                                     filename,
-                                    write::merge_map(
-                                        from_str(&read_to_string(path.unwrap().path()).unwrap())
-                                            .unwrap(),
+                                    merge_map(
+                                        from_str(&read_to_string(path.path()).unwrap()).unwrap(),
                                     ),
                                 );
                             }
@@ -313,11 +236,12 @@ fn main() {
                     .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
                     .collect();
 
-                let maps_translated_text_vec: Vec<String> = read_to_string(dir_paths.maps_trans)
-                    .unwrap()
-                    .par_split('\n')
-                    .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
-                    .collect();
+                let mut maps_translated_text_vec: Vec<String> =
+                    read_to_string(dir_paths.maps_trans)
+                        .unwrap()
+                        .par_split('\n')
+                        .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
+                        .collect();
 
                 let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
                     .unwrap()
@@ -325,11 +249,19 @@ fn main() {
                     .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
                     .collect();
 
-                let maps_translated_names_vec: Vec<String> = read_to_string(dir_paths.names_trans)
-                    .unwrap()
-                    .par_split('\n')
-                    .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
-                    .collect();
+                let mut maps_translated_names_vec: Vec<String> =
+                    read_to_string(dir_paths.names_trans)
+                        .unwrap()
+                        .par_split('\n')
+                        .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
+                        .collect();
+
+                if drunk {
+                    let mut rng: ThreadRng = thread_rng();
+
+                    maps_translated_text_vec.shuffle(&mut rng);
+                    maps_translated_names_vec.shuffle(&mut rng);
+                }
 
                 let maps_text_hashmap: HashMap<&str, &str> = maps_original_text_vec
                     .par_iter()
@@ -367,9 +299,9 @@ fn main() {
                         },
                     );
 
-                write::write_maps(
+                write_maps(
                     maps_hashmap,
-                    dir_paths.output,
+                    &dir_paths.output,
                     maps_text_hashmap,
                     maps_names_hashmap,
                     write_options.4,
@@ -380,22 +312,20 @@ fn main() {
             if write_options.1 {
                 const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
 
-                let other_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
+                let other_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
                     .unwrap()
                     .par_bridge()
+                    .flatten()
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<String, Value>,
-                         path: Result<std::fs::DirEntry, std::io::Error>| {
-                            let filename: String =
-                                path.as_ref().unwrap().file_name().into_string().unwrap();
+                        |mut hashmap: HashMap<String, Value>, path: DirEntry| {
+                            let filename: String = path.file_name().into_string().unwrap();
 
                             if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
                                 hashmap.insert(
                                     filename,
-                                    write::merge_other(
-                                        from_str(&read_to_string(path.unwrap().path()).unwrap())
-                                            .unwrap(),
+                                    merge_other(
+                                        from_str(&read_to_string(path.path()).unwrap()).unwrap(),
                                     ),
                                 );
                             }
@@ -410,18 +340,19 @@ fn main() {
                         },
                     );
 
-                write::write_other(
+                write_other(
                     other_hashmap,
-                    dir_paths.output,
-                    dir_paths.other,
+                    &dir_paths.output,
+                    &dir_paths.other,
                     write_options.4,
                     language,
+                    drunk,
                 );
             }
 
             if write_options.2 {
                 let system_json: Value = from_str(
-                    &read_to_string(format!("{}/System.json", dir_paths.original)).unwrap(),
+                    &read_to_string(format!("{}/System.json", &dir_paths.original)).unwrap(),
                 )
                 .unwrap();
 
@@ -432,12 +363,18 @@ fn main() {
                         .map(|x: &str| x.to_string())
                         .collect();
 
-                let system_translated_text: Vec<String> =
+                let mut system_translated_text: Vec<String> =
                     read_to_string(format!("{}/System_trans.txt", dir_paths.other))
                         .unwrap()
                         .par_split('\n')
                         .map(|x: &str| x.to_string())
                         .collect();
+
+                if drunk {
+                    let mut rng: ThreadRng = thread_rng();
+
+                    system_translated_text.shuffle(&mut rng);
+                }
 
                 let system_text_hashmap: HashMap<&str, &str> = system_original_text
                     .par_iter()
@@ -457,9 +394,9 @@ fn main() {
                         },
                     );
 
-                write::write_system(
+                write_system(
                     system_json,
-                    dir_paths.output,
+                    &dir_paths.output,
                     system_text_hashmap,
                     write_options.4,
                     language,
@@ -479,16 +416,22 @@ fn main() {
                         .map(|x: &str| x.to_string())
                         .collect();
 
-                let plugins_translated_text_vec: Vec<String> =
+                let mut plugins_translated_text_vec: Vec<String> =
                     read_to_string(format!("{}/plugins_trans.txt", dir_paths.plugins))
                         .unwrap()
                         .par_split('\n')
                         .map(|x: &str| x.to_string())
                         .collect();
 
-                write::write_plugins(
+                if drunk {
+                    let mut rng: ThreadRng = thread_rng();
+
+                    plugins_translated_text_vec.shuffle(&mut rng);
+                }
+
+                write_plugins(
                     plugins_json,
-                    dir_paths.plugins_output,
+                    &dir_paths.plugins_output,
                     plugins_original_text_vec,
                     plugins_translated_text_vec,
                     write_options.4,
@@ -510,21 +453,43 @@ fn main() {
         }
 
         "read" => {
-            const INPUT_DIR: &str = "../original";
-            const OUTPUT_DIR: &str = "./parsed";
+            let input_dir: String = if let Some(input_dir) = matches.get_one::<String>("input_dir")
+            {
+                input_dir
+            } else {
+                "../original"
+            }
+            .replace('\\', "/");
 
-            create_dir_all(OUTPUT_DIR).unwrap();
+            let output_dir: String =
+                if let Some(output_dir) = matches.get_one::<String>("output_dir") {
+                    output_dir
+                } else {
+                    "./parsed"
+                }
+                .replace('\\', "/");
+
+            if !Path::new(&input_dir).exists() {
+                if language == "ru" {
+                    println!("Путь к входной директории не существует.");
+                } else {
+                    println!("The path to the input directory does not exist.");
+                }
+                return;
+            }
+
+            create_dir_all(&output_dir).unwrap();
 
             if write_options.0 {
-                read::read_map(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_map(&input_dir, &output_dir, write_options.4, language);
             }
 
             if write_options.1 {
-                read::read_other(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_other(&input_dir, &output_dir, write_options.4, language);
             }
 
             if write_options.2 {
-                read::read_system(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_system(&input_dir, &output_dir, write_options.4, language);
             }
 
             if language == "ru" {
