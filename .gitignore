@@ -4,8 +4,7 @@
 /cli/Cargo.lock
 /cli/target
 /cli/parsed
-/cli/data
-/cli/js
+/cli/output
 /gui-old
 /gui/node_modules
 /gui/bun.lockb

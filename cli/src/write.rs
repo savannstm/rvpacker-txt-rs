@@ -1,3 +1,4 @@
+use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng};
 use rayon::prelude::*;
 use serde_json::{to_string, to_value, Value, Value::Array};
 use std::collections::{HashMap, HashSet};
@@ -186,6 +187,7 @@ pub fn write_other(
     other_dir: &str,
     logging: bool,
     language: &str,
+    drunk: bool,
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
@@ -196,12 +198,18 @@ pub fn write_other(
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
 
-            let other_translated_text: Vec<String> =
+            let mut other_translated_text: Vec<String> =
                 read_to_string(format!("{}/{}_trans.txt", other_dir, &f[..f.len() - 5]))
                     .unwrap()
                     .par_split('\n')
                     .map(|x: &str| x.to_string().replace("\\n", "\n"))
                     .collect();
+
+            let mut rng: ThreadRng = thread_rng();
+
+            if drunk {
+                other_translated_text.shuffle(&mut rng);
+            }
 
             let hashmap: HashMap<&str, &str> = other_original_text
                 .par_iter()
