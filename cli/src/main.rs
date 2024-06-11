@@ -1,8 +1,7 @@
-use colored::{ColoredString, Colorize, CustomColor};
+use clap::{Arg, ArgMatches, Command};
 use rayon::prelude::*;
 use serde_json::{from_str, Value};
 use std::collections::HashMap;
-use std::env::args;
 use std::fs::{create_dir_all, read_dir, read_to_string};
 use std::process::exit;
 use std::time::Instant;
@@ -11,243 +10,97 @@ use sys_locale::get_locale;
 mod read;
 mod write;
 
-trait Gray {
-    fn gray(&self) -> ColoredString;
-}
-
-impl<T: AsRef<str> + Colorize> Gray for T {
-    fn gray(&self) -> ColoredString {
-        self.as_ref().custom_color(CustomColor::new(33, 33, 33))
-    }
-}
-
-fn handle_args(args: Vec<String>, language: &str) -> ((bool, bool, bool, bool, bool), String) {
-    let mut write_options: (bool, bool, bool, bool, bool) = (true, true, true, true, false);
-    let args_len: usize = args.len();
-
-    match args_len {
-        1 => {
-            if language == "ru" {
-                println!(
-                    "{}",
-                    "\nКоманда не задана. Прерываем работу. Для получения справки, вызовите json-writer -h.".yellow()
-                );
-            } else {
-                println!(
-                    "{}",
-                    "\nCommand not specified. Exiting. For help, call json-writer -h.".yellow()
-                );
-            }
-            exit(1);
-        }
-        2 => match args[1].as_str() {
-            "read" => (write_options, String::from("read")),
-            "write" => (write_options, String::from("write")),
-            _ => {
-                if language == "ru" {
-                    println!(
-                        "{}",
-                        "Неверное значение команды.\nДопустимые значения: write, read.".red()
-                    )
-                } else {
-                    println!(
-                        "{}",
-                        "Incorrect command value.\nAvailable values: write, read.".red()
-                    )
-                }
-
-                exit(1);
-            }
-        },
-        _ => {
-            const SPACES: usize = 48;
-
-            let (
-                desc,
-                usage,
-                commands,
-                read_command_text,
-                write_command_text,
-                options,
-                help_command_text,
-                no_command_text,
-                log_command_text,
-                incorrect_command,
-                incorrect_no,
-            ) = if language == "ru" {
-                (
-                    "Данный CLI инструмент записывает .txt файлы перевода в .json файлы игры.".bold(),
-                    format!(
-                        "{}: {} {} {}",
-                        "Использование".bold(),
-                        "json-writer",
-                        "команда".purple(),
-                        "[ОПЦИИ]".gray()
-                    ),
-                    "Команды:",
-                    "Читает и парсит оригинальный текст из файлов игры. (кроме файла plugins.js).",
-                    "Записывает перевод в файлы игры.",
-                    "Опции:",
-                    "Выводит эту справку.".gray(),
-                    "Отключает компиляцию указанных файлов.".gray(),
-                    "Включает логирование.".gray(),
-                    "Неверное значение команды.\nДопустимые значения: write, read.".red(),
-                    "Неверные значения аргумента -no. Допустимые значения: maps, other, system, plugins."
-                        .red(),
-                )
-            } else {
-                (
-                    "This CLI tool writes .txt translation files to .json game files.".bold(),
-                    format!(
-                        "{}: {} {} {}",
-                        "Usage".bold(),
-                        "json-writer",
-                        "command".purple(),
-                        "[OPTIONS]".gray()
-                    ),
-                    "Commands:",
-                    "Reads and parses the original text from game files. (except plugins.js).",
-                    "Writes the translation to game files.",
-                    "Options:",
-                    "Prints this help message.".gray(),
-                    "Disables compilation of the specified files.".gray(),
-                    "Enables logging.".gray(),
-                    "Incorrect command value.\nAvailable values: write, read.".red(),
-                    "Incorrect value of the -no argument. Available values: maps, other, system, plugins."
-                        .red(),
-            )
-            };
-
-            let read_command: ColoredString = "read".bold();
-            let write_command: ColoredString = "write".bold();
-            let help_command: String = format!("{}, {}", "-h".bold(), "--help".gray());
-            let no_command: ColoredString = "-no={maps,other,system,plugins}".bold();
-            let log_command: ColoredString = "--log".bold();
-
-            let mode: String = match args[1].as_str() {
-                "-h" | "--help" => {
-                    println!("\n{desc}\n\n{usage}\n\n{commands}");
-                    println!(
-                        "{read_command} {}{}",
-                        " ".repeat(SPACES - read_command.len() - 1),
-                        read_command_text.gray()
-                    );
-                    println!(
-                        "{write_command} {}{}",
-                        " ".repeat(SPACES - write_command.len() - 1),
-                        write_command_text.gray()
-                    );
-                    println!("\n{options}");
-                    println!(
-                        "{help_command} {}{}",
-                        " ".repeat(SPACES - 10 - 1),
-                        help_command_text
-                    );
-                    println!(
-                        "{no_command} {}{}",
-                        " ".repeat(SPACES - no_command.len() - 1),
-                        no_command_text
-                    );
-                    println!(
-                        "{log_command} {}{}",
-                        " ".repeat(SPACES - log_command.len() - 1),
-                        log_command_text
-                    );
-                    exit(0);
-                }
-                "write" => "write".to_string(),
-                "read" => "read".to_string(),
-                _ => {
-                    println!("{incorrect_command}");
-                    exit(1);
-                }
-            };
-
-            for arg in args.iter().skip(2) {
-                match arg.as_str() {
-                    "-h" | "--help" => {
-                        if mode == "read" {
-                            let read_no_command: String = no_command.replace(",plugins}", "}");
-                            println!("\n{}", read_command_text.trim().bold());
-                            println!("\n{options}");
-                            println!(
-                                "{help_command} {}{}",
-                                " ".repeat(SPACES - 10 - 1),
-                                help_command_text
-                            );
-                            println!(
-                                "{} {}{}",
-                                read_no_command,
-                                " ".repeat(SPACES - read_no_command.len() - 1),
-                                no_command_text
-                            );
-                        } else {
-                            println!("\n{}", write_command_text.trim().bold());
-                            println!("\n{options}");
-                            println!(
-                                "{help_command} {}{}",
-                                " ".repeat(SPACES - 10 - 1),
-                                help_command_text
-                            );
-                            println!(
-                                "{no_command} {}{}",
-                                " ".repeat(SPACES - no_command.len() - 1),
-                                no_command_text
-                            );
-                        }
-                        println!(
-                            "{log_command} {}{}",
-                            " ".repeat(SPACES - log_command.len() - 1),
-                            log_command_text
-                        );
-                        exit(0);
-                    }
-
-                    arg if arg.starts_with("-no=") => {
-                        for opt in arg[4..].split(',') {
-                            match opt {
-                                "maps" => write_options.0 = false,
-                                "other" => write_options.1 = false,
-                                "system" => write_options.2 = false,
-                                "plugins" => write_options.3 = false,
-                                _ => {
-                                    println!("{incorrect_no}");
-                                    exit(1);
-                                }
-                            }
-                        }
-                    }
-                    "--log" => write_options.4 = true,
-                    _ => {}
-                }
-            }
-
-            (write_options, mode)
-        }
-    }
-}
+use read::*;
+use write::*;
 
 fn main() {
     let start_time: Instant = Instant::now();
 
-    let args: Vec<String> = args().collect();
-
     let locale: String = get_locale().unwrap_or_else(|| String::from("en_US"));
 
-    const RU_LOCALES: [&str; 3] = ["ru", "uk", "be"];
-
-    let language: &str = if RU_LOCALES.iter().any(|x: &&str| locale.starts_with(x)) {
-        "ru"
-    } else {
-        "en"
+    let language: &str = match locale.as_str() {
+        "ru" => "ru",
+        "uk" => "ru",
+        "be" => "ru",
+        _ => "en",
     };
 
-    let settings: ((bool, bool, bool, bool, bool), String) = handle_args(args, language);
+    let (about_text, read_text, write_text, no_text, log_text, incorrect_no) = match language {
+        "ru" => (
+            "Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать его в .json файлы",
+            "Читает и парсит оригинальный текст из файлов игры.",
+            "Записывает текстовые файлы в .json файлы игры.",
+            "Не читает указанные файлы.",
+            "Включает логирование.",
+            "Некорректное значение аргумента --no. Допустимые значения: maps, other, system, plugins."
+        ),
+        "en" => (
+            "Repository with tools for editing F&H2: Termina text and compiling it into .json files",
+            "Reads and parses the original text from the game files.",
+            "Writes the parsed text to the .json files of the game.",
+            "Skips reading the specified files.",
+            "Enables logging.",
+            "Incorrect value of the --no argument. Available values: maps, other, system, plugins."
+        ),
+        _ => unreachable!(),
+    };
 
-    let write_options: (bool, bool, bool, bool, bool) = settings.0;
-    let mode: String = settings.1;
+    let matches: ArgMatches = Command::new("fh-termina-json-writer")
+        .about(about_text)
+        .subcommands([
+            Command::new("read").about(read_text).arg(
+                Arg::new("no")
+                    .long("no")
+                    .value_delimiter(',')
+                    .help(format!("{no_text} Usage: --no=maps,other,system"))
+                    .value_name("maps,other,system"),
+            ),
+            Command::new("write").about(write_text).arg(
+                Arg::new("no")
+                    .long("no")
+                    .value_delimiter(',')
+                    .help(format!("{no_text} Usage: --no=maps,other,system,plugins"))
+                    .value_name("maps,other,system,plugins"),
+            ),
+        ])
+        .arg(
+            Arg::new("log")
+                .long("log")
+                .default_value("false")
+                .action(clap::ArgAction::SetTrue)
+                .global(true)
+                .help(log_text),
+        )
+        .get_matches();
 
-    match mode.as_str() {
+    let mode: &str = if let Some(subcommand) = matches.subcommand_name() {
+        subcommand
+    } else {
+        exit(1);
+    };
+
+    let mut write_options: (bool, bool, bool, bool, bool) = (true, true, true, true, false);
+
+    if let Some(no_values) = matches.subcommand().unwrap().1.get_one::<String>("no") {
+        for no_value in no_values.split(',').collect::<Vec<&str>>() {
+            match no_value {
+                "maps" => write_options.0 = false,
+                "other" => write_options.1 = false,
+                "system" => write_options.2 = false,
+                "plugins" => write_options.3 = false,
+                _ => {
+                    println!("{incorrect_no}");
+                    exit(1);
+                }
+            }
+        }
+    }
+
+    if matches.get_flag("log") {
+        write_options.4 = true;
+    }
+
+    match mode {
         "write" => {
             struct Paths {
                 original: &'static str,
@@ -280,19 +133,17 @@ fn main() {
                 let maps_hashmap: HashMap<String, Value> = read_dir(dir_paths.original)
                     .unwrap()
                     .par_bridge()
+                    .flatten()
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<String, Value>,
-                         path: Result<std::fs::DirEntry, std::io::Error>| {
-                            let filename: String =
-                                path.as_ref().unwrap().file_name().into_string().unwrap();
+                        |mut hashmap: HashMap<String, Value>, path: std::fs::DirEntry| {
+                            let filename: String = path.file_name().into_string().unwrap();
 
                             if filename.starts_with("Map") {
                                 hashmap.insert(
                                     filename,
-                                    write::merge_map(
-                                        from_str(&read_to_string(path.unwrap().path()).unwrap())
-                                            .unwrap(),
+                                    merge_map(
+                                        from_str(&read_to_string(path.path()).unwrap()).unwrap(),
                                     ),
                                 );
                             }
@@ -367,7 +218,7 @@ fn main() {
                         },
                     );
 
-                write::write_maps(
+                write_maps(
                     maps_hashmap,
                     dir_paths.output,
                     maps_text_hashmap,
@@ -393,7 +244,7 @@ fn main() {
                             if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
                                 hashmap.insert(
                                     filename,
-                                    write::merge_other(
+                                    merge_other(
                                         from_str(&read_to_string(path.unwrap().path()).unwrap())
                                             .unwrap(),
                                     ),
@@ -410,7 +261,7 @@ fn main() {
                         },
                     );
 
-                write::write_other(
+                write_other(
                     other_hashmap,
                     dir_paths.output,
                     dir_paths.other,
@@ -457,7 +308,7 @@ fn main() {
                         },
                     );
 
-                write::write_system(
+                write_system(
                     system_json,
                     dir_paths.output,
                     system_text_hashmap,
@@ -486,7 +337,7 @@ fn main() {
                         .map(|x: &str| x.to_string())
                         .collect();
 
-                write::write_plugins(
+                write_plugins(
                     plugins_json,
                     dir_paths.plugins_output,
                     plugins_original_text_vec,
@@ -516,15 +367,15 @@ fn main() {
             create_dir_all(OUTPUT_DIR).unwrap();
 
             if write_options.0 {
-                read::read_map(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_map(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
             }
 
             if write_options.1 {
-                read::read_other(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_other(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
             }
 
             if write_options.2 {
-                read::read_system(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
+                read_system(INPUT_DIR, OUTPUT_DIR, write_options.4, language);
             }
 
             if language == "ru" {

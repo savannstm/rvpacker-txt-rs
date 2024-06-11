@@ -102,7 +102,7 @@ pub fn write_maps(
                 .as_array_mut()
                 .unwrap()
                 .par_iter_mut()
-                .skip(1)
+                .skip(1) //Skipping first element in array as it is null
                 .for_each(|event: &mut Value| {
                     if event.is_null() {
                         return;
@@ -225,7 +225,7 @@ pub fn write_other(
                 file.as_array_mut()
                     .unwrap()
                     .par_iter_mut()
-                    .skip(1)
+                    .skip(1) //Skipping first element in array as it is null
                     .for_each(|element: &mut Value| {
                         if let Some(text) = hashmap.get(element["name"].as_str().unwrap()) {
                             element["name"] = to_value(text).unwrap();
@@ -248,12 +248,14 @@ pub fn write_other(
                             let note_str: &str = element["note"].as_str().unwrap();
 
                             if f == "Classes.json" {
+                                // Only in Classes.json note should be replaced entirely with translated text
                                 if let Some(text) = hashmap.get(note_str) {
                                     element["note"] = to_value(text).unwrap();
                                 }
-                            } else {
+                            } else if f == "Items.json" {
                                 for text in TO_REPLACE {
                                     if note_str.contains(text) {
+                                        // In Items.json note contains Menu Category that should be replaced with translated text
                                         element["note"] =
                                             to_value(note_str.replace(text, hashmap[text]))
                                                 .unwrap();
@@ -264,11 +266,14 @@ pub fn write_other(
                         }
                     });
             } else {
+                //Other files have the structure similar to Maps.json files
                 file.as_array_mut()
                     .unwrap()
                     .par_iter_mut()
-                    .skip(1)
+                    .skip(1) //Skipping first element in array as it is null
                     .for_each(|element: &mut Value| {
+                        //If element has pages, we'll get their length
+                        //Otherwise, it doesn't matter and we just set it to 1
                         let pages_length: usize = if element["pages"].is_array() {
                             element["pages"].as_array().unwrap().len()
                         } else {
@@ -276,6 +281,8 @@ pub fn write_other(
                         };
 
                         for i in 0..pages_length {
+                            //If element has pages, then we'll iterate over them
+                            //Otherwise we'll just iterate over the list
                             let iterable_object: &mut Value = if pages_length != 1 {
                                 &mut element["pages"][i]["list"]
                             } else {
