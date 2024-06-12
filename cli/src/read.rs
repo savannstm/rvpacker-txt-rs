@@ -6,7 +6,7 @@ use std::{
     fs::{read_dir, read_to_string, write, DirEntry},
 };
 
-pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
+pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
@@ -88,11 +88,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
         }
 
         if logging {
-            if language == "ru" {
-                println!("Распарсен файл {filename}.");
-            } else {
-                println!("Parsed file {filename}.");
-            }
+            println!("{log_string} {filename}.");
         }
     }
 
@@ -103,7 +99,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
     .unwrap();
 }
 
-pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
+pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
@@ -265,16 +261,12 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, language: &s
         .unwrap();
 
         if logging {
-            if language == "ru" {
-                println!("Распарсен файл {filename}");
-            } else {
-                println!("Parsed file {filename}");
-            }
+            println!("{log_string} {filename}");
         }
     }
 }
 
-pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, language: &str) {
+pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
     let system_file: String = format!("{}/System.json", input_dir);
 
     let json: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
@@ -336,10 +328,6 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, language: &
     .unwrap();
 
     if logging {
-        if language == "ru" {
-            println!("Распарсен файл System.json.");
-        } else {
-            println!("Parsed file System.json.");
-        }
+        println!("{log_string} System.json.");
     }
 }

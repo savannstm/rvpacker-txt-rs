@@ -19,75 +19,93 @@ mod write;
 use read::*;
 use write::*;
 
-struct LanguageMessages<'a> {
-    about_text: &'a str,
-    read_text: &'a str,
-    write_text: &'a str,
-    no_text: &'a str,
-    log_text: &'a str,
-    input_dir_text: &'a str,
-    output_dir_text: &'a str,
-    drunk_text: &'a str,
-    language_text: &'a str,
-    help_text: &'a str,
+struct ProgramLocalization<'a> {
+    about: &'a str,
+    read: &'a str,
+    write: &'a str,
+    no: &'a str,
+    log: &'a str,
+    input_dir: &'a str,
+    output_dir: &'a str,
+    drunk: &'a str,
+    language: &'a str,
+    help: &'a str,
     help_template: &'a str,
     subcommand_help_template: &'a str,
-    possible_values_text: &'a str,
-    example_text: &'a str,
-    default_value_text: &'a str,
+    possible_values: &'a str,
+    example: &'a str,
+    default_value: &'a str,
     input_dir_value_name: &'a str,
     output_dir_value_name: &'a str,
     no_arg_value_name: &'a str,
     drunk_arg_value_name: &'a str,
     language_arg_value_name: &'a str,
+    write_input_path_does_not_exist: &'a str,
+    read_input_path_does_not_exist: &'a str,
+    write_log: &'a str,
+    read_log: &'a str,
+    write_success: &'a str,
+    read_success: &'a str,
 }
 
-impl<'a> LanguageMessages<'a> {
+impl<'a> ProgramLocalization<'a> {
     fn new(language: &str) -> Self {
         match language {
-            "ru" => LanguageMessages {
-                about_text: cstr!("<bold>Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать его в .json файлы.</bold>"),
-                read_text: cstr!("<bold>Читает и парсит оригинальный текст из файлов игры.</bold>"),
-                write_text: cstr!("<bold>Записывает текстовые файлы в .json файлы игры.</bold>"),
-                no_text: "Не обрабатывает указанные файлы.",
-                log_text: "Включает логирование.",
-                input_dir_text: "Входная директория, содержащая папки original и translation, с оригинальным текстом игры и .txt файлами с переводом соответственно.",
-                output_dir_text: "Выходная директория, в которой будут созданы папки data и js, содержащие скомпилированные файлы с переводом.",
-                drunk_text: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
-                language_text: "Устанавливает локализацию инструмента на выбранный язык.",
-                help_text: "Выводит справочную информацию по программе либо по введёной команде.",
+            "ru" => ProgramLocalization {
+                about: cstr!("<bold>Репозиторий с инструментами, позволяющими редактировать текст F&H2: Termina и компилировать его в .json файлы.</bold>"),
+                read: cstr!("<bold>Читает и парсит оригинальный текст из файлов игры.</bold>"),
+                write: cstr!("<bold>Записывает текстовые файлы в .json файлы игры.</bold>"),
+                no: "Не обрабатывает указанные файлы.",
+                log: "Включает логирование.",
+                input_dir: "Входная директория, содержащая папки original и translation, с оригинальным текстом игры и .txt файлами с переводом соответственно.",
+                output_dir: "Выходная директория, в которой будут созданы папки data и js, содержащие скомпилированные файлы с переводом.",
+                drunk: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
+                language: "Устанавливает локализацию инструмента на выбранный язык.",
+                help: "Выводит справочную информацию по программе либо по введёной команде.",
                 help_template: cstr!("{about}\n\n<underline><bold>Использование:</bold></underline> {usage}\n\n<underline><bold>Команды:</bold></underline>\n{subcommands}\n\n<underline><bold>Опции:</bold></underline>\n{options}"),
                 subcommand_help_template: cstr!("{about}\n\n<underline><bold>Использование:</bold></underline> {usage}\n\n<underline><bold>Опции:</bold></underline>\n{options}"),
-                possible_values_text: "Разрешённые значения:",
-                example_text: "\nПример:",
-                default_value_text: "Значение по умолчанию:",
+                possible_values: "Разрешённые значения:",
+                example: "\nПример:",
+                default_value: "Значение по умолчанию:",
                 input_dir_value_name: "ВХОДНОЙ_ПУТЬ",
                 output_dir_value_name: "ВЫХОДНОЙ_ПУТЬ",
                 no_arg_value_name: "ИМЕНА_ФАЙЛОВ",
                 drunk_arg_value_name: "ЦИФРА",
                 language_arg_value_name: "ЯЗЫК",
+                write_input_path_does_not_exist:"Путь к входной директории, либо папкам original/translation, которые должны находиться внутри входной директории, не существует.",
+                write_log: "Записан файл",
+                write_success: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
+                read_input_path_does_not_exist: "Путь к входной директории не существует.",
+                read_success: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
+                read_log: "Распарсен файл",
             },
-            "en" => LanguageMessages {
-                about_text: cstr!("<bold>Repository with tools for editing F&H2: Termina text and compiling it into .json files.</bold>"),
-                read_text: cstr!("<bold>Reads and parses the original text from the game files.</bold>"),
-                write_text: cstr!("<bold>Writes the parsed text to the .json files of the game.</bold>"),
-                no_text: "Skips processing the specified files.",
-                log_text: "Enables logging.",
-                input_dir_text: "Input directory, containing original and translation folders with the original game text and translation .txt files respectively.",
-                output_dir_text: "Output directory, where the data and js folders will be created with compiled translation files.",
-                drunk_text: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
-                language_text: "Sets the localization of the tool to the selected language.",
-                help_text: "Prints the program's help message or for the entered subcommand.",
+            "en" => ProgramLocalization {
+                about: cstr!("<bold>Repository with tools for editing F&H2: Termina text and compiling it into .json files.</bold>"),
+                read: cstr!("<bold>Reads and parses the original text from the game files.</bold>"),
+                write: cstr!("<bold>Writes the parsed text to the .json files of the game.</bold>"),
+                no: "Skips processing the specified files.",
+                log: "Enables logging.",
+                input_dir: "Input directory, containing original and translation folders with the original game text and translation .txt files respectively.",
+                output_dir: "Output directory, where the data and js folders will be created with compiled translation files.",
+                drunk: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
+                language: "Sets the localization of the tool to the selected language.",
+                help: "Prints the program's help message or for the entered subcommand.",
                 help_template: cstr!("{about}\n\n<underline><bold>Usage:</bold></underline> {usage}\n\n<underline><bold>Commands:</bold></underline>\n{subcommands}\n\n<underline><bold>Options:</bold></underline>\n{options}"),
                 subcommand_help_template: cstr!("{about}\n\n<underline><bold>Usage:</bold></underline> {usage}\n\n<underline><bold>Options:</bold></underline>\n{options}"),
-                possible_values_text: "Allowed values:",
-                example_text: "Example:",
-                default_value_text: "Default value:",
+                possible_values: "Allowed values:",
+                example: "Example:",
+                default_value: "Default value:",
                 input_dir_value_name: "INPUT_PATH",
                 output_dir_value_name: "OUTPUT_PATH",
                 no_arg_value_name: "FILENAMES",
                 drunk_arg_value_name: "NUMBER",
                 language_arg_value_name: "LANGUAGE",
+                write_input_path_does_not_exist: "The path to the input directory, or the directories original/translation, which should be in the input directory, does not exist.",
+                write_log: "Wrote file",
+                write_success: "All files were written successfully.\nTime spent (in seconds):",
+                read_input_path_does_not_exist: "The path to the output directory does not exist.",
+                read_success: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
+                read_log: "Parsed file",
             },
             _ => unreachable!(),
         }
@@ -118,13 +136,13 @@ fn main() {
         _ => "en",
     };
 
-    let localization: LanguageMessages = LanguageMessages::new(language);
+    let localization: ProgramLocalization = ProgramLocalization::new(language);
 
     // Help argument
     let help_arg: Arg = Arg::new("help")
         .short('h')
         .long("help")
-        .help(localization.help_text)
+        .help(localization.help)
         .action(clap::ArgAction::Help);
 
     // Read subcommand
@@ -135,9 +153,9 @@ fn main() {
         .value_name(localization.no_arg_value_name)
         .help(cformat!(
             "{} {} --no=maps,other,system.<bold>\n[{} {}]</bold>",
-            localization.no_text,
-            localization.example_text,
-            localization.possible_values_text,
+            localization.no,
+            localization.example,
+            localization.possible_values,
             POSSIBLE_READ_NO_VALUES.join(", ")
         ))
         .value_parser(POSSIBLE_READ_NO_VALUES)
@@ -146,7 +164,7 @@ fn main() {
     let read_subcommand: Command = Command::new("read")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
-        .about(localization.read_text)
+        .about(localization.read)
         .arg(read_no_arg)
         .arg(&help_arg);
 
@@ -158,9 +176,9 @@ fn main() {
         .value_name(localization.no_arg_value_name)
         .help(cformat!(
             "{} {} --no=maps,other,system,plugins.<bold>\n[{} {}]</bold>",
-            localization.no_text,
-            localization.example_text,
-            localization.possible_values_text,
+            localization.no,
+            localization.example,
+            localization.possible_values,
             POSSIBLE_WRITE_NO_VALUES.join(", ")
         ))
         .value_parser(POSSIBLE_WRITE_NO_VALUES)
@@ -175,11 +193,11 @@ fn main() {
         .value_parser(clap::value_parser!(u8).range(0..=2))
         .help(cformat!(
             "{} {} --drunk 1.<bold>\n[{} {}]\n[{} {}]</bold>",
-            localization.drunk_text,
-            localization.example_text,
-            localization.possible_values_text,
+            localization.drunk,
+            localization.example,
+            localization.possible_values,
             "0, 1, 2",
-            localization.default_value_text,
+            localization.default_value,
             "0"
         ))
         .hide_possible_values(true)
@@ -189,7 +207,7 @@ fn main() {
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .next_line_help(true)
-        .about(localization.write_text)
+        .about(localization.write)
         .arg(write_no_arg)
         .arg(drunk_arg)
         .arg(&help_arg);
@@ -199,7 +217,7 @@ fn main() {
         .short('i')
         .long("input-dir")
         .global(true)
-        .help(localization.input_dir_text)
+        .help(localization.input_dir)
         .value_name(localization.input_dir_value_name)
         .value_parser(clap::value_parser!(PathBuf));
 
@@ -207,7 +225,7 @@ fn main() {
         .short('o')
         .long("output-dir")
         .global(true)
-        .help(localization.output_dir_text)
+        .help(localization.output_dir)
         .value_name(localization.output_dir_value_name)
         .value_parser(clap::value_parser!(PathBuf));
 
@@ -218,9 +236,9 @@ fn main() {
         .global(true)
         .help(cformat!(
             "{} {} --language en.<bold>\n[{} {}]</bold>",
-            localization.language_text,
-            localization.example_text,
-            localization.possible_values_text,
+            localization.language,
+            localization.example,
+            localization.possible_values,
             ALLOWED_LANGUAGES.join(", ")
         ))
         .value_parser(ALLOWED_LANGUAGES)
@@ -230,14 +248,14 @@ fn main() {
         .long("log")
         .action(clap::ArgAction::SetTrue)
         .global(true)
-        .help(localization.log_text);
+        .help(localization.log);
 
     let cli: Command = Command::new("fh-termina-json-writer")
         .disable_version_flag(true)
         .disable_help_subcommand(true)
         .disable_help_flag(true)
         .term_width(80)
-        .about(localization.about_text)
+        .about(localization.about)
         .help_template(localization.help_template)
         .subcommands([read_subcommand, write_subcommand])
         .arg(input_dir_arg)
@@ -296,11 +314,7 @@ fn main() {
                 || !Path::new(format!("{input_dir}/original").as_str()).exists()
                 || !Path::new(format!("{input_dir}/translation").as_str()).exists()
             {
-                if language == "ru" {
-                    println!("Путь к входной директории, либо папкам original/translation, которая должна находится внутри входной директории, не существует.");
-                } else {
-                    println!("The path to the input directory, or the directories original/translation, which should be in the input directory, does not exist.");
-                }
+                println!("{}", localization.write_input_path_does_not_exist);
                 return;
             }
 
@@ -458,7 +472,7 @@ fn main() {
                     maps_text_hashmap,
                     maps_names_hashmap,
                     write_options.4,
-                    language,
+                    localization.write_log,
                 );
             }
 
@@ -498,7 +512,7 @@ fn main() {
                     &dir_paths.output,
                     &dir_paths.other,
                     write_options.4,
-                    language,
+                    localization.write_log,
                     drunk,
                 );
             }
@@ -560,7 +574,7 @@ fn main() {
                     &dir_paths.output,
                     system_text_hashmap,
                     write_options.4,
-                    language,
+                    localization.write_log,
                 );
             }
 
@@ -604,21 +618,15 @@ fn main() {
                     plugins_original_text_vec,
                     plugins_translated_text_vec,
                     write_options.4,
-                    language,
+                    localization.write_log,
                 );
             }
 
-            if language == "ru" {
-                println!(
-                    "Все файлы были записаны успешно.\nПотрачено (в секундах): {}.",
-                    start_time.elapsed().as_secs_f64()
-                );
-            } else {
-                println!(
-                    "All files were successfully written.\nTime spent (in seconds): {}.",
-                    start_time.elapsed().as_secs_f64()
-                );
-            }
+            println!(
+                "{} {}.",
+                localization.write_success,
+                start_time.elapsed().as_secs_f64()
+            );
         }
 
         "read" => {
@@ -639,41 +647,46 @@ fn main() {
                 .replace('\\', "/");
 
             if !Path::new(&input_dir).exists() {
-                if language == "ru" {
-                    println!("Путь к входной директории не существует.");
-                } else {
-                    println!("The path to the input directory does not exist.");
-                }
+                println!("{}", localization.read_input_path_does_not_exist);
                 return;
             }
 
             create_dir_all(&output_dir).unwrap();
 
             if write_options.0 {
-                read_map(&input_dir, &output_dir, write_options.4, language);
+                read_map(
+                    &input_dir,
+                    &output_dir,
+                    write_options.4,
+                    localization.read_log,
+                );
             }
 
             if write_options.1 {
-                read_other(&input_dir, &output_dir, write_options.4, language);
+                read_other(
+                    &input_dir,
+                    &output_dir,
+                    write_options.4,
+                    localization.read_log,
+                );
             }
 
             if write_options.2 {
-                read_system(&input_dir, &output_dir, write_options.4, language);
+                read_system(
+                    &input_dir,
+                    &output_dir,
+                    write_options.4,
+                    localization.read_log,
+                );
             }
 
-            if language == "ru" {
-                println!(
-                    "Весь игровой текст был успешно запарсен.\nПотрачено {} секунд.",
-                    start_time.elapsed().as_secs_f64()
-                );
-            } else {
-                println!(
-                    "The entire game text was successfully parsed.\nTime spent: {} seconds.",
-                    start_time.elapsed().as_secs_f64()
-                );
-            }
+            println!(
+                "{} {}.",
+                localization.read_success,
+                start_time.elapsed().as_secs_f64()
+            );
         }
 
-        _ => {}
+        _ => unreachable!(),
     }
 }
