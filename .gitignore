@@ -5,6 +5,7 @@
 /cli/target
 /cli/parsed
 /cli/output
+/cli/.cargo
 /gui-old
 /gui/node_modules
 /gui/bun.lockb

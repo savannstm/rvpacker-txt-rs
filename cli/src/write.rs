@@ -189,7 +189,7 @@ pub fn write_other(
     other_dir: &str,
     logging: bool,
     language: &str,
-    drunk: bool,
+    drunk: u8,
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
@@ -209,8 +209,16 @@ pub fn write_other(
 
             let mut rng: ThreadRng = thread_rng();
 
-            if drunk {
+            if drunk > 0 {
                 other_translated_text.shuffle(&mut rng);
+
+                if drunk == 2 {
+                    for text_string in other_translated_text.iter_mut() {
+                        let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
+                        text_string_split.shuffle(&mut rng);
+                        *text_string = text_string_split.join(" ");
+                    }
+                }
             }
 
             let hashmap: HashMap<&str, &str> = other_original_text
