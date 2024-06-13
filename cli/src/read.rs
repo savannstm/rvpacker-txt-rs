@@ -100,7 +100,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     }
 
     write(
-        format!("{}/maps.txt", output_dir),
+        format!("{output_dir}/maps.txt",),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
     )
     .unwrap();
@@ -174,8 +174,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
 
             write(
                 format!(
-                    "{}/{}",
-                    output_dir,
+                    "{output_dir}/{}",
                     filename.replace(".json", ".txt").to_lowercase()
                 ),
                 lines.iter().cloned().collect::<Vec<String>>().join("\n"),
@@ -269,8 +268,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
 
         write(
             format!(
-                "{}/{}",
-                output_dir,
+                "{output_dir}/{}",
                 filename.replace(".json", ".txt").to_lowercase()
             ),
             lines.iter().cloned().collect::<Vec<String>>().join("\n"),
@@ -339,7 +337,7 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string:
     }
 
     write(
-        format!("{}/system.txt", output_dir),
+        format!("{output_dir}/system.txt"),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
     )
     .unwrap();
