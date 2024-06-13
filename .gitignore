@@ -5,6 +5,15 @@
 /cli/target
 /cli/parsed
 /cli/output
+/cli/.cargo
+/cli/src/vx-parser/js/inspectable
+/cli/src/vx-parser/js/readable
+/cli/src/vx-parser/js/output
+/cli/src/vx-parser/js/original
+/cli/src/vx-parser/js/parsed
+/cli/src/vx-parser/js/translation
+/cli/src/vx-parser/js/node_modules
+/cli/src/vx-parser/js/bun.lockb
 /gui-old
 /gui/node_modules
 /gui/bun.lockb
