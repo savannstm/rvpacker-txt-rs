@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@hyrious/marshal": "^0.3.3",
+    "commander": "^12.1.0",
+    "immutable": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.4"
+  }
+}
