@@ -286,9 +286,8 @@ pub fn write_other(
                     .par_iter_mut()
                     .skip(1) //Skipping first element in array as it is null
                     .for_each(|element: &mut Value| {
-                        //If element has pages, we'll get their length
-                        //Otherwise, it doesn't matter and we just set it to 1
-                        let pages_length: usize = if element["pages"].is_array() {
+                        //CommonEvents doesn't have pages, so we can just check if it Troops
+                        let pages_length: usize = if f == "Troops.json" {
                             element["pages"].as_array().unwrap().len()
                         } else {
                             1
