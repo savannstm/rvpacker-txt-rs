@@ -24,8 +24,15 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
         .collect();
 
     let mut lines: IndexSet<String> = IndexSet::new();
+    let mut names_lines: IndexSet<String> = IndexSet::new();
 
     for (filename, json) in json_data {
+        if let Some(display_name) = json["displayName"].as_str() {
+            if !display_name.is_empty() {
+                names_lines.insert(display_name.to_string());
+            }
+        }
+
         for event in json["events"].as_array().unwrap().iter().skip(1) {
             if !event["pages"].is_array() {
                 continue;
@@ -99,6 +106,16 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, language: &str
     write(
         format!("{}/maps.txt", output_dir),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
+    )
+    .unwrap();
+
+    write(
+        format!("{output_dir}/names.txt"),
+        names_lines
+            .iter()
+            .cloned()
+            .collect::<Vec<String>>()
+            .join("\n"),
     )
     .unwrap();
 }
