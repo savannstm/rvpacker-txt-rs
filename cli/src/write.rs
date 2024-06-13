@@ -93,7 +93,7 @@ pub fn write_maps(
     text_hashmap: HashMap<&str, &str>,
     names_hashmap: HashMap<&str, &str>,
     logging: bool,
-    language: &str,
+    log_string: &str,
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
@@ -171,14 +171,10 @@ pub fn write_maps(
                                 });
                         });
                 });
-            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
+            write(format!("{output_dir}/{f}"), file.to_string()).unwrap();
 
             if logging {
-                if language == "ru" {
-                    println!("Записан файл {}", f);
-                } else {
-                    println!("Wrote file {}", f);
-                }
+                println!("{log_string} {f}");
             }
         });
 }
@@ -188,8 +184,8 @@ pub fn write_other(
     output_dir: &str,
     other_dir: &str,
     logging: bool,
-    language: &str,
-    drunk: bool,
+    log_string: &str,
+    drunk: u8,
 ) {
     json.par_iter_mut()
         .for_each(|(f, file): (&String, &mut Value)| {
@@ -209,8 +205,16 @@ pub fn write_other(
 
             let mut rng: ThreadRng = thread_rng();
 
-            if drunk {
+            if drunk > 0 {
                 other_translated_text.shuffle(&mut rng);
+
+                if drunk == 2 {
+                    for text_string in other_translated_text.iter_mut() {
+                        let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
+                        text_string_split.shuffle(&mut rng);
+                        *text_string = text_string_split.join(" ");
+                    }
+                }
             }
 
             let hashmap: HashMap<&str, &str> = other_original_text
@@ -356,14 +360,10 @@ pub fn write_other(
                         }
                     });
             }
-            write(format!("{}/{}", output_dir, f), file.to_string()).unwrap();
+            write(format!("{output_dir}/{f}"), file.to_string()).unwrap();
 
             if logging {
-                if language == "ru" {
-                    println!("Записан файл {}", f);
-                } else {
-                    println!("Wrote file {}", f);
-                }
+                println!("{log_string} {f}");
             }
         });
 }
@@ -373,7 +373,7 @@ pub fn write_system(
     output_path: &str,
     system_text_hashmap: HashMap<&str, &str>,
     logging: bool,
-    language: &str,
+    log_string: &str,
 ) {
     json["equipTypes"]
         .as_array_mut()
@@ -437,17 +437,13 @@ pub fn write_system(
         });
 
     write(
-        format!("{}/System.json", output_path),
+        format!("{output_path}/System.json"),
         to_string(&json).unwrap(),
     )
     .unwrap();
 
     if logging {
-        if language == "ru" {
-            println!("Записан файл System.json");
-        } else {
-            println!("Wrote file System.json");
-        }
+        println!("{log_string} System.json");
     }
 }
 
@@ -457,7 +453,7 @@ pub fn write_plugins(
     original_text_vec: Vec<String>,
     translated_text_vec: Vec<String>,
     logging: bool,
-    language: &str,
+    log_string: &str,
 ) {
     let hashmap: HashMap<&str, &str> = original_text_vec
         .par_iter()
@@ -535,16 +531,12 @@ pub fn write_plugins(
     const PREFIX: &str = "var $plugins =";
 
     write(
-        format!("{}/plugins.js", output_path),
-        format!("{}\n{}", PREFIX, to_string(&json).unwrap()),
+        format!("{output_path}/plugins.js"),
+        format!("{PREFIX}\n{}", to_string(&json).unwrap()),
     )
     .unwrap();
 
     if logging {
-        if language == "ru" {
-            println!("Записан файл plugins.js");
-        } else {
-            println!("Wrote file plugins.js");
-        }
+        println!("{log_string} plugins.js");
     }
 }
