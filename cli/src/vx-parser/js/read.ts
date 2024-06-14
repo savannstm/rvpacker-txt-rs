@@ -2,28 +2,27 @@ import { writeFileSync, readFileSync, readdirSync } from "fs";
 import { OrderedSet } from "immutable";
 import { getValueBySymbolDesc } from "./symbol-utils";
 import { load } from "@hyrious/marshal";
-import { dumpOriginalJSON } from "./dev-utils";
 
 export function readMap(inputDir: string, outputDir: string, logging: boolean, logString: string): void {
     const files = readdirSync(inputDir).filter(
         (filename) => filename.startsWith("Map") && !filename.startsWith("MapInfos")
     );
 
-    const jsonData = new Map(
+    const objMap = new Map(
         files.map((filename) => [filename, load(readFileSync(`${inputDir}/${filename}`)) as object])
     );
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
     const namesLines = OrderedSet().asMutable() as OrderedSet<string>;
 
-    for (const [filename, json] of jsonData.entries()) {
-        const displayName = getValueBySymbolDesc(json, "@display_name");
+    for (const [filename, obj] of objMap) {
+        const displayName = getValueBySymbolDesc(obj, "@display_name");
 
         if (displayName) {
             namesLines.add(displayName);
         }
 
-        const events: object = getValueBySymbolDesc(json, "@events");
+        const events: object = getValueBySymbolDesc(obj, "@events");
 
         for (const event of Object.values(events || {})) {
             const pages: object[] = getValueBySymbolDesc(event, "@pages");
@@ -102,15 +101,15 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
         return files.some((file) => filename.startsWith(file)) ? false : true;
     });
 
-    const jsonData: Map<string, object[]> = new Map(
-        filenames.map((filename) => [filename, load(readFileSync(`${inputDir}/${filename}`))! as object[]])
+    const objMap: Map<string, object[]> = new Map(
+        filenames.map((filename) => [filename, load(readFileSync(`${inputDir}/${filename}`)) as object[]])
     );
 
-    for (const [filename, json] of jsonData.entries()) {
+    for (const [filename, objArr] of objMap) {
         const lines: OrderedSet<string> = OrderedSet().asMutable() as OrderedSet<string>;
 
         if (!filename.toLowerCase().startsWith("commonevents") && !filename.startsWith("Troops")) {
-            for (const obj of json.slice(1)) {
+            for (const obj of objArr.slice(1)) {
                 const name: string = getValueBySymbolDesc(obj, "@name");
                 const description: string = getValueBySymbolDesc(obj, "@description");
                 const note: string = getValueBySymbolDesc(obj, "@note");
@@ -142,7 +141,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
         }
 
         if (filename.toLowerCase().startsWith("commonevents")) {
-            for (const obj of json.slice(1)) {
+            for (const obj of objArr.slice(1)) {
                 const list: object[] = getValueBySymbolDesc(obj, "@list");
 
                 if (!Array.isArray(list)) {
@@ -199,7 +198,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                 }
             }
         } else {
-            for (const obj of json.slice(1)) {
+            for (const obj of objArr.slice(1)) {
                 const pages = getValueBySymbolDesc(obj, "@pages");
 
                 for (const page of pages) {
@@ -281,13 +280,13 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
 
 export function readSystem(inputDir: string, outputDir: string, logging: boolean, logString: string): void {
     const systemPath = `${inputDir}/System.rvdata2`;
-    const json: object = load(readFileSync(systemPath)) as object;
+    const obj = load(readFileSync(systemPath)) as object;
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
     const symbols = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
 
     const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbols.map((symbol) =>
-        getValueBySymbolDesc(json, symbol)
+        getValueBySymbolDesc(obj, symbol)
     );
 
     for (const arr of [skillTypes, weaponTypes, armorTypes]) {

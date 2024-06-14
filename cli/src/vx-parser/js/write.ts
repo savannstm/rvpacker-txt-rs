@@ -40,8 +40,8 @@ function mergeSeq(json: object[]): object[] {
     return json;
 }
 
-export function mergeMap(json: object[]): object[] {
-    const events: object = getValueBySymbolDesc(json, "@events");
+export function mergeMap(obj: object): object {
+    const events: object = getValueBySymbolDesc(obj, "@events");
 
     for (const event of Object.values(events)) {
         const pages: object[] = getValueBySymbolDesc(event, "@pages");
@@ -55,11 +55,11 @@ export function mergeMap(json: object[]): object[] {
         }
     }
 
-    return json;
+    return obj;
 }
 
-export function mergeOther(json: object[]): object[] {
-    for (const element of json) {
+export function mergeOther(objArr: object[]): object[] {
+    for (const element of objArr) {
         const pages: object[] = getValueBySymbolDesc(element, "@pages");
 
         if (Array.isArray(pages)) {
@@ -76,25 +76,25 @@ export function mergeOther(json: object[]): object[] {
         }
     }
 
-    return json;
+    return objArr;
 }
 
 export function writeMap(
-    json: any,
+    objectsMap: Map<string, object>,
     outputDir: string,
     textMap: Map<string, string>,
     namesMap: Map<string, string>,
     logging: boolean,
     logString: string
 ): void {
-    for (const [f, file] of json) {
-        const displayName: string = getValueBySymbolDesc(file, "@display_name");
+    for (const [filename, obj] of objectsMap) {
+        const displayName: string = getValueBySymbolDesc(obj, "@display_name");
 
         if (namesMap.has(displayName)) {
-            setValueBySymbolDesc(file, "@display_name", namesMap.get(displayName)!);
+            setValueBySymbolDesc(obj, "@display_name", namesMap.get(displayName)!);
         }
 
-        const events: object = getValueBySymbolDesc(file, "@events");
+        const events: object = getValueBySymbolDesc(obj, "@events");
 
         for (const event of Object.values(events)) {
             const pages: object[] = getValueBySymbolDesc(event, "@pages");
@@ -138,33 +138,36 @@ export function writeMap(
             }
 
             if (logging) {
-                console.log(`${logString} ${f}`);
+                console.log(`${logString} ${filename}`);
             }
         }
 
-        writeFileSync(`${outputDir}/${f}`, dump(file));
+        writeFileSync(`${outputDir}/${filename}`, dump(obj));
     }
 }
 
 export function writeOther(
-    json: any,
+    objectsMap: Map<string, object[]>,
     outputDir: string,
     otherDir: string,
     logging: boolean,
     logString: string,
     drunk: number
 ): void {
-    for (const [f, file] of json) {
-        const otherOriginalText: string[] = readFileSync(`${otherDir}/${f.slice(0, f.lastIndexOf("."))}.txt`, "utf8")
-            .split("\n")
-            .map((l: string) => l.replaceAll("\\n", "\n"));
-
-        let otherTranslatedText: string[] = readFileSync(
-            `${otherDir}/${f.slice(0, f.lastIndexOf("."))}_trans.txt`,
+    for (const [filename, objArr] of objectsMap) {
+        const otherOriginalText: string[] = readFileSync(
+            `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}.txt`,
             "utf8"
         )
             .split("\n")
-            .map((l: string) => l.replaceAll("\\n", "\n"));
+            .map((string) => string.replaceAll("\\n", "\n"));
+
+        let otherTranslatedText: string[] = readFileSync(
+            `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`,
+            "utf8"
+        )
+            .split("\n")
+            .map((string) => string.replaceAll("\\n", "\n"));
 
         if (drunk > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
@@ -180,8 +183,8 @@ export function writeOther(
 
         const map = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
 
-        if (f !== "Commonevents.rvdata2" && f != "Troops.rvdata2") {
-            for (const element of file) {
+        if (!filename.toLowerCase().startsWith("commonevents") && !filename.startsWith("Troops")) {
+            for (const element of objArr) {
                 const name: string = getValueBySymbolDesc(element, "@name");
                 const description: string = getValueBySymbolDesc(element, "@description");
                 const note: string = getValueBySymbolDesc(element, "@note");
@@ -194,18 +197,18 @@ export function writeOther(
                     setValueBySymbolDesc(element, "@description", map.get(description));
                 }
 
-                if (f === "Classes.rvdata2" && map.has(note)) {
+                if (filename === "Classes.rvdata2" && map.has(note)) {
                     setValueBySymbolDesc(element, "@note", map.get(note));
                 }
             }
         } else {
-            for (const element of file.slice(1)) {
+            for (const element of objArr.slice(1)) {
                 const pages: object[] = getValueBySymbolDesc(element, "@pages");
-                const pagesLength: number = f == "Troops.rvdata2" ? pages.length : 1;
+                const pagesLength: number = filename == "Troops.rvdata2" ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
                     const list =
-                        f == "Troops.rvdata2"
+                        filename == "Troops.rvdata2"
                             ? getValueBySymbolDesc(pages[i], "@list")
                             : getValueBySymbolDesc(element, "@list");
 
@@ -249,15 +252,15 @@ export function writeOther(
         }
 
         if (logging) {
-            console.log(`${logString} ${f}`);
+            console.log(`${logString} ${filename}`);
         }
 
-        writeFileSync(`${outputDir}/${f}`, dump(file));
+        writeFileSync(`${outputDir}/${filename}`, dump(objArr));
     }
 }
 
 export function writeSystem(
-    json: any,
+    obj: object,
     outputDir: string,
     systemTextMap: Map<string, string>,
     logging: boolean,
@@ -265,7 +268,7 @@ export function writeSystem(
 ): void {
     const symbols = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
     const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbols.map((symbol) =>
-        getValueBySymbolDesc(json, symbol)
+        getValueBySymbolDesc(obj, symbol)
     );
 
     for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
@@ -273,12 +276,12 @@ export function writeSystem(
             if (element && systemTextMap.has(element)) {
                 arr[j] = systemTextMap.get(element);
 
-                setValueBySymbolDesc(json, symbols[i], arr);
+                setValueBySymbolDesc(obj, symbols[i], arr);
             }
         }
     }
 
-    setValueBySymbolDesc(json, currencyUnit, systemTextMap.get(currencyUnit));
+    setValueBySymbolDesc(obj, currencyUnit, systemTextMap.get(currencyUnit));
 
     const termsSymbols = Object.getOwnPropertySymbols(terms);
     const termsValues = termsSymbols.map((symbol) => terms[symbol]);
@@ -296,5 +299,6 @@ export function writeSystem(
     if (logging) {
         console.log(`${logString} System.rvdata2`);
     }
-    writeFileSync(`${outputDir}/System.rvdata2`, dump(json));
+
+    writeFileSync(`${outputDir}/System.rvdata2`, dump(obj));
 }

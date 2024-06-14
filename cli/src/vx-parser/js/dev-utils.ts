@@ -5,7 +5,7 @@ import { isTypedArray } from "util/types";
 
 export function dumpOriginalJSON(originalDir: string, outputDir: string) {
     const originalRubyFiles: string[] = readdirSync(originalDir).filter((filename: string) =>
-        filename.includes(".rvdata")
+        filename.endsWith(".rvdata")
     );
 
     for (const rubyFile of originalRubyFiles) {

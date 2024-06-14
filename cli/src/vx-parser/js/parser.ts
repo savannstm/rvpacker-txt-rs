@@ -242,12 +242,12 @@ program
 
         mkdirSync(outputDir, { recursive: true });
 
-        const mapsHashmap: Map<string, object[]> = new Map(
+        const mapsObjMap: Map<string, object> = new Map(
             readdirSync(paths.original)
                 .filter((filename: string) => filename.startsWith("Map"))
                 .map((filename: string) => [
                     filename,
-                    mergeMap(load(readFileSync(`${paths.original}/${filename}`)) as object[]),
+                    mergeMap(load(readFileSync(`${paths.original}/${filename}`)) as object),
                 ])
         );
 
@@ -287,25 +287,25 @@ program
             mapsOriginalNames.map((string, i) => [string, mapsTranslatedNames[i]])
         );
 
-        writeMap(mapsHashmap, outputDir, mapsTextHashmap, mapsNamesHashmap, log, localization.writeLogString);
+        writeMap(mapsObjMap, outputDir, mapsTextHashmap, mapsNamesHashmap, log, localization.writeLogString);
 
-        const otherHashmap: Map<string, object[]> = new Map(
+        const otherObjMap: Map<string, object[]> = new Map(
             readdirSync(`${inputDir}/original`)
                 .filter(
-                    (filename: string) =>
-                        !["Map", "Tilesets", "Animations", "States", "System"].some((prefix: string) =>
+                    (filename) =>
+                        !["Map", "Tilesets", "Animations", "States", "System"].some((prefix) =>
                             filename.startsWith(prefix)
                         )
                 )
-                .map((filename: string) => [
+                .map((filename) => [
                     filename,
                     mergeOther(load(readFileSync(`${paths.original}/${filename}`)) as object[]),
                 ])
         );
 
-        writeOther(otherHashmap, outputDir, paths.other, log, localization.writeLogString, drunkInt);
+        writeOther(otherObjMap, outputDir, paths.other, log, localization.writeLogString, drunkInt);
 
-        const systemJSON = load(readFileSync(`${paths.original}/System.rvdata2`));
+        const systemObj = load(readFileSync(`${paths.original}/System.rvdata2`)) as object;
 
         const systemOriginalText: string[] = readFileSync(`${paths.other}/system.txt`, "utf8").split("\n");
         let systemTranslatedText: string[] = readFileSync(`${paths.other}/system_trans.txt`, "utf8").split("\n");
@@ -326,7 +326,7 @@ program
             systemOriginalText.map((string, i) => [string, systemTranslatedText[i]])
         );
 
-        writeSystem(systemJSON, outputDir, systemTextHashmap, log, localization.writeLogString);
+        writeSystem(systemObj, outputDir, systemTextHashmap, log, localization.writeLogString);
     });
 
 program.parse(process.argv);
