@@ -1,11 +1,11 @@
-import { load } from "@hyrious/marshal";
-import { mkdirSync, readFileSync, readdirSync } from "fs";
+import { dump, load } from "@hyrious/marshal";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
 import { Help, Option, program } from "commander";
 import { getUserLocale } from "get-user-locale";
 import chalk from "chalk";
 
 import { readMap, readOther, readSystem, readScripts } from "./read";
-import { writeMap, mergeMap, mergeOther, writeOther, writeSystem } from "./write";
+import { mergeMap, mergeOther, writeMap, writeOther, writeSystem, writeScripts } from "./write";
 import "./shuffle";
 
 interface ProgramLocalization {
@@ -39,6 +39,7 @@ interface ProgramLocalization {
     drunkDesc: string;
     readLogString: string;
     writeLogString: string;
+    timeElapsed: string;
 }
 
 class ProgramLocalization {
@@ -82,6 +83,7 @@ class ProgramLocalization {
                     "At value 1: shuffles all translation lines. At value 2: shuffles all words in translation lines.";
                 this.readLogString = "Parsed file";
                 this.writeLogString = "Written file";
+                this.timeElapsed = "Time elapsed (in seconds):";
                 break;
             case "ru":
                 this.programDesc = "Инструмент, который парсит .rvdata файлы в текст и записывает их обратно.";
@@ -121,6 +123,7 @@ class ProgramLocalization {
                     "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
                 this.readLogString = "Распарсен файл";
                 this.writeLogString = "Записан файл";
+                this.timeElapsed = "Время выполнения (в секундах):";
                 break;
         }
 
@@ -133,28 +136,35 @@ class ProgramLocalization {
     }
 }
 
+const startTime = performance.now();
 const args = process.argv;
 
 let locale = getUserLocale();
 
-let language = locale.slice(0, locale.lastIndexOf("-"));
-switch (language) {
-    case "ru" && "be" && "uk":
+const allowedLanguages = ["ru", "en"];
+
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === "-l" || args[i] === "--language") {
+        if (allowedLanguages.includes(args[i + 1])) {
+            locale = args[i + 1];
+            break;
+        }
+    }
+}
+
+locale = locale.split("-")[0];
+
+let language;
+switch (locale) {
+    case "ru" || "uk" || "be":
         language = "ru";
+        break;
+    case "en":
+        language = "en";
         break;
     default:
         language = "en";
         break;
-}
-
-const allowedLanguages = ["ru", "en"];
-for (let i = 0; i < args.length; i++) {
-    if (args[i] === "-l" || args[i] === "--language") {
-        if (allowedLanguages.includes(args[i + 1])) {
-            language = args[i + 1];
-            break;
-        }
-    }
 }
 
 const localization = new ProgramLocalization(language);
@@ -176,7 +186,7 @@ program.configureHelp({
 });
 
 program.configureOutput({
-    writeErr: (str: string) => process.stderr.write(str.replace("error:", localization.error)),
+    writeErr: (str) => process.stderr.write(str.replace("error:", localization.error)),
 });
 
 program.usage(`[${localization.optionsType}] [${localization.commandType}]`);
@@ -202,13 +212,11 @@ program
 
         const paths: Record<string, string> = {
             original: `${inputDir}/original`,
-            parsed: `${outputDir}/parsed`,
-            maps: `${outputDir}/parsed/maps`,
-            other: `${outputDir}/parsed/other`,
-            plugins: `${outputDir}/parsed/plugins`,
+            maps: `${outputDir}/translation/maps`,
+            other: `${outputDir}/translation/other`,
+            plugins: `${outputDir}/translation/plugins`,
         };
 
-        mkdirSync(paths.parsed, { recursive: true });
         mkdirSync(paths.maps, { recursive: true });
         mkdirSync(paths.other, { recursive: true });
         mkdirSync(paths.plugins, { recursive: true });
@@ -216,6 +224,7 @@ program
         readMap(paths.original, paths.maps, log, localization.readLogString);
         readOther(paths.original, paths.other, log, localization.readLogString);
         readSystem(paths.original, paths.other, log, localization.readLogString);
+        readScripts(paths.original, paths.other, log, localization.readLogString);
     });
 
 program
@@ -238,34 +247,32 @@ program
             names: `${inputDir}/translation/maps/names.txt`,
             namesTrans: `${inputDir}/translation/maps/names_trans.txt`,
             other: `${inputDir}/translation/other`,
+            output: `${outputDir}/output/data`,
         };
 
-        mkdirSync(outputDir, { recursive: true });
+        mkdirSync(paths.output, { recursive: true });
 
-        const mapsObjMap: Map<string, object> = new Map(
+        const mapsObjMap = new Map(
             readdirSync(paths.original)
-                .filter((filename: string) => filename.startsWith("Map"))
-                .map((filename: string) => [
-                    filename,
-                    mergeMap(load(readFileSync(`${paths.original}/${filename}`)) as object),
-                ])
+                .filter((filename) => filename.startsWith("Map"))
+                .map((filename) => [filename, mergeMap(load(readFileSync(`${paths.original}/${filename}`)) as object)])
         );
 
-        const mapsOriginalText: string[] = readFileSync(paths.maps, "utf8")
+        const mapsOriginalText = readFileSync(paths.maps, "utf8")
             .split("\n")
-            .map((line: string) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("\\n", "\n").trim());
 
-        let mapsTranslatedText: string[] = readFileSync(paths.mapsTrans, "utf8")
+        let mapsTranslatedText = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line: string) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("\\n", "\n").trim());
 
-        const mapsOriginalNames: string[] = readFileSync(paths.names, "utf8")
+        const mapsOriginalNames = readFileSync(paths.names, "utf8")
             .split("\n")
-            .map((line: string) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("\\n", "\n").trim());
 
-        let mapsTranslatedNames: string[] = readFileSync(paths.mapsTrans, "utf8")
+        let mapsTranslatedNames = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line: string) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("\\n", "\n").trim());
 
         if (drunkInt > 0) {
             mapsTranslatedText = mapsTranslatedText.shuffle();
@@ -273,27 +280,24 @@ program
 
             if (drunkInt === 2) {
                 mapsTranslatedText = mapsTranslatedText.map((string) => {
-                    let words = string.split(new RegExp(" "));
-                    words = words.shuffle();
-                    return words.join(" ");
+                    return string
+                        .split("\n")
+                        .map((line) => line.split(" ").shuffle().join(" "))
+                        .join("\n");
                 });
             }
         }
 
-        const mapsTextHashmap: Map<string, string> = new Map(
-            mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]])
-        );
-        const mapsNamesHashmap: Map<string, string> = new Map(
-            mapsOriginalNames.map((string, i) => [string, mapsTranslatedNames[i]])
-        );
+        const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
+        const namesTranslationMap = new Map(mapsOriginalNames.map((string, i) => [string, mapsTranslatedNames[i]]));
 
-        writeMap(mapsObjMap, outputDir, mapsTextHashmap, mapsNamesHashmap, log, localization.writeLogString);
+        writeMap(mapsObjMap, paths.output, mapsTranslationMap, namesTranslationMap, log, localization.writeLogString);
 
-        const otherObjMap: Map<string, object[]> = new Map(
+        const otherObjMap = new Map(
             readdirSync(`${inputDir}/original`)
                 .filter(
                     (filename) =>
-                        !["Map", "Tilesets", "Animations", "States", "System"].some((prefix) =>
+                        !["Map", "Tilesets", "Animations", "States", "System", "Scripts"].some((prefix) =>
                             filename.startsWith(prefix)
                         )
                 )
@@ -303,30 +307,37 @@ program
                 ])
         );
 
-        writeOther(otherObjMap, outputDir, paths.other, log, localization.writeLogString, drunkInt);
+        writeOther(otherObjMap, paths.output, paths.other, log, localization.writeLogString, drunkInt);
 
         const systemObj = load(readFileSync(`${paths.original}/System.rvdata2`)) as object;
 
-        const systemOriginalText: string[] = readFileSync(`${paths.other}/system.txt`, "utf8").split("\n");
-        let systemTranslatedText: string[] = readFileSync(`${paths.other}/system_trans.txt`, "utf8").split("\n");
+        const systemOriginalText = readFileSync(`${paths.other}/system.txt`, "utf8").split("\n");
+        let systemTranslatedText = readFileSync(`${paths.other}/system_trans.txt`, "utf8").split("\n");
 
         if (drunkInt > 0) {
             systemTranslatedText = systemTranslatedText.shuffle();
 
             if (drunkInt === 2) {
                 systemTranslatedText = systemTranslatedText.map((string) => {
-                    let words = string.split(new RegExp(" "));
-                    words = words.shuffle();
-                    return words.join(" ");
+                    return string
+                        .split("\n")
+                        .map((line) => line.split(" ").shuffle().join(" "))
+                        .join("\n");
                 });
             }
         }
 
-        const systemTextHashmap: Map<string, string> = new Map(
-            systemOriginalText.map((string, i) => [string, systemTranslatedText[i]])
-        );
+        const systemTranslationMap = new Map(systemOriginalText.map((string, i) => [string, systemTranslatedText[i]]));
 
-        writeSystem(systemObj, outputDir, systemTextHashmap, log, localization.writeLogString);
+        writeSystem(systemObj, paths.output, systemTranslationMap, log, localization.writeLogString);
+
+        const scriptsArr = load(readFileSync(`${paths.original}/Scripts.rvdata2`), {
+            string: "binary",
+        }) as Uint8Array[][];
+        const scriptsTranslation = readFileSync(`${paths.other}/scripts_trans.txt`, "utf8").split("\n");
+
+        writeScripts(scriptsArr, scriptsTranslation, paths.output, log, localization.writeLogString);
     });
 
 program.parse(process.argv);
+console.log(`${localization.timeElapsed} ${(performance.now() - startTime) / 1000}`);

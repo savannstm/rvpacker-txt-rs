@@ -1,5 +1,7 @@
 import { writeFileSync, readFileSync } from "fs";
 import { dump } from "@hyrious/marshal";
+import { deflateSync } from "zlib";
+
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 
 function mergeSeq(json: object[]): object[] {
@@ -9,7 +11,7 @@ function mergeSeq(json: object[]): object[] {
     const stringArray: string[] = [];
 
     for (let i = 0; i < json.length; i++) {
-        const object: object = json[i];
+        const object = json[i];
         const code: number = getValueBySymbolDesc(object, "@code");
 
         if (code === 401) {
@@ -25,8 +27,8 @@ function mergeSeq(json: object[]): object[] {
             parameters[0] = stringArray.join("\n");
             setValueBySymbolDesc(json[first], "@parameters", parameters);
 
-            const startIndex: number = first + 1;
-            const itemsToDelete: number = startIndex + number;
+            const startIndex = first + 1;
+            const itemsToDelete = startIndex + number;
             json.splice(startIndex, itemsToDelete);
 
             stringArray.length = 0;
@@ -43,7 +45,7 @@ function mergeSeq(json: object[]): object[] {
 export function mergeMap(obj: object): object {
     const events: object = getValueBySymbolDesc(obj, "@events");
 
-    for (const event of Object.values(events)) {
+    for (const event of Object.values(events || {})) {
         const pages: object[] = getValueBySymbolDesc(event, "@pages");
         if (!pages) {
             continue;
@@ -59,8 +61,12 @@ export function mergeMap(obj: object): object {
 }
 
 export function mergeOther(objArr: object[]): object[] {
-    for (const element of objArr) {
-        const pages: object[] = getValueBySymbolDesc(element, "@pages");
+    for (const obj of objArr) {
+        if (!obj) {
+            continue;
+        }
+
+        const pages: object[] = getValueBySymbolDesc(obj, "@pages");
 
         if (Array.isArray(pages)) {
             for (const page of pages) {
@@ -68,10 +74,10 @@ export function mergeOther(objArr: object[]): object[] {
                 setValueBySymbolDesc(page, "@list", mergeSeq(list));
             }
         } else {
-            const list: object[] = getValueBySymbolDesc(element, "@list");
+            const list: object[] = getValueBySymbolDesc(obj, "@list");
 
             if (Array.isArray(list)) {
-                setValueBySymbolDesc(element, "@list", mergeSeq(list));
+                setValueBySymbolDesc(obj, "@list", mergeSeq(list));
             }
         }
     }
@@ -80,23 +86,23 @@ export function mergeOther(objArr: object[]): object[] {
 }
 
 export function writeMap(
-    objectsMap: Map<string, object>,
+    objMap: Map<string, object>,
     outputDir: string,
-    textMap: Map<string, string>,
-    namesMap: Map<string, string>,
+    textTranslationMap: Map<string, string>,
+    namesTranslationMap: Map<string, string>,
     logging: boolean,
     logString: string
 ): void {
-    for (const [filename, obj] of objectsMap) {
+    for (const [filename, obj] of objMap) {
         const displayName: string = getValueBySymbolDesc(obj, "@display_name");
 
-        if (namesMap.has(displayName)) {
-            setValueBySymbolDesc(obj, "@display_name", namesMap.get(displayName)!);
+        if (namesTranslationMap.has(displayName)) {
+            setValueBySymbolDesc(obj, "@display_name", namesTranslationMap.get(displayName)!);
         }
 
         const events: object = getValueBySymbolDesc(obj, "@events");
 
-        for (const event of Object.values(events)) {
+        for (const event of Object.values(events || {})) {
             const pages: object[] = getValueBySymbolDesc(event, "@pages");
             if (!pages) {
                 return;
@@ -117,16 +123,18 @@ export function writeMap(
                                     (parameter.startsWith("GabText") ||
                                         (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
                             ) {
-                                if (textMap.has(parameter)) {
-                                    parameters[i] = textMap.get(parameter)!;
+                                if (textTranslationMap.has(parameter)) {
+                                    parameters[i] = textTranslationMap.get(parameter)!;
                                     setValueBySymbolDesc(item, "@parameters", parameters);
                                 }
                             }
                         } else if (code == 102 && Array.isArray(parameter)) {
                             for (const [j, param] of (parameter as string[]).entries()) {
                                 if (typeof param === "string") {
-                                    if (textMap.has(param.replaceAll("\\n[", "\\N["))) {
-                                        (parameters[i][j] as string) = textMap.get(param.replaceAll("\\n[", "\\N["))!;
+                                    if (textTranslationMap.has(param.replaceAll("\\n[", "\\N["))) {
+                                        (parameters[i][j] as string) = textTranslationMap.get(
+                                            param.replaceAll("\\n[", "\\N[")
+                                        )!;
 
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
@@ -147,70 +155,75 @@ export function writeMap(
 }
 
 export function writeOther(
-    objectsMap: Map<string, object[]>,
+    objMap: Map<string, object[]>,
     outputDir: string,
     otherDir: string,
     logging: boolean,
     logString: string,
     drunk: number
 ): void {
-    for (const [filename, objArr] of objectsMap) {
-        const otherOriginalText: string[] = readFileSync(
+    for (const [filename, objArr] of objMap) {
+        const otherOriginalText = readFileSync(
             `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}.txt`,
             "utf8"
         )
             .split("\n")
             .map((string) => string.replaceAll("\\n", "\n"));
 
-        let otherTranslatedText: string[] = readFileSync(
+        let otherTranslatedText = readFileSync(
             `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`,
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("\\n", "\n"));
+            .map((string) => string.replaceAll("\\r\\n", "\r\n").replaceAll("\\n", "\n"));
 
         if (drunk > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
 
             if (drunk === 2) {
                 otherTranslatedText = otherTranslatedText.map((string) => {
-                    let words = string.split(new RegExp(" "));
-                    words = words.shuffle();
-                    return words.join(" ");
+                    return string
+                        .split("\n")
+                        .map((line) => line.split(" ").shuffle().join(" "))
+                        .join("\n");
                 });
             }
         }
 
-        const map = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
+        const translationMap = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
 
-        if (!filename.toLowerCase().startsWith("commonevents") && !filename.startsWith("Troops")) {
-            for (const element of objArr) {
-                const name: string = getValueBySymbolDesc(element, "@name");
-                const description: string = getValueBySymbolDesc(element, "@description");
-                const note: string = getValueBySymbolDesc(element, "@note");
-
-                if (map.has(name)) {
-                    setValueBySymbolDesc(element, "@name", map.get(name));
+        if (!filename.startsWith("Common") && !filename.startsWith("Troops")) {
+            for (const obj of objArr) {
+                if (!obj) {
+                    continue;
                 }
 
-                if (typeof description === "string" && map.has(description)) {
-                    setValueBySymbolDesc(element, "@description", map.get(description));
+                const name: string = getValueBySymbolDesc(obj, "@name");
+                const description: string = getValueBySymbolDesc(obj, "@description");
+                const note: string = getValueBySymbolDesc(obj, "@note");
+
+                if (translationMap.has(name)) {
+                    setValueBySymbolDesc(obj, "@name", translationMap.get(name));
                 }
 
-                if (filename === "Classes.rvdata2" && map.has(note)) {
-                    setValueBySymbolDesc(element, "@note", map.get(note));
+                if (typeof description === "string" && translationMap.has(description)) {
+                    setValueBySymbolDesc(obj, "@description", translationMap.get(description));
+                }
+
+                if (translationMap.has(note)) {
+                    setValueBySymbolDesc(obj, "@note", translationMap.get(note));
                 }
             }
         } else {
-            for (const element of objArr.slice(1)) {
-                const pages: object[] = getValueBySymbolDesc(element, "@pages");
-                const pagesLength: number = filename == "Troops.rvdata2" ? pages.length : 1;
+            for (const obj of objArr.slice(1)) {
+                const pages: object[] = getValueBySymbolDesc(obj, "@pages");
+                const pagesLength = filename == "Troops.rvdata2" ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
                     const list =
                         filename == "Troops.rvdata2"
                             ? getValueBySymbolDesc(pages[i], "@list")
-                            : getValueBySymbolDesc(element, "@list");
+                            : getValueBySymbolDesc(obj, "@list");
 
                     if (!Array.isArray(list)) {
                         for (const item of list) {
@@ -225,8 +238,8 @@ export function writeOther(
                                             (parameter.startsWith("GabText") ||
                                                 (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
                                     ) {
-                                        if (map.has(parameter)) {
-                                            parameters[i] = map.get(parameter)!;
+                                        if (translationMap.has(parameter)) {
+                                            parameters[i] = translationMap.get(parameter)!;
 
                                             setValueBySymbolDesc(item, "@parameters", parameters);
                                         }
@@ -234,8 +247,8 @@ export function writeOther(
                                 } else if (code === 102 && Array.isArray(parameter)) {
                                     for (const [j, param] of (parameter as string[]).entries()) {
                                         if (typeof param === "string") {
-                                            if (map.has(param.replaceAll("\\n[", "\\N["))) {
-                                                (parameters[i][j] as string) = map.get(
+                                            if (translationMap.has(param.replaceAll("\\n[", "\\N["))) {
+                                                (parameters[i][j] as string) = translationMap.get(
                                                     param.replaceAll("\\n[", "\\N[")
                                                 )!;
 
@@ -262,7 +275,7 @@ export function writeOther(
 export function writeSystem(
     obj: object,
     outputDir: string,
-    systemTextMap: Map<string, string>,
+    translationMap: Map<string, string>,
     logging: boolean,
     logString: string
 ): void {
@@ -273,23 +286,23 @@ export function writeSystem(
 
     for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
         for (const [j, element] of arr.entries()) {
-            if (element && systemTextMap.has(element)) {
-                arr[j] = systemTextMap.get(element);
+            if (element && translationMap.has(element)) {
+                arr[j] = translationMap.get(element);
 
                 setValueBySymbolDesc(obj, symbols[i], arr);
             }
         }
     }
 
-    setValueBySymbolDesc(obj, currencyUnit, systemTextMap.get(currencyUnit));
+    setValueBySymbolDesc(obj, currencyUnit, translationMap.get(currencyUnit));
 
     const termsSymbols = Object.getOwnPropertySymbols(terms);
     const termsValues = termsSymbols.map((symbol) => terms[symbol]);
 
     for (let i = 0; i < termsSymbols.length; i++) {
         for (const [j, termValue] of termsValues.entries()) {
-            if (systemTextMap.has(termValue[j])) {
-                termValue[j] = systemTextMap.get(termValue[j])!;
+            if (translationMap.has(termValue[j])) {
+                termValue[j] = translationMap.get(termValue[j])!;
             }
 
             setValueBySymbolDesc(terms, termsSymbols[i].description as string, termValue);
@@ -301,4 +314,31 @@ export function writeSystem(
     }
 
     writeFileSync(`${outputDir}/System.rvdata2`, dump(obj));
+}
+
+export function writeScripts(
+    obj: Uint8Array[][],
+    translationArr: string[],
+    outputDir: string,
+    logging: boolean,
+    logString: string
+): void {
+    const decoder = new TextDecoder();
+
+    for (let i = 0; i < obj.length; i++) {
+        if (obj[i][0] instanceof Uint8Array) {
+            obj[i][0] = decoder.decode(obj[i][0]);
+        }
+        if (obj[i][1] instanceof Uint8Array) {
+            obj[i][1] = decoder.decode(obj[i][1]);
+        }
+
+        obj[i][2] = deflateSync(translationArr[i].replaceAll("\\n", "\r\n"), { level: 6 });
+    }
+
+    if (logging) {
+        console.log(`${logString} Scripts.rvdata2`);
+    }
+
+    writeFileSync(`${outputDir}/Scripts.rvdata2`, dump(obj));
 }
