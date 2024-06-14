@@ -1,164 +1,332 @@
-import { dump, load } from "@hyrious/marshal";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
-import { OrderedSet } from "immutable";
-import { parseArgs, inspect } from "util";
-import { isTypedArray } from "util/types";
-import { readMap, readOther, readSystem } from "./read";
+import { load } from "@hyrious/marshal";
+import { mkdirSync, readFileSync, readdirSync } from "fs";
+import { Help, Option, program } from "commander";
+import { getUserLocale } from "get-user-locale";
+import chalk from "chalk";
+
+import { readMap, readOther, readSystem, readScripts } from "./read";
 import { writeMap, mergeMap, mergeOther, writeOther, writeSystem } from "./write";
-import { program } from "commander";
+import "./shuffle";
 
-/*
-const { values, positionals } = parseArgs({
-    args: process.argv,
+interface ProgramLocalization {
+    programDesc: string;
+    languageDesc: string;
+    inputDirType: string;
+    outputDirType: string;
+    readInputDirDesc: string;
+    readOutputDirDesc: string;
+    writeInputDirDesc: string;
+    writeOutputDirDesc: string;
+    helpOptionDesc: string;
+    helpCommandDesc: string;
+    helpCommandType: string;
+    usage: string;
+    arguments: string;
+    commands: string;
+    options: string;
+    error: string;
+    optionsType: string;
+    commandType: string;
+    readDesc: string;
+    writeDesc: string;
+    default: string;
+    choices: string;
+    false: string;
+    true: string;
+    logOptionDesc: string;
+    languageType: string;
+    drunkType: string;
+    drunkDesc: string;
+    readLogString: string;
+    writeLogString: string;
+}
 
-    options: {
-        command: {
-            type: "string",
-        },
-        inputDir: {
-            type: "string",
-        },
-        outputDir: {
-            type: "string",
-        },
-    },
-    strict: true,
-    allowPositionals: true,
+class ProgramLocalization {
+    constructor(language: string) {
+        switch (language) {
+            case "en":
+                this.programDesc = "A tool, that parses .rvdata files into text and writes them back.";
+                this.languageDesc = "Sets tool language to specified.";
+                this.inputDirType = "INPUT_PATH";
+                this.outputDirType = "OUTPUT_PATH";
+                this.readInputDirDesc =
+                    'Path to the input directory, containing a "original" folder with .rvdata files.';
+                this.readOutputDirDesc =
+                    'Path to the output directory, where the "parsed" folder with .txt files with text from the parsed .rvdata files will be created.';
+                this.writeInputDirDesc =
+                    'Path to the input directory, containing folders "original" with original game .rvdata files, and "translation" with "maps" and "other" folders with .txt game files.';
+                this.writeOutputDirDesc =
+                    'Path to the output directory, where the "output" folder with .rvdata files will be created out of .txt translation files.';
+                this.helpOptionDesc = "Prints this help message.";
+                this.helpCommandDesc = "Prints a help message for specified command.";
+                this.helpCommandType = "COMMAND_NAME";
+                this.usage = "Usage:";
+                this.arguments = "Arguments;";
+                this.commands = "Commands:";
+                this.options = "Options:";
+                this.error = "error:";
+                this.optionsType = "OPTIONS";
+                this.commandType = "COMMAND";
+                this.readDesc =
+                    'Parses .rvdata files from the "original" folder of input directory to the "parsed" folder of output directory.';
+                this.writeDesc =
+                    'Writes translated .rvdata files using original files from the "original" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
+                this.default = "default:";
+                this.choices = "choices:";
+                this.false = "false";
+                this.true = "true";
+                this.logOptionDesc = "Enables logging.";
+                this.languageType = "LANGUAGE";
+                this.drunkType = "NUMBER";
+                this.drunkDesc =
+                    "At value 1: shuffles all translation lines. At value 2: shuffles all words in translation lines.";
+                this.readLogString = "Parsed file";
+                this.writeLogString = "Written file";
+                break;
+            case "ru":
+                this.programDesc = "Инструмент, который парсит .rvdata файлы в текст и записывает их обратно.";
+                this.languageDesc = "Устанавливает язык инструмента на введённый.";
+                this.inputDirType = "ВХОДНОЙ_ПУТЬ";
+                this.outputDirType = "ВЫХОДНОЙ_ПУТЬ";
+                this.readInputDirDesc = 'Путь к директории входа, содержащей папку "original" с .rvdata файлами игры.';
+                this.readOutputDirDesc =
+                    'Путь к директории выхода, в которой будет создана папка "parsed" с .txt файлами из распарсенных .rvdata файлов.';
+                this.writeInputDirDesc =
+                    'Путь к директории входа, содержащей папки "original" с оригинальными .rvdata файлами игры, и "translation" с папками "maps" и "other" с .txt файлами игры.';
+                this.writeOutputDirDesc =
+                    'Путь к директории выхода, в которой будет создана папка "output" с .rvdata файлами, созданными из .txt файлов с переводом.';
+                this.helpOptionDesc = "Выводит эту справку.";
+                this.helpCommandDesc = "Выводит справку для указанной команды.";
+                this.helpCommandType = "ИМЯ_КОМАНДЫ";
+                this.usage = "Использование:";
+                this.arguments = "Аргументы:";
+                this.commands = "Команды:";
+                this.options = "Опции:";
+                this.error = "ошибка:";
+                this.optionsType = "ОПЦИИ";
+                this.commandType = "КОМАНДА";
+                this.readDesc =
+                    'Парсит .rvdata файлы из папки "original" входной директории в папку "parsed" выходной директории.';
+                this.writeDesc = "";
+                this.default = "по умолчанию:";
+                this.choices = "варианты:";
+                this.false = "нет";
+                this.true = "да";
+                this.logOptionDesc = "Включает логирование.";
+                this.languageType = "ЯЗЫК";
+                this.drunkType = "ЧИСЛО";
+                this.writeDesc =
+                    'Записывает переведенные файлы .rvdata, используя исходные файлы из папки "original" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
+                this.drunkDesc =
+                    "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
+                this.readLogString = "Распарсен файл";
+                this.writeLogString = "Записан файл";
+                break;
+        }
+
+        this.usage = chalk.bold.underline(this.usage);
+        this.arguments = chalk.bold.underline(this.arguments);
+        this.commands = chalk.bold.underline(this.commands);
+        this.options = chalk.bold.underline(this.options);
+        this.optionsType = chalk.bold(this.optionsType);
+        this.commandType = chalk.bold(this.commandType);
+    }
+}
+
+const args = process.argv;
+
+let locale = getUserLocale();
+
+let language = locale.slice(0, locale.lastIndexOf("-"));
+switch (language) {
+    case "ru" && "be" && "uk":
+        language = "ru";
+        break;
+    default:
+        language = "en";
+        break;
+}
+
+const allowedLanguages = ["ru", "en"];
+for (let i = 0; i < args.length; i++) {
+    if (args[i] === "-l" || args[i] === "--language") {
+        if (allowedLanguages.includes(args[i + 1])) {
+            language = args[i + 1];
+            break;
+        }
+    }
+}
+
+const localization = new ProgramLocalization(language);
+
+program.description(localization.programDesc);
+
+program.configureHelp({
+    formatHelp: (cmd, helper) =>
+        new Help()
+            .formatHelp(cmd, helper)
+            .replace("Arguments:", localization.arguments)
+            .replace("Commands:", localization.commands)
+            .replace("Options:", localization.options)
+            .replace("Usage:", localization.usage)
+            .replaceAll("default:", localization.default)
+            .replaceAll("choices:", localization.choices)
+            .replaceAll("false", localization.false)
+            .replaceAll("true", localization.true),
 });
-*/
 
-program.description("Parse .rvdata files and write .json files");
+program.configureOutput({
+    writeErr: (str: string) => process.stderr.write(str.replace("error:", localization.error)),
+});
+
+program.usage(`[${localization.optionsType}] [${localization.commandType}]`);
+
+program.helpOption("-h, --help", localization.helpOptionDesc);
+program.helpCommand(`help [${localization.helpCommandType}]`, localization.helpCommandDesc);
+
 program
-    .requiredOption("-c, --command <command>", "Command")
-    .option("-i, --inputDir <inputDir>", "Input directory")
-    .option("-o, --outputDir <outputDir>", "Output directory")
-    .parse();
+    .option("--log", localization.logOptionDesc, false)
+    .addOption(
+        new Option(`-l, --language <${localization.languageType}>`, localization.languageDesc).choices(allowedLanguages)
+    );
 
-const options = program.opts();
+program
+    .command("read")
+    .option(`-i, --inputDir <${localization.inputDirType}>`, localization.readInputDirDesc, "./")
+    .option(`-o, --outputDir <${localization.outputDirType}>`, localization.readOutputDirDesc, "./")
+    .usage(localization.optionsType)
+    .description(localization.readDesc)
+    .action(function () {
+        const { inputDir, outputDir }: { [key: string]: string } = this.opts();
+        const { log } = program.opts();
 
-const { command, inputDir, outputDir } = options;
+        const paths: Record<string, string> = {
+            original: `${inputDir}/original`,
+            parsed: `${outputDir}/parsed`,
+            maps: `${outputDir}/parsed/maps`,
+            other: `${outputDir}/parsed/other`,
+            plugins: `${outputDir}/parsed/plugins`,
+        };
 
-function dumpOriginalJSON(originalDir: string, outputDir: string) {
-    const originalRubyFiles: string[] = readdirSync(originalDir).filter((f: string) => f.includes(".rvdata"));
+        mkdirSync(paths.parsed, { recursive: true });
+        mkdirSync(paths.maps, { recursive: true });
+        mkdirSync(paths.other, { recursive: true });
+        mkdirSync(paths.plugins, { recursive: true });
 
-    for (const rubyFile of originalRubyFiles) {
-        const data: object = load(readFileSync(`${originalDir}/${rubyFile}`)) as object;
-        const inspectable: string = inspect(data, {
-            showHidden: true,
-            depth: null,
-            maxArrayLength: null,
-            maxStringLength: null,
-        });
+        readMap(paths.original, paths.maps, log, localization.readLogString);
+        readOther(paths.original, paths.other, log, localization.readLogString);
+        readSystem(paths.original, paths.other, log, localization.readLogString);
+    });
 
-        mkdirSync(`${outputDir}/inspectable`, { recursive: true });
-        writeFileSync(
-            `${outputDir}/inspectable/${rubyFile.slice(0, rubyFile.lastIndexOf("."))}.json`,
-            inspectable,
-            "utf8"
+program
+    .command("write")
+    .option(`-i, --inputDir <${localization.inputDirType}>`, localization.writeInputDirDesc, "./")
+    .option(`-o, --outputDir <${localization.outputDirType}>`, localization.writeOutputDirDesc, "./")
+    .option(`-d, --drunk <${localization.drunkType}>`, localization.drunkDesc, "0")
+    .usage(localization.optionsType)
+    .description(localization.writeDesc)
+    .action(function () {
+        const { inputDir, outputDir, drunk }: { [key: string]: string } = this.opts();
+        const { log } = program.opts();
+
+        const drunkInt = Number.parseInt(drunk);
+
+        const paths: Record<string, string> = {
+            original: `${inputDir}/original`,
+            maps: `${inputDir}/translation/maps/maps.txt`,
+            mapsTrans: `${inputDir}/translation/maps/maps_trans.txt`,
+            names: `${inputDir}/translation/maps/names.txt`,
+            namesTrans: `${inputDir}/translation/maps/names_trans.txt`,
+            other: `${inputDir}/translation/other`,
+        };
+
+        mkdirSync(outputDir, { recursive: true });
+
+        const mapsHashmap: Map<string, object[]> = new Map(
+            readdirSync(paths.original)
+                .filter((filename: string) => filename.startsWith("Map"))
+                .map((filename: string) => [
+                    filename,
+                    mergeMap(load(readFileSync(`${paths.original}/${filename}`)) as object[]),
+                ])
         );
-    }
-}
 
-function dumpReadableJSON(originalDir: string, outputDir: string) {
-    const originalRubyFiles: string[] = readdirSync(originalDir).filter((f: string) => f.includes(".rvdata"));
-
-    mkdirSync(`${outputDir}/readable`, { recursive: true });
-    for (const rubyFile of originalRubyFiles) {
-        const data: object = load(readFileSync(`${originalDir}/${rubyFile}`), { ivarToString: "" }) as object;
-
-        writeFileSync(
-            `${outputDir}/readable/${rubyFile.slice(0, rubyFile.lastIndexOf("."))}.json`,
-            JSON.stringify(
-                data,
-                (_, value: any) =>
-                    isTypedArray(value) && !(value instanceof BigInt64Array || value instanceof BigUint64Array)
-                        ? Array.from(value)
-                        : value,
-                4
-            ),
-            "utf8"
-        );
-    }
-}
-
-switch (command) {
-    case "dump":
-        dumpReadableJSON(inputDir, outputDir);
-        break;
-    case "read":
-        readMap(inputDir, outputDir);
-        readOther(inputDir, outputDir);
-        readSystem(inputDir, outputDir);
-        break;
-    case "write":
-        const mapsHashmap: any = new Map();
-
-        for (const filename of readdirSync(`${inputDir}/original`).filter((f: string) => f.startsWith("Map"))) {
-            mapsHashmap.set(filename, mergeMap(load(readFileSync(`${inputDir}/original/${filename}`))));
-        }
-
-        const mapsOriginalText: string[] = readFileSync(`${inputDir}/translation/maps/maps.txt`, "utf8")
+        const mapsOriginalText: string[] = readFileSync(paths.maps, "utf8")
             .split("\n")
-            .map((l) => l.replaceAll("\\n", "\n").trim());
+            .map((line: string) => line.replaceAll("\\n", "\n").trim());
 
-        const mapsTranslatedText: string[] = readFileSync(`${inputDir}/translation/maps/maps_trans.txt`, "utf8")
+        let mapsTranslatedText: string[] = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((l) => l.replaceAll("\\n", "\n").trim());
+            .map((line: string) => line.replaceAll("\\n", "\n").trim());
 
-        const mapsOriginalNames: string[] = readFileSync(`${inputDir}/translation/maps/names.txt`, "utf8")
+        const mapsOriginalNames: string[] = readFileSync(paths.names, "utf8")
             .split("\n")
-            .map((l) => l.replaceAll("\\n", "\n").trim());
+            .map((line: string) => line.replaceAll("\\n", "\n").trim());
 
-        const mapsTranslatedNames: string[] = readFileSync(`${inputDir}/translation/maps/names_trans.txt`, "utf8")
+        let mapsTranslatedNames: string[] = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((l) => l.replaceAll("\\n", "\n").trim());
+            .map((line: string) => line.replaceAll("\\n", "\n").trim());
 
-        const mapsTextHashmap: Map<string, string> = new Map();
-        const mapsNamesHashmap: Map<string, string> = new Map();
+        if (drunkInt > 0) {
+            mapsTranslatedText = mapsTranslatedText.shuffle();
+            mapsTranslatedNames = mapsTranslatedNames.shuffle();
 
-        for (let i = 0; i < mapsOriginalText.length; i++) {
-            mapsTextHashmap.set(mapsOriginalText[i], mapsTranslatedText[i]);
-        }
-
-        for (let i = 0; i < mapsOriginalNames.length; i++) {
-            mapsNamesHashmap.set(mapsOriginalNames[i], mapsTranslatedNames[i]);
-        }
-
-        writeMap(mapsHashmap, outputDir, mapsTextHashmap, mapsNamesHashmap);
-
-        const otherHashmap: any = new Map();
-
-        for (const filename of readdirSync(`${inputDir}/original`).filter((f: string) => {
-            const FILENAMES: string[] = ["Map", "Tilesets", "Animations", "States", "System"];
-            for (const filename of FILENAMES) {
-                if (f.startsWith(filename)) {
-                    return false;
-                }
+            if (drunkInt === 2) {
+                mapsTranslatedText = mapsTranslatedText.map((string) => {
+                    let words = string.split(new RegExp(" "));
+                    words = words.shuffle();
+                    return words.join(" ");
+                });
             }
-            return true;
-        })) {
-            otherHashmap.set(filename, mergeOther(load(readFileSync(`${inputDir}/original/${filename}`))));
         }
 
-        writeOther(otherHashmap, outputDir, `${inputDir}/translation/other`);
-
-        const systemJSON: string = load(readFileSync(`${inputDir}/original/System.rvdata2`)) as string;
-
-        const systemOriginalText: string[] = readFileSync(`${inputDir}/translation/other/system.txt`, "utf8").split(
-            "\n"
+        const mapsTextHashmap: Map<string, string> = new Map(
+            mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]])
+        );
+        const mapsNamesHashmap: Map<string, string> = new Map(
+            mapsOriginalNames.map((string, i) => [string, mapsTranslatedNames[i]])
         );
 
-        const systemTranslatedText: string[] = readFileSync(
-            `${inputDir}/translation/other/system_trans.txt`,
-            "utf8"
-        ).split("\n");
+        writeMap(mapsHashmap, outputDir, mapsTextHashmap, mapsNamesHashmap, log, localization.writeLogString);
 
-        const systemTextHashmap: Map<string, string> = new Map();
+        const otherHashmap: Map<string, object[]> = new Map(
+            readdirSync(`${inputDir}/original`)
+                .filter(
+                    (filename: string) =>
+                        !["Map", "Tilesets", "Animations", "States", "System"].some((prefix: string) =>
+                            filename.startsWith(prefix)
+                        )
+                )
+                .map((filename: string) => [
+                    filename,
+                    mergeOther(load(readFileSync(`${paths.original}/${filename}`)) as object[]),
+                ])
+        );
 
-        for (let i = 0; i < systemOriginalText.length; i++) {
-            systemTextHashmap.set(systemOriginalText[i], systemTranslatedText[i]);
+        writeOther(otherHashmap, outputDir, paths.other, log, localization.writeLogString, drunkInt);
+
+        const systemJSON = load(readFileSync(`${paths.original}/System.rvdata2`));
+
+        const systemOriginalText: string[] = readFileSync(`${paths.other}/system.txt`, "utf8").split("\n");
+        let systemTranslatedText: string[] = readFileSync(`${paths.other}/system_trans.txt`, "utf8").split("\n");
+
+        if (drunkInt > 0) {
+            systemTranslatedText = systemTranslatedText.shuffle();
+
+            if (drunkInt === 2) {
+                systemTranslatedText = systemTranslatedText.map((string) => {
+                    let words = string.split(new RegExp(" "));
+                    words = words.shuffle();
+                    return words.join(" ");
+                });
+            }
         }
 
-        writeSystem(systemJSON, outputDir, systemTextHashmap);
-        break;
-}
+        const systemTextHashmap: Map<string, string> = new Map(
+            systemOriginalText.map((string, i) => [string, systemTranslatedText[i]])
+        );
+
+        writeSystem(systemJSON, outputDir, systemTextHashmap, log, localization.writeLogString);
+    });
+
+program.parse(process.argv);

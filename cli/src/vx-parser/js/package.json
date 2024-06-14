@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "@hyrious/marshal": "^0.3.3",
+    "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "get-user-locale": "^2.3.2",
     "immutable": "^4.3.6"
   },
   "devDependencies": {
