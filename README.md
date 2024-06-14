@@ -8,8 +8,8 @@
 
 После того, как вы внесли изменения в файлы \_trans.txt в директории `translation` - **запустите бинарный файл json-writer с командой write**.
 
-Вы также можете использовать команду `read`, чтобы извлечь текст из .json файлов, находящихся в директории `original`. Проще говоря, это значит что вы можете переместить .json файлы любой игры, сделанной с помощью RPG Maker MV в директорию `original`, а затем извлечь их используя **json-writer read**. 
-Извлеченный текст в формате .txt файлов будет находится по пути `cli/parsed`.
+Вы также можете использовать команду `read`, чтобы извлечь текст из .json файлов, находящихся в директории `original`. Проще говоря, это значит что вы можете переместить .json файлы любой игры, сделанной с помощью RPG Maker MV в директорию `original`, а затем извлечь их используя **json-writer read**.
+Извлеченный текст в формате .txt файлов будет находится по пути `cli/translation`.
 
 json-writer поддерживает различные команды и аргументы - чтобы получить сводку, вызовите `json-writer -h` или `json-writer --help`.
 
@@ -68,8 +68,8 @@ This directory contains program's CLI verison. This is your choice, if you want 
 
 After you edited the \_trans.txt files in `translation` directory - **run json-writer binary with write command**.
 
-You can also use the `read` command to extract the text from .json files located in the `original` directory. Simply put, it means that you can move .json files of any game made with RPG Maker MV to the `original` directory, and then extract them using **json-writer read**. 
-The extracted text in the .txt files format will be located in the `cli/parsed` path. 
+You can also use the `read` command to extract the text from .json files located in the `original` directory. Simply put, it means that you can move .json files of any game made with RPG Maker MV to the `original` directory, and then extract them using **json-writer read**.
+The extracted text in the .txt files format will be located in the `cli/translation` path.
 
 json-writer supports different commands and arguments - to receive help, use `json-writer -h` or `json-writer --help`.
 
