@@ -11,11 +11,11 @@ Party talk
 Check up on your party.
 Hack
 Pinecone pig
-Animated figure of a pinecone pig. A loyal companion\nuntil it's very end.
+Animated figure of a pinecone pig. A loyal companion/#until it's very end.
 Talk
 Talking can sometimes get you out of uncomfortable situations.
 Hurting
-Create a devastating vortex out of your concentrated feelings \nof hurting and hatred. Requires 1 Rev Point.
+Create a devastating vortex out of your concentrated feelings /#of hurting and hatred. Requires 1 Rev Point.
 Scratch
 Stump arm
 Slam
@@ -25,7 +25,7 @@ Small fire attack with lantern.
 Sickle
 Manic stab
 Necromancy
-Bring back life to where it once lingered. The bond between\nthe body and the soul must still be relatively fresh for the\nnecromancy to work.
+Bring back life to where it once lingered. The bond between/#the body and the soul must still be relatively fresh for the/#necromancy to work.
 Pipe smash
 The moonscorched is tearing his face apart...
 The moonscorched is shaking uncontrollably.
@@ -35,10 +35,10 @@ Pickpocket valuables from the enemy pockets.
 Explosion
 Poison tongue
 Suicide
-There are worse fates than death. Sometimes it's\ngood to go on your own terms...
+There are worse fates than death. Sometimes it's/#good to go on your own terms...
 Low sweep
 Run
-There is no shame in running away from battles. Live to see\nanother day.
+There is no shame in running away from battles. Live to see/#another day.
 Critical slash
 Pyromancy trick
 A simple pyromancy trick to cause burns to your opponent.
@@ -51,9 +51,9 @@ Summon a swarm of rats to disrupt the enemy.
 Guard break
 Break through the defence of the opponent.
 Blood golem
-Sacrifice blood to summon a golem that fights by your side\ntemporarily. The golem only takes orders from the one that\ngave birth to it. Requires 1 Rev Point.
+Sacrifice blood to summon a golem that fights by your side/#temporarily. The golem only takes orders from the one that/#gave birth to it. Requires 1 Rev Point.
 Pheromones
-Release of pheromones that makes the opponent divert all\nattention to the target.
+Release of pheromones that makes the opponent divert all/#attention to the target.
 Rock smash
 Smash
 Snatch
@@ -63,26 +63,26 @@ Nasty bite
 The ghoul stares at you with it's dead fish eyes...
 Cinder
 Needle worms
-Harness the strength of a hundred leeches. The price is\nthat you have to carry them inside you as parasites...
+Harness the strength of a hundred leeches. The price is/#that you have to carry them inside you as parasites...
 Needle worm
 The yellow mage forms magical hand signs...
 Chains of torment
-Summon the chains that tormented Chambara for hundreds\nof years.
+Summon the chains that tormented Chambara for hundreds/#of years.
 En garde
-Long combat experience has prepared you for fights.\nPrepare for an attack to gain advantage by pressing [E].
+Long combat experience has prepared you for fights./#Prepare for an attack to gain advantage by pressing [E].
 Ritual spear
 Flock of crows
 Black orb
-A concentrated negative energy that can be hurled at your\nopponent multiple times. The orb maintains its form only\ntemporarily before the ill will disperses.
+A concentrated negative energy that can be hurled at your/#opponent multiple times. The orb maintains its form only/#temporarily before the ill will disperses.
 Healing whispers
-Whispers carried by the older god Sylvian heal wounds\nand mend injuries.
+Whispers carried by the older god Sylvian heal wounds/#and mend injuries.
 Inject
 Ritual knife
 Axe kick
 Rusty claw
 Whispers of Gro-goroth
 Combustion
-A talented wizard can control the heat in the atmosphere\nand create a large combustion of fire and flames to devour\ntheir opponents. Requires 1 Rev Point.
+A talented wizard can control the heat in the atmosphere/#and create a large combustion of fire and flames to devour/#their opponents. Requires 1 Rev Point.
 Dodge roll
 Kick
 Face rip
@@ -91,7 +91,7 @@ The leg is hanging loose.
 Cutlass
 Molten gold
 A simple pyromancy trick to burn your opponents.
-A large combustion of fire and flames. Requires 1 Rev\nPoint.
+A large combustion of fire and flames. Requires 1 Rev/#Point.
 Suckerpunch
 Shield bash
 Light blue vial
@@ -99,7 +99,7 @@ The outlander aims carefully...
 Gaping mouth
 Summon Asterisk
 Salvation
-Concentrated whispers carried by the older god Sylvian. Heals\na considerable amount of health of all the party members.
+Concentrated whispers carried by the older god Sylvian. Heals/#a considerable amount of health of all the party members.
 Purifying ember
 Purifying black flames
 The creature is wriggling in pain...
@@ -110,7 +110,7 @@ Double-arm smash
 Plague touch
 Punch
 Loving whispers
-Concentrated whispers carried out by the older god Sylvian.\nHeals a considerable amount of health. Precariously the whisper's\neffects are solely based on Sylvian's whims.
+Concentrated whispers carried out by the older god Sylvian./#Heals a considerable amount of health. Precariously the whisper's/#effects are solely based on Sylvian's whims.
 Summon the deity of the good luck. The pinecone pig.
 Gauntlet punch
 Spider bite
@@ -136,12 +136,12 @@ War cry
 Provoke the enemy into attacking you.
 Chomp
 Rebirth of the beloved
-A hidden love magic that is said to bring back the one\nyou loved the most.
+A hidden love magic that is said to bring back the one/#you loved the most.
 Escape plan
-A skill that greatly enhances your chances of running away\nfrom fights. Planning for an escape in advance pays off.\nA passive skill.
+A skill that greatly enhances your chances of running away/#from fights. Planning for an escape in advance pays off./#A passive skill.
 Stomp
 Rot
-Rot the victim from inside out to make them vulnerable to \nattacks. Requires 1 Rev Point.
+Rot the victim from inside out to make them vulnerable to /#attacks. Requires 1 Rev Point.
 Janitor
 The villager sets up a bear trap
 Bear trap
@@ -158,18 +158,18 @@ Idle swing...
 Mastery over vermin
 Gain the ability to talk to those who are often left unseen.
 Flesh puppetry
-Puppeteer severed limbs at your disposal to attack the enemy.\nYou need sawed off limbs to do this.
+Puppeteer severed limbs at your disposal to attack the enemy./#You need sawed off limbs to do this.
 Mind read
-A moon magic that reveal the inner thoughts of your\nfellow humans.
+A moon magic that reveal the inner thoughts of your/#fellow humans.
 Grasp of a giant
 The monster grabs you by the face!
 Gun proficiency
-Proficiency with firearms gives you greater accuracy while\nshooting. A passive skill.
+Proficiency with firearms gives you greater accuracy while/#shooting. A passive skill.
 Gunslinger
-Advanced use of pistols. Precise shots can occasionally \ndismember opponents. Used on field.
+Advanced use of pistols. Precise shots can occasionally /#dismember opponents. Used on field.
 Executioner
-Advanced use of trenchguns. You are able to execute a stunned\nenemy by shooting it again on the field.
-Advanced use of rifles. You are able to one-shot enemies\nwith the rifle every now and then. Used on field.
+Advanced use of trenchguns. You are able to execute a stunned/#enemy by shooting it again on the field.
+Advanced use of rifles. You are able to one-shot enemies/#with the rifle every now and then. Used on field.
 Giant fork
 Giant knife
 The gentleman makes gurggling sounds...
@@ -178,13 +178,13 @@ Canister smash
 Gas is leaking from Vile's canister...
 Doomsday trumpet
 Engrave
-Engrave a sigil on a party member. The benefit of the sigil varies\ndepeding on the god it belongs to. Historically sigils were carved\non the body, but modern practition prefers face sigils.
+Engrave a sigil on a party member. The benefit of the sigil varies/#depeding on the god it belongs to. Historically sigils were carved/#on the body, but modern practition prefers face sigils.
 Rampage
 A vicious ramming attack.
 Advanced occultism
-Your advanced knowledge in occult arts enables you to start \na battle with an extra Rev point. A passive skill.
+Your advanced knowledge in occult arts enables you to start /#a battle with an extra Rev point. A passive skill.
 Meditation
-Reach a higher state of awareness. Meditate while guarding to gain \nextra Rev points on that turn.
+Reach a higher state of awareness. Meditate while guarding to gain /#extra Rev points on that turn.
 Mucus and slime drips from the trout...
 Shoot
 Critical shot
@@ -202,19 +202,19 @@ Needle whip
 Mystery injection
 Baton
 Organ harvest
-Harvest organs from fallen foes to sacrifice them with your\nmedicinal skills. The desecration of bodies used to be a taboo\nsubject, but it is now widely used among medical practitioners.
+Harvest organs from fallen foes to sacrifice them with your/#medicinal skills. The desecration of bodies used to be a taboo/#subject, but it is now widely used among medical practitioners.
 Medicinal
-Sacrifice harvested organs to Vitruvia, the architect of the human\nbody. A sacrifice will cure a corresponding status ailment. Medicinal\nis based on the law where every action has an equal reaction.
+Sacrifice harvested organs to Vitruvia, the architect of the human/#body. A sacrifice will cure a corresponding status ailment. Medicinal/#is based on the law where every action has an equal reaction.
 Magna-medicinal
-A greater form of medicinal where the surgeon will sacrifice\ntheir own limbs in exhange for human life. The procedure must be\nperformed on the spot during an encounter to work properly.
+A greater form of medicinal where the surgeon will sacrifice/#their own limbs in exhange for human life. The procedure must be/#performed on the spot during an encounter to work properly.
 Analyze
-Study the anatomy of your opponent to quickly find the biggest\nweaknesses it their physique.
+Study the anatomy of your opponent to quickly find the biggest/#weaknesses it their physique.
 Trapcraft
-Craft bear traps and booby traps from different utility items.\nUsed in the Crafting menu.
+Craft bear traps and booby traps from different utility items./#Used in the Crafting menu.
 Weaponcraft
-Use your imagination to craft unique weapons from different\nutility items. Used in the Crafting menu.
+Use your imagination to craft unique weapons from different/#utility items. Used in the Crafting menu.
 Short circuit
-Short circuit an electric lock to open locked doors.\nRelatively simple in practice, but short circuiting the wrong\nconductors might lock the door for good.
+Short circuit an electric lock to open locked doors./#Relatively simple in practice, but short circuiting the wrong/#conductors might lock the door for good.
 Remedial poison
 Sacrifice a kidney to Vitruvia to cure poison.
 Remedial toxic
@@ -228,9 +228,9 @@ Sacrifice parathyroid glands to Vitruvia to cure fractures.
 Remedial blindness
 Sacrifice an eye to Vitruvia to cure blindness.
 Greater analyze
-Analyze the enemy behaviour and find the weak points. You can\nuse the acquired information against similar type enemies.
+Analyze the enemy behaviour and find the weak points. You can/#use the acquired information against similar type enemies.
 Wrench toss
-Throw your pipe wrench at the enemy with devastating force.\nA chance of stun. Requires pipe wrench to be equipped first.
+Throw your pipe wrench at the enemy with devastating force./#A chance of stun. Requires pipe wrench to be equipped first.
 Bulldozer
 The pillarman starts to jog...
 The dysmorphia's arm is spasming violently...
@@ -260,102 +260,102 @@ Body throw
 Bribe
 The mallet is hanging loose...
 Greater occultism
-Your greater knowledge in occult arts enables you to start \na battle with 2 extra Rev points. A passive skill.
+Your greater knowledge in occult arts enables you to start /#a battle with 2 extra Rev points. A passive skill.
 Warding sigil
-Draw a warding sigil on the ground to fend off malice and\ncreatures with ill intent. Originally created by the Virgin\nMages of the Eastern Sanctuaries.
+Draw a warding sigil on the ground to fend off malice and/#creatures with ill intent. Originally created by the Virgin/#Mages of the Eastern Sanctuaries.
 La Danse Macabre
-A ritual dance used to channel otherwordly powers to be used\nby the performer. Raises otherwordly powers gradually over the\ncourse of a fight. A passive skill.
+A ritual dance used to channel otherwordly powers to be used/#by the performer. Raises otherwordly powers gradually over the/#course of a fight. A passive skill.
 Premonitions
 Greater meditation
-Reach a greater state of awareness. Meditate while guarding to gain\neven more Rev points on that turn.
+Reach a greater state of awareness. Meditate while guarding to gain/#even more Rev points on that turn.
 Spice forge
-Spice forges were widely used by magick practitioners of the\nMiddle East back in the day. Spices make it possible to customize\nthe properties of your otherwordly skills.
-Sacrifice your own blood for Gro-goroth, the god of destruction.\nA blood sacrifice will enhance your affinity with the said god.\nSacrifices like these were everyday occurences back in the day.
+Spice forges were widely used by magick practitioners of the/#Middle East back in the day. Spices make it possible to customize/#the properties of your otherwordly skills.
+Sacrifice your own blood for Gro-goroth, the god of destruction./#A blood sacrifice will enhance your affinity with the said god./#Sacrifices like these were everyday occurences back in the day.
 Masturbation
-An act of self-love enhances your affinity with Sylvian when\nperformed on a ritual circle. This act is widely popular among\nthe priests of Vatican when mixed with blood sacrifice.
+An act of self-love enhances your affinity with Sylvian when/#performed on a ritual circle. This act is widely popular among/#the priests of Vatican when mixed with blood sacrifice.
 Slow metabolism
-Slowing down your breath and concentrating on the matters at\nhand. You don't need to eat quite as often. You only need few\ngood meals a day.
+Slowing down your breath and concentrating on the matters at/#hand. You don't need to eat quite as often. You only need few/#good meals a day.
 Masterchef
-Greater culinary skills enable you to cook meals that have\nspecial nutritional properties. These include various stat boosts.
+Greater culinary skills enable you to cook meals that have/#special nutritional properties. These include various stat boosts.
 Melee proficiency
-Proficiency with melee weapons gives you greater accuracy when\nfighting with a weapon you can swing. A passive skill.
+Proficiency with melee weapons gives you greater accuracy when/#fighting with a weapon you can swing. A passive skill.
 Toxicology
-The skill to condense the effective properties of different\npoisonous plants to maximize their potential. Teaches you the\nrecipes for condensed nettle and condensed hemlock.
+The skill to condense the effective properties of different/#poisonous plants to maximize their potential. Teaches you the/#recipes for condensed nettle and condensed hemlock.
 Undergrowth awareness
-You can harvest irritable and poisonous plants safely and also\ntell apart the plants that have potential use in your situation.\nA passive skill useful on the field.
+You can harvest irritable and poisonous plants safely and also/#tell apart the plants that have potential use in your situation./#A passive skill useful on the field.
 Advanced botanism
-The skill to condense the effective properties of herbs and\nplants to maximize their potential. Teaches you the recipes for\ncondensed blue and green herbs as well as lavender.
+The skill to condense the effective properties of herbs and/#plants to maximize their potential. Teaches you the recipes for/#condensed blue and green herbs as well as lavender.
 Poison tip
-Coat your weapon in poison extracted from the local plantlife.\nThe poison tip takes a small toll on your sanity because of the\nconstant stress of handling a poison coated weapon.
+Coat your weapon in poison extracted from the local plantlife./#The poison tip takes a small toll on your sanity because of the/#constant stress of handling a poison coated weapon.
 Fast stance
-Raise your speed with swift footwork. In most cases you get\nand extra turn between enemy attacks.
+Raise your speed with swift footwork. In most cases you get/#and extra turn between enemy attacks.
 Bob and weave
-A defensive technique where one bobs their head laterally to an\nincoming attack while shifting balance to either left or right.\nRaises evasion greatly.
+A defensive technique where one bobs their head laterally to an/#incoming attack while shifting balance to either left or right./#Raises evasion greatly.
 Counter stance
 Stay alert for enemy attacks and counter when possible.
 Adrenaline rush
-The longer the combat goes on, the stronger you get as your\nblood boils ever hotter.
+The longer the combat goes on, the stronger you get as your/#blood boils ever hotter.
 Bare-fisted proficiency
-Proficiency with your bare fists gives you greater accuracy when\nfighting without a weapon. A passive skill.
+Proficiency with your bare fists gives you greater accuracy when/#fighting without a weapon. A passive skill.
 Intimidate
-Intimidation tactics in battle work on those mentally weak.\nThe effects vary case by case. Used while initiating Talk\nduring combat.
+Intimidation tactics in battle work on those mentally weak./#The effects vary case by case. Used while initiating Talk/#during combat.
 Killing intent
-You killing intent eminates strong. This will scare away the\nweaker opponent so you don't need to bother with them.
+You killing intent eminates strong. This will scare away the/#weaker opponent so you don't need to bother with them.
 Explosives
-Getting creative in a wartorn times is a must. Craft explosives\nto be used in combat from simple everyday ingredients.
-Try to pickpocket goods from your opponents. You never know\nwhat you might find.
+Getting creative in a wartorn times is a must. Craft explosives/#to be used in combat from simple everyday ingredients.
+Try to pickpocket goods from your opponents. You never know/#what you might find.
 Bury the trauma
-Bury your trauma and fears. This reduces your sanity decline while \nexploring. You can deal with the psychiatric collapse and the combat\nfatigue once you're in a safer place. After all this...
+Bury your trauma and fears. This reduces your sanity decline while /#exploring. You can deal with the psychiatric collapse and the combat/#fatigue once you're in a safer place. After all this...
 Order, Charge!
-Give orders to your team to charge and attack the enemy without\nwasting their turns.
+Give orders to your team to charge and attack the enemy without/#wasting their turns.
 Order, Defend!
 Lockpicking
 An ability to open any simple lock with your trusty lockpick.
 Persuade
-Persuade your opponents with greater intellect and wit. The effects\nvary between enemy to enemy depending on their persona. Used with\nTalk skill.
+Persuade your opponents with greater intellect and wit. The effects/#vary between enemy to enemy depending on their persona. Used with/#Talk skill.
 Diplomacy
-Start the fight by talking to the opponent without wasting a\nturn. Maybe you can find a diplomatic resolution before any\nviolence takes place?
+Start the fight by talking to the opponent without wasting a/#turn. Maybe you can find a diplomatic resolution before any/#violence takes place?
 Reverse-healing
 remove own organs to cause serious damage
 Precision stance
-A special stance to raise your accuracy greatly. Often used\nduring medical surgeries to prevent one's arm from shaking.
+A special stance to raise your accuracy greatly. Often used/#during medical surgeries to prevent one's arm from shaking.
 Diagnosis
-Study fallen enemies and their anatomy to gain knowledge of\nthem. Diagnosis also reveals what strategies might work the\nbest when facing similar foes in the future.
+Study fallen enemies and their anatomy to gain knowledge of/#them. Diagnosis also reveals what strategies might work the/#best when facing similar foes in the future.
 Rugged handsome looks
-The skill doesn't necessarily translate to everyone. Beauty is in\nthe eye of beholder after all.
-A barbaric trait of devouring the carcass of your opponents \nto ease hunger.
-Hype yourself into a state of aggression and trance. An old\ntraditional Oldegårdian folk skill.
-Provoke the enemy into attacking you only, leaving others\nalone.
+The skill doesn't necessarily translate to everyone. Beauty is in/#the eye of beholder after all.
+A barbaric trait of devouring the carcass of your opponents /#to ease hunger.
+Hype yourself into a state of aggression and trance. An old/#traditional Oldegårdian folk skill.
+Provoke the enemy into attacking you only, leaving others/#alone.
 Sisu
-Your will to live. You just grind your teeth together instead\nof dying. You're not ready just yet.
+Your will to live. You just grind your teeth together instead/#of dying. You're not ready just yet.
 Black smog
-Crystallize manmade darkness born from the industrial age\nto blind and suffocate your opponents. Requires 1 Rev Point.
+Crystallize manmade darkness born from the industrial age/#to blind and suffocate your opponents. Requires 1 Rev Point.
 Mark of Gro-goroth
 Scorched earth
-Scorch your surroundings completely to create an environment\nthat greatly enhances fire attacks. Requires 1 Rev Point.
+Scorch your surroundings completely to create an environment/#that greatly enhances fire attacks. Requires 1 Rev Point.
 Roots that reap
-A talented wizard can generate a shockwave that travels\nunderground and forces sharp roots to push through the ground.\nAttacks all enemies. Requires 2 Rev Points.
+A talented wizard can generate a shockwave that travels/#underground and forces sharp roots to push through the ground./#Attacks all enemies. Requires 2 Rev Points.
 Spontaneous combustion
 THe highest form of pyromancy. Becomes the flame itself.
 Photosynthesis
-The process in which you use sunlight to create oxygen and\nenergy to replenish your health gradually over time. Requires\nsunlight obviously. A passive skill.
+The process in which you use sunlight to create oxygen and/#energy to replenish your health gradually over time. Requires/#sunlight obviously. A passive skill.
 Greater photosynthesis
 Brain flower
-Plant your personal seeds of brain flower to a fertile ground.\nFreshly deceased corpses being the most fertile of grounds. A brain\nflower replenishes sanity and mind.
+Plant your personal seeds of brain flower to a fertile ground./#Freshly deceased corpses being the most fertile of grounds. A brain/#flower replenishes sanity and mind.
 Heart flower
-Plant your personal seeds of heart flower to a fertile ground.\nFreshly deceased corpses being the most fertile of grounds. A heart\nflower replenishes body and wounds.
+Plant your personal seeds of heart flower to a fertile ground./#Freshly deceased corpses being the most fertile of grounds. A heart/#flower replenishes body and wounds.
 Golden gates
-A gift from the Moon God himself. Gain access to golden gates\nthat lead you out from madness and world of deceit. A passive ability.
+A gift from the Moon God himself. Gain access to golden gates/#that lead you out from madness and world of deceit. A passive ability.
 Reveal aura
-Reveal positions of the other contestants through examining a\nmap. To sense these positions, a spike of energy is required.\nYou can't sense a person without this.
+Reveal positions of the other contestants through examining a/#map. To sense these positions, a spike of energy is required./#You can't sense a person without this.
 Blood sword
-The blood of Alll-mer boils and rages even ages after his death.\nJust a drop sends swords to the heart of his enemies. Summon a\nblood sword to wield in battle.
+The blood of Alll-mer boils and rages even ages after his death./#Just a drop sends swords to the heart of his enemies. Summon a/#blood sword to wield in battle.
 Resurrection
 Longinus
-The blood of Alll-mer boils and rages even ages after his death.\nJust a drop thrusts spears to the torso of his enemies. Summon a\nblood spear to wield in battle.
+The blood of Alll-mer boils and rages even ages after his death./#Just a drop thrusts spears to the torso of his enemies. Summon a/#blood spear to wield in battle.
 Inverse crown of thorns
-A glimpse of the pain and suffering Alll-mer the ascended one\nendured on the cross. Can you feel closer to the god this way?
-Summon a mischief of rats to disrupt the enemy. Rats spread\nconfusion and disease where ever they go.
+A glimpse of the pain and suffering Alll-mer the ascended one/#endured on the cross. Can you feel closer to the god this way?
+Summon a mischief of rats to disrupt the enemy. Rats spread/#confusion and disease where ever they go.
 Mad sack smash
 Sack smash
 Double sack smash
@@ -387,7 +387,7 @@ Rapid fire
 The weeping scope is weeping...
 Wire trap
 Cross stiching
-Concentrated whispers carried by the older god Sylvian\nheal a considerable amount of health.
+Concentrated whispers carried by the older god Sylvian/#heal a considerable amount of health.
 The floppy arm stays idle.
 The neighbour is preparing for a devastating attack!
 The floppy arm is tensing up...
@@ -415,9 +415,9 @@ Flamethrower
 The flame trooper readies his flamethrower...
 Low bayonet
 Guard+
-Skill #2 will be used when you select\nthe Guard command.\n
+Skill #2 will be used when you select/#the Guard command./#
 Perfect guard
-While guarding your damage is reduced even further and you\ncan evade the most drastic physical trauma.
+While guarding your damage is reduced even further and you/#can evade the most drastic physical trauma.
 Red arc
 Overheat
 Lunar meteorite
@@ -479,26 +479,26 @@ Double pheromones
 Double loving whispers
 Double healing whispers
 Greater hurting
-Create a devastating vortex out of your concentrated feelings \nof hurting and hatred.
+Create a devastating vortex out of your concentrated feelings /#of hurting and hatred.
 Greater black smog
-Crystallize manmade darkness born from the industrial age\nto blind and suffocate your opponents.
+Crystallize manmade darkness born from the industrial age/#to blind and suffocate your opponents.
 Greater blood golem
 Greater black orb
 Greater scorched earth
-Scorch your surroundings completely to create an environment\nthat greatly enhances fire attacks.
+Scorch your surroundings completely to create an environment/#that greatly enhances fire attacks.
 Greater roots that reap
 Greater pyromancy trick
 Greater combustion
 Greater blood sword
 Greater Longinus
 Greater rot
-Rot the victim from inside out to make them vulnerable to \nattacks.
+Rot the victim from inside out to make them vulnerable to /#attacks.
 Greater flesh puppetry
 Greater mischief of rats
 Greater pheromones
 Greater loving whispers
 Greater healing whispers
-Coat your weapon in poison extracted from the local plantlife.\nGives you 50% chance of inflicting the poison on your enemies when\nattacking. A passive skill initiated at the start of an encounter.
+Coat your weapon in poison extracted from the local plantlife./#Gives you 50% chance of inflicting the poison on your enemies when/#attacking. A passive skill initiated at the start of an encounter.
 The owl sprite takes a step forward...
 Poison dart
 The owl cultist is tilting its head...
@@ -533,10 +533,10 @@ Ejaculate
 The ejaculation burns!
 The priest reaches out for you...
 Pocketcat's eyes light up...
-Strike your enemy with a concentrated bolt of electricity\nthat will stun weaker foes.
-Summon the chains that tormented Chambara the Tormented One\nfor hundreds of years. Requires 2 Rev Points.
+Strike your enemy with a concentrated bolt of electricity/#that will stun weaker foes.
+Summon the chains that tormented Chambara the Tormented One/#for hundreds of years. Requires 2 Rev Points.
 Moth swarm
-Summon a swarm of moths to aid you in combat. The moths are the\nvery same that leaked from the paradise, the artificial green, when\nthe door between the two worlds opened. Requires 1 Rev Point.
+Summon a swarm of moths to aid you in combat. The moths are the/#very same that leaked from the paradise, the artificial green, when/#the door between the two worlds opened. Requires 1 Rev Point.
 Healing Link
 Requires 2 Rev Points.
 Left slam

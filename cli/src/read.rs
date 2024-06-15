@@ -55,7 +55,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join("\\n");
+                                let line_joined: String = line.join("/#");
                                 lines.insert(line_joined);
                                 line.clear();
                                 in_seq = false;
@@ -176,7 +176,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let description: &str = obj["description"].as_str().unwrap();
 
                     if !description.is_empty() {
-                        lines.insert(description.replace('\n', "\\n"));
+                        lines.insert(description.replace('\n', "/#"));
                     }
                 }
 
@@ -184,7 +184,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let note: &str = obj["note"].as_str().unwrap();
 
                     if !note.is_empty() {
-                        lines.insert(note.replace('\n', "\\n"));
+                        lines.insert(note.replace('\n', "/#"));
                     }
                 }
             }
@@ -242,7 +242,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join("\\n");
+                                let line_joined: String = line.join("/#");
                                 lines.insert(line_joined);
 
                                 line.clear();

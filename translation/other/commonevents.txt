@@ -1,55 +1,55 @@
 HEADS
 TAILS
-As you finish reading the book, it crumbles into dust\nbefore your very eyes.
-The book contains traditional recipes dating back to the 15th \ncentury cuisine.
-The recipes are collected from the memoirs of the infamous\nchef Andérs that worked at the royal kitchen of Rondon at the\ntime.
-It appears that chef Andérs gained infamy by seducing court \nladies and was even rumoured to had a fling with the princess\nElizabeth, the famous virgin princess.
-Now that you look at it, the book seems to be more about royal\ngossip than food recipes...
-Between all this romance and betreyal you find recipes of \nchef Andérs' famous \c[2]Meatpie\c[0] and \c[2]Vegetable pie\c[0]!
-"What backwater parts these dark corners of the earth really\nare!"
-"When I heard about this assignment, I figured the city of\nPrehevil was at least decent sized and there would surely\nbe some entertainment to be had with the local dancers and\nstreet girls."
-"But alas, I'm not too keen on getting that comfy with the\nlocals after sightseeing the city a bit..."
-"Frankly I'm baffled at how a city of this size has managed \nto stay so isolated from the neighbouring influences and\nmodern times."
-"The Prehevil folk still hold on tightly to religious rites\nas old as 'The Fellowship' itself."
-"The human sacrifices creep me out in this day and age. Even\nif I've seen the horrors of war, the crucifixes set around\nthe city manage to send a chill down my spine."
-"The sights of Ma'habre. You have seen them too, haven't\nyou? In your dreams you wander for one lifetime with\nsilhoutte of this city in horizon.
-"You have seen the twin towers that rise next to\na black night sky. Those macabre obelisks telling tales \nof some older, more cruel age.
-"You have seen the grand gate with it's maddening\nmurals and spirals. Patterns beyond understanding."
-"It's not like the sound of wind, howling between\nthose hollow streets wasn't enough..."
-"You also hear the sound of local residents. Even while\nall comphrehension would dictate that this place is\nlong abandoned..."
-"...You still hear them. You are not alone in this\nvile part of world."
-"In your dreams you have seen it, haven't you?\nThe city of Ma'habre. The city of gods."
+As you finish reading the book, it crumbles into dust/#before your very eyes.
+The book contains traditional recipes dating back to the 15th /#century cuisine.
+The recipes are collected from the memoirs of the infamous/#chef Andérs that worked at the royal kitchen of Rondon at the/#time.
+It appears that chef Andérs gained infamy by seducing court /#ladies and was even rumoured to had a fling with the princess/#Elizabeth, the famous virgin princess.
+Now that you look at it, the book seems to be more about royal/#gossip than food recipes...
+Between all this romance and betreyal you find recipes of /#chef Andérs' famous \c[2]Meatpie\c[0] and \c[2]Vegetable pie\c[0]!
+"What backwater parts these dark corners of the earth really/#are!"
+"When I heard about this assignment, I figured the city of/#Prehevil was at least decent sized and there would surely/#be some entertainment to be had with the local dancers and/#street girls."
+"But alas, I'm not too keen on getting that comfy with the/#locals after sightseeing the city a bit..."
+"Frankly I'm baffled at how a city of this size has managed /#to stay so isolated from the neighbouring influences and/#modern times."
+"The Prehevil folk still hold on tightly to religious rites/#as old as 'The Fellowship' itself."
+"The human sacrifices creep me out in this day and age. Even/#if I've seen the horrors of war, the crucifixes set around/#the city manage to send a chill down my spine."
+"The sights of Ma'habre. You have seen them too, haven't/#you? In your dreams you wander for one lifetime with/#silhoutte of this city in horizon.
+"You have seen the twin towers that rise next to/#a black night sky. Those macabre obelisks telling tales /#of some older, more cruel age.
+"You have seen the grand gate with it's maddening/#murals and spirals. Patterns beyond understanding."
+"It's not like the sound of wind, howling between/#those hollow streets wasn't enough..."
+"You also hear the sound of local residents. Even while/#all comphrehension would dictate that this place is/#long abandoned..."
+"...You still hear them. You are not alone in this/#vile part of world."
+"In your dreams you have seen it, haven't you?/#The city of Ma'habre. The city of gods."
 "Did you know it exists here?"
-"Gro-goroth - The destroyer of men. He who ushers a new dawn \nwith force and violence."
-"Gro-goroth is the other part of the most primal duality.\nCreation and destruction. Where the other doesn't exist \nwithout the other."
-"The word 'destruction' is often associated with the evil of \nthe world. This of course is foolishness. There is no room\nfor new creation if the slate is not first burnt clean and \nempty."
-"A man fears destruction. Man gets accustomed to peace and \nquiet. Man grows fat and afraid of change."
+"Gro-goroth - The destroyer of men. He who ushers a new dawn /#with force and violence."
+"Gro-goroth is the other part of the most primal duality./#Creation and destruction. Where the other doesn't exist /#without the other."
+"The word 'destruction' is often associated with the evil of /#the world. This of course is foolishness. There is no room/#for new creation if the slate is not first burnt clean and /#empty."
+"A man fears destruction. Man gets accustomed to peace and /#quiet. Man grows fat and afraid of change."
 "Change is inevitable, just as Gro-goroth."
-"What one needs to understand is that the destruction is of\npure kind. It does not target one man specifically. It just\nexists."
-"Gro-goroth is associated with the the god of creation, Sylvian\nand their child, the god of the nature, Vinushka."
-"Gro-goroth offers the mankind the blessing of blood magick.\nConstant sacrifices in his name will maintain the relationship."
-"The Mark of Gro-goroth raises the physical strength of its\nwearer."
-The text includes the sigil of the Gro-goroth and instructions\non how to use it.
-"Very much like the sun - the moon is one of the primordial entities \nand thus it has lore and beliefs written since the dawn of time."
-"This makes it difficult to separate facts from fiction and mad\nramblings from hidden truths."
-"Consistent details among the myriad of stories seem to hint of a \ngod called Rher. Also knowns as the Trickster God and the Moon God."
-"In the most ancient of writings Rher is depicted as the god of the\ninsane and those who've succumbed to the madness."
-"His blessing to men is his moonlight, which is said to uncover the\ntruth under the human filth. A truth that is often too much for a \nhuman mind to handle."
-"It can be debated whether his version of the truth is more accurate \nthan that of the human filth."
-"Unlike many of the other older gods, Rher's part in the greater \nscheme of things remains a mystery."
-"Just looking at the night sky, you can see his presence, in an\neternal slumber. This makes his secrecy even more infuriating, he\nis literally hiding in plain sight."
+"What one needs to understand is that the destruction is of/#pure kind. It does not target one man specifically. It just/#exists."
+"Gro-goroth is associated with the the god of creation, Sylvian/#and their child, the god of the nature, Vinushka."
+"Gro-goroth offers the mankind the blessing of blood magick./#Constant sacrifices in his name will maintain the relationship."
+"The Mark of Gro-goroth raises the physical strength of its/#wearer."
+The text includes the sigil of the Gro-goroth and instructions/#on how to use it.
+"Very much like the sun - the moon is one of the primordial entities /#and thus it has lore and beliefs written since the dawn of time."
+"This makes it difficult to separate facts from fiction and mad/#ramblings from hidden truths."
+"Consistent details among the myriad of stories seem to hint of a /#god called Rher. Also knowns as the Trickster God and the Moon God."
+"In the most ancient of writings Rher is depicted as the god of the/#insane and those who've succumbed to the madness."
+"His blessing to men is his moonlight, which is said to uncover the/#truth under the human filth. A truth that is often too much for a /#human mind to handle."
+"It can be debated whether his version of the truth is more accurate /#than that of the human filth."
+"Unlike many of the other older gods, Rher's part in the greater /#scheme of things remains a mystery."
+"Just looking at the night sky, you can see his presence, in an/#eternal slumber. This makes his secrecy even more infuriating, he/#is literally hiding in plain sight."
 "The Mark of Rher raises the maximum capacity of the mind."
-The text includes the sigil of the Rher and instructions on how\nto use it.
+The text includes the sigil of the Rher and instructions on how/#to use it.
 "The Intermediate Level of Alchemy - Alchemillia vol.2"
-"The effects of different coloured alchemic substances are listed\nhere:"
-"Yellow + Oil = Highly flammable"\nBlue + Fly Amanita = Antidote for the poison\nGolden chantarelle + Golden chantarelle = Nutritious liquid."
-"Conceived by the black. Born from the clay. Shaped by\nour fears. Forged by the sins of her parents."
+"The effects of different coloured alchemic substances are listed/#here:"
+"Yellow + Oil = Highly flammable"/#Blue + Fly Amanita = Antidote for the poison/#Golden chantarelle + Golden chantarelle = Nutritious liquid."
+"Conceived by the black. Born from the clay. Shaped by/#our fears. Forged by the sins of her parents."
 "From eternal darkness and void, she'd bring gloom."
-"The hubris of man brought this upon us, but it is not\nbecause of cruelty, it is because of wisdom. Only through\nhardship could we see the errors of our ways."
+"The hubris of man brought this upon us, but it is not/#because of cruelty, it is because of wisdom. Only through/#hardship could we see the errors of our ways."
 The book radiates light in every color of the spectrum.
-You feel like your journey has just began. As if your existence \nsince this very moment has been like watching someone else \nentirely.
-You feel a perspective shift in your surroundings. As if \neverything was to shrink, or perhaps you were to ascend \nhigher.
-You gain better understanding of yourself. The link between \nyour mind and body has started it's deterioration.
+You feel like your journey has just began. As if your existence /#since this very moment has been like watching someone else /#entirely.
+You feel a perspective shift in your surroundings. As if /#everything was to shrink, or perhaps you were to ascend /#higher.
+You gain better understanding of yourself. The link between /#your mind and body has started it's deterioration.
 You feel closer to enlightenment.
 You find a \c[2]Cloth Fragment\c[0]!
 You find a \c[2]Dirty toilet paper\c[0]!
@@ -117,7 +117,7 @@ Another one of these... You find a \c[2]'Man in dreams' flyer\c[0]!
 You find the \c[2]'Man in dreams' flyer\c[0]!
 You find the \c[2]The Tale of the Pocketcat Ch. 2\c[0]!
 You find the \c[2]The Tale of the Pocketcat Ch. 1\c[0]!
-You have already learned everything Gro-goroth has to\noffer at the moment...
+You have already learned everything Gro-goroth has to/#offer at the moment...
 GabText \N[1] feels a little less hungry.
 GabText \N[3] feels a little less hungry.
 GabText \N[4] feels a little less hungry.
@@ -182,7 +182,7 @@ Take your own life?
 Unfortunately you don't have arms to perform such acts.
 You keep on going for now...
 \N[1] cannot hold weapons without arms!
-The cold pistol grip feels familiar in your hands. You didn't think\nyou'd be grasping to one so soon after leaving the frontlines...
+The cold pistol grip feels familiar in your hands. You didn't think/#you'd be grasping to one so soon after leaving the frontlines...
 You wonder if you'll ever be able to leave that past behind.
 \N[1] is out of ammo, so he continues unarmed.
 \N[1] cannot hold \c[2]Mauler\c[0] with just one arm!
@@ -195,9 +195,9 @@ You wonder if you'll ever be able to leave that past behind.
 \N[1] cannot hold \c[2]Gaelian greatsword\c[0] with just one arm!
 \N[1] cannot hold \c[2]Iron spear\c[0] with just one arm!
 \N[1] cannot hold \c[2]Sergal spear\c[0] with just one arm!
-You check the functionality of the rifle without even thinking about\nit. Your old habits are kicking in. The rifle creates a familiar \nfeeling of safety.
-You check the functionality of the rifle without even thinking about \nit. Your old habits are kicking in. The rifle creates a familiar \nfeeling of safety.
-You check the functionality of the trenchgun without even thinking \nabout it. Your old habits are kicking in. The gun creates a familiar \nfeeling of safety.
+You check the functionality of the rifle without even thinking about/#it. Your old habits are kicking in. The rifle creates a familiar /#feeling of safety.
+You check the functionality of the rifle without even thinking about /#it. Your old habits are kicking in. The rifle creates a familiar /#feeling of safety.
+You check the functionality of the trenchgun without even thinking /#about it. Your old habits are kicking in. The gun creates a familiar /#feeling of safety.
 \N[16] cannot hold weapons without arms!
 \N[17] cannot hold weapons without arms!
 \N[18] cannot hold weapons without arms!
@@ -205,17 +205,17 @@ You check the functionality of the trenchgun without even thinking \nabout it. Y
 \N[28] cannot hold weapons without arms!
 \N[29] cannot hold weapons without arms!
 \N[3] cannot hold weapons without arms!
-The firearm feels oddly heavy in your hands. You didn't think it\nwould feel like this. You realize that you're carrying a tool meant\nfor killing and this just adds to the burden.
-It's a surreal feeling. Nervously you take a firmer grasp on the\npistol grip and aim down its iron sights.
+The firearm feels oddly heavy in your hands. You didn't think it/#would feel like this. You realize that you're carrying a tool meant/#for killing and this just adds to the burden.
+It's a surreal feeling. Nervously you take a firmer grasp on the/#pistol grip and aim down its iron sights.
 \N[3] is out of ammo, so she continues unarmed.
 \N[3] cannot hold \c[2]Rifle\c[0] with just one arm!
 \N[3] cannot hold \c[2]Trenchgun\c[0] with just one arm!
 \N[3] cannot hold \c[2]Reaper's rake\c[0] with just one arm!
-The firearm feels unwieldy and a bit clumsy. You've seen soldiers\ncarrying one, you've seen movies where people use one. Now it has\ncome down to you using one.
-It feels surreal that you're carrying a tool meant for killing. You\ndon't really like the burden.
+The firearm feels unwieldy and a bit clumsy. You've seen soldiers/#carrying one, you've seen movies where people use one. Now it has/#come down to you using one.
+It feels surreal that you're carrying a tool meant for killing. You/#don't really like the burden.
 \N[4] cannot hold weapons without arms!
-The pistol grip doesn't feel right in your hands. You've used one\nmany times before, but still the feeling doesn't go away.
-But under the mysterious circumstances it's best to grasp to any\nstraw given to you.
+The pistol grip doesn't feel right in your hands. You've used one/#many times before, but still the feeling doesn't go away.
+But under the mysterious circumstances it's best to grasp to any/#straw given to you.
 \N[4] is out of ammo, so he continues unarmed.
 \N[4] cannot hold \c[2]Mauler\c[0] with just one arm!
 \N[4] cannot hold \c[2]Bayonet\c[0] with just one arm!
@@ -226,13 +226,13 @@ But under the mysterious circumstances it's best to grasp to any\nstraw given to
 \N[4] cannot hold \c[2]Lantern flail\c[0] with just one arm!
 \N[4] cannot hold \c[2]Iron spear\c[0] with just one arm!
 \N[4] cannot hold \c[2]Sergal spear\c[0] with just one arm!
-You check if the rifle functions well. It does. You remember how as\na child seeing a firearm created excitement and sense of respect in \nyou. But now these things have become mundane.
-You're too used to their presence in the times of war. You figure \nthat it is what it is. No use making a big deal out of it.
-You check if the gun functions well. It does. You remember how as a\nchild seeing a firearm created excitement and sense of respect in \nyou. But now these things have become mundane.
+You check if the rifle functions well. It does. You remember how as/#a child seeing a firearm created excitement and sense of respect in /#you. But now these things have become mundane.
+You're too used to their presence in the times of war. You figure /#that it is what it is. No use making a big deal out of it.
+You check if the gun functions well. It does. You remember how as a/#child seeing a firearm created excitement and sense of respect in /#you. But now these things have become mundane.
 \N[5] cannot hold weapons without arms!
-You examine the pistol. It feels crazy to you that such a small\napparatus can have such a big impact to the world.
-You've seen these things create destruction around the world and\nyou've created a great disdain over them over time. Having one in\nthis situation however creates a sense of safety.
-You're not very familiar with one, but you figure that plenty of\ndull-witted people have managed to use one, so why not you?
+You examine the pistol. It feels crazy to you that such a small/#apparatus can have such a big impact to the world.
+You've seen these things create destruction around the world and/#you've created a great disdain over them over time. Having one in/#this situation however creates a sense of safety.
+You're not very familiar with one, but you figure that plenty of/#dull-witted people have managed to use one, so why not you?
 \N[5] is out of ammo, so she continues unarmed.
 \N[5] cannot hold \c[2]Mauler\c[0] with just one arm!
 \N[5] cannot hold \c[2]Bayonet\c[0] with just one arm!
@@ -243,8 +243,8 @@ You're not very familiar with one, but you figure that plenty of\ndull-witted pe
 \N[5] cannot hold \c[2]Lantern flail\c[0] with just one arm!
 \N[5] cannot hold \c[2]Iron spear\c[0] with just one arm!
 \N[5] cannot hold \c[2]Sergal spear\c[0] with just one arm!
-You examine the rifle. It feels crazy to you that such a simple \napparatus can have such a big impact to the world.
-You examine the trenchgun. It feels crazy to you that such a simple \napparatus can have such a big impact to the world.
+You examine the rifle. It feels crazy to you that such a simple /#apparatus can have such a big impact to the world.
+You examine the trenchgun. It feels crazy to you that such a simple /#apparatus can have such a big impact to the world.
 \c[2]Wild dagga\c[0]
 \c[2]Tobacco\c[0]
 Nevermind
@@ -295,7 +295,7 @@ Sacrifice
 Pray
 Leave
 A ritual circle is drawn and carved here.
-With the sacrifice, your affinity with the Gro-goroth is \ngrowing...
+With the sacrifice, your affinity with the Gro-goroth is /#growing...
 You don't have anyone to sacrifice.
 Gro-goroth
 Sylvian
@@ -363,75 +363,75 @@ You find a \c[2]Death mask\c[0]!
 You find a \c[2]Pipe bomb\c[0]!
 You find a \c[2]Chainmail dress\c[0]!
 You find a \c[2]Ballistic shield\c[0]!
-"-The Tale of the Pocketcat -\n"This is a tale about the Pocketcat, the friend of the children, but\nonly a friend, nothing more."
-"Willem, the wildest child known to the little town of Merwood spent\nanother afternoon watching raindrops dance against the window."
-"It had been raining without a stop for the whole week and Willem, the\nrestless boy he was, grew even more restless."
-"His mother would warn him of going outside during an usettled weather.\nThe rain brings forth all kinds of dangers otherwise unknown to little \nboys."
-"Besides decent children would help their parents with various \nhousehold chores during this kind of dreich."
-"Willem, the restless boy he was, disregarded the warnings and slipped\nout without a worry in the world."
+"-The Tale of the Pocketcat -/#"This is a tale about the Pocketcat, the friend of the children, but/#only a friend, nothing more."
+"Willem, the wildest child known to the little town of Merwood spent/#another afternoon watching raindrops dance against the window."
+"It had been raining without a stop for the whole week and Willem, the/#restless boy he was, grew even more restless."
+"His mother would warn him of going outside during an usettled weather./#The rain brings forth all kinds of dangers otherwise unknown to little /#boys."
+"Besides decent children would help their parents with various /#household chores during this kind of dreich."
+"Willem, the restless boy he was, disregarded the warnings and slipped/#out without a worry in the world."
 "He dashed through the bushes and ran deep in the heart of the Merwood."
-"The first horror to befall on him was a two-day-old carcass of a once\nbeautiful deer, now defiled by the pest of the forest floor devouring\nits remains."
-"The second horror poor little Willem witnessed was an age-old slowworm\ncaught in the middle of an ant colony. Slowly the slowworm sank deeper \nand deeper to its inevitable doom as the ant nest consumed it torso."
-"In the heart of the forest, all wet from the rain, Willem\nheard slight panting noices from an overgrown grotto nearby..."
+"The first horror to befall on him was a two-day-old carcass of a once/#beautiful deer, now defiled by the pest of the forest floor devouring/#its remains."
+"The second horror poor little Willem witnessed was an age-old slowworm/#caught in the middle of an ant colony. Slowly the slowworm sank deeper /#and deeper to its inevitable doom as the ant nest consumed it torso."
+"In the heart of the forest, all wet from the rain, Willem/#heard slight panting noices from an overgrown grotto nearby..."
 "Cautiously Willem peeked through the leaves..."
-"He would not believe his eyes when he saw a finely dressed \ncat standing on two feet, twice as tall as Willem's father \nwould be."
-"The cat's back was facing Willem. Its hand was moving\nswiftly inside its pocket while the two big yellow eyes  \nglee'd inside a burlap bag in great excitement."
+"He would not believe his eyes when he saw a finely dressed /#cat standing on two feet, twice as tall as Willem's father /#would be."
+"The cat's back was facing Willem. Its hand was moving/#swiftly inside its pocket while the two big yellow eyes  /#glee'd inside a burlap bag in great excitement."
 "Suddenly the hand movement came to a halt."
-"Even if Willem was well hidden behind the leaves - slowly \nthe cat turned it's eyes towards him."
+"Even if Willem was well hidden behind the leaves - slowly /#the cat turned it's eyes towards him."
 "In terror Willem ran as fast as he could towards his home!"
-"The two glowing yellow eyes of the cat haunted him all the\nway to his home gates."
-"His mother was there to meet him by the front door.\n'So you just had to go to the woods, did you?' - said\nhis mother."
-"'You saw something you shouldn't have, right!?' - questioned \nhis mother. 'And how do I know this?'"
-"Willem's mother would go inside to get a little parcel with \ndecorated wrappings."
-"'This appeared on the front door just before you came. \nIt was directed to young mister Willem.'"
-"Slowly Willem unwrapped the decorated paper with small\nmouse prints on it..."
+"The two glowing yellow eyes of the cat haunted him all the/#way to his home gates."
+"His mother was there to meet him by the front door./#'So you just had to go to the woods, did you?' - said/#his mother."
+"'You saw something you shouldn't have, right!?' - questioned /#his mother. 'And how do I know this?'"
+"Willem's mother would go inside to get a little parcel with /#decorated wrappings."
+"'This appeared on the front door just before you came. /#It was directed to young mister Willem.'"
+"Slowly Willem unwrapped the decorated paper with small/#mouse prints on it..."
 "Inside the parcel, there was catnip."
-"-The Four Ages of Modern History-"\n"The modern age and modern chronology begins from the birth \nof our lord , the ascended one, Alll-mer."
-"There are many fabricated religious text about Alll-mer, but\nthere is enough evidence to prove that Alll-mer did indeed\nexist as a real person at the time.
-"His birth would mark as the first age. The second age started\nfrom the reign of the so-called New gods in the year 410."
-"There are texts about different new gods prior to this event,\nand the concept did exist in ancient times as well, but this\ngroup of people included the famed warlord from the Eastern \nSanctuaries, Nash'rah the great."
-"This alone made this group more distinguished compared to\nthe ones that came before."
-"Their world order started a slow decline few hundred years\nafter their deaths, only to be ended by 'The fellowship'\naround year 800."
-"The popular book 'The Fellowship' inspired the comtemporary\npeople of the time and lifted the four people of the fellowship -\nFrancóis, Chambara, Nilvan and Valteil to a near god-like status.
-"Their age would last until the end of the 16th century.\nThe western world was in a dark age at the time and out of\nnowhere appeared a new idol of worship, the god of Fear\n& Hunger."
-"People forgot the teachings of the old in times of diseases\nand death and turned on to this new saviour."
-"The appearance of the God of Fear & Hunger started the fourth\nage in which mankind had to learn to adapt and evolve. As\ntimes have progressed, we are still living according to this \nideology."
+"-The Four Ages of Modern History-"/#"The modern age and modern chronology begins from the birth /#of our lord , the ascended one, Alll-mer."
+"There are many fabricated religious text about Alll-mer, but/#there is enough evidence to prove that Alll-mer did indeed/#exist as a real person at the time.
+"His birth would mark as the first age. The second age started/#from the reign of the so-called New gods in the year 410."
+"There are texts about different new gods prior to this event,/#and the concept did exist in ancient times as well, but this/#group of people included the famed warlord from the Eastern /#Sanctuaries, Nash'rah the great."
+"This alone made this group more distinguished compared to/#the ones that came before."
+"Their world order started a slow decline few hundred years/#after their deaths, only to be ended by 'The fellowship'/#around year 800."
+"The popular book 'The Fellowship' inspired the comtemporary/#people of the time and lifted the four people of the fellowship -/#Francóis, Chambara, Nilvan and Valteil to a near god-like status.
+"Their age would last until the end of the 16th century./#The western world was in a dark age at the time and out of/#nowhere appeared a new idol of worship, the god of Fear/#& Hunger."
+"People forgot the teachings of the old in times of diseases/#and death and turned on to this new saviour."
+"The appearance of the God of Fear & Hunger started the fourth/#age in which mankind had to learn to adapt and evolve. As/#times have progressed, we are still living according to this /#ideology."
 \N[9] cannot hold \c[2]Iron spear\c[0] with just one arm!
 You pick up the unused \c[2]Gasoline canister\c[0].
 "The Experienced Level of Alchemy - Alchemillia vol.3"
-"Recipes for intermediate alchemy:\nBlue + Pep pills = Super senses\nBlue + Blue = Greater healing"
-Talking to yourself or the voices inside won't save your \nsanity.
+"Recipes for intermediate alchemy:/#Blue + Pep pills = Super senses/#Blue + Blue = Greater healing"
+Talking to yourself or the voices inside won't save your /#sanity.
 "What is going on here?"
 "Should we rest?"
 "Nevermind."
-\>\i[76]\}ARINA\{\<\n"Don't you just hate this place?"
-\>\i[76]\}ARINA\{\<\n"I really don't know. This is nightmarish even by my \nstandards..."
-\>\i[76]\}ARINA\{\<\n"I don't really know where we even COULD rest... There're\nthese lunatics behind every corner..."
-\>\i[76]\}ARINA\{\<\n"Let's just keep on going! There has to be a safe place\nsomewhere!"
-\>\i[75]\}EVI\{\<\n"..."
+\>\i[76]\}ARINA\{\</#"Don't you just hate this place?"
+\>\i[76]\}ARINA\{\</#"I really don't know. This is nightmarish even by my /#standards..."
+\>\i[76]\}ARINA\{\</#"I don't really know where we even COULD rest... There're/#these lunatics behind every corner..."
+\>\i[76]\}ARINA\{\</#"Let's just keep on going! There has to be a safe place/#somewhere!"
+\>\i[75]\}EVI\{\</#"..."
 Levi doesn't seem that talkative...
 Levi shrugs and rolls his eyes.
 Levi shakes his head in disagreement.
-\>\i[75]\}EVI\{\<\n"I can still go..."
+\>\i[75]\}EVI\{\</#"I can still go..."
 "You could show some respect."
 "Stupid goat."
-Black Kalev ignores you. He clearly has no interest in\nmeddling with the likes of you.
+Black Kalev ignores you. He clearly has no interest in/#meddling with the likes of you.
 Black Kalev mocks you with his bleats.
-Black Kalev stares right through you. In his world, you are\nnothing but an ant waiting to be stomped.
-\>\i[67]\}AAN\{\<\n"I can't help but be fascinated by this place, even if all\nthese people are suffering here..."
-\>\i[67]\}AAN\{\<\n"What I don't understand is how none of this has leaked to\noutside world? I haven't heard anything about Prehevil in\nnews or other media..."
-\>\i[67]\}AAN\{\<\n"I can still go on for a day or two or three..."
-\>\i[64]\}BELLE\{\<\n"Härregud..."
-\>\i[64]\}BELLE\{\<\n"I don't even want to guess... Frankly I have no idea."
-\>\i[64]\}BELLE\{\<\n"We can rest in the retirement home... As if we'd ever make\nit there at this rate."
-\>\i[64]\}BELLA\{\<\n"Huh... Where did Marina go?"
+Black Kalev stares right through you. In his world, you are/#nothing but an ant waiting to be stomped.
+\>\i[67]\}AAN\{\</#"I can't help but be fascinated by this place, even if all/#these people are suffering here..."
+\>\i[67]\}AAN\{\</#"What I don't understand is how none of this has leaked to/#outside world? I haven't heard anything about Prehevil in/#news or other media..."
+\>\i[67]\}AAN\{\</#"I can still go on for a day or two or three..."
+\>\i[64]\}BELLE\{\</#"Härregud..."
+\>\i[64]\}BELLE\{\</#"I don't even want to guess... Frankly I have no idea."
+\>\i[64]\}BELLE\{\</#"We can rest in the retirement home... As if we'd ever make/#it there at this rate."
+\>\i[64]\}BELLA\{\</#"Huh... Where did Marina go?"
 You notice that Marina is not in the party anymore.
 "Let's look for her!"
 "Maybe she needed to go somewhere?"
 "That's strange..."
 "..."
-\>\i[64]\}BELLA\{\<\n"Did she wander off? She didn't say anything."
-You notice that Marina is not in the party anymore. She must have\nwandered off to somewhere... Or what else could it be?
+\>\i[64]\}BELLA\{\</#"Did she wander off? She didn't say anything."
+You notice that Marina is not in the party anymore. She must have/#wandered off to somewhere... Or what else could it be?
 GabText Distant noises echo from somewhere...
 GabText You can feel someone or something following you...
 GabText It's as if someone is staring at you from distance...
@@ -529,8 +529,8 @@ GabText Hunger is crippling \N[18].
 GabText \N[18] is blind from hunger.
 GabText \N[18] feels dizzy...
 "The book of fears and phobias."
-"Nosophobia - Fear of disease and contamination\nPhasmophobia - Fear of ghosts and ghastly figures\nRhabdophobia - Fear of magic and otherworldly powers."
-"Erotophobia - Fear of sex and genitals\nZoophobia - Fear of animals and beasts\nTeratophobia - Fear of monsters and malformations."
+"Nosophobia - Fear of disease and contamination/#Phasmophobia - Fear of ghosts and ghastly figures/#Rhabdophobia - Fear of magic and otherworldly powers."
+"Erotophobia - Fear of sex and genitals/#Zoophobia - Fear of animals and beasts/#Teratophobia - Fear of monsters and malformations."
 GabText \N[1] is at the edge of his sanity...
 GabText \N[1] has formed a panophobia. A fear of everything.
 GabText \N[3] is at the edge of her sanity...
@@ -550,127 +550,127 @@ GabText \N[13] has formed a panophobia. A fear of everything.
 GabText The potion causes burning sensation the moment it is drank.
 "The Basics of Alchemy - Alchemillia vol.1"
 "The effects of different herbs and plants are listed here:"
-"Blue - Blue herb has healing properties. It's often rubbed against\nopen wounds and injuries. The effects are almost immediate."
-"Green - Green herbs are commonly used on open wounds to prevent\ninfections."
-"Red - Red herbs have little to no effect on their own, but when\nused together with other herbs they have a boosting effect."
-"Lavender - The smell of lavender can be used to ease anxiety and\nfear. It's also said to keep bees away."
-"Recipes for basic alchemy:\nBlue + Red = Greater healing properties\nGreen + Red = Antidote for mild poisons\nBlue + Blue = Blue vial"
-"The book of medical science - The book of Anathomia.\nCollected knowledge of Homer of the Abyssonia."
-"Symptoms - Effects:\n\i[117] - Concussion\n\i[124] - Fracture or broken bone\n\i[114] - Bleeding wounds"
-"Symptoms - Effects:\n\i[16] - Mild Poisoning\n\i[113] - Poisoned\n\i[112] - Toxic/Severe poisoning
-"Symptoms - Effects:\n\i[152] - Infected wound on arm\n\i[136] - Infected wound on leg\n\i[118] - Blindness or other eye trauma"
-"Symptoms - Effects:\n\i[129] - Severe mental trauma\n\i[165] - Severe physical trauma\n\i[158] - Nausea/Sickness"
-"Symptoms - Effects:\n\i[102] - Confusion\n\i[125] - Withdrawal symptoms\n\i[126] - Severe withdrawal symptoms"
-"Symptoms - Effects:\n\i[17] - Irritation\n\i[137] - Burn\n\i[119] - Temporary paralysis"
-"Symptoms - Effects:\n\i[147]-\i[151] - Different stages of hunger\n\i[131]-\i[135] - Different stages of fear"
-"This book by no means covers everything under the sun and\nstars and thus it should only be used as a reference.
+"Blue - Blue herb has healing properties. It's often rubbed against/#open wounds and injuries. The effects are almost immediate."
+"Green - Green herbs are commonly used on open wounds to prevent/#infections."
+"Red - Red herbs have little to no effect on their own, but when/#used together with other herbs they have a boosting effect."
+"Lavender - The smell of lavender can be used to ease anxiety and/#fear. It's also said to keep bees away."
+"Recipes for basic alchemy:/#Blue + Red = Greater healing properties/#Green + Red = Antidote for mild poisons/#Blue + Blue = Blue vial"
+"The book of medical science - The book of Anathomia./#Collected knowledge of Homer of the Abyssonia."
+"Symptoms - Effects:/#\i[117] - Concussion/#\i[124] - Fracture or broken bone/#\i[114] - Bleeding wounds"
+"Symptoms - Effects:/#\i[16] - Mild Poisoning/#\i[113] - Poisoned/#\i[112] - Toxic/Severe poisoning
+"Symptoms - Effects:/#\i[152] - Infected wound on arm/#\i[136] - Infected wound on leg/#\i[118] - Blindness or other eye trauma"
+"Symptoms - Effects:/#\i[129] - Severe mental trauma/#\i[165] - Severe physical trauma/#\i[158] - Nausea/Sickness"
+"Symptoms - Effects:/#\i[102] - Confusion/#\i[125] - Withdrawal symptoms/#\i[126] - Severe withdrawal symptoms"
+"Symptoms - Effects:/#\i[17] - Irritation/#\i[137] - Burn/#\i[119] - Temporary paralysis"
+"Symptoms - Effects:/#\i[147]-\i[151] - Different stages of hunger/#\i[131]-\i[135] - Different stages of fear"
+"This book by no means covers everything under the sun and/#stars and thus it should only be used as a reference.
 Saw off an arm
 Saw off a leg
 What do you want to saw off from \N[1]?
 Unfortunately \N[1] has no arms left to saw.
-Unfortunately there is no one to saw off \N[1]'s other\narm and he cannot do it himself.
+Unfortunately there is no one to saw off \N[1]'s other/#arm and he cannot do it himself.
 Unfortunately \N[1] has no legs left to saw.
-Unfortunately there is no one to saw off \N[1]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[1]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[5]?
 Unfortunately \N[5] has no arms left to saw.
-Unfortunately there is no one to saw off \N[5]'s other\narm and she cannot do it herself.
+Unfortunately there is no one to saw off \N[5]'s other/#arm and she cannot do it herself.
 Unfortunately \N[5] has no legs left to saw.
-Unfortunately there is no one to saw off \N[5]'s legs\nand she cannot do it herself.
+Unfortunately there is no one to saw off \N[5]'s legs/#and she cannot do it herself.
 What do you want to saw off from \N[3]?
 Unfortunately \N[3] has no arms left to saw.
-Unfortunately there is no one to saw off \N[3]'s other\narm and she cannot do it herself.
+Unfortunately there is no one to saw off \N[3]'s other/#arm and she cannot do it herself.
 Unfortunately \N[3] has no legs left to saw.
-Unfortunately there is no one to saw off \N[3]'s legs\nand she cannot do it herself.
+Unfortunately there is no one to saw off \N[3]'s legs/#and she cannot do it herself.
 What do you want to saw off from \N[22]?
 Unfortunately \N[22] has no arms left to saw.
-Unfortunately there is no one to saw off \N[22]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[22]'s arm/#and he cannot do it himself.
 Unfortunately \N[22] has no legs left to saw.
-Unfortunately there is no one to saw off \N[22]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[22]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[28]?
 Unfortunately \N[28] has no arms left to saw.
-Unfortunately there is no one to saw off \N[28]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[28]'s arm/#and he cannot do it himself.
 Unfortunately \N[28] has no legs left to saw.
-Unfortunately there is no one to saw off \N[28]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[28]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[29]?
 Unfortunately \N[29] has no arms left to saw.
-Unfortunately there is no one to saw off \N[29]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[29]'s arm/#and he cannot do it himself.
 Unfortunately \N[29] has no legs left to saw.
-Unfortunately there is no one to saw off \N[29]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[29]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[16]?
 Unfortunately \N[16] has no arms left to saw.
-Unfortunately there is no one to saw off \N[16]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[16]'s arm/#and he cannot do it himself.
 Unfortunately \N[16] has no legs left to saw.
-Unfortunately there is no one to saw off \N[16]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[16]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[17]?
 Unfortunately \N[17] has no arms left to saw.
-Unfortunately there is no one to saw off \N[17]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[17]'s arm/#and he cannot do it himself.
 Unfortunately \N[17] has no legs left to saw.
-Unfortunately there is no one to saw off \N[17]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[17]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[18]?
 Unfortunately \N[18] has no arms left to saw.
-Unfortunately there is no one to saw off \N[18]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[18]'s arm/#and he cannot do it himself.
 Unfortunately \N[18] has no legs left to saw.
-Unfortunately there is no one to saw off \N[18]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[18]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[11]?
 Unfortunately \N[11] has no arms left to saw.
-Unfortunately there is no one to saw off \N[11]'s arm\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[11]'s arm/#and he cannot do it himself.
 Unfortunately \N[11] has no legs left to saw.
-Unfortunately there is no one to saw off \N[11]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[11]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[4]?
 Unfortunately \N[4] has no arms left to saw.
-Unfortunately there is no one to saw off \N[4]'s other\narm and he cannot do it himself.
+Unfortunately there is no one to saw off \N[4]'s other/#arm and he cannot do it himself.
 Unfortunately \N[4] has no legs left to saw.
-Unfortunately there is no one to saw off \N[4]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[4]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[6]?
 Unfortunately \N[6] has no arms left to saw.
-Unfortunately there is no one to saw off \N[6]'s other \narm and he cannot do it himself.
+Unfortunately there is no one to saw off \N[6]'s other /#arm and he cannot do it himself.
 Unfortunately \N[6] has no legs left to saw.
-Unfortunately there is no one to saw off \N[6]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[6]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[9]?
 Unfortunately \N[9] has no arms left to saw.
-Unfortunately there is no one to saw off \N[9]'s other\narm and he cannot do it himself.
+Unfortunately there is no one to saw off \N[9]'s other/#arm and he cannot do it himself.
 Unfortunately \N[9] has no legs left to saw.
-Unfortunately there is no one to saw off \N[9]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[9]'s legs/#and he cannot do it himself.
 What do you want to saw off from \N[15]?
 Unfortunately \N[15] has no arms left to saw.
-Unfortunately there is no one to saw off \N[15]'s other\narm and she cannot do it herself.
+Unfortunately there is no one to saw off \N[15]'s other/#arm and she cannot do it herself.
 Unfortunately \N[15] has no legs left to saw.
-Unfortunately there is no one to saw off \N[15]'s legs\nand she cannot do it herself.
+Unfortunately there is no one to saw off \N[15]'s legs/#and she cannot do it herself.
 What do you want to saw off from \N[13]?
 Unfortunately \N[13] has no arms left to saw.
-Unfortunately there is no one to saw off \N[13]'s other\narm and he cannot do it himself.
+Unfortunately there is no one to saw off \N[13]'s other/#arm and he cannot do it himself.
 Unfortunately \N[13] has no legs left to saw.
-Unfortunately there is no one to saw off \N[13]'s legs\nand he cannot do it himself.
+Unfortunately there is no one to saw off \N[13]'s legs/#and he cannot do it himself.
 Saw off a paw
 What do you want to saw off from \N[7]?
 Unfortunately \N[7] has no paws left to saw.
-Unfortunately there is no one to saw off \N[7]'s\nhoofs and he cannot do it himself.
+Unfortunately there is no one to saw off \N[7]'s/#hoofs and he cannot do it himself.
 What do you want to saw off from \N[14]?
 Unfortunately \N[14] has no arms left to saw.
-Unfortunately there is no one to saw off \N[14]'s other\narm and she cannot do it herself.
+Unfortunately there is no one to saw off \N[14]'s other/#arm and she cannot do it herself.
 Unfortunately \N[14] has no legs left to saw.
-Unfortunately there is no one to saw off \N[14]'s legs\nand she cannot do it herself.
+Unfortunately there is no one to saw off \N[14]'s legs/#and she cannot do it herself.
 You find \c[2]Alchemillia vol. 1\c[0]!
 You find \c[2]Alchemillia vol. 2\c[0]!
 You find \c[2]Alchemillia vol. 3\c[0]!
 You find a \c[2]Anathomia\c[0]!
 \N[1] assists in this task.
-\>\i[75]\}EVI\{\<\n"... I... I can do it. Just hold still..."
+\>\i[75]\}EVI\{\</#"... I... I can do it. Just hold still..."
 \N[3] assists in this task.
-\>\i[76]\}ARINA\{\<\n"If there's no one else... I guess it'll have to be me. I'll help\nout..."
+\>\i[76]\}ARINA\{\</#"If there's no one else... I guess it'll have to be me. I'll help/#out..."
 \N[4] assists in this task.
-\>\i[67]\}AAN\{\<\n"I'm not going to lie - This'll hurt. But don't worry, I've done\nthis plenty of times before..."
+\>\i[67]\}AAN\{\</#"I'm not going to lie - This'll hurt. But don't worry, I've done/#this plenty of times before..."
 \N[5] assists in this task.
-\>\i[64]\}BELLA\{\<\n"No use delaying the inevitable. We have to do this."
+\>\i[64]\}BELLA\{\</#"No use delaying the inevitable. We have to do this."
 \N[6] assists in this task.
-\>\i[78]\}'SAA\{\<\n"Just give me the saw. I'll do this."
+\>\i[78]\}'SAA\{\</#"Just give me the saw. I'll do this."
 \N[15] assists in this task.
-\>\i[78]\}LIVIA\{\<\n"Ummm... I'm so sorry, but there isn't any other way..."
+\>\i[78]\}LIVIA\{\</#"Ummm... I'm so sorry, but there isn't any other way..."
 \N[13] assists in this task.
-\>\i[76]\}ARCOH\{\<\n"... Sorry about this."
+\>\i[76]\}ARCOH\{\</#"... Sorry about this."
 Marcoh just picks up the saw and goes for it.
 \N[14] assists in this task.
-\>\i[74]\}ARIN\{\<\n"Ah... Ummm... \.Just give me the saw. I guess there's no one else\nto do this!"
+\>\i[74]\}ARIN\{\</#"Ah... Ummm... \.Just give me the saw. I guess there's no one else/#to do this!"
 GabText The infection on \N[1]'s arm is looking bad...
 GabText \N[1] is feeling terrible because of the infection...
 GabText You are feeling dizzy...
@@ -699,9 +699,9 @@ GabText \N[1] lost his another arm too!
 GabText \N[1] lost his left leg! It's bleeding heavily!
 GabText \N[1] lost his another leg too!
 \N[1] cannot hold \c[2]Longinus\c[0] with just one arm!
-The cold pistol grip feels familiar in your hands. You didn't\nthink you'd be grasping to one so soon after leaving the frontlines. 
-You check the functionality of the rifle without even thinking\nabout it. Your old habits are kicking in. The rifle creates\na familiar feeling of safety.
-You check the functionality of the trenchgun without even \nthinking about it. Your old habits are kicking in. The gun\ncreates a familiar feeling of safety.
+The cold pistol grip feels familiar in your hands. You didn't/#think you'd be grasping to one so soon after leaving the frontlines. 
+You check the functionality of the rifle without even thinking/#about it. Your old habits are kicking in. The rifle creates/#a familiar feeling of safety.
+You check the functionality of the trenchgun without even /#thinking about it. Your old habits are kicking in. The gun/#creates a familiar feeling of safety.
 GabText \N[1] is tied up!
 GabText \N[1] got decapitated!
 GabText \N[1]'s head exploded from the pressure!
@@ -737,7 +737,7 @@ GabText \N[6]'s head exploded from the pressure!
 GabText \N[7] lost a hoof! The stump is bleeding heavily!
 GabText \N[7] lost another hoof! He is having trouble standing up...
 GabText \N[7] lost his third hoof already!
-\N[7] has lost all 3 of his 4 hoofs. There is no way for him\nto continue living.
+\N[7] has lost all 3 of his 4 hoofs. There is no way for him/#to continue living.
 GabText \N[7] is tied up!
 GabText \N[7] is decapitated!
 GabText \N[7]'s head exploded because of the pressure!
@@ -747,7 +747,7 @@ GabText \N[10] lost it's left leg!
 GabText \N[10] lost it's another leg too!
 GabText \N[16] lost his left arm! It's bleeding heavily!
 GabText \N[16] lost his another arm too!
-\N[16] has lost both legs and arms and is\nuseless now.
+\N[16] has lost both legs and arms and is/#useless now.
 GabText \N[16] lost his left leg! It's bleeding heavily!
 GabText \N[16] lost his another leg too!
 \N[16] has lost both legs and arms and is useless now.
@@ -756,7 +756,7 @@ GabText \N[16] is decapitated!
 GabText \N[16]'s head exploded from the pressure!
 GabText \N[17] lost his left arm! It's bleeding heavily!
 GabText \N[17] lost his another arm too!
-\N[17] has lost both legs and arms and is\nuseless now.
+\N[17] has lost both legs and arms and is/#useless now.
 GabText \N[17] lost his left leg! It's bleeding heavily!
 GabText \N[17] lost his another leg too!
 \N[17] has lost both legs and arms and is useless now.
@@ -765,7 +765,7 @@ GabText \N[17] is decapitated!
 GabText \N[17]'s head exploded from the pressure!
 GabText \N[18] lost his left arm! It's bleeding heavily!
 GabText \N[18] lost his another arm too!
-\N[18] has lost both legs and arms and is\nuseless now.
+\N[18] has lost both legs and arms and is/#useless now.
 GabText \N[18] lost his left leg! It's bleeding heavily!
 GabText \N[18] lost his another leg too!
 GabText \N[18] is tied up!
@@ -820,8 +820,8 @@ GabText \N[13] lost his another arm too!
 GabText \N[13] lost his left leg! It's bleeding heavily!
 GabText \N[13] lost his another leg too!
 \N[13] cannot hold weapons without arms!
-You once made a promise to yourself that you'd never lay a finger\non firearms ever again...
-However, the circumstances are what they are. You find it surprising\nhow light the pistol feels in your hands after all this time.
+You once made a promise to yourself that you'd never lay a finger/#on firearms ever again...
+However, the circumstances are what they are. You find it surprising/#how light the pistol feels in your hands after all this time.
 \N[13] is out of ammo, so he continues unarmed.
 \N[13] cannot hold \c[2]Mauler\c[0] with just one arm!
 \N[13] cannot hold \c[2]Bayonet\c[0] with just one arm!
@@ -834,9 +834,9 @@ However, the circumstances are what they are. You find it surprising\nhow light 
 \N[13] cannot hold \c[2]Iron spear\c[0] with just one arm!
 \N[13] cannot hold \c[2]Sergal spear\c[0] with just one arm!
 \N[13] cannot hold \c[2]Longinus\c[0] with just one arm!
-You've never really used one of these. But you've seen enough soldiers\ncock their bolt action rifle to know how it's done.
-The rifle feels pretty natural against your shoulder as you look\ndown the iron sights.
-You've never really used one of these. But you've seen movies where\nfirearms like these were used. After messing around with the gun a bit,\nyou feel comfortable with it.
+You've never really used one of these. But you've seen enough soldiers/#cock their bolt action rifle to know how it's done.
+The rifle feels pretty natural against your shoulder as you look/#down the iron sights.
+You've never really used one of these. But you've seen movies where/#firearms like these were used. After messing around with the gun a bit,/#you feel comfortable with it.
 GabText \N[13] is tied up!
 GabText \N[13] got decapitated!
 GabText \N[13]'s head exploded from the pressure!
@@ -847,16 +847,16 @@ GabText \N[15] lost her left leg! It's bleeding heavily!
 GabText \N[15] lost her other leg too!
 GabText \N[15] is knocked down from her wheelchair!
 \N[15] cannot hold weapons without arms!
-The firearm feels oddly heavy in your hands. You didn't think it would\nfeel this hefty. The iron against your skin, it creates a rush in your\nhead.
+The firearm feels oddly heavy in your hands. You didn't think it would/#feel this hefty. The iron against your skin, it creates a rush in your/#head.
 You are now wielding power to take away life.
 \N[15] is out of ammo, so she continues unarmed.
 \N[15] cannot hold \c[2]Rifle\c[0] with just one arm!
 \N[15] cannot hold \c[2]Trenchgun\c[0] with just one arm!
 \N[15] cannot hold \c[2]Reaper's rake\c[0] with just one arm!
-You gasp as you take the rifle in your arms. The firearm feels heavy \nand sturdy. Slowly you graze its long barrel with your index finger...
-Your body is tingling with adrenaline from just holding the rifle.\nYou've never used one before, but oddly it feels just right. Like \nyou were always meant to wield one.
-You gasp as you take the trenchgun in your arms. The firearm feels \nheavy and sturdy. Slowly you graze its thick barrel with your index \nfinger...
-Your body is tingling with adrenaline from just holding the gun.\nYou've never used one before, but oddly it feels just right. Like \nyou were always meant to wield one.
+You gasp as you take the rifle in your arms. The firearm feels heavy /#and sturdy. Slowly you graze its long barrel with your index finger...
+Your body is tingling with adrenaline from just holding the rifle./#You've never used one before, but oddly it feels just right. Like /#you were always meant to wield one.
+You gasp as you take the trenchgun in your arms. The firearm feels /#heavy and sturdy. Slowly you graze its thick barrel with your index /#finger...
+Your body is tingling with adrenaline from just holding the gun./#You've never used one before, but oddly it feels just right. Like /#you were always meant to wield one.
 GabText \N[15] is tied up!
 GabText \N[15] got decapitated!
 GabText \N[15]'s head exploded from the pressure!
@@ -866,8 +866,8 @@ GabText \N[14] lost her other arm too!
 GabText \N[14] lost her left leg! It's bleeding heavily!
 GabText \N[14] lost her other leg too!
 \N[14] cannot hold weapons without arms!
-With a firm grip you cock the gun and switch the safety on and off.\nYou remember his teachings... He told you how to wield this thing.
-You used to hate the mere idea behind firearms, but now you see\nthem as the simple tools they really are. It is the humans behind\nthe guns that disgust you now.
+With a firm grip you cock the gun and switch the safety on and off./#You remember his teachings... He told you how to wield this thing.
+You used to hate the mere idea behind firearms, but now you see/#them as the simple tools they really are. It is the humans behind/#the guns that disgust you now.
 \N[14] is out of ammo, so she continues unarmed.
 \N[14] cannot hold \c[2]Mauler\c[0] with just one arm!
 \N[14] cannot hold \c[2]Bayonet\c[0] with just one arm!
@@ -880,11 +880,11 @@ You used to hate the mere idea behind firearms, but now you see\nthem as the sim
 \N[14] cannot hold \c[2]Iron spear\c[0] with just one arm!
 \N[14] cannot hold \c[2]Sergal spear\c[0] with just one arm!
 \N[14] cannot hold \c[2]Longinus\c[0] with just one arm!
-With a firm grip you cock the rifle and check its iron sights. You\nremember his teachings... He told you how to wield this thing.
+With a firm grip you cock the rifle and check its iron sights. You/#remember his teachings... He told you how to wield this thing.
 GabText \N[14] is tied up!
 GabText \N[14] got decapitated!
 GabText \N[14]'s head exploded from the pressure!
-With your dedication your affinity with the Alll-mer is \ngrowing...
+With your dedication your affinity with the Alll-mer is /#growing...
 You find a \c[2]Meatpie\c[0] and a \c[2]Moldy bread\c[0]!
 You find a severed \c[2]Arm\c[0] and \c[2]Leg\c[0].
 You find a \c[2]Cloth fragment\c[0]!
@@ -902,53 +902,53 @@ You find a \c[2]Sorcerer's stone\c[0]!
 \N[14] has no arms to use the syringe.
 \N[13] has no arms to use the syringe.
 \N[15] has no arms to use the syringe.
-The veins on \N[16]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-The veins on \N[17]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-The veins on \N[18]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-The veins on \N[22]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-The veins on \N[28]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-The veins on \N[29]'s arm aren't working.\nThere is no blood circulation, so the heroin goes to waste.
-Black Kalev evades your syringe nonchalantly. He clearly\ndoesn't want a shot.
+The veins on \N[16]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+The veins on \N[17]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+The veins on \N[18]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+The veins on \N[22]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+The veins on \N[28]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+The veins on \N[29]'s arm aren't working./#There is no blood circulation, so the heroin goes to waste.
+Black Kalev evades your syringe nonchalantly. He clearly/#doesn't want a shot.
 You search the barrel for anything useful...
 You search the box for anything useful...
-\>\i[73]\}ANITOR\{\<\n"Where do you think you are going!?"
+\>\i[73]\}ANITOR\{\</#"Where do you think you are going!?"
 You search the urn for anything useful...
 You get \c[2]Sturdy overalls\c[0] and a \c[2]Booby trap\c[0].
-"Dear Giesela, I write this letter in great sadness. I'm\nafraid I will have to postpone my return to your loving\nbosom."
-"Even if the great war is supposedly over, our tasks seem to \nbe anything but."
-"After running around following orders that would sicken every\nsane person who had not witnessed the horrors of war, I think\nI've finally started to see the red line our Kaiser has been\nfollowing all along."
-"This rotten city... It was the very thing our Kaiser strived \nto conquer since day one."
-"I do not think it a coincidence that very soon after \nreaching this city, the Kaiser decided to withraw Bremen\nforces elsewhere and agree on the terms of peace."
-"I don't know what's so special about this miserable place,\nbut I even heard that the Kaiser himself will be coming here\nin the upcoming days."
-"Maybe after that, I can finally return home. I hope you\nare able to wait for me just a little while longer."
+"Dear Giesela, I write this letter in great sadness. I'm/#afraid I will have to postpone my return to your loving/#bosom."
+"Even if the great war is supposedly over, our tasks seem to /#be anything but."
+"After running around following orders that would sicken every/#sane person who had not witnessed the horrors of war, I think/#I've finally started to see the red line our Kaiser has been/#following all along."
+"This rotten city... It was the very thing our Kaiser strived /#to conquer since day one."
+"I do not think it a coincidence that very soon after /#reaching this city, the Kaiser decided to withraw Bremen/#forces elsewhere and agree on the terms of peace."
+"I don't know what's so special about this miserable place,/#but I even heard that the Kaiser himself will be coming here/#in the upcoming days."
+"Maybe after that, I can finally return home. I hope you/#are able to wait for me just a little while longer."
 "Yours forever - Jonni."
 \N[3] cannot hold \c[2]Iron spear\c[0] with just one arm!
 The bonesaw cracked!
-"The Occult Grimoires - Magick in Theory and Practice.\nWritten by Samiri Zimri. Translated by Oscar Renté."
-"So that one doesn't lose his mind along with the soul, one\nmust come prepared for all situations."
-"The basics of any knowledge are always the most important,\nyou need steady foundations, in order to build the tower to\nthe gods."
-"To perform any rites on a ritual circle, the founding circle\nmust be carved first."
-"From top to bottom - The first one is the asymmetric circle.\nThe asymmetric circle represent the older gods and their one\nsided distribution of power."
-"The second one is called the imperfect circle. The imperfect\ncircle is the mark of the new gods who have strived for\nperfection since their conception, never to attain it truly."
-"And the last one is called the perfection circle. The perfection\ncircle represent countless spiraling cycles culminating in\nthe birth of the ascended ones. The ones who were able to\ngo beyond human limits."
-"One must never assign sigils, not meant for their founding\ncircles. That is the lesson to take from here."
-"The beauty of these rites is that you cannot change them,\nbut they can change you."
-You find a \c[2]Basement key\c[0] from the pockets of the\nwoodsman! You also take the \c[2]Axe\c[0].
-With the sacrifice your affinity with the Gro-goroth is \ngrowing...
+"The Occult Grimoires - Magick in Theory and Practice./#Written by Samiri Zimri. Translated by Oscar Renté."
+"So that one doesn't lose his mind along with the soul, one/#must come prepared for all situations."
+"The basics of any knowledge are always the most important,/#you need steady foundations, in order to build the tower to/#the gods."
+"To perform any rites on a ritual circle, the founding circle/#must be carved first."
+"From top to bottom - The first one is the asymmetric circle./#The asymmetric circle represent the older gods and their one/#sided distribution of power."
+"The second one is called the imperfect circle. The imperfect/#circle is the mark of the new gods who have strived for/#perfection since their conception, never to attain it truly."
+"And the last one is called the perfection circle. The perfection/#circle represent countless spiraling cycles culminating in/#the birth of the ascended ones. The ones who were able to/#go beyond human limits."
+"One must never assign sigils, not meant for their founding/#circles. That is the lesson to take from here."
+"The beauty of these rites is that you cannot change them,/#but they can change you."
+You find a \c[2]Basement key\c[0] from the pockets of the/#woodsman! You also take the \c[2]Axe\c[0].
+With the sacrifice your affinity with the Gro-goroth is /#growing...
 Sacrifice \N[1]?
-\N[1] seems to disagree with your plans. He gives you a cold\nshoulder.
+\N[1] seems to disagree with your plans. He gives you a cold/#shoulder.
 Sacrifice \N[3]?
-\>\i[76]\}ARINA\{\<\n"W-what?? I was the one instructing you with this circle\nand this is how you repay?"
-\>\i[76]\}ARINA\{\<\n"I don't think so."
+\>\i[76]\}ARINA\{\</#"W-what?? I was the one instructing you with this circle/#and this is how you repay?"
+\>\i[76]\}ARINA\{\</#"I don't think so."
 Sacrifice \N[4]?
-\>\i[67]\}AAN\{\<\n"... Oh, what? You are asking if I want to be sacrificed?"
-\>\i[67]\}AAN\{\<\n"As tempting as dying for your empty cause sounds... I'll\npass."
+\>\i[67]\}AAN\{\</#"... Oh, what? You are asking if I want to be sacrificed?"
+\>\i[67]\}AAN\{\</#"As tempting as dying for your empty cause sounds... I'll/#pass."
 Sacrifice \N[5]?
-\>\i[64]\}BELLE\{\<\n"No."
-\>\i[64]\}BELLE\{\<\n"What kind of sick joke is that anyway?"
-"The beast has entered this house. It is not my property any\nlonger."
+\>\i[64]\}BELLE\{\</#"No."
+\>\i[64]\}BELLE\{\</#"What kind of sick joke is that anyway?"
+"The beast has entered this house. It is not my property any/#longer."
 "The beast took my wife, it took my dignity, it took my faith."
-"If it wasn't the full moon, I would let it take my life\nas well, by my own hand."
+"If it wasn't the full moon, I would let it take my life/#as well, by my own hand."
 Engrave the sigil \i[26]
 Engrave the sigil \i[10]
 Engrave the sigil \i[27]
@@ -986,78 +986,78 @@ Which sigil would you like to engrave on \N[28]?
 Unfortunately \N[28] has got a sigil already.
 Which sigil would you like to engrave on \N[29]?
 Unfortunately \N[29] has got a sigil already.
-"This manual depicts basics of survival in a close-combat situations,\nas well as on the field. The following teachings can be applied both \non the battlefield and in your everyday life."
-"\c[2]Lesson 1 - Strategic Dismemberment\c[0]\nSever different limbs of the enemy to best subdue their attacks.\nIf the enemy is carrying a weapon, it might be best to deal with \nthat particular limb first."
-"Going straight for the head might seem tempting, but attacking such\nguarded bodypart in the heat of the battle might prove out to be \ndifficult."
-"Taking out legs will often rock the balance of the enemy and make \nthem vulnerable for head shots."
-"\c[2]Lesson 2 - Rev Up\c[0]\nAs the fight goes on, you will get more rev'd up naturally as\nindicated with your \i[175] Points increasing every turn."
-"Use one or two \i[175] Points to boost your strength, or three to \nadd an additional attack to your string."
-"There are also different skills that require Rev Points. These are \nmentioned in the skill descriptions."
-"\c[2]Lesson 3 - Devastating Attacks\c[0]\nSometimes the enemy might be preparing for a Devastating Attack.\nThese attacks cause massive damage or other status ailments that \nprove out to be insufferable."
-"Most of the time these attacks are telegraphed somehow on the\nprevious turn and you can see them coming. You can either dodge \nDevastating Attacks by guarding or you can risk it and face the \nCoin of Judgement."
-"The Coin of Judgement is your last chance in dodging the incoming\nattack. You can affect your chances by throwing a \c[2]Lucky coin\c[0] into \nthe mix by holding [SHIFT] key while you choose either Heads or \nTails."
+"This manual depicts basics of survival in a close-combat situations,/#as well as on the field. The following teachings can be applied both /#on the battlefield and in your everyday life."
+"\c[2]Lesson 1 - Strategic Dismemberment\c[0]/#Sever different limbs of the enemy to best subdue their attacks./#If the enemy is carrying a weapon, it might be best to deal with /#that particular limb first."
+"Going straight for the head might seem tempting, but attacking such/#guarded bodypart in the heat of the battle might prove out to be /#difficult."
+"Taking out legs will often rock the balance of the enemy and make /#them vulnerable for head shots."
+"\c[2]Lesson 2 - Rev Up\c[0]/#As the fight goes on, you will get more rev'd up naturally as/#indicated with your \i[175] Points increasing every turn."
+"Use one or two \i[175] Points to boost your strength, or three to /#add an additional attack to your string."
+"There are also different skills that require Rev Points. These are /#mentioned in the skill descriptions."
+"\c[2]Lesson 3 - Devastating Attacks\c[0]/#Sometimes the enemy might be preparing for a Devastating Attack./#These attacks cause massive damage or other status ailments that /#prove out to be insufferable."
+"Most of the time these attacks are telegraphed somehow on the/#previous turn and you can see them coming. You can either dodge /#Devastating Attacks by guarding or you can risk it and face the /#Coin of Judgement."
+"The Coin of Judgement is your last chance in dodging the incoming/#attack. You can affect your chances by throwing a \c[2]Lucky coin\c[0] into /#the mix by holding [SHIFT] key while you choose either Heads or /#Tails."
 "Ultimately your fate will be chosen by the higher powers."
-"\c[2]Lesson 4 - Shooting\c[0]\nYou can use various different firearms on the field, before even\ninitiating a combat encounter, to weaken or to kill the enemy before\nthey get to the striking distance."
-"Just have a firearm equipped, some ammo to spare and press [SHIFT].\nThe effects of your attack vary from enemy to enemy. Weaker foes\nmight even get killed from a single hit."
-"\c[2]Lesson 5 - Running\c[0]\nHold [SHIFT] to run. Running slowly depletes your stamina. If you\nrun out of stamina entirely, you'll need a short recovery time to\ncatch your breath before being able to run again."
-"If an enemy spots you, you will go into Tension mode where stamina \ndepletes at an alarming rate. This tense moment will luckily pass by\nfairly fast."
-"If you have firearms equipped, you can't run. No running and\ngunning. If you have injured your legs, no running either."
-"There is a lot more to survival, but hopefully these lessons will\naid you to get started. Good luck."
-It is a week-old newspaper article about the supposed end of \nthe Great War II.
-"...Two of the biggest powers in the western world - The\nEastern Union and the Bremen settled for peace after the last \naggressive push by the Bremen troops happening just days prior\nto the treaty."
-"The Bremen troops seized the power in a small city of\nPrehevil, located in central Bohemia, just west from Lake\nVerdite."
-"The last push was considered especially aggressive and it\nis widely considered to have advanced the peace agreements\non a larger scale."
-"Another major factor behind the peace was the joined assaults\nagainst the Eastern Union on both the western and eastern \nfronts."
-"From the west, the remnants of the Kingdom of Rondon kept\nattacking the Eastern Union and from the east, the Kingdom of\nEdo continued their campaign after their prior defeats..."
-The article goes on and on about the small details, but that\nseems to be the gist of the article.
-The letter is encrypted by someone from the Nameless Liberty \nUnderground. It uses the same code language taught to you at \nthe NLU headquarters. You take a closer look...
-"Eastern Union officials from both Voroniyan Republic as well \nas from Eastern Sanctuaries don't understand what they are giving\nup."
-"I tried to emphasize the importance of the project Logic during \nmy time with the research, yet they cannot see its true potential. \nEastern Union is willing to let go of Prehevil for a very cheap \nprice."
-"The leaked documents say the officials are stupid enough to \nthink they even got a good deal out of it. They don't understand \nwhat they are handing over to Kaiser on a silver platter."
+"\c[2]Lesson 4 - Shooting\c[0]/#You can use various different firearms on the field, before even/#initiating a combat encounter, to weaken or to kill the enemy before/#they get to the striking distance."
+"Just have a firearm equipped, some ammo to spare and press [SHIFT]./#The effects of your attack vary from enemy to enemy. Weaker foes/#might even get killed from a single hit."
+"\c[2]Lesson 5 - Running\c[0]/#Hold [SHIFT] to run. Running slowly depletes your stamina. If you/#run out of stamina entirely, you'll need a short recovery time to/#catch your breath before being able to run again."
+"If an enemy spots you, you will go into Tension mode where stamina /#depletes at an alarming rate. This tense moment will luckily pass by/#fairly fast."
+"If you have firearms equipped, you can't run. No running and/#gunning. If you have injured your legs, no running either."
+"There is a lot more to survival, but hopefully these lessons will/#aid you to get started. Good luck."
+It is a week-old newspaper article about the supposed end of /#the Great War II.
+"...Two of the biggest powers in the western world - The/#Eastern Union and the Bremen settled for peace after the last /#aggressive push by the Bremen troops happening just days prior/#to the treaty."
+"The Bremen troops seized the power in a small city of/#Prehevil, located in central Bohemia, just west from Lake/#Verdite."
+"The last push was considered especially aggressive and it/#is widely considered to have advanced the peace agreements/#on a larger scale."
+"Another major factor behind the peace was the joined assaults/#against the Eastern Union on both the western and eastern /#fronts."
+"From the west, the remnants of the Kingdom of Rondon kept/#attacking the Eastern Union and from the east, the Kingdom of/#Edo continued their campaign after their prior defeats..."
+The article goes on and on about the small details, but that/#seems to be the gist of the article.
+The letter is encrypted by someone from the Nameless Liberty /#Underground. It uses the same code language taught to you at /#the NLU headquarters. You take a closer look...
+"Eastern Union officials from both Voroniyan Republic as well /#as from Eastern Sanctuaries don't understand what they are giving/#up."
+"I tried to emphasize the importance of the project Logic during /#my time with the research, yet they cannot see its true potential. /#Eastern Union is willing to let go of Prehevil for a very cheap /#price."
+"The leaked documents say the officials are stupid enough to /#think they even got a good deal out of it. They don't understand /#what they are handing over to Kaiser on a silver platter."
 "But Kaiser knows."
-"I first met him briefly during my scholarship at the compound \nall those years ago. It sounds like Kaiser knows perfectly well \nwhat the project has been building towards..."
-"...in fact from the pieces I was able to gather, it sounds\nlike he was one of the main forces kickstarting the project long \nbefore The Great War started and pitted Bremen and Eastern Union \nagainst each other. -R"
+"I first met him briefly during my scholarship at the compound /#all those years ago. It sounds like Kaiser knows perfectly well /#what the project has been building towards..."
+"...in fact from the pieces I was able to gather, it sounds/#like he was one of the main forces kickstarting the project long /#before The Great War started and pitted Bremen and Eastern Union /#against each other. -R"
 Looks like a coded letter... Or a child's prank.
-Unfortunately you do not have the means to decrypt this at the\nmoment...
-\>\i[64]\}BELLA\{\<\n"What's that?"
-\>\i[64]\}BELLA\{\<\n"Can I see it for a second?"
-\>\i[64]\}BELLA\{\<\n"Hmmmmm\..\..\.."
-\>\i[64]\}BELLA\{\<\n"...Mmmmmm.\..\..\."
+Unfortunately you do not have the means to decrypt this at the/#moment...
+\>\i[64]\}BELLA\{\</#"What's that?"
+\>\i[64]\}BELLA\{\</#"Can I see it for a second?"
+\>\i[64]\}BELLA\{\</#"Hmmmmm\..\..\.."
+\>\i[64]\}BELLA\{\</#"...Mmmmmm.\..\..\."
 "No idea."
 "I was hoping you could tell me."
 "It's probably nothing important."
-\>\i[64]\}BELLA\{\<\n"That's a weird one. What do you reckon it says?"
-\>\i[64]\}BELLA\{\<\n"Yup...\. I can keep it and try to make sense of it. If you don't \nmind that is?"
-\>\i[64]\}BELLA\{\<\n"Beats me."
-\>\i[64]\}BELLA\{\<\n"Maybe it's nothing? I wouldn't lose sleep over it."
-\>\i[64]\}BELLA\{\<\n"Yup, agreed."
-\>\i[64]\}BELLA\{\<\n"Let's just move on."
+\>\i[64]\}BELLA\{\</#"That's a weird one. What do you reckon it says?"
+\>\i[64]\}BELLA\{\</#"Yup...\. I can keep it and try to make sense of it. If you don't /#mind that is?"
+\>\i[64]\}BELLA\{\</#"Beats me."
+\>\i[64]\}BELLA\{\</#"Maybe it's nothing? I wouldn't lose sleep over it."
+\>\i[64]\}BELLA\{\</#"Yup, agreed."
+\>\i[64]\}BELLA\{\</#"Let's just move on."
 Despite your deep dreams you do not feel rested a bit.
 You search the trash for anything useful...
 "The Last Frontier - The Vinland Coloniale - Chapter 1."
-"The legends report that in the year 1009 a group of \nexplorers from Oldegård first made contact with the island\nregion of Vinland."
-"This is the first written record of the continent. The\nnext confirmed case dates back to year 1310 when a small \nfleet from Abyssonia ventured to the dark waters of the \nwest."
-"However it would take another 200 years before an \nestablished trade route would be formed, again by the \nseafarers of Oldegård in the year 1577."
-"It was during this escapade that the continent was named\nVinland, translating to 'Wine Land' supposedly because of\nthe amount of wine required to wipe the memories clean of\nthe land and the horrors it contained."
-"Despite the existence of the continent becoming more \ncommon knowledge among the scholars of the western world,\nventures to the said land were very rare."
-"In the year 1650, a scholar from the Vatican City wrote\nthe following description of the land:"
-"The soil consists of minerals that seem to reject sunlight\nand warmth altogether resulting the ground to look like\na contiguous colourless black mass where it is hard to\nmeasure depth of each hill and basin with a naked eye."
-"And the few plants that manage to grow in this hostile \nground end up taking these very same features. Thus the\nlandscape merges together as far as the eye can see."
-"Just endless darkness. If you are lucky, the clouds might\nshift a little and you can at the very least tell where\nthe land ends and where the gloomy sky begins."
+"The legends report that in the year 1009 a group of /#explorers from Oldegård first made contact with the island/#region of Vinland."
+"This is the first written record of the continent. The/#next confirmed case dates back to year 1310 when a small /#fleet from Abyssonia ventured to the dark waters of the /#west."
+"However it would take another 200 years before an /#established trade route would be formed, again by the /#seafarers of Oldegård in the year 1577."
+"It was during this escapade that the continent was named/#Vinland, translating to 'Wine Land' supposedly because of/#the amount of wine required to wipe the memories clean of/#the land and the horrors it contained."
+"Despite the existence of the continent becoming more /#common knowledge among the scholars of the western world,/#ventures to the said land were very rare."
+"In the year 1650, a scholar from the Vatican City wrote/#the following description of the land:"
+"The soil consists of minerals that seem to reject sunlight/#and warmth altogether resulting the ground to look like/#a contiguous colourless black mass where it is hard to/#measure depth of each hill and basin with a naked eye."
+"And the few plants that manage to grow in this hostile /#ground end up taking these very same features. Thus the/#landscape merges together as far as the eye can see."
+"Just endless darkness. If you are lucky, the clouds might/#shift a little and you can at the very least tell where/#the land ends and where the gloomy sky begins."
 "The land is cursed. The land is morbid and dark."
-"Each settler comes back with vivid stories of very personal \nnightmares they went through during their stay in Vinland."
-"The discovery of this continent is the biggest mistake\nthe mankind has ever made."
+"Each settler comes back with vivid stories of very personal /#nightmares they went through during their stay in Vinland."
+"The discovery of this continent is the biggest mistake/#the mankind has ever made."
 You search the urn for anything useful...
-"James, it happened again. Those kids stole the tools for the\numpteenth time! If I ever catch them in act, there's going to be \nhell to pay."
-"The priest told me that everyone under the ascended one share all \npossession. 'Nothing is mine and nothing is yours. All is that of \nAlll-mer.'"
-"What mumbo jumbo! That might work for the priest and all, but \nhe's not the one doing these renovations under a strict schedule!"
-"In future I'll hide the tool box. I got the perfect spot in\nmind already."
-"When you enter the second hall, you know those statues? They are\npointing, one to another. Just follow their lead. The last one \npoints at the spot near the wall. I'll leave the box under the \nfloor tiling there."
-"Also, just to make it more difficult for those thieving little\nrats, I decided it's best to close the underground passage to the\nrenovation site."
-"Father Domek took one of the key effigies to his orphanage, one \nwas left for the priests here and I'll take the last one to my \nown apartment."
+"James, it happened again. Those kids stole the tools for the/#umpteenth time! If I ever catch them in act, there's going to be /#hell to pay."
+"The priest told me that everyone under the ascended one share all /#possession. 'Nothing is mine and nothing is yours. All is that of /#Alll-mer.'"
+"What mumbo jumbo! That might work for the priest and all, but /#he's not the one doing these renovations under a strict schedule!"
+"In future I'll hide the tool box. I got the perfect spot in/#mind already."
+"When you enter the second hall, you know those statues? They are/#pointing, one to another. Just follow their lead. The last one /#points at the spot near the wall. I'll leave the box under the /#floor tiling there."
+"Also, just to make it more difficult for those thieving little/#rats, I decided it's best to close the underground passage to the/#renovation site."
+"Father Domek took one of the key effigies to his orphanage, one /#was left for the priests here and I'll take the last one to my /#own apartment."
 "So if you need to use the passage, let me know."
 You copied the locations mentioned on the note to your map.
-"Sala di Mueer'laku\n - In the (same) room with the everwatching's eye."
+"Sala di Mueer'laku/# - In the (same) room with the everwatching's eye."
 His rifle seems to be out of shape and broken...
 You find 2 \c[2].303 Ammo\c[0]!
 You find a \c[2].303 Ammo\c[0]!
@@ -1083,47 +1083,47 @@ You find \c[2]Gun powder\c[0]!
 You find a \c[2]Sewer winch\c[0]!
 You find a \c[2]Saw blade\c[0]!
 You find an \c[2]Gun powder\c[0]!
-"The Midnight Gazette, January 31, 1936 \nAppointment of Kaiser as Bremen chancellor has been made \nofficial today."
-"In approximately 14 years Kaiser has brought into being the \ngreatest popular movement Bremen has ever seen. In fact one \nof the greatest that history registers."
-"This mysterious man who seems to remain in secrecy under\nhis now trademark hood rose to popularity seemingly out of \nnowhere."
-"But just witnessing him giving one of his famous speeches \nto masses makes it very obvious why both the high and low \nclass fell under his charms. Kaiser's energy is a sight to \nbehold."
-"In a short amount of time Kaiser has managed to unite the\nmid-western nations under the flag of Bremen."
-"He formed the special troops 'The Marching Men of the Nights \nDay' which effectively have been expanding the Bremen reign at \na rapid rate."
-"A rate that has made the leaders of The Eastern Union worried. \nWhere these turns take the world cannot be foreseen."
-"His acts can very well be described as vile and monstrous, \nbut only future history can tell if his means justify the  \nends."
-"The Midnight Gazette, September 17, 1942\nThe formation of 'The Marching Men of the Nights Day' marked \nthe day Europa officially jumped the shark."
-"There are conflicting stories as to whether the Bremen army \nhas truly succumbed to the horrors the rumours speak of, but \nit is clear as a day, that something vile is brewing under\nthat black and yellow banner of Kaiser's Bremen."
-"Especially the campaigns that took place in the area of \nBohemia. Kaiser pursued this area with such vigor, that it \nis without a question his endgame."
-"It is hardly a coincidence that Kaiser is opening up the \ntalks about the peace treaty right after his Bremen pig occupy\nPrehevil, the capital of Bohemia."
-"The Kingdom of Rondon and the allied forces suspect that this \nwhole Bremen ambition is directly linked to the advanced \nelectronic network experiments the Eastern Union has been \nconducting in the area."
-"It is beyond me how the masses fail to see through these \nplans. Instead they give credence to Kaiser's madness and \nplace more trust in his perversions than logic."
-"There are no rational answers to the irrational ideologies\nwhich Kaiser brings to the table. - An article written by\nKarin Sauer."
+"The Midnight Gazette, January 31, 1936 /#Appointment of Kaiser as Bremen chancellor has been made /#official today."
+"In approximately 14 years Kaiser has brought into being the /#greatest popular movement Bremen has ever seen. In fact one /#of the greatest that history registers."
+"This mysterious man who seems to remain in secrecy under/#his now trademark hood rose to popularity seemingly out of /#nowhere."
+"But just witnessing him giving one of his famous speeches /#to masses makes it very obvious why both the high and low /#class fell under his charms. Kaiser's energy is a sight to /#behold."
+"In a short amount of time Kaiser has managed to unite the/#mid-western nations under the flag of Bremen."
+"He formed the special troops 'The Marching Men of the Nights /#Day' which effectively have been expanding the Bremen reign at /#a rapid rate."
+"A rate that has made the leaders of The Eastern Union worried. /#Where these turns take the world cannot be foreseen."
+"His acts can very well be described as vile and monstrous, /#but only future history can tell if his means justify the  /#ends."
+"The Midnight Gazette, September 17, 1942/#The formation of 'The Marching Men of the Nights Day' marked /#the day Europa officially jumped the shark."
+"There are conflicting stories as to whether the Bremen army /#has truly succumbed to the horrors the rumours speak of, but /#it is clear as a day, that something vile is brewing under/#that black and yellow banner of Kaiser's Bremen."
+"Especially the campaigns that took place in the area of /#Bohemia. Kaiser pursued this area with such vigor, that it /#is without a question his endgame."
+"It is hardly a coincidence that Kaiser is opening up the /#talks about the peace treaty right after his Bremen pig occupy/#Prehevil, the capital of Bohemia."
+"The Kingdom of Rondon and the allied forces suspect that this /#whole Bremen ambition is directly linked to the advanced /#electronic network experiments the Eastern Union has been /#conducting in the area."
+"It is beyond me how the masses fail to see through these /#plans. Instead they give credence to Kaiser's madness and /#place more trust in his perversions than logic."
+"There are no rational answers to the irrational ideologies/#which Kaiser brings to the table. - An article written by/#Karin Sauer."
 Train cabin
 Old town
 Book store
 Church of Alll-mer
 PRHL Bop
 Donnovan's house
-"Alll-mer - The ascended one. One of the two humanborn gods known \nto this day."
+"Alll-mer - The ascended one. One of the two humanborn gods known /#to this day."
 "There are two stories of the origins of Alll-mer."
-"The more common story speaks of a human born from a virgin \nmother. A mere mortal that had humble origins, but one that quickly \nrose to prominence because of his teachings."
-"Unlike the warring kings and sultans of the time, Alll-mer's ideal \nworld united people of all different religions and ideologies under\none umbrella."
-"The powers of the time wouldn't stand up for this and quickly \nhad him arrested and sentenced for a public humiliation and eventual \ndeath on a cross."
-"This only served Alll-mer's purpose, making him a martyr and \nthe pain he went through pushed him over the edge to his ascension \nto the true godhood."
-"After his ascension, Alll-mer returned to avenge his death. \nThe bloodbath that ensued shook the world order and demolished the\nworship New Gods of the time had been enjoying."
-"The other version of Alll-mer's origins tells how Sylvian, the\nolder god of fertility ordered a deity known as Vitruvia to create \nan architectural reprography of a man and a woman that would be \nto the likeness of Sylvian herself."
-"Vitruvia, being the master architect, did just that. Sylvian fell\nin love with the results. She went on and created the mankind \naccording to Vitruvia's drawings."
-"At first Vitruvia was amazed by the life Sylvian managed to usher \ninto her designs. However, over time Vitruvia started to see small \nimperfections here and there."
-"Nothing bothered her more than the idea that her designs were\nanything but perfect."
-"So she set out to create the perfect human being. The pinnacle of \nman's potential."
-"This being was born on the year nil and he is the one known as\nAlll-mer today."
-"On the surface level these stories don't contradict with \nthemselves too much. But on an ideological level there are\ninteresting differences."
-"The other story tells how a mortal everyday man rose to rival\nthe powers of older gods, while the other story makes Alll-mer \njust one more creation of the higher powers."
-"The truth might lie somewhere between these stories if you'd\nask me."
+"The more common story speaks of a human born from a virgin /#mother. A mere mortal that had humble origins, but one that quickly /#rose to prominence because of his teachings."
+"Unlike the warring kings and sultans of the time, Alll-mer's ideal /#world united people of all different religions and ideologies under/#one umbrella."
+"The powers of the time wouldn't stand up for this and quickly /#had him arrested and sentenced for a public humiliation and eventual /#death on a cross."
+"This only served Alll-mer's purpose, making him a martyr and /#the pain he went through pushed him over the edge to his ascension /#to the true godhood."
+"After his ascension, Alll-mer returned to avenge his death. /#The bloodbath that ensued shook the world order and demolished the/#worship New Gods of the time had been enjoying."
+"The other version of Alll-mer's origins tells how Sylvian, the/#older god of fertility ordered a deity known as Vitruvia to create /#an architectural reprography of a man and a woman that would be /#to the likeness of Sylvian herself."
+"Vitruvia, being the master architect, did just that. Sylvian fell/#in love with the results. She went on and created the mankind /#according to Vitruvia's drawings."
+"At first Vitruvia was amazed by the life Sylvian managed to usher /#into her designs. However, over time Vitruvia started to see small /#imperfections here and there."
+"Nothing bothered her more than the idea that her designs were/#anything but perfect."
+"So she set out to create the perfect human being. The pinnacle of /#man's potential."
+"This being was born on the year nil and he is the one known as/#Alll-mer today."
+"On the surface level these stories don't contradict with /#themselves too much. But on an ideological level there are/#interesting differences."
+"The other story tells how a mortal everyday man rose to rival/#the powers of older gods, while the other story makes Alll-mer /#just one more creation of the higher powers."
+"The truth might lie somewhere between these stories if you'd/#ask me."
 "The Mark of Alll-mer raises the physical protection of its wielder."
-The text includes the sigil of the Alll-mer and instructions\non how to use it.
-It appears that chef Andérs had a serious rivalry with the\nprevious royal chef Alexej. Their rivalry escalated to the \nmurder of the latter after which chef Andérs created a royal\nfeast out of his remains in all secrecy.
-Between all this murder and betreyal you find recipes of \nchef Andérs' famous \c[2]Goulash\c[0] and \c[2]Mushroom stew\c[0]!
+The text includes the sigil of the Alll-mer and instructions/#on how to use it.
+It appears that chef Andérs had a serious rivalry with the/#previous royal chef Alexej. Their rivalry escalated to the /#murder of the latter after which chef Andérs created a royal/#feast out of his remains in all secrecy.
+Between all this murder and betreyal you find recipes of /#chef Andérs' famous \c[2]Goulash\c[0] and \c[2]Mushroom stew\c[0]!
 \i[94]Liver
 \i[93]Kidney
 \i[92]Eye
@@ -1173,68 +1173,68 @@ The talking board doesn't react to your question in any way.
 "GOOD BYE"
 "LET'S ... PLAY"
 "HIDE ... N ... SEEK"
-"The only logical explanation I can come up with is that the people\nin this immediate area are under a mass psychosis of some kind."
-"It's not too rare for such to occur in the times of continued war,\nlike the times we live in. As an example for comparison, there was \na mass psychosis brewing in the Empire of Bremen after the first \ngreat war as well."
-"The VRIL society were stirring up public unrest among the working\nclass. Their villainous front figures raved like a mad men and were\nable to enchant the vast majority of the country."
-"Only our one god truly knows where things would have advanced in\nBremen if it wasn't for the Kaiser appearing out of nowhere and\ntaking reigns of that runaway horse."
-"Maybe the whole Bremen was destined to cannibalise its own in\na never-ending bloodbath, not too different from the recent events\nin Prehevil?"
+"The only logical explanation I can come up with is that the people/#in this immediate area are under a mass psychosis of some kind."
+"It's not too rare for such to occur in the times of continued war,/#like the times we live in. As an example for comparison, there was /#a mass psychosis brewing in the Empire of Bremen after the first /#great war as well."
+"The VRIL society were stirring up public unrest among the working/#class. Their villainous front figures raved like a mad men and were/#able to enchant the vast majority of the country."
+"Only our one god truly knows where things would have advanced in/#Bremen if it wasn't for the Kaiser appearing out of nowhere and/#taking reigns of that runaway horse."
+"Maybe the whole Bremen was destined to cannibalise its own in/#a never-ending bloodbath, not too different from the recent events/#in Prehevil?"
 "There is very little work for a doctor here anymore."
-Most parts of the diary are completely illegible scriblings of\na madman, but towards the end, the text becomes more lucid.
+Most parts of the diary are completely illegible scriblings of/#a madman, but towards the end, the text becomes more lucid.
 "Dream of the moon. The sign. The city is in upheaval."
 "Fools. They don't know what awaits them."
-"The moon is of no value to me. It is but a mark of a trigger. \nThe time has come. And so has he."
-"As you are my witness, I am ready my lord. I have gone through \nthis a thousand times in my head."
+"The moon is of no value to me. It is but a mark of a trigger. /#The time has come. And so has he."
+"As you are my witness, I am ready my lord. I have gone through /#this a thousand times in my head."
 "The first blood - The one who talks only to her plants."
 "The second blood - His puppets will bear witness to his sacrifice."
 "The third blood - The foolish braggart who just moved in."
-"The fourth blood and the final sacrifice - The girl who keeps\nme up at night. The songbird that utters her last whimpers."
-"To finish the ritual, I need time. The laundry room works as a\nperfect hiding place for the sacrificed."
-"I will swear on your name my lord, our one true leader, the Sulf--"\nThe writing becomes too hard to read past this point.
-"The seed of Gro'goroth that had been fermenting for an aeon, \nfinally reached its maturity, and thus Sylvian pushed a whole \npinecone out of her loose abyss and named her child Ninush."
-"The cycle of destruction and creation is seen in its purest form\nin nature. Thus it comes as no surprise that the very god of nature,\nVinushka is an offspring of the two older gods Gro-goroth and Sylvian."
-"Like the nature of mankind, the nature of Vinushka too can change\nfrom fiery raging volcanos to serene grasslands where a gentle wind \nlulls one to sleep."
-"The ancient tribes of men used to live in a symbiosis with the \nnature, with its cycles of destruction and creation."
-"But people grew greedy and hostile towards the land they settled\nand ravaged the nature to give room for their own civilizations."
+"The fourth blood and the final sacrifice - The girl who keeps/#me up at night. The songbird that utters her last whimpers."
+"To finish the ritual, I need time. The laundry room works as a/#perfect hiding place for the sacrificed."
+"I will swear on your name my lord, our one true leader, the Sulf--"/#The writing becomes too hard to read past this point.
+"The seed of Gro'goroth that had been fermenting for an aeon, /#finally reached its maturity, and thus Sylvian pushed a whole /#pinecone out of her loose abyss and named her child Ninush."
+"The cycle of destruction and creation is seen in its purest form/#in nature. Thus it comes as no surprise that the very god of nature,/#Vinushka is an offspring of the two older gods Gro-goroth and Sylvian."
+"Like the nature of mankind, the nature of Vinushka too can change/#from fiery raging volcanos to serene grasslands where a gentle wind /#lulls one to sleep."
+"The ancient tribes of men used to live in a symbiosis with the /#nature, with its cycles of destruction and creation."
+"But people grew greedy and hostile towards the land they settled/#and ravaged the nature to give room for their own civilizations."
 "As people grew greedy and hostile, so did Vinushka."
-"A long war was waged to determine who was to become the master \nand who the slave. To everyone's surprise, or at least to my\nsurprise, this resulted in the demise of Vinushka."
-"For all tense and purposes the nature is dead. Vinushka died by\nthe hands of men."
-"From this grievous realization comes the name of the god. 'Vinushka'\nmeaning guilt, the great guilt of mankind."
-"This guilt will surely eat away the known world in time. For now\nfaint traces of the god still linger in Vinushka's totems, deities\nthat desperately search for the murdered god in vain."
-"Maybe these totems are the manifestation of human guilt. Once they\nunderstand the events that took place, mankind will surely feel\ntheir grief too."
-"For now it's best to exploit the nature while we still can.\nThe Mark of Vinushka raises the otherwordly offence of its wielder."
-The text includes the sigil of the Vinushka and instructions on how\nto use it.
+"A long war was waged to determine who was to become the master /#and who the slave. To everyone's surprise, or at least to my/#surprise, this resulted in the demise of Vinushka."
+"For all tense and purposes the nature is dead. Vinushka died by/#the hands of men."
+"From this grievous realization comes the name of the god. 'Vinushka'/#meaning guilt, the great guilt of mankind."
+"This guilt will surely eat away the known world in time. For now/#faint traces of the god still linger in Vinushka's totems, deities/#that desperately search for the murdered god in vain."
+"Maybe these totems are the manifestation of human guilt. Once they/#understand the events that took place, mankind will surely feel/#their grief too."
+"For now it's best to exploit the nature while we still can./#The Mark of Vinushka raises the otherwordly offence of its wielder."
+The text includes the sigil of the Vinushka and instructions on how/#to use it.
 "- The truth under the moonlight -"
 "Who of us doesn't cover their true face and hide behind a persona?"
-"In the broad daylight we adopt a social role depending on the\nsurrounding people. We put on a mask that works as the public image\nof our true personality."
-"Do we hide our face to avoid the judgement of the people, or do\nwe look down in shame as the sun watches our every move?"
+"In the broad daylight we adopt a social role depending on the/#surrounding people. We put on a mask that works as the public image/#of our true personality."
+"Do we hide our face to avoid the judgement of the people, or do/#we look down in shame as the sun watches our every move?"
 "A sun that knows our deepest longings and lustful thoughts."
-"Only in the darkness of the night does the true and vile nature \nof men get revealed. We share our decrepit bodies only to the select\nfew under the moonlight."
-"Despite what lowly thieves, covering in the shadows, would like you\nto think, the moonlight hides no one."
-"The similarities between the nature and mankind are fitting as\nboth grew up sucking the many bosoms of Sylvian after all. Both \nwere born from the same loins."
-"Vinushka and the represenation of humanity, Alll-mer the Ascended\nOne are considered equal. Neither of the two stands taller."
-"What is Vinushka's, is for the men to reap, just as the nature\nreaps our old and weary."
+"Only in the darkness of the night does the true and vile nature /#of men get revealed. We share our decrepit bodies only to the select/#few under the moonlight."
+"Despite what lowly thieves, covering in the shadows, would like you/#to think, the moonlight hides no one."
+"The similarities between the nature and mankind are fitting as/#both grew up sucking the many bosoms of Sylvian after all. Both /#were born from the same loins."
+"Vinushka and the represenation of humanity, Alll-mer the Ascended/#One are considered equal. Neither of the two stands taller."
+"What is Vinushka's, is for the men to reap, just as the nature/#reaps our old and weary."
 "The Mark of Vinushka raises the otherwordly offence of its wielder."
-"...Looking back at the history of this place - There has been\nsettlement here for as long as the history books cover the area. It\nhas always centered around the mysterious Hollow Tower that works as \nthe central pillar of the community."
-"The city flourished during the cruel age in the 1600s, but it \nquickly fell from prominence the closer we got to the modern times."
-"I understand the city is medium in size as far as cities in\neastern Europa go, but still I find it hard to believe that this\nplace would serve as a hub of any kind in a civilized world."
-"For some reason the goverment officials insist that Prehevil keeps \nits capital identity despite it being one of the more remote and \nunwelcoming cities in all of Bohemia, if not all of Europa."
-"The only explanation I can come up with is that the country is proud\nof the old archaic rites that still go down in this city and they \nwant to show their full support."
-"If you were to visit Prehevil and sightsee its small center, you'd\nsee glimpses of its ancient glory days, still well and alive in these\nmodern times."
-"Do not let the western style shopping district with its latest\nmovie posters and advetisements fool you, the locals still worship\nthe old world order in the dank and crumling parts of the town."
-"Ritualistic murder sites are just around the corner no matter where\nyou are in the city. While the churches look to be dedicated to our\none true god Alll-mer from the outside, insides tell a whole different \nstory."
-"Ancient gods without name in any known language still linger in\nthose crypts. And why wouldn't they? You can hear the priests chant \ntheir masses in the moonlit alleys during the dead of the night."
-"The whole wicked city is a playground for the ancient beings and\nthe people living there offer themselves to the first taker without\nsecond thought."
-"The God of Fear and Hunger - There are popular texts that tell \nstories of a false god and a chosen human joining together in the \ndarkest and the wettest of dreams."
-"The forgotten and long dormant God of the Depths perished that\nnight. Only an older god never truly perishes. In its stead, the \nGod of Fear and Hunger planted its roots and started to grow her \ninfluence on the surface world."
-"The scheming false deity had hoped her daughter would be the \nlight of mankind. Only true darkness does not breed light."
-"The god of Fear and Hunger was a pure child, a blank slate birthed\nin the darkest pits of human creation. That is where she grew, that\nis all she knew."
-"She was the pure representation of fear and hunger, not spoiled by\neven a glimmer of hope."
-"Mankind had seen its share of stagnation and suffering up to\nthat point. To rise from those perilious pits, growing pains were \nnecessary. Progress comes at a price."
+"...Looking back at the history of this place - There has been/#settlement here for as long as the history books cover the area. It/#has always centered around the mysterious Hollow Tower that works as /#the central pillar of the community."
+"The city flourished during the cruel age in the 1600s, but it /#quickly fell from prominence the closer we got to the modern times."
+"I understand the city is medium in size as far as cities in/#eastern Europa go, but still I find it hard to believe that this/#place would serve as a hub of any kind in a civilized world."
+"For some reason the goverment officials insist that Prehevil keeps /#its capital identity despite it being one of the more remote and /#unwelcoming cities in all of Bohemia, if not all of Europa."
+"The only explanation I can come up with is that the country is proud/#of the old archaic rites that still go down in this city and they /#want to show their full support."
+"If you were to visit Prehevil and sightsee its small center, you'd/#see glimpses of its ancient glory days, still well and alive in these/#modern times."
+"Do not let the western style shopping district with its latest/#movie posters and advetisements fool you, the locals still worship/#the old world order in the dank and crumling parts of the town."
+"Ritualistic murder sites are just around the corner no matter where/#you are in the city. While the churches look to be dedicated to our/#one true god Alll-mer from the outside, insides tell a whole different /#story."
+"Ancient gods without name in any known language still linger in/#those crypts. And why wouldn't they? You can hear the priests chant /#their masses in the moonlit alleys during the dead of the night."
+"The whole wicked city is a playground for the ancient beings and/#the people living there offer themselves to the first taker without/#second thought."
+"The God of Fear and Hunger - There are popular texts that tell /#stories of a false god and a chosen human joining together in the /#darkest and the wettest of dreams."
+"The forgotten and long dormant God of the Depths perished that/#night. Only an older god never truly perishes. In its stead, the /#God of Fear and Hunger planted its roots and started to grow her /#influence on the surface world."
+"The scheming false deity had hoped her daughter would be the /#light of mankind. Only true darkness does not breed light."
+"The god of Fear and Hunger was a pure child, a blank slate birthed/#in the darkest pits of human creation. That is where she grew, that/#is all she knew."
+"She was the pure representation of fear and hunger, not spoiled by/#even a glimmer of hope."
+"Mankind had seen its share of stagnation and suffering up to/#that point. To rise from those perilious pits, growing pains were /#necessary. Progress comes at a price."
 "Fear motivated people while hunger kept them moving forward."
-"People cherished their hardship and drew inspiration from it.\nThey learned from it. What followed was advancement the mankind\nhad not seen since the forgotten ages."
-"The dark fumes that rise from the pipes of modern cities are\ndirect consequences of this era. An era that came to be known\nas the Cruel Age."
+"People cherished their hardship and drew inspiration from it./#They learned from it. What followed was advancement the mankind/#had not seen since the forgotten ages."
+"The dark fumes that rise from the pipes of modern cities are/#direct consequences of this era. An era that came to be known/#as the Cruel Age."
 "The Mark of Fear and Hunger raises the agility of its wielder."
-The text includes the sigil of Fear and Hunger and instructions on \nhow to use it.
+The text includes the sigil of Fear and Hunger and instructions on /#how to use it.
 You find 2 \c[2]9mm Bullets\c[0]!
 You find 4 \c[2]9mm Bullets\c[0]!
 You find 2 \c[2]Gun powders\c[0]!
@@ -1288,39 +1288,39 @@ GabText Hunger is crippling \N[29].
 GabText \N[29] is blind from hunger.
 GabText \N[29] feels dizzy...
 "I tried to fool myself. Deny the inevitable."
-"There's no mistaking it anymore. I've felt it inside me for few \ndays now. What happened to Marcoh and everyone else in this cursed \nland..."
-"I know I'm next. The gut wrenching nausea deep within me... \nIt's growing... Fast..."
-"All my memories and regrets... They become increasingly heavy.\nIt's a burden that is almost too much to bear."
+"There's no mistaking it anymore. I've felt it inside me for few /#days now. What happened to Marcoh and everyone else in this cursed /#land..."
+"I know I'm next. The gut wrenching nausea deep within me... /#It's growing... Fast..."
+"All my memories and regrets... They become increasingly heavy./#It's a burden that is almost too much to bear."
 "I now understand why Marcoh succumbed to the madness."
 "It truly is a fate worse than death."
 Map
-"NLU Reconnaissance Report #1\nQuick bullet points of the reconnaissance:\n- Nameless Liberty Underground\n- The organizations roots date back to The First Great War"
-"- Formed from a small groups participating in civil disobedience\nacross different regions in Europa, Voroniya and Eastern Sanctuaries\n- Became more organized with partisan fighters and professionals with\nexperience in guerilla warfare."
-"- The organization formed under NLU name after The First Great War\n- Loosely connected throughout Europa"
-"- No centralized leader figure\n- Spies in high ranking positions in the armies of Eastern Union, \nBremen Empire and Allied forces"
-"- Recently has taken action in sabotaging both Allied forces \nOperation Bow and Arrow, as well as Eastern Unions Operation Logic\n- Bohemian sect considered a threat to Operation Logic"
-"NLU Reconnaissance Report #2\nQuick bullet points on the Bohemian sect member, Haas Reila Audrey:\n- Born January 1st, 1922 (Current Age 20)\n- Hair: Medium height, dark brown"
-"- Eyes: Blue\n- 132 IQ\n- Relatives: Twin-sister - Olivia Haas, father - Franz Haas, \nmother - Ema Haas"
-"- Shown to possess exceptionally high empathic traits\n- Highly knowledgeable in New Sciences"
-"- Started studies of New Sciences in Bremen in 1937\n- Worked under a special scholarship in 'Operation ein Geist'\n- First confirmed contact with NLU"
-"- Got an international scholarship in 1939\n- The studies continue abroad in the Eastern Union\n- Recruited for 'Operation Logic' in Bohemia"
-"- Promoted to the position of head-engineer in the operation\n- Confirmed contact with NLU\n- NLU contact person captured and executed"
-"- Reila Haas arrested for a treason against the Empire\n- Held at the East-Bremen for iterrogations\n- Information about the 'Operation Logic' gathered\n- Reila Haas reported missing in East-Bremen State Prison
-"- NLU suspected to have aided her escape\n- Suspected to work with Bohemian sect of NLU\n- Possesses potential danger for 'Operation ein Geist'\n- Marked as 'a Person of Special Interest' by Kaiser"
+"NLU Reconnaissance Report #1/#Quick bullet points of the reconnaissance:/#- Nameless Liberty Underground/#- The organizations roots date back to The First Great War"
+"- Formed from a small groups participating in civil disobedience/#across different regions in Europa, Voroniya and Eastern Sanctuaries/#- Became more organized with partisan fighters and professionals with/#experience in guerilla warfare."
+"- The organization formed under NLU name after The First Great War/#- Loosely connected throughout Europa"
+"- No centralized leader figure/#- Spies in high ranking positions in the armies of Eastern Union, /#Bremen Empire and Allied forces"
+"- Recently has taken action in sabotaging both Allied forces /#Operation Bow and Arrow, as well as Eastern Unions Operation Logic/#- Bohemian sect considered a threat to Operation Logic"
+"NLU Reconnaissance Report #2/#Quick bullet points on the Bohemian sect member, Haas Reila Audrey:/#- Born January 1st, 1922 (Current Age 20)/#- Hair: Medium height, dark brown"
+"- Eyes: Blue/#- 132 IQ/#- Relatives: Twin-sister - Olivia Haas, father - Franz Haas, /#mother - Ema Haas"
+"- Shown to possess exceptionally high empathic traits/#- Highly knowledgeable in New Sciences"
+"- Started studies of New Sciences in Bremen in 1937/#- Worked under a special scholarship in 'Operation ein Geist'/#- First confirmed contact with NLU"
+"- Got an international scholarship in 1939/#- The studies continue abroad in the Eastern Union/#- Recruited for 'Operation Logic' in Bohemia"
+"- Promoted to the position of head-engineer in the operation/#- Confirmed contact with NLU/#- NLU contact person captured and executed"
+"- Reila Haas arrested for a treason against the Empire/#- Held at the East-Bremen for iterrogations/#- Information about the 'Operation Logic' gathered/#- Reila Haas reported missing in East-Bremen State Prison
+"- NLU suspected to have aided her escape/#- Suspected to work with Bohemian sect of NLU/#- Possesses potential danger for 'Operation ein Geist'/#- Marked as 'a Person of Special Interest' by Kaiser"
 "- Wanted: Alive"
-"Telelectroscope - An interconnected, computerized system which\ndocuments our lives and extracts information from our consciousness. \nThe data is abstracted from banks of every person in the whole human \nsystem."
-"Logic - Logic works as the center of Telelectroscope. A core in \nthis world where all of our knowledge and inspiration come from and\ngo to."
-A data tank which possess all knowledge and it provides people with \nsaid information as they need it."
-"The future of telelectroscope - People become obsessed with these\nfake 'friends' who exist in the walls. Ultimately people will begin\nto shun personal contact, preferring to interact with each other via\nmachine technology."
-"People will rather stay in the world created by our shared\nconsciousness. The logic is designed so that each individual human\nin the system will affect the surrounding world."
+"Telelectroscope - An interconnected, computerized system which/#documents our lives and extracts information from our consciousness. /#The data is abstracted from banks of every person in the whole human /#system."
+"Logic - Logic works as the center of Telelectroscope. A core in /#this world where all of our knowledge and inspiration come from and/#go to."
+A data tank which possess all knowledge and it provides people with /#said information as they need it."
+"The future of telelectroscope - People become obsessed with these/#fake 'friends' who exist in the walls. Ultimately people will begin/#to shun personal contact, preferring to interact with each other via/#machine technology."
+"People will rather stay in the world created by our shared/#consciousness. The logic is designed so that each individual human/#in the system will affect the surrounding world."
 "Thus creating a shared paradise. A shared consensus."
 "Sylvian - the goddess of love, lust and creation."
-"She created men and women at the dawn of time. From the very\nfirst moments she loved her children dearly."
-"Over time her love blossomed into a more obsessive form and \nshe would take a more hands-on approach in controlling the direction\nher children took in life, always having their best interests in\nmind of course."
-"Once she realized her children would never return the same amount \nof affection back to her, her love took a more twisted form."
-"Sylvian forced mankind more to her liking and closer to her own\nimage with her gift to humans - the love magic, otherwise known \nas the flower magic."
-"For a brief moment in history, mankind fell into a craze of \nfleshly delights. As a synchronized mass, sea of naked people \nin a middle of coitus would pulsate and waste their days."
-"Sylvian is often associated with Gro-goroth, the god of destruction\nand their offspring Vinuska, the god of nature."
+"She created men and women at the dawn of time. From the very/#first moments she loved her children dearly."
+"Over time her love blossomed into a more obsessive form and /#she would take a more hands-on approach in controlling the direction/#her children took in life, always having their best interests in/#mind of course."
+"Once she realized her children would never return the same amount /#of affection back to her, her love took a more twisted form."
+"Sylvian forced mankind more to her liking and closer to her own/#image with her gift to humans - the love magic, otherwise known /#as the flower magic."
+"For a brief moment in history, mankind fell into a craze of /#fleshly delights. As a synchronized mass, sea of naked people /#in a middle of coitus would pulsate and waste their days."
+"Sylvian is often associated with Gro-goroth, the god of destruction/#and their offspring Vinuska, the god of nature."
 "The Mark of Sylvian raises the otherwordly protection of its wielder."
 You find a \c[2]Rifle .303 Mk I\c[0] and 3 \c[2].303 Ammo\c[0]!
 You find a \c[2]Bremen elite helmet\c[0] and a \c[2]Bremen chestplate\c[0]!
@@ -1329,14 +1329,14 @@ You find a \c[2]Bremen gas mask\c[0] and \c[2]Arm guards\c[0]!
 You find 4 \c[2]9mm Bullet\c[0]!
 "The first blood - The foolish braggart who just moved in."
 "The second blood - The one who talks only to her plants."
-"The third blood - The girl who keeps me up at night. The songbird \nthat utters her last whimpers."
-"The fourth blood and the final sacrifice - His puppets will bear \nwitness to his bloodletting."
-"The first blood - The lunatic that raves about the moon and stars\nto all days end."
+"The third blood - The girl who keeps me up at night. The songbird /#that utters her last whimpers."
+"The fourth blood and the final sacrifice - His puppets will bear /#witness to his bloodletting."
+"The first blood - The lunatic that raves about the moon and stars/#to all days end."
 "The second blood - The foolish braggart who just moved in."
 "The third blood - His puppets will bear witness to his bloodletting."
 Offer the \c[2]Woodsman head\c[0]?
 You put the offering on the center of the circle...
-The air cools down and becomes thicker. It feels heavy just to\nbreath.
+The air cools down and becomes thicker. It feels heavy just to/#breath.
 Offer the \c[2]Villager head\c[0]?
 Offer the \c[2]Vile head\c[0]?
 Offer the \c[2]Priest head\c[0]?
@@ -1390,29 +1390,29 @@ Offer the \c[2]Death mask head\c[0]?
 Offer the \c[2]Meat grinder head\c[0]?
 Offer the \c[2]Centaur head\c[0]?
 Offer the \c[2]Gull brother head\c[0]?
-\>\i[144]\}ER'KELE\{\<\n"Humans are such funny little creatures."
-You hear voices echoing from the beheaded wizard...\n\c[7]"Tell me about it."\c[0]
-You hear voices echoing from the beheaded wizard...\n\c[7]"Although I wouldn't use the word 'funny', more like 'pathetic' and\n'miserable'."\c[0]
-\>\i[144]\}ER'KELE\{\<\n"Since the dawn of men you've tried to please the sun god to keep \nyou warm and give good harvest..."
-\>\i[144]\}ER'KELE\{\<\n"You've worshipped destruction and creation, in the delusion that\nyou'd have say in those matters..."
-\>\i[144]\}ER'KELE\{\<\n"You've given a name to each and every one of these forces, even\nthe nature itself has a name given by you."
-\>\i[144]\}ER'KELE\{\<\n"It's a strange paradox. You throw yourself as a slave to these\ngods of your own creation."
-\>\i[144]\}ER'KELE\{\<\n"Only humans could be this silly. To the others - they are but\nnatural forces."
+\>\i[144]\}ER'KELE\{\</#"Humans are such funny little creatures."
+You hear voices echoing from the beheaded wizard.../#\c[7]"Tell me about it."\c[0]
+You hear voices echoing from the beheaded wizard.../#\c[7]"Although I wouldn't use the word 'funny', more like 'pathetic' and/#'miserable'."\c[0]
+\>\i[144]\}ER'KELE\{\</#"Since the dawn of men you've tried to please the sun god to keep /#you warm and give good harvest..."
+\>\i[144]\}ER'KELE\{\</#"You've worshipped destruction and creation, in the delusion that/#you'd have say in those matters..."
+\>\i[144]\}ER'KELE\{\</#"You've given a name to each and every one of these forces, even/#the nature itself has a name given by you."
+\>\i[144]\}ER'KELE\{\</#"It's a strange paradox. You throw yourself as a slave to these/#gods of your own creation."
+\>\i[144]\}ER'KELE\{\</#"Only humans could be this silly. To the others - they are but/#natural forces."
 "But how can you explain the gift of magic?"
 "But you also said you were a servant of the moon god..."
-\>\i[144]\}ER'KELE\{\<\n"They are not there to help you, to harm you or to be worshipped by\nyou. They just exist in the greater scheme of things."
-\>\i[144]\}ER'KELE\{\<\n"Just as a sailor harnesses the power of wind, one can harness the\npower of these forces to our own benefit."
+\>\i[144]\}ER'KELE\{\</#"They are not there to help you, to harm you or to be worshipped by/#you. They just exist in the greater scheme of things."
+\>\i[144]\}ER'KELE\{\</#"Just as a sailor harnesses the power of wind, one can harness the/#power of these forces to our own benefit."
 "So you mean to say there are no such things as gods?"
-\>\i[144]\}ER'KELE\{\<\n"I am a servant of the moon god as I cannot control him and 
-\>\i[144]\}ER'KELE\{\<\n"I never said that."
-\>\i[144]\}ER'KELE\{\<\n"There are plenty of deities that could fall under that category."
-\>\i[144]\}ER'KELE\{\<\n"Even you've probably heard of some."
-The document page is one of many. You do not have the previous pages,\nso it's difficult to make out the full context of the document...
-"The modern science and medicine is still limited in this subject.\nThere is a debate if science will ever be capable of calculating \nthe necessary amounts of information."
-"Human mind and soul after all are so complex that it is not \nquantifiable by any computer. Thus it might not be possible to\nreplace the Logic even as the technology advances in coming \ndecades."
-"Likewise, it is also impossible for human mind to calculate the \nmathemetical formulas in a conscious state. That is why it's \nnecessary for the subject to be in a lucid dreaming state at \nall times."
-"That is when both conscious and unconscious mind are activated.\nThat is when the processing power of the human mind is at its \nfullest potential."
-"The subject will be hooked to the telectroscope. The engine and \nthe subject form The Logic together. The electronic signals that \noccur in the subject's brain are converted to ones and zeros\nblurring the line between a human and a machine."
+\>\i[144]\}ER'KELE\{\</#"I am a servant of the moon god as I cannot control him and 
+\>\i[144]\}ER'KELE\{\</#"I never said that."
+\>\i[144]\}ER'KELE\{\</#"There are plenty of deities that could fall under that category."
+\>\i[144]\}ER'KELE\{\</#"Even you've probably heard of some."
+The document page is one of many. You do not have the previous pages,/#so it's difficult to make out the full context of the document...
+"The modern science and medicine is still limited in this subject./#There is a debate if science will ever be capable of calculating /#the necessary amounts of information."
+"Human mind and soul after all are so complex that it is not /#quantifiable by any computer. Thus it might not be possible to/#replace the Logic even as the technology advances in coming /#decades."
+"Likewise, it is also impossible for human mind to calculate the /#mathemetical formulas in a conscious state. That is why it's /#necessary for the subject to be in a lucid dreaming state at /#all times."
+"That is when both conscious and unconscious mind are activated./#That is when the processing power of the human mind is at its /#fullest potential."
+"The subject will be hooked to the telectroscope. The engine and /#the subject form The Logic together. The electronic signals that /#occur in the subject's brain are converted to ones and zeros/#blurring the line between a human and a machine."
 \i[101]Leechmonger ring [8]
 \i[194]Ring of wraiths [4]
 \i[49]Yggaegetsu amulet [9]
@@ -1437,22 +1437,22 @@ GabText \N[6] summons the Longinus.
 GabText \N[13] summons the Longinus.
 GabText \N[14] summons the Longinus, but she cannot wield it!
 GabText \N[15] summons the Longinus, but she cannot wield it!
-\>\i[64]\}BELLA\{\<\n"We shouldn't be fighting each other! There has to be another way."
-\>\i[78]\}LIVIA\{\<\n"Aaah! Please stop this fight! There is no reason for this!"
-\>\i[74]\}ARIN\{\<\n"We have a couple of cavepeople here. Violence solves nothing,\nwe can always talk this out!"
-\>\i[76]\}ARCOH\{\<\n"..."
-\>\i[76]\}ARCOH\{\<\n"Have you lost your mind? Why are we fighting each other?"
-\>\i[67]\}AAN\{\<\n"Count me out. I want no part in this..."
-\>\i[76]\}ARINA\{\<\n"I don't feel good about this... Do we really have to fight?"
-\>\i[75]\}EVI\{\<\n"Do we really have to do this?"
-\>\i[78]\}'SAA\{\<\n"I have no interest in your quarrel."
+\>\i[64]\}BELLA\{\</#"We shouldn't be fighting each other! There has to be another way."
+\>\i[78]\}LIVIA\{\</#"Aaah! Please stop this fight! There is no reason for this!"
+\>\i[74]\}ARIN\{\</#"We have a couple of cavepeople here. Violence solves nothing,/#we can always talk this out!"
+\>\i[76]\}ARCOH\{\</#"..."
+\>\i[76]\}ARCOH\{\</#"Have you lost your mind? Why are we fighting each other?"
+\>\i[67]\}AAN\{\</#"Count me out. I want no part in this..."
+\>\i[76]\}ARINA\{\</#"I don't feel good about this... Do we really have to fight?"
+\>\i[75]\}EVI\{\</#"Do we really have to do this?"
+\>\i[78]\}'SAA\{\</#"I have no interest in your quarrel."
 Zoophobia
 Nosophobia
 Teratophobia
 Phasmophobia
 Erotophobia
 Rhabdophobia
-"It has come to our knowledge that there are sinister forces at play\nand they have their eyes set on Prehevil, Bohemia for whatever wicked \nreason."
+"It has come to our knowledge that there are sinister forces at play/#and they have their eyes set on Prehevil, Bohemia for whatever wicked /#reason."
 GabText IT BURNS!
 GabText Your skin is burning to a crisp!
 GabText The pain is maddening!
@@ -1470,43 +1470,43 @@ What do you want to sacrifice to resurrect \N[7]?
 GabText You already summoned the blood golem.
 GabText The blood golem climbs up from the puddle of your blood.
 GabText There is no room for the blood golem in your party!
-\>\i[74]\}AISER\{\<\n"..."
-\>\i[74]\}AISER\{\<\n"You are late you know..."
-\>\i[74]\}AISER\{\<\n"If you've come to witness the birth of the new era..."
-\>\i[74]\}AISER\{\<\n"The birth of a new god..."
+\>\i[74]\}AISER\{\</#"..."
+\>\i[74]\}AISER\{\</#"You are late you know..."
+\>\i[74]\}AISER\{\</#"If you've come to witness the birth of the new era..."
+\>\i[74]\}AISER\{\</#"The birth of a new god..."
 "The machine god?"
 "Are you talking about yourself?"
 "I've come to take you down Kaiser."
-\>\i[74]\}AISER\{\<\n"The Logic...\.\. The machine god...\.\. is online."
-\>\i[74]\}AISER\{\<\n"Since the dawn of man, we have strived for a power that would\nrival the very gods we worshipped..."
-\>\i[74]\}AISER\{\<\n"There has always been kings and sultans who pursued that strength \nto no ends."
-\>\i[74]\}AISER\{\<\n"Even I fell into that trap at one point in time..."
-\>\i[74]\}AISER\{\<\n"But if we chase that power, we are always looking at the big picture\nfrom behind. We cannot see the forest for the trees."
-\>\i[74]\}AISER\{\<\n"Instead we needed to birth something new."
-\>\i[74]\}AISER\{\<\n"That time has finally come. The true unity of mankind is before \nus. A true god born from humanity, not from the old world."
-\>\i[74]\}AISER\{\<\n"A god that is not born from the powers borrowed, but from our\nown strength. This is the moment in time our whole existence has \nstrived for."
-\>\i[74]\}AISER\{\<\n"Me?"
-\>\i[74]\}AISER\{\<\n"Ha ha ha...\. That is a cruel joke the fate has played on me\ntime and time again..."
-\>\i[74]\}AISER\{\<\n"At one point in time I did think I would be the one to lead us\nall to the promised land, my ego lead me to believe I would be\nthe one true god worshipped in the coming age..."
-\>\i[74]\}AISER\{\<\n"But alas, the world is much too capricious and chaotic. It was\nnever for me to rule."
-\>\i[74]\}AISER\{\<\n"Chaos itself is not something to be dreaded. Chaos is but a\ntransitional phase, where it leads determines whether that chaos\nis a negative force or not."
-\>\i[74]\}AISER\{\<\n"My role in the greater scheme of things was to arrange all \nthe necessary chess pieces to their places and set the wheels in \nmotion instead."
-\>\i[74]\}AISER\{\<\n"I'm at peace with my role at this point.
-\>\i[74]\}AISER\{\<\n"Since I've embraced the chaos, I've even come to surprise myself.\nI was able to abandon my ego and leave that miserable being\nendlessly wandering in the dark green hue..."
-\>\i[74]\}AISER\{\<\n"My Self that remains, only aims for the betterment of mankind and\naltruistic love."
-\>\i[74]\}AISER\{\<\n"So no, the true god I talk about is not me."
-\>\i[74]\}AISER\{\<\nFate hampered my plans in a form of a young woman, a person who\nwas completely clueless of the power struggles of the old world..."
-\>\i[74]\}AISER\{\<\n"She became the symbol of our evolution by pure coincidence."
-\>\i[74]\}AISER\{\<\n"Maybe it is only fitting that a youngling like her would lead\nthe world to a new tomorrow... If it yearns to change, the world\nneeds to forget the past, me included."
-\>\i[74]\}AISER\{\<\n"The breath of the machine god is still frail however."
-\>\i[144]\}OCKETCAT\{\<\n"This is what I have to offer. It is quite a nice collection even\nif I say so myself."
+\>\i[74]\}AISER\{\</#"The Logic...\.\. The machine god...\.\. is online."
+\>\i[74]\}AISER\{\</#"Since the dawn of man, we have strived for a power that would/#rival the very gods we worshipped..."
+\>\i[74]\}AISER\{\</#"There has always been kings and sultans who pursued that strength /#to no ends."
+\>\i[74]\}AISER\{\</#"Even I fell into that trap at one point in time..."
+\>\i[74]\}AISER\{\</#"But if we chase that power, we are always looking at the big picture/#from behind. We cannot see the forest for the trees."
+\>\i[74]\}AISER\{\</#"Instead we needed to birth something new."
+\>\i[74]\}AISER\{\</#"That time has finally come. The true unity of mankind is before /#us. A true god born from humanity, not from the old world."
+\>\i[74]\}AISER\{\</#"A god that is not born from the powers borrowed, but from our/#own strength. This is the moment in time our whole existence has /#strived for."
+\>\i[74]\}AISER\{\</#"Me?"
+\>\i[74]\}AISER\{\</#"Ha ha ha...\. That is a cruel joke the fate has played on me/#time and time again..."
+\>\i[74]\}AISER\{\</#"At one point in time I did think I would be the one to lead us/#all to the promised land, my ego lead me to believe I would be/#the one true god worshipped in the coming age..."
+\>\i[74]\}AISER\{\</#"But alas, the world is much too capricious and chaotic. It was/#never for me to rule."
+\>\i[74]\}AISER\{\</#"Chaos itself is not something to be dreaded. Chaos is but a/#transitional phase, where it leads determines whether that chaos/#is a negative force or not."
+\>\i[74]\}AISER\{\</#"My role in the greater scheme of things was to arrange all /#the necessary chess pieces to their places and set the wheels in /#motion instead."
+\>\i[74]\}AISER\{\</#"I'm at peace with my role at this point.
+\>\i[74]\}AISER\{\</#"Since I've embraced the chaos, I've even come to surprise myself./#I was able to abandon my ego and leave that miserable being/#endlessly wandering in the dark green hue..."
+\>\i[74]\}AISER\{\</#"My Self that remains, only aims for the betterment of mankind and/#altruistic love."
+\>\i[74]\}AISER\{\</#"So no, the true god I talk about is not me."
+\>\i[74]\}AISER\{\</#Fate hampered my plans in a form of a young woman, a person who/#was completely clueless of the power struggles of the old world..."
+\>\i[74]\}AISER\{\</#"She became the symbol of our evolution by pure coincidence."
+\>\i[74]\}AISER\{\</#"Maybe it is only fitting that a youngling like her would lead/#the world to a new tomorrow... If it yearns to change, the world/#needs to forget the past, me included."
+\>\i[74]\}AISER\{\</#"The breath of the machine god is still frail however."
+\>\i[144]\}OCKETCAT\{\</#"This is what I have to offer. It is quite a nice collection even/#if I say so myself."
 \i[261]Book of enlightenment [3]
 \i[216]Recipes of 15th century vol.1 & 2 [2]
 \i[216]Alchemillia vol.1 [1]
 \i[216]Alchemillia vol.2 [1]
 \i[216]Alchemillia vol.3 [1]
 \i[186]Skin bible - Gro-goroth [3]
-\v[396]\c[2]\i[11]Contestant heads\c[0] is all you got. \nWhat do you want to trade them for?
+\v[396]\c[2]\i[11]Contestant heads\c[0] is all you got. /#What do you want to trade them for?
 You got the \c[2]Book of enlightenment\c[0]!
 You don't have enough contestant heads for the trade.
 You got the \c[2]Recipes of the 15th Century vol. 1 & 2\c[0]!
@@ -1524,101 +1524,101 @@ You got the \c[2]Skin bible - Chapter of Alll-mer\c[0]!
 You got the \c[2]Skin bible - Chapter of Rher\c[0]!
 You got the \c[2]Skin bible - Chapter of Vinushka\c[0]!
 You got the \c[2]Skin bible - Chapter of God of Fear and Hunger\c[0]!
-\>\i[144]\}OCKETCAT\{\<\n"Happy to do business with you~!"
+\>\i[144]\}OCKETCAT\{\</#"Happy to do business with you~!"
 "Have you seen this man in dreams?"
-"Over the past week or so, since the full moon, people all over\nPrehevil and its neighbouring settlements see this face in their\ndreams, every night."
-"If you are one of them, or if you have any information that can\nhelp us identify this person, please contact us."
-The flyer tells to contact 'us', but there's no contact information\nto be found from the flyer.
-"Furniture moving without a reason, flickering lights, a television \nset turning on, all on its own. These are usually the first signs \nof a shadow presence or a spirit trying to contact you from the \notherside." 
-"There is no need to be scared about this. Spirits vary and there\nare as many types as there are personality types among the living.\nSome are kind, some are hostile."
-"You can confirm a spirit presence using the talking board. \nAsking a simple opening question like 'Is anyone out there?' or \n'Can you hear me?' opens up a connection between you two."
-"If a spirit wants to communicate with you, you will get a\nvery clear physical confirmation of this with the planchette \n(the heart-shaped indicator) moving on its own."
-"Spirits can only manifest before you when you are close enough\nto them. If a spirit is willing, it can lead you to it using the\ntalking board as its means of communication."
-"Follow the spirit instructions bravely and perhaps you can learn\na thing or two from our brothers and sisters from another plateau*."
-"*'Another plateau' meaning in this instance the otherside, the\nafterlife or the spirit realm."
-"I have read contrary beliefs, ridiculous beliefs even, from facets \nnot to be named here. From an effete facet well known in occult \ncircles despite his biased view on the world of the otherworldly."
-"Just because this not-to-be-named dark priest wrote a book that\nis citated in most occult studies, doesn't mean his word shouldn't\nbe taken with a pinch, no - with a jar of salt."
-"Words about the death of an older god especially are nothing short\nof absurd."
-"How do you kill an idea, an inspiration or one of the primordial \nconcepts once it is conceived? The thought will forever haunt your \nmind as long as our consciousness is there to remind us of it."
-"Once an older god is born, it has existed forever. A god, like\na human soul is not constrained by linear time and space. It can\nreincarnate multiple times within our history and future history\nwithout us knowing any better."
-"They spawn from the green stream, but which spawns first, an\nolder god in its physical form or the concept our consciousness\ngave birth to?"
-"The mockery that is 'the new gods', the puppets yearning to \nbecome the puppeteers, should never be mistaken with the gods that\ndwell beyond our understanding."
-"They are but byproducts of the immense influence the older gods\nhold on us. Just by flying too close to the sun, or why not moon, and \none can attain a glimpse of the true intensity that is older gods."
-"Men inherited the power from the beasts that walked before us.\nHow could such power come even close to that of older gods?"
+"Over the past week or so, since the full moon, people all over/#Prehevil and its neighbouring settlements see this face in their/#dreams, every night."
+"If you are one of them, or if you have any information that can/#help us identify this person, please contact us."
+The flyer tells to contact 'us', but there's no contact information/#to be found from the flyer.
+"Furniture moving without a reason, flickering lights, a television /#set turning on, all on its own. These are usually the first signs /#of a shadow presence or a spirit trying to contact you from the /#otherside." 
+"There is no need to be scared about this. Spirits vary and there/#are as many types as there are personality types among the living./#Some are kind, some are hostile."
+"You can confirm a spirit presence using the talking board. /#Asking a simple opening question like 'Is anyone out there?' or /#'Can you hear me?' opens up a connection between you two."
+"If a spirit wants to communicate with you, you will get a/#very clear physical confirmation of this with the planchette /#(the heart-shaped indicator) moving on its own."
+"Spirits can only manifest before you when you are close enough/#to them. If a spirit is willing, it can lead you to it using the/#talking board as its means of communication."
+"Follow the spirit instructions bravely and perhaps you can learn/#a thing or two from our brothers and sisters from another plateau*."
+"*'Another plateau' meaning in this instance the otherside, the/#afterlife or the spirit realm."
+"I have read contrary beliefs, ridiculous beliefs even, from facets /#not to be named here. From an effete facet well known in occult /#circles despite his biased view on the world of the otherworldly."
+"Just because this not-to-be-named dark priest wrote a book that/#is citated in most occult studies, doesn't mean his word shouldn't/#be taken with a pinch, no - with a jar of salt."
+"Words about the death of an older god especially are nothing short/#of absurd."
+"How do you kill an idea, an inspiration or one of the primordial /#concepts once it is conceived? The thought will forever haunt your /#mind as long as our consciousness is there to remind us of it."
+"Once an older god is born, it has existed forever. A god, like/#a human soul is not constrained by linear time and space. It can/#reincarnate multiple times within our history and future history/#without us knowing any better."
+"They spawn from the green stream, but which spawns first, an/#older god in its physical form or the concept our consciousness/#gave birth to?"
+"The mockery that is 'the new gods', the puppets yearning to /#become the puppeteers, should never be mistaken with the gods that/#dwell beyond our understanding."
+"They are but byproducts of the immense influence the older gods/#hold on us. Just by flying too close to the sun, or why not moon, and /#one can attain a glimpse of the true intensity that is older gods."
+"Men inherited the power from the beasts that walked before us./#How could such power come even close to that of older gods?"
 "In my dreams I'm free."
-"That is my light at the end of the tunnel. The light that keeps\nme going."
+"That is my light at the end of the tunnel. The light that keeps/#me going."
 You find 3 \c[2]9mm Bullets\c[0]!
 You find 5 \c[2]9mm Bullets\c[0]!
 You find 2 \c[2]12-gauge shells\c[0]!
 You find 3 \c[2]12-gauge shells\c[0]!
 You find 3 \c[2].303 Ammo\c[0]!
 "- The Tale of the Pocketcat - Chapter 1 -"
-"It was a rainy day in the countryside just north from the forest\nof Merwood."
-"Willem, the most mischievous child known in the town, stared at\nthe rain drops behind his window screen, just longing for an adventure."
-"His mother would warn him of going outside. Rain brings forth all \nkinds of dangers not otherwise known to little boys. During downpours \ndecent boys should help their parents with various household chores\ninstead."
-"Being the pompous boy he was, Willem refused to give a helping\nhand. The consequences of such refusals were all too familiar to \nWillem. He'd get sentenced to bed without a dinner. And so he did."
-"Crying under his blanket, fits of Willem's anger brought forth his \nreflection from a mirror on the wall."
-"The boy from the mirror introduced himself as Melliw, the sleeping \ntwin brother of Willem that came to this world far too early and\nthus he could only view the world from the land of opposites."
-"Melliw wanted to warn his brother of the coming calamity, but \nhis words echoed from the land of opposites and so they came out \nall wrong."
-"Now his words encouraged Willem to join the coming adventure that\nwas heading his way, heading fast, in fact the adventure already\nsqueezed itself through a small key hole on the window frame."
-"A large beetleman climbed in from the window. The beetleman was\ntall, taller than Willem's father, and rounder than his father as \nwell."
-"The face of the beetleman was obscured. He wore a similar mask \nWillem's grandfather had worn in the war to avoid gas from melting\nhis eyes and burning his lungs."
-"Turkilo, the beetleman had an urgent mission for Willem. You see\nthe ancient kingdom Turkilo came from was under a serious threat \nand Willem was the only boy who could help."
-"Willem was a bit hesitant, but Turkilo was already forcing the\nboy out from his bedroom window out to the rain. 'We got no time\nfor thinkin' said Turkilo."
-"The beetleman showed the way with his lantern, only Willem had\ntrouble keeping up with the pace as Turkilo flew fast deep inside\nthe Merwood with his man-beetle wings."
-"Turkilo's lantern got more distant until Willem couldn't see it\nno more."
-"Hopeless, and now lost in the woods he started crying, not unlike\nhow small song thrush chicks cry and beg for their mother for food."
-"And just like that a giant song thrush grabbed Willem and took \nhim to a treetop nest full of chicks fighting for their place in \nthe world."
-"Willem tried to beg for a tasty worm from the bird mother, but\ncompetition was fierce. Those chicks knew that to succeed in life\nyou have to push the competition over nest boundaries."
-"Willem tried to struggle but ultimately fell off the nest. Just\nas he was about to meet his maker Turkilo scooped by him and grabbed\nWillem with his cold man-beetle arms."
+"It was a rainy day in the countryside just north from the forest/#of Merwood."
+"Willem, the most mischievous child known in the town, stared at/#the rain drops behind his window screen, just longing for an adventure."
+"His mother would warn him of going outside. Rain brings forth all /#kinds of dangers not otherwise known to little boys. During downpours /#decent boys should help their parents with various household chores/#instead."
+"Being the pompous boy he was, Willem refused to give a helping/#hand. The consequences of such refusals were all too familiar to /#Willem. He'd get sentenced to bed without a dinner. And so he did."
+"Crying under his blanket, fits of Willem's anger brought forth his /#reflection from a mirror on the wall."
+"The boy from the mirror introduced himself as Melliw, the sleeping /#twin brother of Willem that came to this world far too early and/#thus he could only view the world from the land of opposites."
+"Melliw wanted to warn his brother of the coming calamity, but /#his words echoed from the land of opposites and so they came out /#all wrong."
+"Now his words encouraged Willem to join the coming adventure that/#was heading his way, heading fast, in fact the adventure already/#squeezed itself through a small key hole on the window frame."
+"A large beetleman climbed in from the window. The beetleman was/#tall, taller than Willem's father, and rounder than his father as /#well."
+"The face of the beetleman was obscured. He wore a similar mask /#Willem's grandfather had worn in the war to avoid gas from melting/#his eyes and burning his lungs."
+"Turkilo, the beetleman had an urgent mission for Willem. You see/#the ancient kingdom Turkilo came from was under a serious threat /#and Willem was the only boy who could help."
+"Willem was a bit hesitant, but Turkilo was already forcing the/#boy out from his bedroom window out to the rain. 'We got no time/#for thinkin' said Turkilo."
+"The beetleman showed the way with his lantern, only Willem had/#trouble keeping up with the pace as Turkilo flew fast deep inside/#the Merwood with his man-beetle wings."
+"Turkilo's lantern got more distant until Willem couldn't see it/#no more."
+"Hopeless, and now lost in the woods he started crying, not unlike/#how small song thrush chicks cry and beg for their mother for food."
+"And just like that a giant song thrush grabbed Willem and took /#him to a treetop nest full of chicks fighting for their place in /#the world."
+"Willem tried to beg for a tasty worm from the bird mother, but/#competition was fierce. Those chicks knew that to succeed in life/#you have to push the competition over nest boundaries."
+"Willem tried to struggle but ultimately fell off the nest. Just/#as he was about to meet his maker Turkilo scooped by him and grabbed/#Willem with his cold man-beetle arms."
 "- The Tale of the Pocketcat - Chapter 2 -"
-"Turkilo scolded Willem from wandering off. When Willem tried to\nexplain what had happened, that only aggravated the beetle man \neven more."
-"To teach Willem a lesson, Turkilo kept pushing Willem deeper to\nthe forest with his freakish man-beetle strength."
-"Willem slid down a muddy hill and found himself on large opening\nin the forest. In the middle of that opening two giant babyfaced\nblindworms were caught in a wrestling match."
-"The two poor bastards fought each other with all they got. The\nbit each other, clawed each other, all while crying and wallowing\nloudly."
-"Turkilo yelled from above that this is the nature of men, that\njust like those song thrush chicks from earlier, this would be\nWillem's future once he grew up to become an adult."
-"Humans were ruthless in their pursuit for riches and wealth. Did\nWillem really want to take part in such fierce competition?"
-"While the two talked, the other, the more ugly faced blindworm\nhad bested the other. Hungry for more devastation the thing set\nits eyes on Willem."
-"It gave Willem a desperate chase. Turkilo just flew away cackling\n'This is what you wanted, right?'"
-"Willem ran to a nearby thicket in hopes that the blindworm couldn't\nfit in there, instead the beast thrusted itself past broken branches\nwith ferocious force."
-"Fat from eating his other babyfaced blindworm sibling, one \nparticularly sharp branch punctured the belly of the beast and\nfrom within hundreds of small blindworm babies spilled all over\nthe place."
-"The little worms started wrestling and devouring each other the \nmoment they landed on the ground. Willem realized this is how the\ngiant babyfaced blindworms got so big to begin with."
+"Turkilo scolded Willem from wandering off. When Willem tried to/#explain what had happened, that only aggravated the beetle man /#even more."
+"To teach Willem a lesson, Turkilo kept pushing Willem deeper to/#the forest with his freakish man-beetle strength."
+"Willem slid down a muddy hill and found himself on large opening/#in the forest. In the middle of that opening two giant babyfaced/#blindworms were caught in a wrestling match."
+"The two poor bastards fought each other with all they got. The/#bit each other, clawed each other, all while crying and wallowing/#loudly."
+"Turkilo yelled from above that this is the nature of men, that/#just like those song thrush chicks from earlier, this would be/#Willem's future once he grew up to become an adult."
+"Humans were ruthless in their pursuit for riches and wealth. Did/#Willem really want to take part in such fierce competition?"
+"While the two talked, the other, the more ugly faced blindworm/#had bested the other. Hungry for more devastation the thing set/#its eyes on Willem."
+"It gave Willem a desperate chase. Turkilo just flew away cackling/#'This is what you wanted, right?'"
+"Willem ran to a nearby thicket in hopes that the blindworm couldn't/#fit in there, instead the beast thrusted itself past broken branches/#with ferocious force."
+"Fat from eating his other babyfaced blindworm sibling, one /#particularly sharp branch punctured the belly of the beast and/#from within hundreds of small blindworm babies spilled all over/#the place."
+"The little worms started wrestling and devouring each other the /#moment they landed on the ground. Willem realized this is how the/#giant babyfaced blindworms got so big to begin with."
 "They kept eating each other until only one remained."
-"For now it seemed like Willem was safe. It was not yet his turn \nto devour or be devoured. For some reason he did not feel comfortable\nthough. It felt like someone or something was keenly watching his\nevery move."
-"He heard faint panting and rustling of leaves. Then he noticed \nthem, a pair of glowing eyes staring right at him from the darkness \nof shrubs and leaves."
-"Willem did not like how the stare felt, panicked and ran to the\nopposite direction."
-"Little did Willem know at the time, but what followed his every\nmove from behind the bush was the tall cat, the Pocketcat himse--"
-Rest of the text is unintelligible and smudged over. It looks \nlike someone didn't want you to read any further for whatever\nreason.
+"For now it seemed like Willem was safe. It was not yet his turn /#to devour or be devoured. For some reason he did not feel comfortable/#though. It felt like someone or something was keenly watching his/#every move."
+"He heard faint panting and rustling of leaves. Then he noticed /#them, a pair of glowing eyes staring right at him from the darkness /#of shrubs and leaves."
+"Willem did not like how the stare felt, panicked and ran to the/#opposite direction."
+"Little did Willem know at the time, but what followed his every/#move from behind the bush was the tall cat, the Pocketcat himse--"
+Rest of the text is unintelligible and smudged over. It looks /#like someone didn't want you to read any further for whatever/#reason.
 Your affinity with the Sylvian has increased.
 Who will you sacrifice?
-\>\i[75]\}EVI\{\<\n"W-what!? You want to sacrifice me? I don't think so!"
+\>\i[75]\}EVI\{\</#"W-what!? You want to sacrifice me? I don't think so!"
 You absorbed the \c[2]Solitary soul\c[0].
 Your affinity with the Gro-goroth has increased.
-\>\i[76]\}ARINA\{\<\n"Since when did you start playing dark mage!? I don't think so!"
+\>\i[76]\}ARINA\{\</#"Since when did you start playing dark mage!? I don't think so!"
 You absorbed the \c[2]Changeling soul\c[0].
-\>\i[67]\}AAN\{\<\n"You expect me to just roll over and die? Some balls you got."
+\>\i[67]\}AAN\{\</#"You expect me to just roll over and die? Some balls you got."
 You absorbed the \c[2]Blank soul\c[0].
-\>\i[64]\}BELLA\{\<\n"WHAT!? All this time this was your plan!?"
+\>\i[64]\}BELLA\{\</#"WHAT!? All this time this was your plan!?"
 You absorbed the \c[2]Caressing soul\c[0].
-\>\i[78]\}'SAA\{\<\n"So this was your plan?\. Fine, let's a make a sacrifice out of\nyou."
+\>\i[78]\}'SAA\{\</#"So this was your plan?\. Fine, let's a make a sacrifice out of/#you."
 You absorbed the \c[2]Enlightened soul\c[0].
-\>\i[76]\}ARCOH\{\<\n"What kind of hocus pocus are you trying to pull?"
+\>\i[76]\}ARCOH\{\</#"What kind of hocus pocus are you trying to pull?"
 You absorbed the \c[2]Tainted soul\c[0].
-\>\i[74]\}ARIN\{\<\n"Wh-what do you think you're doing. Get your hands off me!"
+\>\i[74]\}ARIN\{\</#"Wh-what do you think you're doing. Get your hands off me!"
 You absorbed the \c[2]Endless soul\c[0].
-\>\i[78]\}LIVIA\{\<\n"B-but I thought we were in this together!?"
+\>\i[78]\}LIVIA\{\</#"B-but I thought we were in this together!?"
 You absorbed the \c[2]Shadowed soul\c[0].
-Black Kalev just looks at you with his blank eyes, chewing a tuft \nof grass, almost mocking you to do this.
-\N[16] stares at you with sad eyes. Or maybe you're just\nprojecting? A ghoul is not supposed to feel sadness. He was merely\nresurrected to serve you after all.
-\N[17] seems completely oblivious to your plans for him.\nMaybe it's better this way? So he doesn't know what hit him.
-\N[18] is staring at you. For the first time you think you\nsee understanding and intelligence in his eyes. Like he knows\nwhat's coming for him.
-\N[29] does not mind this fate. He was resurrected to serve \nyou. You're just fulfilling his destiny.
+Black Kalev just looks at you with his blank eyes, chewing a tuft /#of grass, almost mocking you to do this.
+\N[16] stares at you with sad eyes. Or maybe you're just/#projecting? A ghoul is not supposed to feel sadness. He was merely/#resurrected to serve you after all.
+\N[17] seems completely oblivious to your plans for him./#Maybe it's better this way? So he doesn't know what hit him.
+\N[18] is staring at you. For the first time you think you/#see understanding and intelligence in his eyes. Like he knows/#what's coming for him.
+\N[29] does not mind this fate. He was resurrected to serve /#you. You're just fulfilling his destiny.
 \N[28] nod in agreement. He's ready to die for you.
-\N[22] is nervously looking around. Does he actually \nunderstand what is happening? Ghouls should not have that level\nof intelligence.
+\N[22] is nervously looking around. Does he actually /#understand what is happening? Ghouls should not have that level/#of intelligence.
 Do it regardless
 Nevermind then
-It might be risky to to cut yourself with your current state of\nhealth...
-You party members disappeared somewhere... You were left alone\nwhile you were sleeping.
+It might be risky to to cut yourself with your current state of/#health...
+You party members disappeared somewhere... You were left alone/#while you were sleeping.
 O'saa disappeared somewhere while you were sleeping...
 Karin disappeared somewhere while you were sleeping...
 Levi disappeared somewhere while you were sleeping...
@@ -1631,73 +1631,73 @@ GabText The Moon God has noticed you...
 You take the \c[2]Death mask\c[0] and \c[2]Chainmail dress\c[0]!
 GabText You stepped on a rusty nail.
 The fortune teller flips a card.
-\>\i[69]\}ORTUNE TELLER\{\<\n"The tower... and the deception..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears your search for the three figurines is over. Now only\nthe imposing tower awaits... The council with the moon..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Only blood and violence can open the doors that stay locked before\nyou..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The festival is a nasty bugger..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you have already climbed your way to the top of the\nhuman pyramid of flesh and feces..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The foul idol awaits you at the top of the tower."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The sun..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Or maybe there is another way..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Your fortune branches here... You have a decision to make..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"One path leads to the leeches of the sulfuric pit... And the\nother one leads to brave unknown..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Only difficult choices ahead... kjeh kjeh *cough* kjueeh..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you are in search... or in desperate need of select \nfew relics of importance..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The self-fellating man..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The one symbolizing the downfall of men... the primal weakness...\nThat one you can find from the moldy prison that houses the foul\nand the weary..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The gaping hunger..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The one symbolizing the endless hunger and endless discontent...\nThat one you can find from where one starts their long journey on\nthe path to that very same discontent..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The martyr..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The one symbolizing the need for idols... the need for dreams to\nlook up to... the need for those to blame at the darkest hour...\nNaturally you can find that one from the house of the holy."
-\>\i[69]\}ORTUNE TELLER\{\<\n"A new dawn... The midnight sun..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you are well on your way with another quest as well..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you are well on your way with this other quest as \nwell..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The three rivers cross where the history meets the modern man..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Three rivers..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you have began another quest as well... One that is\nhidden in the plain sight..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears you have began this other quest as well... One that \nis hidden in the plain sight..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"The three rivers lead you to the promised land..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"It appears there is another path, hidden in plain sight..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Ah, this is the other path I spoke off... The one hidden in \nplain sight..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"A man-made conflict hides a stream of consciousness..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"A stone fortress that rises in the deep green..."
-\>\i[69]\}ORTUNE TELLER\{\<\n"Follow upstream... A treasure hidden behind a waterfall..."
-\>\i[67]\}AAN\{\<\n"His face..."
-\>\i[67]\}AAN\{\<\n"It's smeared with makeup and blood... His expression is still \nfrozen in that shit-eating grin despite having gone through a \npainful death..."
-\>\i[67]\}AAN\{\<\n"..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The tower... and the deception..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears your search for the three figurines is over. Now only/#the imposing tower awaits... The council with the moon..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Only blood and violence can open the doors that stay locked before/#you..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The festival is a nasty bugger..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you have already climbed your way to the top of the/#human pyramid of flesh and feces..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The foul idol awaits you at the top of the tower."
+\>\i[69]\}ORTUNE TELLER\{\</#"The sun..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Or maybe there is another way..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Your fortune branches here... You have a decision to make..."
+\>\i[69]\}ORTUNE TELLER\{\</#"One path leads to the leeches of the sulfuric pit... And the/#other one leads to brave unknown..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Only difficult choices ahead... kjeh kjeh *cough* kjueeh..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you are in search... or in desperate need of select /#few relics of importance..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The self-fellating man..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The one symbolizing the downfall of men... the primal weakness.../#That one you can find from the moldy prison that houses the foul/#and the weary..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The gaping hunger..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The one symbolizing the endless hunger and endless discontent.../#That one you can find from where one starts their long journey on/#the path to that very same discontent..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The martyr..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The one symbolizing the need for idols... the need for dreams to/#look up to... the need for those to blame at the darkest hour.../#Naturally you can find that one from the house of the holy."
+\>\i[69]\}ORTUNE TELLER\{\</#"A new dawn... The midnight sun..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you are well on your way with another quest as well..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you are well on your way with this other quest as /#well..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The three rivers cross where the history meets the modern man..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Three rivers..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you have began another quest as well... One that is/#hidden in the plain sight..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears you have began this other quest as well... One that /#is hidden in the plain sight..."
+\>\i[69]\}ORTUNE TELLER\{\</#"The three rivers lead you to the promised land..."
+\>\i[69]\}ORTUNE TELLER\{\</#"It appears there is another path, hidden in plain sight..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Ah, this is the other path I spoke off... The one hidden in /#plain sight..."
+\>\i[69]\}ORTUNE TELLER\{\</#"A man-made conflict hides a stream of consciousness..."
+\>\i[69]\}ORTUNE TELLER\{\</#"A stone fortress that rises in the deep green..."
+\>\i[69]\}ORTUNE TELLER\{\</#"Follow upstream... A treasure hidden behind a waterfall..."
+\>\i[67]\}AAN\{\</#"His face..."
+\>\i[67]\}AAN\{\</#"It's smeared with makeup and blood... His expression is still /#frozen in that shit-eating grin despite having gone through a /#painful death..."
+\>\i[67]\}AAN\{\</#"..."
 "What is it?"
 "You recognise him?"
-\>\i[67]\}AAN\{\<\n"It can't be..."
-\>\i[67]\}AAN\{\<\n"My mind is just doing tricks on me.\. Nasty tricks..."
-\>\i[67]\}AAN\{\<\n"This guy is in top human form clearly. Under his garbs is a\nmuscular body full of scars."
-\>\i[67]\}AAN\{\<\n"Scary. His muscles are still very tense even after his death."
-\>\i[67]\}AAN\{\<\n"Wouldn't want to run into him alone in a dark alley, that's for\nsure."
-\>\i[67]\}AAN\{\<\n"Because of his strong condition, he doesn't appear to have many\nweaknesses. Fire always works on his garbs though."
-His face... There's something that bothers you in his looks...\nSomething familiar.
-It's smeared with makeup and blood... His expression is still \nfrozen in that shit-eating grin despite having gone through a \npainful death...
-Beneath it all, there's something very familiar about him...\nYou don't want to even consider the possibility, but he reminds\nyou of your father-in-law, Eihner von Dutch...
+\>\i[67]\}AAN\{\</#"It can't be..."
+\>\i[67]\}AAN\{\</#"My mind is just doing tricks on me.\. Nasty tricks..."
+\>\i[67]\}AAN\{\</#"This guy is in top human form clearly. Under his garbs is a/#muscular body full of scars."
+\>\i[67]\}AAN\{\</#"Scary. His muscles are still very tense even after his death."
+\>\i[67]\}AAN\{\</#"Wouldn't want to run into him alone in a dark alley, that's for/#sure."
+\>\i[67]\}AAN\{\</#"Because of his strong condition, he doesn't appear to have many/#weaknesses. Fire always works on his garbs though."
+His face... There's something that bothers you in his looks.../#Something familiar.
+It's smeared with makeup and blood... His expression is still /#frozen in that shit-eating grin despite having gone through a /#painful death...
+Beneath it all, there's something very familiar about him.../#You don't want to even consider the possibility, but he reminds/#you of your father-in-law, Eihner von Dutch...
 But that's impossible. Isn't it?
-Then again, you felt like you just saw the ghost of Elise as \nwell...
+Then again, you felt like you just saw the ghost of Elise as /#well...
 Your mind must be playing dirty tricks on you...
-Needles is in top human form clearly. Under his garbs is a\nmuscular body full of scars. Some of the scars look like old burns\nand some look like old rash of some kind.
-Because of his strong condition, he doesn't appear to have many\nweaknesses. Fire always works on his garbs though.
-\>\i[67]\}AAN\{\<\n"The person looks to have a rather normal female body. A little bit\nmore muscular than usual perhaps, but nothing out of ordinary."
-\>\i[67]\}AAN\{\<\n"She has sewn her mouth partly shut and there appears to be more\nsewn cuts scattered around her body. Their purpose is unknown to\nbe, but they do distort her face beyond recognition..."
+Needles is in top human form clearly. Under his garbs is a/#muscular body full of scars. Some of the scars look like old burns/#and some look like old rash of some kind.
+Because of his strong condition, he doesn't appear to have many/#weaknesses. Fire always works on his garbs though.
+\>\i[67]\}AAN\{\</#"The person looks to have a rather normal female body. A little bit/#more muscular than usual perhaps, but nothing out of ordinary."
+\>\i[67]\}AAN\{\</#"She has sewn her mouth partly shut and there appears to be more/#sewn cuts scattered around her body. Their purpose is unknown to/#be, but they do distort her face beyond recognition..."
 "What's wrong?"
 "Are you alright?"
 Daan looks shaken up. His eyes are wide as he stares the woman.
-\>\i[67]\}AAN\{\<\n"Let's just go."
-\>\i[67]\}AAN\{\<\n"I really need fresh air."
+\>\i[67]\}AAN\{\</#"Let's just go."
+\>\i[67]\}AAN\{\</#"I really need fresh air."
 Elise...
-The person looks to have a rather normal female body. A little bit\nmore muscular than usual perhaps, but nothing out of ordinary.
-She has sewn her mouth partly shut and there appears to be more\nsewn cuts scattered around her body. Their purpose is unknown to\nyou, but they do distort her face beyond recognition.
+The person looks to have a rather normal female body. A little bit/#more muscular than usual perhaps, but nothing out of ordinary.
+She has sewn her mouth partly shut and there appears to be more/#sewn cuts scattered around her body. Their purpose is unknown to/#you, but they do distort her face beyond recognition.
 But despite that... She eerily reminds you of someone...
-The more you entertain the idea, the more certain you become of\nthis haunting realization.
-No matter how disfigured her face would be, you would always\nrecognize your wife Elise... This woman has her appearance. You\nare 100% certain of this now.
+The more you entertain the idea, the more certain you become of/#this haunting realization.
+No matter how disfigured her face would be, you would always/#recognize your wife Elise... This woman has her appearance. You/#are 100% certain of this now.
 But it's impossible. She is dead...
-Either you are losing your mind slowly but surely, this place has\nfinally gotten the best of you... Or maybe there is some other\nsinister reasoning behind all this...
-You hope that it is only your mind that is crumbling here...\nYou wish Elise has her rest now...
-Because of the sewn cuts, the body is especially weak against\nslashing attacks that might open the cuts. Also blunt attacks\nmight open the stitches.
+Either you are losing your mind slowly but surely, this place has/#finally gotten the best of you... Or maybe there is some other/#sinister reasoning behind all this...
+You hope that it is only your mind that is crumbling here.../#You wish Elise has her rest now...
+Because of the sewn cuts, the body is especially weak against/#slashing attacks that might open the cuts. Also blunt attacks/#might open the stitches.
 GabText The pinecone pig brought you 2 \c[2]Matches\c[0]!
 GabText The pinecone pig brought you an \c[2]Egg\c[0]!
 GabText The pinecone pig brought you \c[2]Dried meat\c[0]!
@@ -1724,6 +1724,6 @@ GabText The pinecone pig brought you \c[2]Nettle\c[0]!
 GabText The pinecone pig brought you \c[2]Ratkin head\c[0]!
 GabText The pinecone pig brought you \c[2]Dark blue root\c[0]!
 GabText The pinecone pig brought you a \c[2]Glass shards\c[0]!
-"Eastern Union abandoned the compound like expected. They \ndetonated explosives to cave-in the railway tracks to the compound. \nBut Bremen and Kaiser will find their way inside."
-"We have to move now. This is our only window of opportunity. \nOur sources say Kaiser is already on his way to Prehevil. I'm not \nsure if the project is far enough, but we must hijack it asap."
-"Kaiser plans to launch the system himself, it looks like the \nonly way to stop this is to do it before him. I know how to \nset it up, just mobilize whoever is in the area. \nWe must act - now. -R"
+"Eastern Union abandoned the compound like expected. They /#detonated explosives to cave-in the railway tracks to the compound. /#But Bremen and Kaiser will find their way inside."
+"We have to move now. This is our only window of opportunity. /#Our sources say Kaiser is already on his way to Prehevil. I'm not /#sure if the project is far enough, but we must hijack it asap."
+"Kaiser plans to launch the system himself, it looks like the /#only way to stop this is to do it before him. I know how to /#set it up, just mobilize whoever is in the area. /#We must act - now. -R"

@@ -152,13 +152,9 @@ pub fn write_maps(
                                                     .par_iter_mut()
                                                     .for_each(|param: &mut Value| {
                                                         if param.is_string() {
-                                                            if let Some(text) = text_hashmap.get(
-                                                                param
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .replace("\\n[", "\\N[")
-                                                                    .as_str(),
-                                                            ) {
+                                                            if let Some(text) = text_hashmap
+                                                                .get(param.as_str().unwrap())
+                                                            {
                                                                 *param = to_value(text).unwrap();
                                                             }
                                                         }
@@ -193,7 +189,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace("\\n", "\n"))
+            .map(|line: &str| line.to_string().replace("/#", "\n"))
             .collect();
 
             let mut other_translated_text: Vec<String> = read_to_string(format!(
@@ -202,7 +198,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace("\\n", "\n"))
+            .map(|line: &str| line.to_string().replace("/#", "\n"))
             .collect();
 
             let mut rng: ThreadRng = thread_rng();
@@ -341,13 +337,9 @@ pub fn write_other(
                                                     .par_iter_mut()
                                                     .for_each(|param: &mut Value| {
                                                         if param.is_string() {
-                                                            if let Some(text) = translation_map.get(
-                                                                param
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .replace("\\n[", "\\N[")
-                                                                    .as_str(),
-                                                            ) {
+                                                            if let Some(text) = translation_map
+                                                                .get(param.as_str().unwrap())
+                                                            {
                                                                 *param = to_value(text).unwrap();
                                                             }
                                                         }

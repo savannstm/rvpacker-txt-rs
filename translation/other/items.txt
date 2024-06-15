@@ -5,14 +5,14 @@
 Prehevil map
 A map of Prehevil.
 Photo album
-A humble little album containing all the photos you've collected\nthrough the years.
+A humble little album containing all the photos you've collected/#through the years.
 Recipes of the 15th Century vol.1
-The first volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
+The first volume of the cook book series. Contains recipes/#for the meat and vegetable pies.
 The Four Ages of History
-A brief history book about the different ages of modern\nchronology.
+A brief history book about the different ages of modern/#chronology.
 Flashlight
 Matches
-Use to light a fire. Light brings warmth and safety and keeps\nfear in check.
+Use to light a fire. Light brings warmth and safety and keeps/#fear in check.
 Cloth fragment
 Cloth can be used to tie up small wounds and stop bleeding.
 Glass vial
@@ -24,7 +24,7 @@ A vial full of mysterious black liquid.
 Oil
 A vial full of oil that is somewhat flammable.
 Alchemillia vol.2
-A book for intermediate level alchemy. Contains recipes for\nthe murky vial, the white vial and the yellow vial.
+A book for intermediate level alchemy. Contains recipes for/#the murky vial, the white vial and the yellow vial.
 Meatpie
 Old fashioned meatpie. Rather easy to do.
 Egg
@@ -32,101 +32,101 @@ An egg of bird or lizard origin. Who knows really?
 Dried meat
 Strips of meat, dried to prevent spoiling.
 Wheat flour
-Grinded wheat. On its own it's not much of use, but can be\nused in bakery.
+Grinded wheat. On its own it's not much of use, but can be/#used in bakery.
 Woodsman's letter
-A single piece of paper with crude writing on it. It seems\nto have been written in a hurry.
+A single piece of paper with crude writing on it. It seems/#to have been written in a hurry.
 Dirty toilet paper
-This paper can be used to tie up small wounds and stop bleeding.\nIt does look absolutely rancid though. It definitely isn't the\nmost hygienic way to patch up yourself...
+This paper can be used to tie up small wounds and stop bleeding./#It does look absolutely rancid though. It definitely isn't the/#most hygienic way to patch up yourself...
 Small key
 A rusty worn-out key.
 Rotten meat
 Disgusting piece of meat. Its use is questionable...
 New poems of love and torment
-A perfect collection of love letters written by the storied\nhero Ronn Chambara.
+A perfect collection of love letters written by the storied/#hero Ronn Chambara.
 Mahavre
 A book about the ancient city Mahavre.
-This book tells the tale of the legendary fellowship\nthat would be known in this day as the new gods.
+This book tells the tale of the legendary fellowship/#that would be known in this day as the new gods.
 Soldier's diary 1
-A diary of a Bremen soldier that arrived to this area \nrecently.
+A diary of a Bremen soldier that arrived to this area /#recently.
 Stick
-A cut tree branch. It might be useful in some\nsituations.
+A cut tree branch. It might be useful in some/#situations.
 Blue vial
 A vial full of blue liquid.
 Vodka
-A bottle of old vodka. Helps you keep sane in this crazy\nworld.
+A bottle of old vodka. Helps you keep sane in this crazy/#world.
 Moldy bread
-A dried up bread with some mold already growing on it.\nGives momentary ease against hunger.
+A dried up bread with some mold already growing on it./#Gives momentary ease against hunger.
 Yellow vial
-A vial full of yellow colored mucus. The smell is very salty,\nbut it might just be edible...
+A vial full of yellow colored mucus. The smell is very salty,/#but it might just be edible...
 Blood vial
 A vial full of blood.
 Notes written by a torturer.
 Cheese
 An old dried up cheese. It has a pretty bad smell to it.
 Beer
-A bottle of beer. The beer inside is murky. Helps you stay\nsane in the ever-pressing darkness.
+A bottle of beer. The beer inside is murky. Helps you stay/#sane in the ever-pressing darkness.
 Book of enlightenment
-A mysterious ancient book radiating warm light. It's said\nto be written by the monks beyond the Eastern Sanctuaries.
+A mysterious ancient book radiating warm light. It's said/#to be written by the monks beyond the Eastern Sanctuaries.
 Vegetable pie
 Old fashioned pie made from various vegetables.
 Carrot
 A perfectly edible carrot.
 Turnip
-A turnip that seems to be fresh from the ground. It even\ngot pieces of dirt in it still.
+A turnip that seems to be fresh from the ground. It even/#got pieces of dirt in it still.
 Orders from Vatican
 A letter directed to father Domek of Prehevil.
 White vial
-A vial full of white colored liquid. Works as an antidote\nfor poisoning.
+A vial full of white colored liquid. Works as an antidote/#for poisoning.
 Purple vial
-A vial full of purple colored liquid. Slowly working, but\npotent poison.
+A vial full of purple colored liquid. Slowly working, but/#potent poison.
 Red vial
-A vial full of red colored liquid. Highly corrosive. Can be\nused to melt certain objects.
+A vial full of red colored liquid. Highly corrosive. Can be/#used to melt certain objects.
 Devil's Grass
-Creates a relaxing and fear reducing effects when smoked.\nThe only negative effect is slight loss of accuracy.
+Creates a relaxing and fear reducing effects when smoked./#The only negative effect is slight loss of accuracy.
 Heroin
-Highly addictive pain medication. The high creates an\neuphoric effect, but the withdrawal symptoms are severe.
+Highly addictive pain medication. The high creates an/#euphoric effect, but the withdrawal symptoms are severe.
 Pep pills
-A strong stimulant with performance-enhancing effects. The\nhigh raises your awareness, the withdrawal tires you out.
+A strong stimulant with performance-enhancing effects. The/#high raises your awareness, the withdrawal tires you out.
 Lucky coin
-Lucky coin to be used in dire situations. Hold [SHIFT]\nwhile choosing head or tails to boost your chances.
+Lucky coin to be used in dire situations. Hold [SHIFT]/#while choosing head or tails to boost your chances.
 Green vial
-A vial full of green colored liquid. Just the smell makes\nyour muscles contract and heightens your senses.
+A vial full of green colored liquid. Just the smell makes/#your muscles contract and heightens your senses.
 Bacon & eggs
-A great way to start new day - if not a little bit\nheavy on your stomach.
+A great way to start new day - if not a little bit/#heavy on your stomach.
 Goulash
-A local delicacy. A stew of meat and vegetables seasoned \nwith paprika.
+A local delicacy. A stew of meat and vegetables seasoned /#with paprika.
 Tomato
-The color of the tomato is a little pale, suggesting\nit hasn't seen much sun.
+The color of the tomato is a little pale, suggesting/#it hasn't seen much sun.
 Paprika
-The parika is already getting a little bit soft, but it's\nstill edible.
+The parika is already getting a little bit soft, but it's/#still edible.
 Light blue vial
 A vial full of light blue liquid.
 Salami
 A Dry piece of salami. Made from horse meat.
 Blueberries
-Rather fresh pile of blue berries. They are very\nhealthy!
+Rather fresh pile of blue berries. They are very/#healthy!
 Blueberry pie
-Old fashioned pie made of blueberries. Tasty and \nhealthy in same package!
+Old fashioned pie made of blueberries. Tasty and /#healthy in same package!
 Nitroglycerin powder
-White powder of nitroglycerin. Mixed with right\nelements, you can get something out of this...
+White powder of nitroglycerin. Mixed with right/#elements, you can get something out of this...
 Opium powder
-If you had a pipe, you could smoke this. It has\ncalming and fear reducing effects.
+If you had a pipe, you could smoke this. It has/#calming and fear reducing effects.
 Pipe
 You could smoke something with this.
 Tobacco
-A rare luxury product from the new continent, the dark\nlands of Vinland. Can be smoked with a pipe.
+A rare luxury product from the new continent, the dark/#lands of Vinland. Can be smoked with a pipe.
 9mm Bullet
-A 9mm handgun bullet. On the casing it says "Si vis pacem,\npara bellum". Use [SHIFT] to shoot.
+A 9mm handgun bullet. On the casing it says "Si vis pacem,/#para bellum". Use [SHIFT] to shoot.
 Bear trap
-A strong contraption that will cause severe damage if stepped\non.
+A strong contraption that will cause severe damage if stepped/#on.
 12-gauge shells
-A shell that is loaded with multiple lead shots. These shells\nare used with Trenchguns. Use [SHIFT] to shoot.
+A shell that is loaded with multiple lead shots. These shells/#are used with Trenchguns. Use [SHIFT] to shoot.
 .303 Ammo
-Round-nosed, copper-nickel full-metal-jacketed bullet with\na lead core. Ammo meant for rifles. Shoot with [SHIFT].
+Round-nosed, copper-nickel full-metal-jacketed bullet with/#a lead core. Ammo meant for rifles. Shoot with [SHIFT].
 Explosive vial
-A vial full of explosive liquids. Can be used to clear\ncave-ins or other rocks and rubble.
+A vial full of explosive liquids. Can be used to clear/#cave-ins or other rocks and rubble.
 The Tale of the Pocketcat Ch. 1
-The first chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
+The first chapter of an old fairytale used to scare children from/#wandering off on their own. This particular copy seems faithful to the/#original, unlike the modern watered down versions of the story.
 Stone
 A small rock.
 Water vial
@@ -135,59 +135,59 @@ Quill
 A feather of a falcon. Perfectly suited for use as a quill.
 An empty scroll waiting for someone to write in it.
 Alchemillia vol.3
-A book for experienced level alchemy. Contains recipes for\nthe light blue vial and the brown vial.
+A book for experienced level alchemy. Contains recipes for/#the light blue vial and the brown vial.
 Brown vial
-A vial full of brown colored liquid. Just the smell makes\nyour muscles contract and heightens your senses.
+A vial full of brown colored liquid. Just the smell makes/#your muscles contract and heightens your senses.
 The Passages of Ma'habre
-A normal looking book that feels surprisingly heavy. It's\ncovers look very old.
+A normal looking book that feels surprisingly heavy. It's/#covers look very old.
 Green herb
-A green herb with a bitter smell. Used commonly to cure\ninfections by rubbing them with the herb.
+A green herb with a bitter smell. Used commonly to cure/#infections by rubbing them with the herb.
 Blue herb
 A blue herb with a sweet smell.
 Lavender
-Lavender petals that give off a lovely scent. The scent\nsoothes you and dilutes your fears.
+Lavender petals that give off a lovely scent. The scent/#soothes you and dilutes your fears.
 Wine vial
-A vial of old murky wine. Drink it to dim your senses\nand fear.
+A vial of old murky wine. Drink it to dim your senses/#and fear.
 Book of Fears
 A book written about different phobias.
 Woodsman head
-The severed head of a woodsman. The blank eyes stare to\nemptiness.
+The severed head of a woodsman. The blank eyes stare to/#emptiness.
 Booby trap
-A makeshift trap made from a case of a landmine. While not\nvery damaging, can be used to stun opponents momentarily.
+A makeshift trap made from a case of a landmine. While not/#very damaging, can be used to stun opponents momentarily.
 Lighter
-Use to light a fire. Light brings warmth and safety and keeps\nfear in check. There is still some gas left.
+Use to light a fire. Light brings warmth and safety and keeps/#fear in check. There is still some gas left.
 Villager head
-The severed head of a villager. The blank eyes stare to\nemptiness.
+The severed head of a villager. The blank eyes stare to/#emptiness.
 Vile head
-The severed head of a villager with his pig mask still on.\nYou couldn't get the mask off as if it's melted to the skin.
+The severed head of a villager with his pig mask still on./#You couldn't get the mask off as if it's melted to the skin.
 Priest's head
-The severed head of a decrepit priest. There's something eerie\nabout the head. As if something lingers still inside...
+The severed head of a decrepit priest. There's something eerie/#about the head. As if something lingers still inside...
 Gentleman's head
 The severed head of the Gentleman.
 Ronteal's head
-The severed head of a ronteal. The head is full of sharp teeth\nand muckus.
+The severed head of a ronteal. The head is full of sharp teeth/#and muckus.
 Rifleman head
-The severed head of a rifleman. His eyes are in permanent squint\nnow.
+The severed head of a rifleman. His eyes are in permanent squint/#now.
 Soul stone
-The insides of the gemstone radiate faint light that slowly\nswirls around.
+The insides of the gemstone radiate faint light that slowly/#swirls around.
 Brain flower seed
 Small seeds that are soft and squishy.
 Soul stone shard
-A shard of a larger gemstone. You can feel magnetic pulse\nfrom the shard... Maybe if you had more of these...?
-A surprisingly heavy gemstone. The insides radiate\nfaint blue light that slowly swirl around.
+A shard of a larger gemstone. You can feel magnetic pulse/#from the shard... Maybe if you had more of these...?
+A surprisingly heavy gemstone. The insides radiate/#faint blue light that slowly swirl around.
 White key
 A white key.
 Red herb
-A red herb with a neutral smell. Intensifies the effect of\nother herbs.
+A red herb with a neutral smell. Intensifies the effect of/#other herbs.
 Alchemillia vol.1
-A book for beginner level alchemy. Contains recipes for the\nblue vial and simple mixed herbs.
+A book for beginner level alchemy. Contains recipes for the/#blue vial and simple mixed herbs.
 Mixed herbs
 A mixture of blue and red herbs that is especially potent.
 A mixture of green and red herbs that is especially potent.
 Anathomia
 The book of collected knowledge of medical science.
 Bonesaw
-A rusty old bonesaw. You can only imagine the cruelty this\nsaw has seen. Effective against infections.
+A rusty old bonesaw. You can only imagine the cruelty this/#saw has seen. Effective against infections.
 Arm
 An arm that's still relatively fresh.
 Leg
@@ -197,107 +197,107 @@ A skeletal leg that's been cut off.
 Goat hoof
 A hoof of a goat. It's still relatively fresh.
 Purifying talisman
-A paper talisman with markings that originate from\nEastern Sanctuaries.
+A paper talisman with markings that originate from/#Eastern Sanctuaries.
 Raw meat
-A piece of raw meat. It's huge junk, but you don't know\nif it's healthy to eat it raw...
+A piece of raw meat. It's huge junk, but you don't know/#if it's healthy to eat it raw...
 Grilled meat
-A piece of grilled meat. It's huge junk that will surely\nsatisfy your hunger.
+A piece of grilled meat. It's huge junk that will surely/#satisfy your hunger.
 Mushroom stew
 Mushroom stew made from local penny buns.
 Saw blade
-A saw blade that is used in table saws. The blade has been\ngathering a little bit rust.
+A saw blade that is used in table saws. The blade has been/#gathering a little bit rust.
 Ornament lantern
-A simple lantern with ornament decorations. Can be used to\nthrow at the enemies for a small fire attack.
+A simple lantern with ornament decorations. Can be used to/#throw at the enemies for a small fire attack.
 The Tale of the Pocketcat Ch. 2
-The second chapter of an old fairytale used to scare children from\nwandering off on their own. This particular copy seems faithful to the\noriginal, unlike the modern watered down versions of the story.
+The second chapter of an old fairytale used to scare children from/#wandering off on their own. This particular copy seems faithful to the/#original, unlike the modern watered down versions of the story.
 Fallen cherub head
-The severed head of a fallen cherub. The head feels hollow and its\nskin feels crispy.
+The severed head of a fallen cherub. The head feels hollow and its/#skin feels crispy.
 Throwing dart
-Small darts designed for throwing. They are also dipped\nin poison.
+Small darts designed for throwing. They are also dipped/#in poison.
 Coded letter #1
 Coded letter #2
 A letter with a coded message...
 Lion brass key
-A brass key with a crude insignia of the 2-tailed lion that\nis the old symbol of Prehevil.
+A brass key with a crude insignia of the 2-tailed lion that/#is the old symbol of Prehevil.
 Gasoline canister
 A canister with a good amount of gasoline still left inside.
 Rust-coloured pearl
-A mysterious rust-coloured pearl found from inside a ronteal.\nThe shape is perfect, but there is something ominous about it...
+A mysterious rust-coloured pearl found from inside a ronteal./#The shape is perfect, but there is something ominous about it...
 Soldier's letter
-A handwritten letter of a Bremen soldier. Seems like he\nnever got to send the letter...
+A handwritten letter of a Bremen soldier. Seems like he/#never got to send the letter...
 Shilling
-The common currency used in Prehevil. It's value is less\nthan that of its counter-parts in Europa.
+The common currency used in Prehevil. It's value is less/#than that of its counter-parts in Europa.
 Eagle brass key
-A brass key with a crude insignia of the Bremen national\nanimal black eagle.
+A brass key with a crude insignia of the Bremen national/#animal black eagle.
 Silver shilling
-A currency used in Prehevil by the higher class residents. They\nsay that there are certain things only silver can buy.
+A currency used in Prehevil by the higher class residents. They/#say that there are certain things only silver can buy.
 Chalk
 A short piece of chalk. You can draw things with this.
 Occult Grimoires
-The book contains the basics of occult and magick. Information\nabout the ritual circles can be found here.
+The book contains the basics of occult and magick. Information/#about the ritual circles can be found here.
 Basement key
 A basement key found from the woodsman.
 Skin bible - Gro-goroth
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Gro-goroth.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Gro-goroth.
 Skin bible - Rher
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Rher.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Rher.
 Combat manual
 A beginner's guide to survival and combat on a battlefield.
 Black matter
-You cannot quite tell what you are looking at. You can\nrecognize pasta in there. It might be edible?
+You cannot quite tell what you are looking at. You can/#recognize pasta in there. It might be edible?
 Newspaper article
 An article about the end of the Great War II.
 Penny bun
-A mushroom commonly found throughout Europa. An edible mushroom.\nIt is used widely as an ingredient in various foods.
+A mushroom commonly found throughout Europa. An edible mushroom./#It is used widely as an ingredient in various foods.
 Fly amanita
-One of the more iconic toadstool species. Its (relatively)\nmild poison is well known even by small children.
+One of the more iconic toadstool species. Its (relatively)/#mild poison is well known even by small children.
 Golden chanterelle
-A sought-after edible mushroom. Its delicious taste is often\nreferenced "Chanterelle dreams, amanita nightmares."
+A sought-after edible mushroom. Its delicious taste is often/#referenced "Chanterelle dreams, amanita nightmares."
 Glass shards
-A fistful of glass shards. Better handle them with care so\nyou won't cut yourself!
+A fistful of glass shards. Better handle them with care so/#you won't cut yourself!
 The Last Frontier ch.1
 A brief history of the dark continent Vinland.
 Bolt cutters
-A tool used for cutting chains, padlocks, bolts and wire.\nThe handles are positioned with the best leverage in mind.
+A tool used for cutting chains, padlocks, bolts and wire./#The handles are positioned with the best leverage in mind.
 Bolt
-Bolts are typically used in assembling different components\ntogether.
+Bolts are typically used in assembling different components/#together.
 Duct tape
-A special water resistant tape created recently in the second\ngreat war to seal ammunition cases in a durable manner.
+A special water resistant tape created recently in the second/#great war to seal ammunition cases in a durable manner.
 Scrap metal
 Pieces of scrap metal left seemingly with no purpose.
 Craftman's notes
 Notes left behind by the craftman of the church.
 Moonscorched head
-The severed head of a moonscorched villager. The skin has\nburned and melted in an unusual way.
+The severed head of a moonscorched villager. The skin has/#burned and melted in an unusual way.
 Bobby's head
-The severed head of a bobby. The skin has taken exoskeleton-like\nqualities. The expression is in eternal grin.
+The severed head of a bobby. The skin has taken exoskeleton-like/#qualities. The expression is in eternal grin.
 Head of Needles
-The severed head of the Needles. For some reason you get a\nfeeling that his presence still lingers in those eyes...
+The severed head of the Needles. For some reason you get a/#feeling that his presence still lingers in those eyes...
 Pillarman's head
-The severed head of a moonscorched villager. The skin seems\nburned in an unusual way.
+The severed head of a moonscorched villager. The skin seems/#burned in an unusual way.
 Head of the Tormented one
 Janitor head
-The severed head of the janitor from workshops. The face seems\nto be set in forever-grin.
+The severed head of the janitor from workshops. The face seems/#to be set in forever-grin.
 Dead crow
-A crow carcass that has recently started decomposing. It smells\nawful and even has few maggots in it.
+A crow carcass that has recently started decomposing. It smells/#awful and even has few maggots in it.
 Church keys
-A set of keys found from the lower levels of the Church of\nAlll-mer. They look like typical prison keys.
+A set of keys found from the lower levels of the Church of/#Alll-mer. They look like typical prison keys.
 Crosswords puzzle
-A torn crosswords puzzle from an old newspaper. Looks like someone\nhas filled some of it already...
+A torn crosswords puzzle from an old newspaper. Looks like someone/#has filled some of it already...
 Broomstick
-A simple wooden broomstick. It doesn't feel sturdy enough\nto be used as a weapon.
+A simple wooden broomstick. It doesn't feel sturdy enough/#to be used as a weapon.
 Sewer keys
-A set of dirty and rusty keys. One of the keys got carved\ntext saying "Sewers".
+A set of dirty and rusty keys. One of the keys got carved/#text saying "Sewers".
 Recipes of the 15th Century vol.2
-The second volume of the cook book series. Contains recipes\nfor the meat and vegetable pies.
+The second volume of the cook book series. Contains recipes/#for the meat and vegetable pies.
 Skin bible - Alll-mer
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Alll-mer.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Alll-mer.
 C-ration
-A canned military food ration issued to the allied forces.\nConsists corned beef and hardtack biscuits.
+A canned military food ration issued to the allied forces./#Consists corned beef and hardtack biscuits.
 Pressure plate
-A piece of scrap metal. This particular piece has been used\nas a pressure plate of sorts.
+A piece of scrap metal. This particular piece has been used/#as a pressure plate of sorts.
 Gun powder
-Looks like the standard gun powder that is used with bullets\nand shells.
+Looks like the standard gun powder that is used with bullets/#and shells.
 Weapon schematics
 Schematics for custom weaponry.
 Trap schematics
@@ -305,49 +305,49 @@ Schematics for custom traps.
 Explosive schematics
 Schematics for explosives
 Liver
-The liver has a function in detoxication, the removal of\ntoxic substances from a living organism.
+The liver has a function in detoxication, the removal of/#toxic substances from a living organism.
 Kidney
-Kidney participates in the control of bodily fluids, acid-base\nbalance and removal of toxins from the body.
+Kidney participates in the control of bodily fluids, acid-base/#balance and removal of toxins from the body.
 Eye
-Eyes are organs of the visual system. They provide animals\nwith vision.
+Eyes are organs of the visual system. They provide animals/#with vision.
 Heart
-The heart is a muscular organ which pumps blood through the\nblood vessels of the circulatory system.
+The heart is a muscular organ which pumps blood through the/#blood vessels of the circulatory system.
 Parathyroid glands
-The parathyroid glands are four tiny glands that control the\nbody's calcium levels.
+The parathyroid glands are four tiny glands that control the/#body's calcium levels.
 Thymus
-The thymus is a critical organ to the adaptive immune system\nwhere the body adapts specifically to foreign invaders.
+The thymus is a critical organ to the adaptive immune system/#where the body adapts specifically to foreign invaders.
 Kaiser critique
 An article that talks against the Kaiser's army and Bremen.
 Kaiser's rise to power
 An article that talks against the Kaiser's rise to power.
 Master key
-Master key found from the landlord's office in the apartment\nbuilding on the residential neighbourhood. A special key designed\nto open all the apartments in the building when necessary.
+Master key found from the landlord's office in the apartment/#building on the residential neighbourhood. A special key designed/#to open all the apartments in the building when necessary.
 Fellatio Effigy
-A small effigy of man hunched over on a throne. It's carved\nfrom an unknown material.
+A small effigy of man hunched over on a throne. It's carved/#from an unknown material.
 Hunger Effigy
-A small effigy of an deity with its gaping mouth open. It's carved\nfrom an unknown material.
+A small effigy of an deity with its gaping mouth open. It's carved/#from an unknown material.
 Martyr Effigy
-A small effigy resembling crucified Alll-mer with a snake curled\nover him. It's carved from an unknown material.
+A small effigy resembling crucified Alll-mer with a snake curled/#over him. It's carved from an unknown material.
 Heart flower stigma
-The stigma of a blooming heart flower. Has restorative properties\nwhen ingested. Heart and brain flowers are said to be nature's\nway of mimicing and growing a full artificial human being.
+The stigma of a blooming heart flower. Has restorative properties/#when ingested. Heart and brain flowers are said to be nature's/#way of mimicing and growing a full artificial human being.
 Brain flower stigma
-The stigma of a blooming brain flower. Has a sanity recovering\neffect when ingested. It is said that the pollen of a brain flower\nhas the opposite effect and often takes hold of its new host.
+The stigma of a blooming brain flower. Has a sanity recovering/#effect when ingested. It is said that the pollen of a brain flower/#has the opposite effect and often takes hold of its new host.
 Fecal hound head
-The severed head of a fecal hound. The smell this beast emits\neven in death is rancid.
+The severed head of a fecal hound. The smell this beast emits/#even in death is rancid.
 Neighbour head
-The severed head of a neighbour. A rancid smell is eminating\nfrom its mouth.
+The severed head of a neighbour. A rancid smell is eminating/#from its mouth.
 Diary of a madman
-A diary of a person living in the apartment building in the\nbackstreets of central Prehevil.
+A diary of a person living in the apartment building in the/#backstreets of central Prehevil.
 Headmaster's key
-A special key that belonged to the headmaster of the Prehevil \norphanage. After his execution, the key is yours to keep.
+A special key that belonged to the headmaster of the Prehevil /#orphanage. After his execution, the key is yours to keep.
 Ratkin head
-The severed head of a ratkin. The head seems to share characteristics\nof both human and rat.
+The severed head of a ratkin. The head seems to share characteristics/#of both human and rat.
 Rat hag head
-The severed head of a rat hag. The towering head is suprisingly\nheavy and left forever in a twisted grin.
+The severed head of a rat hag. The towering head is suprisingly/#heavy and left forever in a twisted grin.
 Henryk's head
 The severed head of Henryk.
 Manor key
-A key found from the mayor's manor in the Prehevil old town.\nThe key looks pretty plain with some light sratches here and there.
+A key found from the mayor's manor in the Prehevil old town./#The key looks pretty plain with some light sratches here and there.
 Abella's head
 The severed head of Abella.
 Marcoh's head
@@ -355,21 +355,21 @@ The severed head of Marcoh.
 Olivia's head
 The severed head of Olivia.
 Poison hemlock
-A large and poisonous plant that emits unpleasant smell. When\ndigested it is very hazardous, but on touch it only causes mild\npoisoning.
+A large and poisonous plant that emits unpleasant smell. When/#digested it is very hazardous, but on touch it only causes mild/#poisoning.
 Nettle
-Also known as stinging nettle. The leaves and the stem have\nmany hollow stinging hairs that cause mild irritation.
+Also known as stinging nettle. The leaves and the stem have/#many hollow stinging hairs that cause mild irritation.
 Tanaka's head
 The severed head of Tanaka.
 Pav's head
 The severed head of Pav.
 Foldable wheelchair
-A special lightweight foldable wheelchair meant. It is easy and\nfast to set up and feels surprisingly durable despite.
+A special lightweight foldable wheelchair meant. It is easy and/#fast to set up and feels surprisingly durable despite.
 Judgement's head
 The severed head of Judgement.
 Head of the Mechanical dance
 The severed head of the Mechanical dance.
 Wild dagga
-Also known as lion's tail. A rare plant to see growing in wild in\nEuropa. Someone must have planted it here. When smoked, the plant\nhas a calming and numbing effect. Great for relieving fear.
+Also known as lion's tail. A rare plant to see growing in wild in/#Europa. Someone must have planted it here. When smoked, the plant/#has a calming and numbing effect. Great for relieving fear.
 Daan's head
 The severed head of Daan.
 Caligura's head
@@ -405,7 +405,7 @@ The severed head of Valkyrie.
 Tanaka's notes
 Notes left behind by Tanaka. The notes look relatively fresh.
 Ancient book
-An ancient looking book with grotesque leather covers. You\nfeel great urge to read the book.
+An ancient looking book with grotesque leather covers. You/#feel great urge to read the book.
 Talking board
 Dysmorphia's head
 The severed head of Dysmorphia.
@@ -418,19 +418,19 @@ The severed head of an elite trooper.
 Flame trooper head
 The severed head of a flame trooper.
 Skin bible - Vinushka (unedited)
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Vinushka. This\nparticular version hasn't been tampered and edited by the Vatican.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Vinushka. This/#particular version hasn't been tampered and edited by the Vatican.
 Skin bible - God of Fear and Hunger
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the god of fear and hunger.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the god of fear and hunger.
 Skin bible - Vinushka
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Vinushka.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Vinushka.
 Skin bible - Sylvian
-A strong occult book written in the medieval times by Enki\nAnkarian. The chapter explains the older god Sylvian.
+A strong occult book written in the medieval times by Enki/#Ankarian. The chapter explains the older god Sylvian.
 Prehevil document
 The truth under the moonlight
 NLU Reconnaissance Report #1
-A brief report about a partisan organization called NLU - Nameless \nLiberty Underground. Distributed to all mid-level Bremen officers\nassigned to Bohemia.
+A brief report about a partisan organization called NLU - Nameless /#Liberty Underground. Distributed to all mid-level Bremen officers/#assigned to Bohemia.
 NLU Reconnaissance Report #2
-A brief report about NLU member Haas Reila Audrey. Distributed to \nall mid-level Bremen officers assigned to Bohemia.
+A brief report about NLU member Haas Reila Audrey. Distributed to /#all mid-level Bremen officers assigned to Bohemia.
 Telelectroscope and Logic
 A document giving you broad overview on Telelectroscope and Logic.
 Brain diagram document
@@ -448,20 +448,20 @@ Schematics for botanism
 Toxicology schematics
 Schematics for toxicology
 Condensed blue
-A condensed ball of blue herbs. Recovers great amount of\nhealth when digested.
+A condensed ball of blue herbs. Recovers great amount of/#health when digested.
 Condensed green
-A condensed ball of green herbs. Offer protection against infections,\npoisoning and other mild status ailments in advance. The effect\ndoesn't last long though.
+A condensed ball of green herbs. Offer protection against infections,/#poisoning and other mild status ailments in advance. The effect/#doesn't last long though.
 Condensed lavender
-A condensed ball of lavender. Recovers great amount of sanity\nwhen digested.
+A condensed ball of lavender. Recovers great amount of sanity/#when digested.
 Bench grinder
-A grinding machine used to drive abrasive wheels. Commonly used\nto hand grind various tools and perform other rough grinding.\nIt's very heavy and you wonder if it's worth carrying around.
+A grinding machine used to drive abrasive wheels. Commonly used/#to hand grind various tools and perform other rough grinding./#It's very heavy and you wonder if it's worth carrying around.
 Condensed nettle
-Also known as stinging nettle. The leaves and the stem have\nmany hollow stinging hairs that cause mild pain if touched.\nThe hairs won't cause any real damage, but they do irritate quite a bit.
+Also known as stinging nettle. The leaves and the stem have/#many hollow stinging hairs that cause mild pain if touched./#The hairs won't cause any real damage, but they do irritate quite a bit.
 Condensed hemlock
-A condensed ball of poison hemlock. Even just a small amount\nof any part of the plant can cause respiratory paralysis and\nand death.
+A condensed ball of poison hemlock. Even just a small amount/#of any part of the plant can cause respiratory paralysis and/#and death.
 The Logic document
 Portrait of a young man
-An old portrait photograph of a young man. It looks like the photo\nwas taken in the late-1800s. The person's face has been scratched\nover and is beyond recognition.
+An old portrait photograph of a young man. It looks like the photo/#was taken in the late-1800s. The person's face has been scratched/#over and is beyond recognition.
 Rancid head
 The severed head of the Rancid sergal.
 Heart-shaped lock
@@ -473,13 +473,13 @@ Goulash+
 Catnip
 Pipe bomb
 Schematics for custom foods.
-The talisman rises defence against otherwordly powers momentarily\nbut it might have some other uses as well...
+The talisman rises defence against otherwordly powers momentarily/#but it might have some other uses as well...
 'Man in dreams' flyer
 A flyer with an eerily familiar face...
 Taking board instructions
-Instructions on how to operate a talking board to communicate\nwith spirits and others alike.
+Instructions on how to operate a talking board to communicate/#with spirits and others alike.
 God manifesto
-A short manifesto on godhood. Written by renowned occultist\nDonnovan Hugo.
+A short manifesto on godhood. Written by renowned occultist/#Donnovan Hugo.
 Death mask head
 The severed head of a death mask.
 Meat grinder head
@@ -487,10 +487,10 @@ The severed head of the meat grinder.
 Centaur head
 The severed head of the centaur.
 Film reel
-A regular 8mm film reel. The label has writing: "Slow Exposure/ \nSubject 17". Someone has written the following on top of the label:\n"What does fast exposure look like?"
+A regular 8mm film reel. The label has writing: "Slow Exposure/ /#Subject 17". Someone has written the following on top of the label:/#"What does fast exposure look like?"
 Dark blue root
-Roots of a blue herb. The smell of the herb is even sweeter in\nits roots compared to the upper parts.
-A mixture of deep blue roots and red herbs that is especially \npotent.
-A mixture of deep blue roots and blue herbs that is especially \npotent.
+Roots of a blue herb. The smell of the herb is even sweeter in/#its roots compared to the upper parts.
+A mixture of deep blue roots and red herbs that is especially /#potent.
+A mixture of deep blue roots and blue herbs that is especially /#potent.
 Gull brother head
 The severed head of a gull brother.
