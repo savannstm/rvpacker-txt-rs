@@ -1,6 +1,6 @@
 import { writeFileSync, readFileSync, readdirSync } from "fs";
 import { OrderedSet } from "immutable";
-import { load, dump } from "@hyrious/marshal";
+import { load } from "@hyrious/marshal";
 import { inflateSync } from "zlib";
 
 import { getValueBySymbolDesc } from "./symbol-utils";
@@ -91,9 +91,9 @@ export function readMap(inputDir: string, outputDir: string, logging: boolean, l
     }
 
     writeFileSync(`${outputDir}/maps.txt`, lines.join("\n"), "utf8");
-    writeFileSync(`${outputDir}/maps_trans.txt`, "\n".repeat(lines.size - 1), "utf8");
+    writeFileSync(`${outputDir}/maps_trans.txt`, "\n".repeat(lines.size ? lines.size - 1 : 0), "utf8");
     writeFileSync(`${outputDir}/names.txt`, namesLines.join("\n"), "utf8");
-    writeFileSync(`${outputDir}/names_trans.txt`, "\n".repeat(namesLines.size - 1), "utf8");
+    writeFileSync(`${outputDir}/names_trans.txt`, "\n".repeat(namesLines.size ? namesLines.size - 1 : 0), "utf8");
 }
 
 export function readOther(inputDir: string, outputDir: string, logging: boolean, logString: string): void {
@@ -112,6 +112,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
         if (!filename.startsWith("Common") && !filename.startsWith("Troops")) {
             for (const obj of objArr.slice(1)) {
                 const name: string = getValueBySymbolDesc(obj, "@name");
+                const nickname: string = getValueBySymbolDesc(obj, "@nickname");
                 const description: string = getValueBySymbolDesc(obj, "@description");
                 const note: string = getValueBySymbolDesc(obj, "@note");
 
@@ -119,12 +120,16 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                     lines.add(name);
                 }
 
+                if (typeof nickname === "string" && nickname) {
+                    lines.add(nickname);
+                }
+
                 if (typeof description === "string" && description) {
-                    lines.add(description.replaceAll("\n", "\\n"));
+                    lines.add(description.replaceAll(/\r\n|\n(?!bt)/g, "\\n"));
                 }
 
                 if (typeof note === "string" && note) {
-                    lines.add(note.replaceAll("\r\n", "\\r\\n").replaceAll("\n", "\\n"));
+                    lines.add(note.replaceAll(/\r\n|\n(?!bt)/g, "\\n"));
                 }
             }
 
@@ -135,7 +140,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
             );
             writeFileSync(
                 `${outputDir}/${filename.toLowerCase().slice(0, filename.lastIndexOf("."))}_trans.txt`,
-                "\n".repeat(lines.size - 1),
+                "\n".repeat(lines.size ? lines.size - 1 : 0),
                 "utf8"
             );
             continue;
@@ -178,7 +183,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                                 switch (code) {
                                     case 102:
                                         if (Array.isArray(parameter)) {
-                                            for (const param in parameter) {
+                                            for (const param of parameter) {
                                                 if (typeof param === "string") {
                                                     lines.add(param);
                                                 }
@@ -216,7 +221,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
 
         writeFileSync(
             `${outputDir}/${filename.toLowerCase().slice(0, filename.lastIndexOf("."))}_trans.txt`,
-            "\n".repeat(lines.size - 1),
+            "\n".repeat(lines.size ? lines.size - 1 : 0),
             "utf8"
         );
     }
@@ -234,9 +239,9 @@ export function readSystem(inputDir: string, outputDir: string, logging: boolean
     );
 
     for (const arr of [skillTypes, weaponTypes, armorTypes]) {
-        for (const element of arr) {
-            if (element) {
-                lines.add(element);
+        for (const string of arr) {
+            if (string) {
+                lines.add(string);
             }
         }
     }
@@ -246,9 +251,9 @@ export function readSystem(inputDir: string, outputDir: string, logging: boolean
     const termsSymbols = Object.getOwnPropertySymbols(terms);
 
     for (let i = 0; i < termsSymbols.length; i++) {
-        for (const element of terms[termsSymbols[i]] as string[]) {
-            if (element) {
-                lines.add(element);
+        for (const string of terms[termsSymbols[i]] as string[]) {
+            if (string) {
+                lines.add(string);
             }
         }
     }
@@ -258,17 +263,23 @@ export function readSystem(inputDir: string, outputDir: string, logging: boolean
     }
 
     writeFileSync(`${outputDir}/system.txt`, lines.join("\n"), "utf8");
-    writeFileSync(`${outputDir}/system_trans.txt`, "\n".repeat(lines.size - 1), "utf8");
+    writeFileSync(`${outputDir}/system_trans.txt`, "\n".repeat(lines.size ? lines.size - 1 : 0), "utf8");
 }
 
 export function readScripts(inputDir: string, outputDir: string, logging: boolean, logString: string): void {
     const scriptsPath = `${inputDir}/Scripts.rvdata2`;
-    const arr = load(readFileSync(scriptsPath), { string: "binary" }) as Uint8Array[][];
+    const uintarrArr = load(readFileSync(scriptsPath), { string: "binary" }) as Uint8Array[][];
 
     const fullCode = [];
-    for (const [_m, _t, code] of arr) {
-        const codeString = inflateSync(code).toString("utf8").replaceAll("\r\n", "\\n");
+    for (const [_m, _t, code] of uintarrArr) {
+        const codeString = inflateSync(code)
+            .toString("utf8")
+            .replaceAll(/\r\n|\n(?!bt)/g, "\\n");
         fullCode.push(codeString);
+    }
+
+    if (logging) {
+        console.log(`${logString} scripts.txt`);
     }
 
     const joinedCode = fullCode.join("\n");

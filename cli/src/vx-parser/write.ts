@@ -1,18 +1,18 @@
 import { writeFileSync, readFileSync } from "fs";
-import { dump, load } from "@hyrious/marshal";
+import { dump } from "@hyrious/marshal";
 import { deflateSync } from "zlib";
 
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 
-function mergeSeq(json: object[]): object[] {
+function mergeSeq(objArr: object[]): object[] {
     let first: null | number = null;
     let number: number = -1;
     let prev: boolean = false;
     const stringArray: string[] = [];
 
-    for (let i = 0; i < json.length; i++) {
-        const object = json[i];
-        const code: number = getValueBySymbolDesc(object, "@code");
+    for (let i = 0; i < objArr.length; i++) {
+        const obj = objArr[i];
+        const code: number = getValueBySymbolDesc(obj, "@code");
 
         if (code === 401) {
             if (first === null) {
@@ -20,16 +20,16 @@ function mergeSeq(json: object[]): object[] {
             }
 
             number += 1;
-            stringArray.push(getValueBySymbolDesc(object, "@parameters")[0]);
+            stringArray.push(getValueBySymbolDesc(obj, "@parameters")[0]);
             prev = true;
         } else if (i > 0 && prev && first !== null && number !== -1) {
-            const parameters = getValueBySymbolDesc(json[first], "@parameters");
+            const parameters = getValueBySymbolDesc(objArr[first], "@parameters");
             parameters[0] = stringArray.join("\n");
-            setValueBySymbolDesc(json[first], "@parameters", parameters);
+            setValueBySymbolDesc(objArr[first], "@parameters", parameters);
 
             const startIndex = first + 1;
             const itemsToDelete = startIndex + number;
-            json.splice(startIndex, itemsToDelete);
+            objArr.splice(startIndex, itemsToDelete);
 
             stringArray.length = 0;
             i -= number;
@@ -39,7 +39,7 @@ function mergeSeq(json: object[]): object[] {
         }
     }
 
-    return json;
+    return objArr;
 }
 
 export function mergeMap(obj: object): object {
@@ -168,14 +168,14 @@ export function writeOther(
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("\\n", "\n"));
+            .map((string) => string.replaceAll("/#", "\n"));
 
         let otherTranslatedText = readFileSync(
             `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`,
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("\\r\\n", "\r\n").replaceAll("\\n", "\n"));
+            .map((string) => string.replaceAll("/#", "\n"));
 
         if (drunk > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
@@ -199,11 +199,16 @@ export function writeOther(
                 }
 
                 const name: string = getValueBySymbolDesc(obj, "@name");
+                const nickname = getValueBySymbolDesc(obj, "@nickname");
                 const description: string = getValueBySymbolDesc(obj, "@description");
                 const note: string = getValueBySymbolDesc(obj, "@note");
 
                 if (translationMap.has(name)) {
                     setValueBySymbolDesc(obj, "@name", translationMap.get(name));
+                }
+
+                if (translationMap.has(nickname)) {
+                    setValueBySymbolDesc(obj, "@nickname", translationMap.get(nickname));
                 }
 
                 if (typeof description === "string" && translationMap.has(description)) {
@@ -279,17 +284,17 @@ export function writeSystem(
     logging: boolean,
     logString: string
 ): void {
-    const symbols = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
-    const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbols.map((symbol) =>
-        getValueBySymbolDesc(obj, symbol)
+    const symbolDesc = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
+    const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDesc.map((desc) =>
+        getValueBySymbolDesc(obj, desc)
     );
 
     for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
-        for (const [j, element] of arr.entries()) {
-            if (element && translationMap.has(element)) {
-                arr[j] = translationMap.get(element);
+        for (const [j, string] of arr.entries()) {
+            if (string && translationMap.has(string)) {
+                arr[j] = translationMap.get(string);
 
-                setValueBySymbolDesc(obj, symbols[i], arr);
+                setValueBySymbolDesc(obj, symbolDesc[i], arr);
             }
         }
     }
@@ -317,7 +322,7 @@ export function writeSystem(
 }
 
 export function writeScripts(
-    obj: Uint8Array[][],
+    uintarrArr: Uint8Array[][],
     translationArr: string[],
     outputDir: string,
     logging: boolean,
@@ -325,25 +330,25 @@ export function writeScripts(
 ): void {
     const decoder = new TextDecoder();
 
-    for (let i = 0; i < obj.length; i++) {
-        const magic = obj[i][0];
-        const title = obj[i][1];
+    for (let i = 0; i < uintarrArr.length; i++) {
+        const magic = uintarrArr[i][0];
+        const title = uintarrArr[i][1];
 
         if (magic instanceof Uint8Array) {
-            obj[i][0] = decoder.decode(magic);
+            uintarrArr[i][0] = decoder.decode(magic);
         }
 
         if (title instanceof Uint8Array) {
-            obj[i][1] = decoder.decode(title);
+            uintarrArr[i][1] = decoder.decode(title);
         }
 
-        const data = translationArr[i].replaceAll("\\n", "\r\n");
-        obj[i][2] = deflateSync(data, { level: 6 });
+        const data = translationArr[i].replaceAll("/#", "\r\n");
+        uintarrArr[i][2] = deflateSync(data, { level: 6 });
     }
 
     if (logging) {
         console.log(`${logString} Scripts.rvdata2`);
     }
 
-    writeFileSync(`${outputDir}/Scripts.rvdata2`, dump(obj));
+    writeFileSync(`${outputDir}/Scripts.rvdata2`, dump(uintarrArr));
 }

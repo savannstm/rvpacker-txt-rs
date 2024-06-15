@@ -1,5 +1,5 @@
-import { dump, load } from "@hyrious/marshal";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "fs";
+import { load } from "@hyrious/marshal";
+import { mkdirSync, readFileSync, readdirSync } from "fs";
 import { Help, Option, program } from "commander";
 import { getUserLocale } from "get-user-locale";
 import chalk from "chalk";
