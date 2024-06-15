@@ -1,5 +1,5 @@
 import { writeFileSync, readFileSync } from "fs";
-import { dump } from "@hyrious/marshal";
+import { dump, load } from "@hyrious/marshal";
 import { deflateSync } from "zlib";
 
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
@@ -326,14 +326,19 @@ export function writeScripts(
     const decoder = new TextDecoder();
 
     for (let i = 0; i < obj.length; i++) {
-        if (obj[i][0] instanceof Uint8Array) {
-            obj[i][0] = decoder.decode(obj[i][0]);
-        }
-        if (obj[i][1] instanceof Uint8Array) {
-            obj[i][1] = decoder.decode(obj[i][1]);
+        const magic = obj[i][0];
+        const title = obj[i][1];
+
+        if (magic instanceof Uint8Array) {
+            obj[i][0] = decoder.decode(magic);
         }
 
-        obj[i][2] = deflateSync(translationArr[i].replaceAll("\\n", "\r\n"), { level: 6 });
+        if (title instanceof Uint8Array) {
+            obj[i][1] = decoder.decode(title);
+        }
+
+        const data = translationArr[i].replaceAll("\\n", "\r\n");
+        obj[i][2] = deflateSync(data, { level: 6 });
     }
 
     if (logging) {

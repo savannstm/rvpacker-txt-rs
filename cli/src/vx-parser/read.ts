@@ -263,16 +263,15 @@ export function readSystem(inputDir: string, outputDir: string, logging: boolean
 
 export function readScripts(inputDir: string, outputDir: string, logging: boolean, logString: string): void {
     const scriptsPath = `${inputDir}/Scripts.rvdata2`;
-    const json = load(readFileSync(scriptsPath), { string: "binary" }) as string[][];
+    const arr = load(readFileSync(scriptsPath), { string: "binary" }) as Uint8Array[][];
 
     const fullCode = [];
-    for (const [magic, title, code] of json) {
-        const codeString = inflateSync(code).toString("utf8").replace(/\r?\n/g, "\\n");
+    for (const [_m, _t, code] of arr) {
+        const codeString = inflateSync(code).toString("utf8").replaceAll("\r\n", "\\n");
         fullCode.push(codeString);
     }
 
-    console.log(fullCode.length);
-
-    writeFileSync(`${outputDir}/scripts.txt`, dump(fullCode.join("\n")), "utf8");
-    writeFileSync(`${outputDir}/scripts_trans.txt`, dump(fullCode.join("\n")), "utf8");
+    const joinedCode = fullCode.join("\n");
+    writeFileSync(`${outputDir}/scripts.txt`, joinedCode, "utf8");
+    writeFileSync(`${outputDir}/scripts_trans.txt`, joinedCode, "utf8");
 }
