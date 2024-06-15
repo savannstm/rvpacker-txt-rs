@@ -55,7 +55,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join("/#");
+                                let line_joined: String = line.join("^");
                                 lines.insert(line_joined);
                                 line.clear();
                                 in_seq = false;
@@ -162,7 +162,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
     for (filename, obj_arr) in obj_arr_map {
         let mut lines: IndexSet<String> = IndexSet::new();
 
-        if !filename.to_lowercase().starts_with("commonevents") && !filename.starts_with("Troops") {
+        if !filename.starts_with("Common") && !filename.starts_with("Troops") {
             for obj in obj_arr {
                 if obj["name"].is_string() {
                     let name: &str = obj["name"].as_str().unwrap();
@@ -176,7 +176,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let description: &str = obj["description"].as_str().unwrap();
 
                     if !description.is_empty() {
-                        lines.insert(description.replace('\n', "/#"));
+                        lines.insert(description.replace('\n', "^"));
                     }
                 }
 
@@ -184,7 +184,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let note: &str = obj["note"].as_str().unwrap();
 
                     if !note.is_empty() {
-                        lines.insert(note.replace('\n', "/#"));
+                        lines.insert(note.replace('\n', "^"));
                     }
                 }
             }
@@ -216,20 +216,20 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
             };
 
             for i in 0..pages_length {
-                let iterable_object: &Value = if pages_length != 1 {
+                let list: &Value = if pages_length != 1 {
                     &obj["pages"][i]["list"]
                 } else {
                     &obj["list"]
                 };
 
-                if !iterable_object.is_array() {
+                if !list.is_array() {
                     continue;
                 }
 
                 let mut in_seq: bool = false;
                 let mut line: Vec<String> = Vec::new();
 
-                for list in iterable_object.as_array().unwrap() {
+                for list in list.as_array().unwrap() {
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                     for parameter_value in list["parameters"].as_array().unwrap() {
@@ -242,7 +242,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join("/#");
+                                let line_joined: String = line.join("^");
                                 lines.insert(line_joined);
 
                                 line.clear();

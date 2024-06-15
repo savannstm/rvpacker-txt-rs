@@ -12,3 +12,4 @@ sys-locale = "0.3.1"
 clap = { version = "4.5.7", features = ["wrap_help"] }
 rand = "0.8.5"
 color-print = "0.3.6"
+regex = "1.10.5"

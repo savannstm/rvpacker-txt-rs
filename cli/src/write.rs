@@ -6,6 +6,8 @@ use std::{
     fs::{read_to_string, write},
 };
 
+use crate::shuffle_words;
+
 fn merge_401(json: &mut Value) {
     let mut first: Option<usize> = None;
     let mut number: i8 = -1;
@@ -189,7 +191,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace("/#", "\n"))
+            .map(|line: &str| line.to_string().replace('^', "\n"))
             .collect();
 
             let mut other_translated_text: Vec<String> = read_to_string(format!(
@@ -198,7 +200,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace("/#", "\n"))
+            .map(|line: &str| line.to_string().replace('^', "\n"))
             .collect();
 
             let mut rng: ThreadRng = thread_rng();
@@ -208,9 +210,7 @@ pub fn write_other(
 
                 if drunk == 2 {
                     for text_string in other_translated_text.iter_mut() {
-                        let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                        text_string_split.shuffle(&mut rng);
-                        *text_string = text_string_split.join(" ");
+                        *text_string = shuffle_words(text_string);
                     }
                 }
             }
@@ -258,12 +258,12 @@ pub fn write_other(
 
                             let note: &str = obj["note"].as_str().unwrap();
 
-                            if filename == "Classes.json" {
+                            if filename.starts_with("Classes") {
                                 // Only in Classes.json note should be replaced entirely with translated text
                                 if let Some(text) = translation_map.get(note) {
                                     obj["note"] = to_value(text).unwrap();
                                 }
-                            } else if filename == "Items.json" {
+                            } else if filename.starts_with("Items") {
                                 for string in TO_REPLACE {
                                     if note.contains(string) {
                                         // In Items.json note contains Menu Category that should be replaced with translated text
@@ -283,7 +283,7 @@ pub fn write_other(
                     .skip(1) //Skipping first element in array as it is null
                     .for_each(|obj: &mut Value| {
                         //CommonEvents doesn't have pages, so we can just check if it Troops
-                        let pages_length: usize = if filename == "Troops.json" {
+                        let pages_length: usize = if filename.starts_with("Troops") {
                             obj["pages"].as_array().unwrap().len()
                         } else {
                             1
@@ -483,6 +483,7 @@ pub fn write_plugins(
         ]);
 
         let name: &str = obj["name"].as_str().unwrap();
+
         if plugin_names.contains(name) {
             if name == "YEP_OptionsCore" {
                 obj["parameters"]

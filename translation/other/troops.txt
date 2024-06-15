@@ -3,27 +3,27 @@ choice_text 2 \}[INTIMIDATE]\{ "Where I go is none of your business."
 "I'd love to leave but don't know how..."
 "I won't leave without your head."
 Nevermind
-\>\i[85]\}OODSMAN\{\</#"Leave stranger. The town has got enough vermin..."
-\>\i[85]\}OODSMAN\{\</#"..."
-\>\i[85]\}OODSMAN\{\</#"Leave! Now! Before I bury this hatchet in your skull..."
+\>\i[85]\}OODSMAN\{\<^"Leave stranger. The town has got enough vermin..."
+\>\i[85]\}OODSMAN\{\<^"..."
+\>\i[85]\}OODSMAN\{\<^"Leave! Now! Before I bury this hatchet in your skull..."
 The woodsman seems to be waiting for your initiative...
-\>\i[85]\}OODSMAN\{\</#"You had your chance... You had your chance you fool!"
+\>\i[85]\}OODSMAN\{\<^"You had your chance... You had your chance you fool!"
 "I told you, I'd leave if I could!"
 "Understand what?"
 "..."
-\>\i[85]\}OODSMAN\{\</#"Leave - now! Don't you understand!?"
-\>\i[85]\}OODSMAN\{\</#"Filthy outsider! You'll leave in a body bag then!"
-\>\i[85]\}OODSMAN\{\</#"It's... the festival of Termina! No one here is going to see/#the morning sun!"
-\>\i[85]\}OODSMAN\{\</#"I have warned you, you miserable weasel..."
+\>\i[85]\}OODSMAN\{\<^"Leave - now! Don't you understand!?"
+\>\i[85]\}OODSMAN\{\<^"Filthy outsider! You'll leave in a body bag then!"
+\>\i[85]\}OODSMAN\{\<^"It's... the festival of Termina! No one here is going to see^the morning sun!"
+\>\i[85]\}OODSMAN\{\<^"I have warned you, you miserable weasel..."
 You seem to have made the woodsman furious.
-\>\i[85]\}OODSMAN\{\</#"Miserable rat. My hatchet will settle this."
+\>\i[85]\}OODSMAN\{\<^"Miserable rat. My hatchet will settle this."
 Your threats don't seem to work on the woodsman...
 GabText The woodsman's skin begins to rot...
 GabText You've exposed the weaknesses of the woodsman!
 GabText There is nothing left to steal!
 GabText You stole 2 \c[2]Tobacco\c[0]!
 GabText You stole an \c[2]Axe\c[0]!
-The party tries to escape... .\/#However, it was unable to escape!
+The party tries to escape... .\^However, it was unable to escape!
 The party tries to escape...
 GabText The woodsman loses his balance!
 GabText The woodsman is blinded! His eyes are bleeding!
@@ -34,62 +34,62 @@ GabText The woodsman loses his balance.
 "Hold on! I don't want to start a fight!"
 "What is going on here!?"
 "I'm ready to defend myself, just so you know."
-The woodsman approaches you ominously. There is silent rage/#in his eyes. A sense of terror fills the air.
+The woodsman approaches you ominously. There is silent rage^in his eyes. A sense of terror fills the air.
 Your words are in vain. The woodsman is clearly out for blood.
 GabText The appendage skitters away!
 GabText You dodge the grab of the appendage!
 HEADS
 TAILS
 \N[1] is grabbed by the boney grasp of the appendage!
-Violently the thing thrusts its tentacles down the throat. Cold/#tendrils can be felt squirming deeper and deeper as \N[1] /#tries to vomit.
-The vile thing squirts warm fluids in. Feels like it's injecting/#\N[1] with something.
+Violently the thing thrusts its tentacles down the throat. Cold^tendrils can be felt squirming deeper and deeper as \N[1] ^tries to vomit.
+The vile thing squirts warm fluids in. Feels like it's injecting^\N[1] with something.
 \N[3] is grabbed by the boney grasp of the appendage!
-Violently the thing thrusts its tentacles down the throat. Cold/#tendrils can be felt squirming deeper and deeper as \N[3] /#tries to vomit.
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[3] with something.
+Violently the thing thrusts its tentacles down the throat. Cold^tendrils can be felt squirming deeper and deeper as \N[3] ^tries to vomit.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[3] with something.
 \N[7] is grabbed by the boney grasp of the appendage!
-Violently the thing thrusts its tentacles down the throat. Cold/#tendrils can be felt squirming deeper and deeper.
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[7] with something.
+Violently the thing thrusts its tentacles down the throat. Cold^tendrils can be felt squirming deeper and deeper.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[7] with something.
 \N[16] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[16] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[16] with something.
 \N[17] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[17] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[17] with something.
 \N[4] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[4] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[4] with something.
 \N[5] is grabbed by the boney grasp of the appendage!
-Violently the thing thrusts its tentacles down the throat. Cold /#tendrils can be felt squirming deeper and deeper.
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[5] with something.
+Violently the thing thrusts its tentacles down the throat. Cold ^tendrils can be felt squirming deeper and deeper.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[5] with something.
 \N[6] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[6] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[6] with something.
 \N[13] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[13] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[13] with something.
 \N[14] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[14] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[14] with something.
 \N[15] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[15] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[15] with something.
 \N[22] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[22] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[22] with something.
 \N[28] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[28] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[28] with something.
 \N[29] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[29] with something.
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[29] with something.
 \N[10] is grabbed by the boney grasp of the appendage!
-The vile things squirts warm fluids in. Feels like it's injecting /#\N[10] with something.
-... But the thing let the blood golem go. Apparently the golem isn't/#fertile ground for the appendage.
-\>\i[73]\}ANITOR\{\</#"Stupid human, STUPID HUMAN! IMBECIL!"
+The vile things squirts warm fluids in. Feels like it's injecting ^\N[10] with something.
+... But the thing let the blood golem go. Apparently the golem isn't^fertile ground for the appendage.
+\>\i[73]\}ANITOR\{\<^"Stupid human, STUPID HUMAN! IMBECIL!"
 choice_text 1 \}[PERSUADE]\{ "We can talk this through! We can get to somekind of an agreement."
 choice_text 2 \}[INTIMIDATE]\{ "All talk, let's see you actually follow through."
 "Please just let me go!"
 "Flay me? I'll finish the job on your back after we're done here!"
-\>\i[73]\}ANITOR\{\</#"I'll slit your throat and flay you alive! That'll teach you!"
-\>\i[73]\}ANITOR\{\</#"Talk? Talk!? Gyah ha ha! In this world strength is all that matters!
-The janitor drops his guard in arrogance. He doesn't seem to view/#you as a serious threat.
-\>\i[73]\}ANITOR\{\</#"Gyah! Fat chance bastard! I need you in my sweatshop!"
-\>\i[73]\}ANITOR\{\</#"..."
-\>\i[73]\}ANITOR\{\</#"Ya don't scare me! STUPID HUMAN!"
-\>\i[73]\}ANITOR\{\</#"You piss me OFF!"
+\>\i[73]\}ANITOR\{\<^"I'll slit your throat and flay you alive! That'll teach you!"
+\>\i[73]\}ANITOR\{\<^"Talk? Talk!? Gyah ha ha! In this world strength is all that matters!
+The janitor drops his guard in arrogance. He doesn't seem to view^you as a serious threat.
+\>\i[73]\}ANITOR\{\<^"Gyah! Fat chance bastard! I need you in my sweatshop!"
+\>\i[73]\}ANITOR\{\<^"..."
+\>\i[73]\}ANITOR\{\<^"Ya don't scare me! STUPID HUMAN!"
+\>\i[73]\}ANITOR\{\<^"You piss me OFF!"
 You made the janitor furious and reckless.
-\>\i[73]\}ANITOR\{\</#"You just keep on talking! Must love your own voice! I'll put my/#stump on it! YOU'LL SEE!"
-\>\i[73]\}ANITOR\{\</#"You'll see! YOU'LL SEE! There are fates worse than death!"
+\>\i[73]\}ANITOR\{\<^"You just keep on talking! Must love your own voice! I'll put my^stump on it! YOU'LL SEE!"
+\>\i[73]\}ANITOR\{\<^"You'll see! YOU'LL SEE! There are fates worse than death!"
 The janitor doesn't care about your threats.
 GabText The janitor's skin begins to rot...
 GabText You've exposed the weaknesses of the janitor!
@@ -99,10 +99,10 @@ GabText The janitor is blinded! His eyes are bleeding!
 GabText A janitor sits down, blocking your way...
 GabText The janitor loses his balance.
 You are grabbed by the boney grasp of the appendage!
-Violently the thing thrusts its tentacles down your throat./#You feel the cold tendrils squirm deeper and deeper as you /#try to vomit.
-You feel warm fluid pour inside your throat. The vile thing/#is injecting you with something.
-Slowly you feel your consciousness fade as it's replaced/#by the will of the thing...
-\>\i[71]\}EADLESS\{\</#*wheeze* *wheeze*
+Violently the thing thrusts its tentacles down your throat.^You feel the cold tendrils squirm deeper and deeper as you ^try to vomit.
+You feel warm fluid pour inside your throat. The vile thing^is injecting you with something.
+Slowly you feel your consciousness fade as it's replaced^by the will of the thing...
+\>\i[71]\}EADLESS\{\<^*wheeze* *wheeze*
 choice_text 1 \}[PERSUADE]\{ "You must be in pain, poor thing. What can I do for you?"
 choice_text 2 \}[INTIMIDATE]\{ "Don't care what you are. All living things understand pain."
 "Sit boy!"
@@ -110,15 +110,15 @@ choice_text 2 \}[INTIMIDATE]\{ "Don't care what you are. All living things under
 Give \c[2]Rotten meat\c[0]
 The creature seems to struggle breathing...
 The creature seems puzzled by your request...
-The beast does hesitate a little bit. As if it's sensing your intimidating/#aura...
+The beast does hesitate a little bit. As if it's sensing your intimidating^aura...
 Your threats go to deaf ears... if the creature even has those...
 The creature is fixated on the meat immediately.
-The toothless gaping mouth starts chewing on the meat with furious /#vigor.
+The toothless gaping mouth starts chewing on the meat with furious ^vigor.
 Give \c[2]Dried meat\c[0]
 Give \c[2]Meatpie\c[0]
 The creature is fixated on the pie immediately.
-The toothless gaping mouth starts chewing on the pie with furious /#vigor.
-The black vomit of the headless reeks horrible! A strong stench/#of feces and rot fill the air. You feel nausea...
+The toothless gaping mouth starts chewing on the pie with furious ^vigor.
+The black vomit of the headless reeks horrible! A strong stench^of feces and rot fill the air. You feel nausea...
 GabText The headless' skin begins to rot...
 GabText You've exposed the weaknesses of the headless!
 GabText There is nothing to steal!
@@ -127,24 +127,24 @@ GabText A headless creature slowly approaches you...
 GabText The headless loses its balance.
 "Stay away foul beast!"
 "Prepare to die!"
-A mysterious beast approaches you with saliva dripping from its/#gaping mouth. The creature seems to be in hunting mode!
+A mysterious beast approaches you with saliva dripping from its^gaping mouth. The creature seems to be in hunting mode!
 Your words are in vain. The beast is clearly out for blood.
 choice_text 1 \}[PERSUADE]\{ "Just walk away and no one will get hurt!"
 choice_text 3 \}[INTIMIDATE]\{ "Is that a threat? Show me your worst!"\c[0]
 "No one needs to die here!"
 "What are you talking about?"
 "Let's start from you."
-\>\i[84]\}ILLAGER\{\</#"I'm sorry... but... everyone must die."
-\>\i[84]\}ILLAGER\{\</#"There is no other way... He demands it..."
+\>\i[84]\}ILLAGER\{\<^"I'm sorry... but... everyone must die."
+\>\i[84]\}ILLAGER\{\<^"There is no other way... He demands it..."
 "Why let anyone tell you what to do? Think for yourself!"
-\>\i[84]\}ILLAGER\{\</#"It's jubilee... Paint the grounds red..."
-\>\i[84]\}ILLAGER\{\</#"..."
+\>\i[84]\}ILLAGER\{\<^"It's jubilee... Paint the grounds red..."
+\>\i[84]\}ILLAGER\{\<^"..."
 The villager is clearly hesitating.
-\>\i[84]\}ILLAGER\{\</#"Enough... Just die already..."
+\>\i[84]\}ILLAGER\{\<^"Enough... Just die already..."
 Your pleads don't seem to work.
-\>\i[84]\}ILLAGER\{\</#"The great trickster... He demands this... You must've heard him/#too..."
+\>\i[84]\}ILLAGER\{\<^"The great trickster... He demands this... You must've heard him^too..."
 The villager's morale fell. He shows signs of fear.
-\>\i[84]\}ILLAGER\{\</#"Only one of us... walks away from here..."
+\>\i[84]\}ILLAGER\{\<^"Only one of us... walks away from here..."
 Your threats don't seem to have effect on him.
 GabText The villager's skin begins to rot...
 GabText You've exposed the weaknesses of the villager!
@@ -155,16 +155,16 @@ GabText The villager loses his balance!
 GabText The villager is blinded! His eyes are bleeding!
 GabText A lone villager stumbles on your path...
 GabText The villager loses his balance.
-The villager raises his scythe and takes an aggressive stance.../#The situation got dangerous all of a sudden!
+The villager raises his scythe and takes an aggressive stance...^The situation got dangerous all of a sudden!
 Your words are in vain. The villager is clearly out for blood.
 GabText You jump over the bear trap!
 choice_text 1 \}[PERSUADE]\{ "If there's any humanity left in you, please hear me out!"
 "Please just stop..."
 "Wobble just one more step and you're dead!"
 A lone ronteal keeps on closing in on you...
-Your pleads have no effect. Maybe there never was humanity here to /#begin with...
-Your plead have absolutely no effect. It feels like the creature's /#mind works on another plane entirely.
-Your threats have absolutely no effect. It feels like the creature's /#mind works on another plane entirely.
+Your pleads have no effect. Maybe there never was humanity here to ^begin with...
+Your plead have absolutely no effect. It feels like the creature's ^mind works on another plane entirely.
+Your threats have absolutely no effect. It feels like the creature's ^mind works on another plane entirely.
 GabText Ronteal's skin begins to rot...
 GabText You've exposed the weaknesses of the ronteal!
 GabText A ronteal wobbles towards you. Its mouths are dripping saliva.
@@ -175,47 +175,47 @@ choice_text 3 \}[INTIMIDATE]\{ "You'll need more than a stubby knife to harm me.
 "Wait, please back away!"
 "This is madness!"
 "Just die already."
-\>\i[84]\}ILLAGER\{\</#"Stab, stab. Stab and stab."
-\>\i[84]\}ILLAGER\{\</#"Ka... Ka ka KA KAA!"
-You just managed to get her furious with your persuasion. Although /#maybe her reckless swings are now easier to evade?
-\>\i[84]\}ILLAGER\{\</#"Kyaaaaaaaa..."
+\>\i[84]\}ILLAGER\{\<^"Stab, stab. Stab and stab."
+\>\i[84]\}ILLAGER\{\<^"Ka... Ka ka KA KAA!"
+You just managed to get her furious with your persuasion. Although ^maybe her reckless swings are now easier to evade?
+\>\i[84]\}ILLAGER\{\<^"Kyaaaaaaaa..."
 She seems to be in a frenzy. Your pleads have no effect on her.
-The woman tilts her head sideways and continues closing in on /#you...
-\>\i[84]\}ILLAGER\{\</#"Ka..."
+The woman tilts her head sideways and continues closing in on ^you...
+\>\i[84]\}ILLAGER\{\<^"Ka..."
 The villager seems to be hesitating a little bit...
-\>\i[84]\}ILLAGER\{\</#"Kya!"
-The woman swings her knives furiously in the air. Your threats /#go only on deaf ears.
+\>\i[84]\}ILLAGER\{\<^"Kya!"
+The woman swings her knives furiously in the air. Your threats ^go only on deaf ears.
 GabText You stole a \c[2]Blue vial\c[0]!
 GabText The villager loses her balance!
 GabText The villager is blinded! Her eyes are bleeding!
 GabText The villager loses her balance.
-The eerie woman reveals blood stained knives underneath her/#apron. The empty gaze pierces through you as you feel your/#adrenaline run high!
+The eerie woman reveals blood stained knives underneath her^apron. The empty gaze pierces through you as you feel your^adrenaline run high!
 GabText You dodge the psychotic villager!
-\>\i[84]\}ILE\{\</#*breathe* *breathe*
+\>\i[84]\}ILE\{\<^*breathe* *breathe*
 Vile isn't interested in talking to you any longer...
-\>\i[84]\}ILE\{\</#*breathe* *breathe* *BREATHE!*
+\>\i[84]\}ILE\{\<^*breathe* *breathe* *BREATHE!*
 Vile is losing his cool because of your lack of understanding.
-Furiously he lifts his mask. The mask seems to have melted on his/#face partially but underneath it you can see a row of sharp teeth/#grimacing at you.
-\>\i[84]\}ILE\{\</#"NO MORE- TALKING! ONLY - THE VILE - SURVIVE!"
-\>\i[84]\}ILE\{\</#"RHER - T-TAKE ME!"
-He is trying to answer you, but you cannot make any sense of his/#words because of the mask...
-You try talking the masked man, but his words are muffled by the/#gas mask.
+Furiously he lifts his mask. The mask seems to have melted on his^face partially but underneath it you can see a row of sharp teeth^grimacing at you.
+\>\i[84]\}ILE\{\<^"NO MORE- TALKING! ONLY - THE VILE - SURVIVE!"
+\>\i[84]\}ILE\{\<^"RHER - T-TAKE ME!"
+He is trying to answer you, but you cannot make any sense of his^words because of the mask...
+You try talking the masked man, but his words are muffled by the^gas mask.
 choice_text 2 \}[PERSUADE]\{ "I interrupted your business, I get it. How can I repay it?"
 choice_text 3 \}[INTIMIDATE]\{ "You think that bug spray will stop me?"\c[0]
 "What was that?"
 "Please don't! I'm just passing through!"
-\>\i[84]\}ILE\{\</#*breathe*
-\>\i[84]\}ILE\{\</#*breather* *breathe*
-It sounds as if Vile is laughing behind his gas mask. He drops his/#guard in arrogance.
+\>\i[84]\}ILE\{\<^*breathe*
+\>\i[84]\}ILE\{\<^*breather* *breathe*
+It sounds as if Vile is laughing behind his gas mask. He drops his^guard in arrogance.
 Seems like your pleads just aggravate Vile even more!
-You can see a faint sign of hesitation in Vile's eyes. He doesn't/#stop on his heels entirely, but he seems to be questioning his next/#move.
+You can see a faint sign of hesitation in Vile's eyes. He doesn't^stop on his heels entirely, but he seems to be questioning his next^move.
 Vile doesn't seem intimidated with your threats.
-\c[7]Vile\c[0]/#"ONLY - THE VILE--"
-Pesticide is leaking from the canister constantly. Vile took /#a good breather of his own pesticide without his mask on...
-\c[7]Vile\c[0]/#*cough* *cough*
+\c[7]Vile\c[0]^"ONLY - THE VILE--"
+Pesticide is leaking from the canister constantly. Vile took ^a good breather of his own pesticide without his mask on...
+\c[7]Vile\c[0]^*cough* *cough*
 He is coughing blood.
-\c[7]Vile\c[0]/#"NO MORE- TALKING! ONLY - THE VILE - SURVIVE!"
-\c[7]Vile\c[0]/#"RHER - T-TAKE ME!"
+\c[7]Vile\c[0]^"NO MORE- TALKING! ONLY - THE VILE - SURVIVE!"
+\c[7]Vile\c[0]^"RHER - T-TAKE ME!"
 GabText The vile's skin begins to rot...
 GabText You can't figure out the weaknesses of the vile...
 GabText You stole 2 \c[2]White vials\c[0]!
@@ -230,52 +230,52 @@ choice_text 2 \}[INTIMIDATE]\{ "You're going to regret ever stepping on my path.
 "No one needs to get hurt..."
 "One more step and you're dead."
 He seems to avoid eye contact with you...
-The villager seems confused by your non-aggressive approach. He/#doesn't seem as determined in his attacks anymore...
+The villager seems confused by your non-aggressive approach. He^doesn't seem as determined in his attacks anymore...
 The same talk doesn't seem to affect the villager anymore.
 "You don't want to do this."
 "Let's have it your way."
-The villager seems to be really stressed out. He avoids your gaze/#by fixating on your feet.
-The villager might be insecure, but determinedly he continues his/#attack. Your pleads don't seem to work.
-The villager might be insecure, but determinedly he continues/#his attack. Your pleads don't seem to work.
+The villager seems to be really stressed out. He avoids your gaze^by fixating on your feet.
+The villager might be insecure, but determinedly he continues his^attack. Your pleads don't seem to work.
+The villager might be insecure, but determinedly he continues^his attack. Your pleads don't seem to work.
 He takes one more step.
-Your intimidation tactics just made the villager more defiant and/#furious. His attacks became more erratic as well. He's swinging his/#pipe wildly without much accuracy.
+Your intimidation tactics just made the villager more defiant and^furious. His attacks became more erratic as well. He's swinging his^pipe wildly without much accuracy.
 GabText You stole a \c[2]12-gauge shell\c[0]!
 GabText You are assaulted by the villager!
-The villager approaches fast with a rusty pipe raised as a/#weapon. All of his muscles seem to tense up in the heat of/#an attack!
+The villager approaches fast with a rusty pipe raised as a^weapon. All of his muscles seem to tense up in the heat of^an attack!
 choice_text 1 \}[PERSUADE]\{ "I've insulted you. How can I apologize?"
 choice_text 2 \}[INTIMIDATE]\{ "I'll shove that fork down your throat!"
 "I'm sorry, can we just sit down and eat?"
 "I'm through with your games."
-\>\i[70]\}ENTLEMAN\{\</#"There is no forgiving! You don't act this way on a candle light/#dinner!"
-\>\i[70]\}ENTLEMAN\{\</#"..."
+\>\i[70]\}ENTLEMAN\{\<^"There is no forgiving! You don't act this way on a candle light^dinner!"
+\>\i[70]\}ENTLEMAN\{\<^"..."
 Bow down and ask for forgiveness
 "I don't think so."
-\>\i[70]\}ENTLEMAN\{\</#"You can start by bowing you head down to your knees and begging for/#forgiveness!"
-\>\i[70]\}ENTLEMAN\{\</#"Well I say..."
+\>\i[70]\}ENTLEMAN\{\<^"You can start by bowing you head down to your knees and begging for^forgiveness!"
+\>\i[70]\}ENTLEMAN\{\<^"Well I say..."
 The gentleman seems to be hesitating a little bit.
-\>\i[70]\}ENTLEMAN\{\</#"That's what I thought."
-\>\i[70]\}ENTLEMAN\{\</#"You just keep apologizing and I keep giving you second chances, is/#that it?"
-\>\i[70]\}ENTLEMAN\{\</#"You had your chance, ungrateful and vulgar tyke!"
-\>\i[70]\}ENTLEMAN\{\</#"That train has passed already. We are way beyond that!"
-\>\i[70]\}ENTLEMAN\{\</#"You ungrateful and vulgar tyke!"
+\>\i[70]\}ENTLEMAN\{\<^"That's what I thought."
+\>\i[70]\}ENTLEMAN\{\<^"You just keep apologizing and I keep giving you second chances, is^that it?"
+\>\i[70]\}ENTLEMAN\{\<^"You had your chance, ungrateful and vulgar tyke!"
+\>\i[70]\}ENTLEMAN\{\<^"That train has passed already. We are way beyond that!"
+\>\i[70]\}ENTLEMAN\{\<^"You ungrateful and vulgar tyke!"
 You are not able to convince him with your words.
-\>\i[70]\}ENTLEMAN\{\</#"Acting like a big mob boss, are we!?"
+\>\i[70]\}ENTLEMAN\{\<^"Acting like a big mob boss, are we!?"
 "Maybe I can fit that knife down there while at it..."
 "Laugh? I will make you cry!"
-\>\i[70]\}ENTLEMAN\{\</#"Don't make me laugh!"
-\>\i[70]\}ENTLEMAN\{\</#"We got a tough guy here..."
+\>\i[70]\}ENTLEMAN\{\<^"Don't make me laugh!"
+\>\i[70]\}ENTLEMAN\{\<^"We got a tough guy here..."
 Despite his words, the gentleman seems a bit nervous.
-\>\i[70]\}ENTLEMAN\{\</#"Huah hah... Sure thing pal."
-\>\i[70]\}ENTLEMAN\{\</#"Maybe work on that intimidation game a bit?"
-\>\i[70]\}ENTLEMAN\{\</#"It's all lovely and all, but no one's going to take you seriously/#here."
-\>\i[70]\}ENTLEMAN\{\</#"So you say, but these are not just my games..."
-\>\i[70]\}ENTLEMAN\{\</#"We are both just pawns in his game... But unlike you scoundrel,/#I'm playing the game by my own rules."
-\>\i[70]\}ENTLEMAN\{\</#"I will savor these last moments... I will have a casserole made/#from you..."
-\>\i[70]\}ENTLEMAN\{\</#"Perhaps with the right wine... I will be able to wash away the/#bad taste you left."
+\>\i[70]\}ENTLEMAN\{\<^"Huah hah... Sure thing pal."
+\>\i[70]\}ENTLEMAN\{\<^"Maybe work on that intimidation game a bit?"
+\>\i[70]\}ENTLEMAN\{\<^"It's all lovely and all, but no one's going to take you seriously^here."
+\>\i[70]\}ENTLEMAN\{\<^"So you say, but these are not just my games..."
+\>\i[70]\}ENTLEMAN\{\<^"We are both just pawns in his game... But unlike you scoundrel,^I'm playing the game by my own rules."
+\>\i[70]\}ENTLEMAN\{\<^"I will savor these last moments... I will have a casserole made^from you..."
+\>\i[70]\}ENTLEMAN\{\<^"Perhaps with the right wine... I will be able to wash away the^bad taste you left."
 GabText The gentleman's skin begins to rot beneath his shirt...
 GabText You can't figure out the weaknesses of the gentleman...
 GabText You stole a \c[2]Meatpie+\c[0] and a \c[2]Vegetable pie+\c[0]!
-The party tries to escape... .\/#However, the creature blocks your path!
+The party tries to escape... .\^However, the creature blocks your path!
 GabText The gentleman rises from the dinner table to confront you!
 GabText The gentleman loses his balance.
 choice_text 1 \}[PERSUADE]\{ "Even the most devout priest has a price... What can I offer?"
@@ -284,19 +284,19 @@ choice_text 3 \}[INTIMIDATE]\{ "Your god won't help you here."
 "Holyman, can you explain me what's going on here?"
 "Yes, you better make your prayers."
 Make the same gesture of Alll-mer with your hands
-The priest makes a sign of a cross with his hands moving from one/#shoulder to another, then to his stomach, and finally to his forehead.
+The priest makes a sign of a cross with his hands moving from one^shoulder to another, then to his stomach, and finally to his forehead.
 "You want this? You can have it."
 "Forget it."
-The priest is eyeing your \c[2]Rust-coloured pearl\c[0] with a wide/#grimace...
+The priest is eyeing your \c[2]Rust-coloured pearl\c[0] with a wide^grimace...
 Use this chance to attack him
 Let him have the pearl
-Cautiously you roll the pearl to the priest. His eyes are fixated/#on the thing as it rolls slowly closer.
-The priest's expression turn into that of annoyment. You managed/#to evoke at least some emotion from him.
-The priest has a blank expression on his face. Your persuasion/#efforts have gone to waste.
-The priest's face doesn't even flinch. Like a robot, he keeps on/#walking towards you with a steady pace.
+Cautiously you roll the pearl to the priest. His eyes are fixated^on the thing as it rolls slowly closer.
+The priest's expression turn into that of annoyment. You managed^to evoke at least some emotion from him.
+The priest has a blank expression on his face. Your persuasion^efforts have gone to waste.
+The priest's face doesn't even flinch. Like a robot, he keeps on^walking towards you with a steady pace.
 There is no bargaining with him.
-His expression doesn't change in the slightest. He keeps on/#walking towards you one step at a time.
-His eyes show great determination and belief in butchering you/#like a pig.
+His expression doesn't change in the slightest. He keeps on^walking towards you one step at a time.
+His eyes show great determination and belief in butchering you^like a pig.
 In other words, your threats have no effect.
 "I too follow the teachings of Alll-mer."
 "Our god doesn't want us to shed blood."
@@ -314,27 +314,27 @@ GabText Father Oscar loses his balance.
 GabText The decrepit priest gives a sadistic wide grin...
 GabText You dodge the priest's grasp just barely!
 The priest grabs you violently by the throat.
-The priest's grip is incredibly strong. Your throat is being crushed/#under his intense grip.
-The last thing you see is the maniac grin on the priest's face as/#you lose consciousness...
+The priest's grip is incredibly strong. Your throat is being crushed^under his intense grip.
+The last thing you see is the maniac grin on the priest's face as^you lose consciousness...
 GabText The ronteal loses her balance!
 GabText The ronteal loses her balance.
 choice_text 2 \}[INTIMIDATE]\{ "Even a brainless brute like you understands pain."
 "Stay away!"
 "I'll rip that disgusting trunk of yours!"
 "There's no use talking to you is there...?"
-Mucus and slime drips from the trout of the creature as it creates/#a whistling sound...
-It does look as if your words resonate with the creature just a/#little bit... Or is it only your imagination?
+Mucus and slime drips from the trout of the creature as it creates^a whistling sound...
+It does look as if your words resonate with the creature just a^little bit... Or is it only your imagination?
 No effect. Your pleads are useless here.
 If anything, your words seem to aggravate the creature even more.
 Your words don't seem to convince the creature.
-The creature is charging towards you in the middles of your/#sentence...
-\N[1] feels intense pressure in his head! It feels like it's/#bursting from pain!
-\N[3] feels intense pressure in his head! It feels like it's/#bursting from pain!
-\N[5] feels intense pressure in her head! It feels like it's/#bursting from pain!
-\N[4] feels intense pressure in his head! It feels like it's/#bursting from pain!
-\N[7] feels intense pressure in his head! It feels like it's/#bursting from pain!
-\N[16] feels intense pressure in his head! It feels like it's/#bursting from pain!
-\N[17] feels intense pressure in his head! It feels like it's/#bursting from pain!
+The creature is charging towards you in the middles of your^sentence...
+\N[1] feels intense pressure in his head! It feels like it's^bursting from pain!
+\N[3] feels intense pressure in his head! It feels like it's^bursting from pain!
+\N[5] feels intense pressure in her head! It feels like it's^bursting from pain!
+\N[4] feels intense pressure in his head! It feels like it's^bursting from pain!
+\N[7] feels intense pressure in his head! It feels like it's^bursting from pain!
+\N[16] feels intense pressure in his head! It feels like it's^bursting from pain!
+\N[17] feels intense pressure in his head! It feels like it's^bursting from pain!
 GabText The creature's skin begins to rot...
 GabText You can't figure out the weaknesses of the Chaugnar...
 GabText You stole a \c[2]Pipe wrench\c[0]!
@@ -352,9 +352,9 @@ GabText The rifleman loses his balance!
 GabText The rifleman is blinded! His eyes are bleeding!
 GabText A lone rifleman stumbles on your path...
 GabText The rifleman loses his balance.
-The disturbed man raises his rifle and clearly tries to take an aim/#of you! The situation got dangerous all of a sudden!
+The disturbed man raises his rifle and clearly tries to take an aim^of you! The situation got dangerous all of a sudden!
 Your words are in vain. The man has you in his iron sight...
-\>\i[144]\}ILLARMAN\{\</#"The choir of Alll-mer! The gospel of agony!"
+\>\i[144]\}ILLARMAN\{\<^"The choir of Alll-mer! The gospel of agony!"
 The pillarman tirelessly charges at you!
 GabText The pillarman's skin begins to rot...
 GabText The pillarman doesn't seem to have clear weaknesses...
@@ -373,43 +373,43 @@ choice_text 2 \}[INTIMIDATE]\{ "You've got guts. Charging at me unarmed..."
 "I mean no harm!"
 "Stay back or else..."
 Ignore it
-\>\i[76]\}OONSCORCHED\{\</#"You miserable piece of--!"
-\>\i[76]\}OONSCORCHED\{\</#"That's right! To rip and tear through your muscle and bone!"
-The moonscorched drops his guard and lunges at you with even more/#vigor.
-\>\i[76]\}OONSCORCHED\{\</#"You're all talk!"
-\>\i[76]\}OONSCORCHED\{\</#"Then you're in the worst possible place on earth!"
-\>\i[76]\}OONSCORCHED\{\</#"Ugh."
+\>\i[76]\}OONSCORCHED\{\<^"You miserable piece of--!"
+\>\i[76]\}OONSCORCHED\{\<^"That's right! To rip and tear through your muscle and bone!"
+The moonscorched drops his guard and lunges at you with even more^vigor.
+\>\i[76]\}OONSCORCHED\{\<^"You're all talk!"
+\>\i[76]\}OONSCORCHED\{\<^"Then you're in the worst possible place on earth!"
+\>\i[76]\}OONSCORCHED\{\<^"Ugh."
 "Who are you trying to convince here? Yourself?"
 "What are you going to do once I break those puny arms?"
-\>\i[76]\}OONSCORCHED\{\</#"My bare arms are all I need against a loser like you!"
-\>\i[76]\}OONSCORCHED\{\</#"You're all talk! Is that supposed to intimidate me?"
+\>\i[76]\}OONSCORCHED\{\<^"My bare arms are all I need against a loser like you!"
+\>\i[76]\}OONSCORCHED\{\<^"You're all talk! Is that supposed to intimidate me?"
 Looks like your threats weren't convincing enough...
-\>\i[76]\}OONSCORCHED\{\</#"..."
-\>\i[76]\}OONSCORCHED\{\</#"Yap, yap, yap! You just keep yapping!"
-Despite trying to look brave your intimidation efforts made the/#moonscorched hesitate a little bit.
-\>\i[76]\}OONSCORCHED\{\</#"You're just full of yourself! I'll show ya!"
-\>\i[76]\}OONSCORCHED\{\</#"Hah! Scared much!?"
+\>\i[76]\}OONSCORCHED\{\<^"..."
+\>\i[76]\}OONSCORCHED\{\<^"Yap, yap, yap! You just keep yapping!"
+Despite trying to look brave your intimidation efforts made the^moonscorched hesitate a little bit.
+\>\i[76]\}OONSCORCHED\{\<^"You're just full of yourself! I'll show ya!"
+\>\i[76]\}OONSCORCHED\{\<^"Hah! Scared much!?"
 Introduce yourself
 "What is going on here?"
-\>\i[76]\}OONSCORCHED\{\</#"Why you little, just who do you think you are!?"
-\>\i[76]\}OONSCORCHED\{\</#"As if I'd care!"
-\>\i[76]\}OONSCORCHED\{\</#"Oh I'll tell you what! I'll rip your throat open, that's/#what!"
-\>\i[76]\}OONSCORCHED\{\</#"Playing it cool? Just keep doing that and I'll rip your/#throat!"
+\>\i[76]\}OONSCORCHED\{\<^"Why you little, just who do you think you are!?"
+\>\i[76]\}OONSCORCHED\{\<^"As if I'd care!"
+\>\i[76]\}OONSCORCHED\{\<^"Oh I'll tell you what! I'll rip your throat open, that's^what!"
+\>\i[76]\}OONSCORCHED\{\<^"Playing it cool? Just keep doing that and I'll rip your^throat!"
 "Let's see it! I call your bluff!"
 "Sorry, I meant no disrespect!"
-\>\i[76]\}OONSCORCHED\{\</#"I will! Look at this!"
-\>\i[76]\}OONSCORCHED\{\</#"Ah..."
+\>\i[76]\}OONSCORCHED\{\<^"I will! Look at this!"
+\>\i[76]\}OONSCORCHED\{\<^"Ah..."
 "Give me something and I might spare you."
 "Let's call it a truce for now."
 "Nothing from you. You are as good as dead."
-\>\i[76]\}OONSCORCHED\{\</#"Well you are something else... What do you want?"
-\>\i[76]\}OONSCORCHED\{\</#"... I understand."
-\>\i[76]\}OONSCORCHED\{\</#"Here, is this enough?"
+\>\i[76]\}OONSCORCHED\{\<^"Well you are something else... What do you want?"
+\>\i[76]\}OONSCORCHED\{\<^"... I understand."
+\>\i[76]\}OONSCORCHED\{\<^"Here, is this enough?"
 You got a \c[2]Lucky coin\c[0]!
-\>\i[76]\}OONSCORCHED\{\</#"I-I have nothing left..."
-\>\i[76]\}OONSCORCHED\{\</#"Ah!"
-\>\i[76]\}OONSCORCHED\{\</#"Die!"
-\>\i[76]\}OONSCORCHED\{\</#"Fine! You pathetic fool!"
+\>\i[76]\}OONSCORCHED\{\<^"I-I have nothing left..."
+\>\i[76]\}OONSCORCHED\{\<^"Ah!"
+\>\i[76]\}OONSCORCHED\{\<^"Die!"
+\>\i[76]\}OONSCORCHED\{\<^"Fine! You pathetic fool!"
 GabText The moonscorched's skin begins to rot...
 GabText You've exposed the weaknesses of the moonscorched!
 GabText You stole 2 \c[2]Shillings\c[0]!
@@ -419,117 +419,117 @@ GabText The moonscorched is blinded! His eyes are bleeding!
 GabText A crazed villager runs straight at you in a blind fury!
 GabText The moonscorched loses his balance.
 "Stay back! I don't want to fight!"
-A man runs straight at you with an obvious killing intent./#Even the flayed skin hanging on his waist doesn't seem to/#slow him down...
-Your words are in vain. The moonscorched is clearly out for /#blood.
+A man runs straight at you with an obvious killing intent.^Even the flayed skin hanging on his waist doesn't seem to^slow him down...
+Your words are in vain. The moonscorched is clearly out for ^blood.
 You got a \c[2]Cloth fragment\c[0]!
 GabText You stole \c[2]Rotten meat\c[0]!
 "No one's going to get hurt here."
 "Prepare to die."
-\>\i[76]\}OONSCORCHED\{\</#"A-are you going to hurt me?"
-\>\i[76]\}OONSCORCHED\{\</#"No, you got it wrong... I want you to."
-\>\i[76]\}OONSCORCHED\{\</#"Please... Just end this..."
-\>\i[76]\}OONSCORCHED\{\</#"MY SKIN... My self... I'm changing..."
+\>\i[76]\}OONSCORCHED\{\<^"A-are you going to hurt me?"
+\>\i[76]\}OONSCORCHED\{\<^"No, you got it wrong... I want you to."
+\>\i[76]\}OONSCORCHED\{\<^"Please... Just end this..."
+\>\i[76]\}OONSCORCHED\{\<^"MY SKIN... My self... I'm changing..."
 GabText You stole an \c[2]Egg\c[0]!
 GabText The crazed villager is too busy to even pay attention to you.
 GabText The crazed villager is in frenzy peeling his face off.
 GabText The crazed villager sinks his nails into his skin.
-\>\i[76]\}OONSCORCHED\{\</#"T-take it off! TAKE IT OFF PLEASE!"
-\>\i[76]\}OONSCORCHED\{\</#"I-I can feel it inside me! It crawled under my skin!"
-The man is crying in a hysteric spasm while furiously /#scratching his skin off.
-\>\i[76]\}OONSCORCHED\{\</#"I-it burns! I-I feel so cold!"
+\>\i[76]\}OONSCORCHED\{\<^"T-take it off! TAKE IT OFF PLEASE!"
+\>\i[76]\}OONSCORCHED\{\<^"I-I can feel it inside me! It crawled under my skin!"
+The man is crying in a hysteric spasm while furiously ^scratching his skin off.
+\>\i[76]\}OONSCORCHED\{\<^"I-it burns! I-I feel so cold!"
 "Time before what?"
 "What does the moon have anything to do with this?"
-\>\i[76]\}OONSCORCHED\{\</#"Look at the sky... Is it full moon yet? Do I still have/#time?"
-\>\i[76]\}OONSCORCHED\{\</#"Before... I lose myself completely."
-\>\i[76]\}OONSCORCHED\{\</#"You've seen it too, haven't you?"
-\>\i[76]\}OONSCORCHED\{\</#"You're part of the festival now as well..."
-\>\i[76]\}OONSCORCHED\{\</#"This land is cursed..."
+\>\i[76]\}OONSCORCHED\{\<^"Look at the sky... Is it full moon yet? Do I still have^time?"
+\>\i[76]\}OONSCORCHED\{\<^"Before... I lose myself completely."
+\>\i[76]\}OONSCORCHED\{\<^"You've seen it too, haven't you?"
+\>\i[76]\}OONSCORCHED\{\<^"You're part of the festival now as well..."
+\>\i[76]\}OONSCORCHED\{\<^"This land is cursed..."
 GabText You stole a \c[2]Small key\c[0]!
 GabText The moonscorched loses her balance!
 GabText The crazed villager is in frenzy peeling her face off.
 GabText The crazed villager sinks his nails into her skin.
 GabText The moonscorched loses her balance.
-\>\i[76]\}OONSCORCHED\{\</#"I feel it underneath my skin... deeper... deeper..."
-\>\i[76]\}OONSCORCHED\{\</#"Just one glimpse... at the moon..."
+\>\i[76]\}OONSCORCHED\{\<^"I feel it underneath my skin... deeper... deeper..."
+\>\i[76]\}OONSCORCHED\{\<^"Just one glimpse... at the moon..."
 The woman is slowly peeling off her face. Strip by strip.
 The creature doesn't seem to be able to utter spoken words...
-But the green bottomless eyes of the monstrosity pierce deep into/#your mind. You hear concepts and ideas linger from seemingly/#nowhere...
+But the green bottomless eyes of the monstrosity pierce deep into^your mind. You hear concepts and ideas linger from seemingly^nowhere...
 choice_text 1 \}[PERSUADE]\{ "It's blood you want, right? I can arrange you some."
 choice_text 3 \}[INTIMIDATE]\{ "Don't care what you are. All living things understand pain."
 "We both keep going different directions, okay?"
 "What do you want?"
-You understand that the creature is not from this world, but its/#motivations lie among humans regardless. You feel an intense lust/#for blood...
-Your persuasion efforts have gone to waste. The creature doesn't seem/#to be willing to have conversation. The crimson father is fixated on/#you, nothing else seems to be able to satiate its curiousity and lust.
-You feel the eyes of the creature bury even deeper. Clearly its/#interests are in you now.
-You see faint visions of an unknown god. A god that does not belong/#to this world. A god that never belonged.
+You understand that the creature is not from this world, but its^motivations lie among humans regardless. You feel an intense lust^for blood...
+Your persuasion efforts have gone to waste. The creature doesn't seem^to be willing to have conversation. The crimson father is fixated on^you, nothing else seems to be able to satiate its curiousity and lust.
+You feel the eyes of the creature bury even deeper. Clearly its^interests are in you now.
+You see faint visions of an unknown god. A god that does not belong^to this world. A god that never belonged.
 \}[PERSUADE]\{ "I need to know more. Anything will do!"
 Its shape does not make sense even as a feeble vision.
-The visions of torn flesh... They start to take more concrete shape./#It's the one-eyed god... The one that burns in a pit of sulfur...
-As the visions become more vivid your head starts to hurt like/#never before.
-Your threats don't seem to have effect on the creature. Slowly the/#thing advances towards you, at a snail's pace.
+The visions of torn flesh... They start to take more concrete shape.^It's the one-eyed god... The one that burns in a pit of sulfur...
+As the visions become more vivid your head starts to hurt like^never before.
+Your threats don't seem to have effect on the creature. Slowly the^thing advances towards you, at a snail's pace.
 GabText The crimson father's torso begins to rot...
 GabText You can't figure out the weaknesses of the creature...
 GabText You stole a \c[2]Soul stone shard\c[0]!
 GabText The crimson father loses his balance!
 GabText The crimson father is blinded!
 GabText The crimson father slowly advances with its eyes fixated on you.
-\>\i[66]\}RIMSON FATHER\{\</#"...Your father..."
-\>\i[66]\}RIMSON FATHER\{\</#"I'm your father..."
+\>\i[66]\}RIMSON FATHER\{\<^"...Your father..."
+\>\i[66]\}RIMSON FATHER\{\<^"I'm your father..."
 GabText The crimson father loses his balance.
-The voice of the bobby is distorted and screechy, barely/#understandable.
-\>\i[65]\}OBBY\{\</#"You have violated the martial law set by the high priest to the/#area of Prehevil and its surroundings."
-\>\i[65]\}OBBY\{\</#"The law broken: EVERYONE - MUST - STAY - INDOORS."
+The voice of the bobby is distorted and screechy, barely^understandable.
+\>\i[65]\}OBBY\{\<^"You have violated the martial law set by the high priest to the^area of Prehevil and its surroundings."
+\>\i[65]\}OBBY\{\<^"The law broken: EVERYONE - MUST - STAY - INDOORS."
 choice_text 1 \}[PERSUADE]\{ "I wasn't aware of such laws. I'll do better next time!"
 choice_text 3 \}[INTIMIDATE]\{ "You better call for reinforcements while you still can."
 "I will correct my ways if you just let me!"
 "Why are such laws in place?"
 "I got more pressing issues than your stupid laws."
-\>\i[65]\}OBBY\{\</#"The protocol to use: LETHAL FORCE."
-\>\i[65]\}OBBY\{\</#"No. You are contaminated."
+\>\i[65]\}OBBY\{\<^"The protocol to use: LETHAL FORCE."
+\>\i[65]\}OBBY\{\<^"No. You are contaminated."
 choice_text 2 \}[PERSUADE]\{ "Contaminated? You're one to talk!"
 "Contaminated by what?"
 "You got it wrong, I'm one of the few healthy ones around!"
-\>\i[65]\}OBBY\{\</#"There is no way back anymore."
-\>\i[65]\}OBBY\{\</#"You know well enough! TAINTED! TAINTED!"
+\>\i[65]\}OBBY\{\<^"There is no way back anymore."
+\>\i[65]\}OBBY\{\<^"You know well enough! TAINTED! TAINTED!"
 "Sounds unjust. I thought you were all about justice and order?"
-\>\i[65]\}OBBY\{\</#"We govern with actions, not with examples."
-\>\i[65]\}OBBY\{\</#"Unjust... Unjust..."
-\>\i[65]\}OBBY\{\</#"..."
+\>\i[65]\}OBBY\{\<^"We govern with actions, not with examples."
+\>\i[65]\}OBBY\{\<^"Unjust... Unjust..."
+\>\i[65]\}OBBY\{\<^"..."
 You got the bobby wondering. He seems to be lost in his thoughts.
-\>\i[65]\}OBBY\{\</#"Enough with the excuses! TAINTED! TAINTED!"
+\>\i[65]\}OBBY\{\<^"Enough with the excuses! TAINTED! TAINTED!"
 choice_text 2 \}[PERSUADE]\{ "The police force should serve people, not force."
 "Protection against what?"
 "So are you going to arrest me?"
-\>\i[65]\}OBBY\{\</#"It is for the safety and protection of civilians."
-\>\i[65]\}OBBY\{\</#"The green hue that devours the land at night."
-\>\i[65]\}OBBY\{\</#"To serve and protect - pr-protect... and..."
-\>\i[65]\}OBBY\{\</#"No reinforcements required."
+\>\i[65]\}OBBY\{\<^"It is for the safety and protection of civilians."
+\>\i[65]\}OBBY\{\<^"The green hue that devours the land at night."
+\>\i[65]\}OBBY\{\<^"To serve and protect - pr-protect... and..."
+\>\i[65]\}OBBY\{\<^"No reinforcements required."
 The bobby doesn't seem to understand intimidation.
-\>\i[65]\}OBBY\{\</#"You shall be detained."
+\>\i[65]\}OBBY\{\<^"You shall be detained."
 GabText The bobby's skin begins to rot even further...
 GabText The bobby doesn't stay still long enough for the analysis...
 GabText You stole 2 \c[2]Cloth fragments\c[0]!
 GabText You stole 3 \c[2]Matches\c[0]!
 GabText The police officer seems determined to catch you.
-\>\i[65]\}OBBY\{\</#"For justice and order!"
+\>\i[65]\}OBBY\{\<^"For justice and order!"
 GabText The face of the police officer is twisting furiously...
 GabText The bobby stopped shaking its head...
 GabText The head of the bobby continues shaking violently.
 GabText The arm of the bobby grew back!
-\>\i[77]\}EEDLES\{\</#"..."
+\>\i[77]\}EEDLES\{\<^"..."
 choice_text 1 \}[PERSUADE]\{ "Live and let live, we are on the same page, right?"
 choice_text 3 \}[INTIMIDATE]\{ "You're going to regret the day you quit the circus."
 "Who are you?"
 "I'll wipe that grin off your face!"
 Needles is just grinning at you with its sadistic smile.
 Needles is just laughing at you with exaggerated gestures.
-He is holding his stomach while pointing a mocking finger at/#you...
+He is holding his stomach while pointing a mocking finger at^you...
 Your persuasion didn't seem to work...
 Needles shrugs with its arms stretched wide.
 "What's the matter? Did I hit a nerve?"
 "Why so serious?"
 The expression on the face of Needles becomes deadly serious.
-The wrinkles around Needles' face get deeper as his expression/#intensifies...
+The wrinkles around Needles' face get deeper as his expression^intensifies...
 Seems like you managed to infuriate Needles.
 Needles is waving its finger around its ear in a mocking manner.
 GabText The skin of the Needles begins to rot...
@@ -539,20 +539,20 @@ GabText Needles loses his balance!
 GabText Needles is blinded! His eyes are bleeding!
 GabText Needles whips out a pistol!
 GabText Needles came waltzing in to greet you.
-Needles looks you straight in the eyes as his expression becomes/#more serious.
+Needles looks you straight in the eyes as his expression becomes^more serious.
 The expression of his face becomes more serious all of a sudden.
 GabText Needles gives you a giggle.
 GabText Needles loses his balance.
 GabText You dodge the syringe of the Needles!
 GabText You stole 6 \c[2]Shillings\c[0]!
-\>\i[82]\}ORMENTED ONE\{\</#"..."
+\>\i[82]\}ORMENTED ONE\{\<^"..."
 choice_text 1 \}[PERSUADE]\{ "I didn't want to create any problems with the summoning!"
 "Stay away from me!"
 "I summoned you, now obey me!"
-You cannot distinguish any expressions from the face of the /#tormented one...
-The tormented one takes a step towards you. His figure seems that/#much more intimidating this close...
+You cannot distinguish any expressions from the face of the ^tormented one...
+The tormented one takes a step towards you. His figure seems that^much more intimidating this close...
 Your persuasion efforts go to waste with the tormented one.
-Your intimidation efforts don't seem to have much effect on the/#tormented one...
+Your intimidation efforts don't seem to have much effect on the^tormented one...
 GabText The flesh of the tormented one begins to rot...
 GabText The tormented one doesn't have weaknesses!
 GabText The tormented one loses his balance!
@@ -561,59 +561,59 @@ GabText Relentlessly the tormented one keeps on pursuing you...
 GabText Something is happening to the tormented one!
 GabText A lone rifleman saw you...
 "But we are indoors!?"
-\>\i[65]\}OBBY\{\</#"Indoors... Must... Stay..."
-\>\i[67]\}YSMORPHIA\{\</#"\N[3]! \N[3]!!"
-\>\i[67]\}YSMORPHIA\{\</#"Can't you see me absolutely radiating!"
-\>\i[67]\}YSMORPHIA\{\</#"What more can you ask!!"
+\>\i[65]\}OBBY\{\<^"Indoors... Must... Stay..."
+\>\i[67]\}YSMORPHIA\{\<^"\N[3]! \N[3]!!"
+\>\i[67]\}YSMORPHIA\{\<^"Can't you see me absolutely radiating!"
+\>\i[67]\}YSMORPHIA\{\<^"What more can you ask!!"
 choice_text 2 \}[PERSUADE]\{ "Let's just talk this through. No harm done yet..."
 choice_text 3 \}[INTIMIDATE]\{ "Turning into an abomination won't save you here."
 "What do you mean 'radiating'?"
 "You've lost your mind!"
 "What's happening to you!?"
-\>\i[67]\}YSMORPHIA\{\</#\{"\N[3]!!"\}
-\>\i[67]\}YSMORPHIA\{\</#"Like a moth! I'm finally close to bloom!"
-\>\i[67]\}YSMORPHIA\{\</#"A hairy moth in the night!"
-\>\i[67]\}YSMORPHIA\{\</#"Talk!? TALK!?"
+\>\i[67]\}YSMORPHIA\{\<^\{"\N[3]!!"\}
+\>\i[67]\}YSMORPHIA\{\<^"Like a moth! I'm finally close to bloom!"
+\>\i[67]\}YSMORPHIA\{\<^"A hairy moth in the night!"
+\>\i[67]\}YSMORPHIA\{\<^"Talk!? TALK!?"
 "What's so weird about wanting to talk?""
 "You were just a regular person a moment ago..."
-\>\i[67]\}YSMORPHIA\{\</#"Why would you want to talk to me!? Just look at me!"
-\>\i[67]\}YSMORPHIA\{\</#"..."
+\>\i[67]\}YSMORPHIA\{\<^"Why would you want to talk to me!? Just look at me!"
+\>\i[67]\}YSMORPHIA\{\<^"..."
 Dysmorphia is clearly hesitating...
-\>\i[67]\}YSMORPHIA\{\</#"This is just a trick, isn't it \N[3]...?"
-\>\i[67]\}YSMORPHIA\{\</#"Or... You really want to talk...?"
-\>\i[67]\}YSMORPHIA\{\</#"This is just a trick, isn't it...? You don't care about me..."
-\>\i[67]\}YSMORPHIA\{\</#"What is that supposed to mean!?"
-\>\i[67]\}YSMORPHIA\{\</#"Why must everyone be regular!?"
-\>\i[67]\}YSMORPHIA\{\</#"Regular this!\. Regular that!\. Be normal!"
-\>\i[67]\}YSMORPHIA\{\</#"You're better than this \N[3]!"
-\>\i[67]\}YSMORPHIA\{\</#\{"YOU CALL ME REGULAR!?"\}
+\>\i[67]\}YSMORPHIA\{\<^"This is just a trick, isn't it \N[3]...?"
+\>\i[67]\}YSMORPHIA\{\<^"Or... You really want to talk...?"
+\>\i[67]\}YSMORPHIA\{\<^"This is just a trick, isn't it...? You don't care about me..."
+\>\i[67]\}YSMORPHIA\{\<^"What is that supposed to mean!?"
+\>\i[67]\}YSMORPHIA\{\<^"Why must everyone be regular!?"
+\>\i[67]\}YSMORPHIA\{\<^"Regular this!\. Regular that!\. Be normal!"
+\>\i[67]\}YSMORPHIA\{\<^"You're better than this \N[3]!"
+\>\i[67]\}YSMORPHIA\{\<^\{"YOU CALL ME REGULAR!?"\}
 You managed to infuriate Dysmorphia with your persuasion efforts.
-\>\i[67]\}YSMORPHIA\{\</#"\N[3]... No. NO! You're just trying to confuse me!"
-\>\i[67]\}YSMORPHIA\{\</#"Let me show you what I'm capable of!"
-\>\i[67]\}YSMORPHIA\{\</#"Enough talking! You're just trying to confuse me!"
-\>\i[67]\}YSMORPHIA\{\</#"\N[3]!"
-\>\i[67]\}YSMORPHIA\{\</#"W-why would you say that!?"
-\>\i[67]\}YSMORPHIA\{\</#"You must understand me! YOU MUST!"
-\>\i[67]\}YSMORPHIA\{\</#"You're just one of them!"
-\>\i[67]\}YSMORPHIA\{\</#"That's what they all say!"
-\>\i[67]\}YSMORPHIA\{\</#"All but \N[3]..."
-\>\i[67]\}YSMORPHIA\{\</#"\N[3], tell them!"
-\>\i[76]\}ARINA\{\</#"..."
-\>\i[76]\}ARINA\{\</#"I have nothing to say here."
-\>\i[67]\}YSMORPHIA\{\</#"\N[3]..."
-\>\i[67]\}YSMORPHIA\{\</#"Abomination!? I'm absolutely radiating!"
-\>\i[67]\}YSMORPHIA\{\</#\{"LOOK AT ME!!"\}
-\>\i[67]\}YSMORPHIA\{\</#\{"YOU CALL ME ABOMINATION!?"\}
+\>\i[67]\}YSMORPHIA\{\<^"\N[3]... No. NO! You're just trying to confuse me!"
+\>\i[67]\}YSMORPHIA\{\<^"Let me show you what I'm capable of!"
+\>\i[67]\}YSMORPHIA\{\<^"Enough talking! You're just trying to confuse me!"
+\>\i[67]\}YSMORPHIA\{\<^"\N[3]!"
+\>\i[67]\}YSMORPHIA\{\<^"W-why would you say that!?"
+\>\i[67]\}YSMORPHIA\{\<^"You must understand me! YOU MUST!"
+\>\i[67]\}YSMORPHIA\{\<^"You're just one of them!"
+\>\i[67]\}YSMORPHIA\{\<^"That's what they all say!"
+\>\i[67]\}YSMORPHIA\{\<^"All but \N[3]..."
+\>\i[67]\}YSMORPHIA\{\<^"\N[3], tell them!"
+\>\i[76]\}ARINA\{\<^"..."
+\>\i[76]\}ARINA\{\<^"I have nothing to say here."
+\>\i[67]\}YSMORPHIA\{\<^"\N[3]..."
+\>\i[67]\}YSMORPHIA\{\<^"Abomination!? I'm absolutely radiating!"
+\>\i[67]\}YSMORPHIA\{\<^\{"LOOK AT ME!!"\}
+\>\i[67]\}YSMORPHIA\{\<^\{"YOU CALL ME ABOMINATION!?"\}
 You managed to infuriate Dysmorphia with your intimidation efforts.
-\>\i[67]\}YSMORPHIA\{\</#"I'm absolutely radiating!"
-\>\i[67]\}YSMORPHIA\{\</#"I did all this for her..."
-\>\i[67]\}YSMORPHIA\{\</#"I had it all ready..."
+\>\i[67]\}YSMORPHIA\{\<^"I'm absolutely radiating!"
+\>\i[67]\}YSMORPHIA\{\<^"I did all this for her..."
+\>\i[67]\}YSMORPHIA\{\<^"I had it all ready..."
 "Ruined what?"
-\>\i[67]\}YSMORPHIA\{\</#"But then you come along...AND RUINED IT ALL!"
-\>\i[67]\}YSMORPHIA\{\</#"I cut that man open like a pig that he is!"
-\>\i[67]\}YSMORPHIA\{\</#"He never realized why I was doing it!"
-\>\i[67]\}YSMORPHIA\{\</#"He never understood the pain he made her go through!"
-\>\i[67]\}YSMORPHIA\{\</#"All but her."
+\>\i[67]\}YSMORPHIA\{\<^"But then you come along...AND RUINED IT ALL!"
+\>\i[67]\}YSMORPHIA\{\<^"I cut that man open like a pig that he is!"
+\>\i[67]\}YSMORPHIA\{\<^"He never realized why I was doing it!"
+\>\i[67]\}YSMORPHIA\{\<^"He never understood the pain he made her go through!"
+\>\i[67]\}YSMORPHIA\{\<^"All but her."
 GabText The dysmorphia's skin begins to rot...
 GabText You can't figure out her weaknesses...
 GabText You stole a \c[2]Soul devour necklace\c[0]!
@@ -622,11 +622,11 @@ GabText Dysmorphia is blinded! Her eyes are bleeding!
 GabText Dysmorphia is radiating before you.
 choice_text 3 \}[PERSUADE]\{ "I get it, you want no part on what's happening outside..."
 choice_text 4 \}[INTIMIDATE]\{ "Cut the crap. No one cares about your little masquerade."
-\>\i[78]\}WL CULTIST\{\</#"..."
+\>\i[78]\}WL CULTIST\{\<^"..."
 "Do you know what's happening in the town?"
 "Just stay back, I'm just passing through..."
-The owl cultist tilts its head from left to right, examining you/#closely...
-The owl cultist continues with the exaggerated head tilts. You /#suspect this person might just be acting the part...
+The owl cultist tilts its head from left to right, examining you^closely...
+The owl cultist continues with the exaggerated head tilts. You ^suspect this person might just be acting the part...
 "I won't disturb you if you just let me quickly pass through..."
 "I'll leave the forest as soon as I'm done here."
 The cultist seems to be listening...
@@ -642,22 +642,22 @@ GabText The cultist is blinded! His eyes are bleeding!
 GabText An owl cultist follows your every move curiously.
 GabText The owl cultist loses his balance.
 "Stay back, I'm just passing through."
-The owl cultist is following your every move curiously. Quickly he/#tilts his head from left to right... There is an ominous aura of /#danger in the air.
-Your words seem to go on deaf ears. The owl cultist seems to have/#made his mind and is now approaching you with determined steps.
+The owl cultist is following your every move curiously. Quickly he^tilts his head from left to right... There is an ominous aura of ^danger in the air.
+Your words seem to go on deaf ears. The owl cultist seems to have^made his mind and is now approaching you with determined steps.
 GabText The owl cultist summons something from the otherside...
 GabText You dodge the owl sprite's beak!
 choice_text 2 \}[PERSUADE]\{ "You have to hear me out if there's any humanity left in you!"
 "Can you undestand me?"
 "Just stay away from me!"
 You try talking some sense to this monstrosity.
-\>\i[77]\}EIGHBOUR\{\</#"..."
+\>\i[77]\}EIGHBOUR\{\<^"..."
 The creature shows no signs on understanding your words.
-The creature is tilting its head in confusion, trying to make sense/#of your words.
-The creature lost interest in you. Your persuasion efforts go to/#deaf ears.
+The creature is tilting its head in confusion, trying to make sense^of your words.
+The creature lost interest in you. Your persuasion efforts go to^deaf ears.
 "Your brains turned into mush when you took that form?"
 "Like I said, pain must be the only thing you understand."
-You only managed to aggravated the creature with your insults and /#intimidation.
-The creature lost interest in you. Your intimidation efforts go/#to waste.
+You only managed to aggravated the creature with your insults and ^intimidation.
+The creature lost interest in you. Your intimidation efforts go^to waste.
 GabText The Neighbour's skin begins to rot...
 GabText You've exposed the weaknesses of the neighbour!
 GabText You stole a bottle of \c[2]Beer\c[0]!
@@ -665,25 +665,25 @@ GabText The neighbour loses his balance!
 GabText The neighbour crouches to your level. You smell its bad breath.
 GabText The neighbour snorts and a dirty cloud is emitted from its nostril.
 GabText The neighbour loses its balance.
-The Neighbour whips its tongue out. It seems to be smelling the/#air with it.
+The Neighbour whips its tongue out. It seems to be smelling the^air with it.
 GabText The neighbour charges, but you manage evading its floppy arms!
 GabText The neighbour charges with its floppy arms flailing!
-The pillarman tirelessly charges at you! You don't even get a chance/#to talk to him properly.
+The pillarman tirelessly charges at you! You don't even get a chance^to talk to him properly.
 choice_text 2 \}[PERSUADE]\{ "I'm trespassing your domain?"
 choice_text 3 \}[INTIMIDATE]\{ "With your looks, no need to even feel bad for beating you."
 "Can you understand me?"
-\>\i[65]\}ELLEND\{\</#"..."
+\>\i[65]\}ELLEND\{\<^"..."
 The creature is tilting its head, trying to make sense of you.
 "I apologize, I will leave this domain if you just let me."
 "I've come to claim this domain as mine."
 "I don't understand what you're trying to say..."
-The creature is hunkering up and down while holding the spear above/#its head... The body language seems that of aggravation.
+The creature is hunkering up and down while holding the spear above^its head... The body language seems that of aggravation.
 The creature takes a step back and measure you from head to toes...
 It seems to give you the chance to leave the area.
 It seems that your persuasion tactics just aggravated the creature.
 The creature resumes to its combat stance.
 Your pleads go to deaf ears. If the creature even has them.
-The creature's grip on the spear tightens and its movements become/#more explosive.
+The creature's grip on the spear tightens and its movements become^more explosive.
 It seems that your intimidation tactics aggravated the creature.
 Your threats go to deaf ears. If the creature even has them.
 GabText The creature's exoskeleton begins to rot...
@@ -695,33 +695,33 @@ choice_text 3 \}[INTIMIDATE]\{ "I hope you're ready for the execution row, soldi
 "What happened here?"
 "We don't need to fight!"
 "Stay back, or else..."
-\>\i[81]\}OLDIER\{\</#"... You are new... What do you want?"
-\>\i[81]\}OLDIER\{\</#"We came here... We got the orders straight from the Kaiser himself."
+\>\i[81]\}OLDIER\{\<^"... You are new... What do you want?"
+\>\i[81]\}OLDIER\{\<^"We came here... We got the orders straight from the Kaiser himself."
 "What's worse than dead?"
 "Why did you come here?"
-\>\i[81]\}OLDIER\{\</#"But it was a mistake... Now everyone's dead or worse..."
-\>\i[81]\}OLDIER\{\</#"You must have seen the residents of this godforsaken place."
-\>\i[81]\}OLDIER\{\</#"That fate awaits us all... My comrades already succumbed to the /#chaos."
-\>\i[81]\}OLDIER\{\</#"My skin is still pretty, but... My mind is deteriorating at/#a rapid rate."
-\>\i[81]\}OLDIER\{\</#"Three days is the limit... Just like what 'he' said."
-\>\i[81]\}OLDIER\{\</#"To secure the city... There is something brewing under the/#ground..."
-\>\i[81]\}OLDIER\{\</#"I'm not. My superiors are no where to be found..."
+\>\i[81]\}OLDIER\{\<^"But it was a mistake... Now everyone's dead or worse..."
+\>\i[81]\}OLDIER\{\<^"You must have seen the residents of this godforsaken place."
+\>\i[81]\}OLDIER\{\<^"That fate awaits us all... My comrades already succumbed to the ^chaos."
+\>\i[81]\}OLDIER\{\<^"My skin is still pretty, but... My mind is deteriorating at^a rapid rate."
+\>\i[81]\}OLDIER\{\<^"Three days is the limit... Just like what 'he' said."
+\>\i[81]\}OLDIER\{\<^"To secure the city... There is something brewing under the^ground..."
+\>\i[81]\}OLDIER\{\<^"I'm not. My superiors are no where to be found..."
 "But aren't you just following the orders of the moon then?"
 "What would your superiors say about that?"
-\>\i[81]\}OLDIER\{\</#"We are participants in the festival... This must be done."
-\>\i[81]\}OLDIER\{\</#"..."
-\>\i[81]\}OLDIER\{\</#"No... This is my choice..."
-You planted a seed of doubt into the soldier's mind. His aggression/#seems to waver...
-\>\i[81]\}OLDIER\{\</#"They said the same to me before I put a bullet into their temple..."
-\>\i[81]\}OLDIER\{\</#"You are just trying to make me second guess my intentions. I see/#through you now..."
-\>\i[81]\}OLDIER\{\</#"You are wrong... That's exactly what is expected from everyone who/#takes part in this..."
+\>\i[81]\}OLDIER\{\<^"We are participants in the festival... This must be done."
+\>\i[81]\}OLDIER\{\<^"..."
+\>\i[81]\}OLDIER\{\<^"No... This is my choice..."
+You planted a seed of doubt into the soldier's mind. His aggression^seems to waver...
+\>\i[81]\}OLDIER\{\<^"They said the same to me before I put a bullet into their temple..."
+\>\i[81]\}OLDIER\{\<^"You are just trying to make me second guess my intentions. I see^through you now..."
+\>\i[81]\}OLDIER\{\<^"You are wrong... That's exactly what is expected from everyone who^takes part in this..."
 "Makes my job easier if you've given up already."
 "Why even struggle then?"
-\>\i[81]\}OLDIER\{\</#"We are all on the execution row... Since the moment we stepped inside/#the borders of this wicked town."
-\>\i[81]\}OLDIER\{\</#"You are walking in my footsteps... No use talking big."
+\>\i[81]\}OLDIER\{\<^"We are all on the execution row... Since the moment we stepped inside^the borders of this wicked town."
+\>\i[81]\}OLDIER\{\<^"You are walking in my footsteps... No use talking big."
 The soldier's eyes become glassy as he stares into the distance...
-\>\i[81]\}OLDIER\{\</#"Or else either one of us dies... Yes..."
-The soldier is trying to hide his face behind his palm. He clearly/#isn't ready to start a conversation.
+\>\i[81]\}OLDIER\{\<^"Or else either one of us dies... Yes..."
+The soldier is trying to hide his face behind his palm. He clearly^isn't ready to start a conversation.
 GabText The soldier's skin begins to rot...
 GabText You've exposed the weaknesses of the infantry!
 GabText You stole 5 \c[2]9mm Bullets\c[0]!
@@ -736,37 +736,37 @@ choice_text 1 \}[PERSUADE]\{ "Instead of condemning, why not educate me instead?
 choice_text 3 \}[INTIMIDATE]\{ "You'll get to meet your maker soon enough."
 "How am I an infidel?"
 "I got more pressing issues than listening you."
-\>\i[72]\}NQUISITOR\{\</#"Infidel! Infidel! Bow your head in shame!"
+\>\i[72]\}NQUISITOR\{\<^"Infidel! Infidel! Bow your head in shame!"
 "Sounds like a harsh ideology..."
 "Alll-mer? How come the town is ravaged by the Rher's will then?"
-\>\i[72]\}NQUISITOR\{\</#"The will of Alll-mer knows no mercy! Infidels will be cut down/#without a chance for redemption!"
-\>\i[72]\}NQUISITOR\{\</#"Control with fear! Lead with violence!"
+\>\i[72]\}NQUISITOR\{\<^"The will of Alll-mer knows no mercy! Infidels will be cut down^without a chance for redemption!"
+\>\i[72]\}NQUISITOR\{\<^"Control with fear! Lead with violence!"
 "We got a hypocrite. You are clearly twisted by the moonlight."
 "Surely you see what has happened around you?"
-\>\i[72]\}NQUISITOR\{\</#"Nonsense! Infidel! Infidel! Enough with your lies and deceit!"
-\>\i[72]\}NQUISITOR\{\</#"The origin of deceit, the sulfuric pits - You are just trying to/#plant a seed of doubt in my head!"
-And you were successful in planting the said seed. The inquisitor/#is wavering in his attacks.
-\>\i[72]\}NQUISITOR\{\</#"Infidel! Infidel! Infidel!"
-\>\i[72]\}NQUISITOR\{\</#"Off with your head!"
-\>\i[72]\}NQUISITOR\{\</#"Surrender yourself to the will of the gods!"
-\>\i[72]\}NQUISITOR\{\</#"Do not look down upon your leading gods! Do not even consider /#reaching the veil hiding the greater truth!"
-\>\i[72]\}NQUISITOR\{\</#"I am ready if so be it!"
+\>\i[72]\}NQUISITOR\{\<^"Nonsense! Infidel! Infidel! Enough with your lies and deceit!"
+\>\i[72]\}NQUISITOR\{\<^"The origin of deceit, the sulfuric pits - You are just trying to^plant a seed of doubt in my head!"
+And you were successful in planting the said seed. The inquisitor^is wavering in his attacks.
+\>\i[72]\}NQUISITOR\{\<^"Infidel! Infidel! Infidel!"
+\>\i[72]\}NQUISITOR\{\<^"Off with your head!"
+\>\i[72]\}NQUISITOR\{\<^"Surrender yourself to the will of the gods!"
+\>\i[72]\}NQUISITOR\{\<^"Do not look down upon your leading gods! Do not even consider ^reaching the veil hiding the greater truth!"
+\>\i[72]\}NQUISITOR\{\<^"I am ready if so be it!"
 Your intimidation efforts didn't seem to have effect.
-\>\i[72]\}NQUISITOR\{\</#"No mercy for the weak! The weak shall perish!"
+\>\i[72]\}NQUISITOR\{\<^"No mercy for the weak! The weak shall perish!"
 GabText The inquisitor's shell of a skin begins to rot...
 GabText The enemies start to rot before your eyes...
 GabText You've exposed the weaknesses of the inquisitor!
 GabText You stole a \c[2]Light blue vial\c[0]!
-The party tries to escape... .\/#However, the Bobby prevents you from escaping!
+The party tries to escape... .\^However, the Bobby prevents you from escaping!
 GabText The inquisitor approaches you with total judgement.
-\>\i[72]\}NQUISITOR\{\</#"Alll-mer be my judge, I will be the executioner and the jury!"
+\>\i[72]\}NQUISITOR\{\<^"Alll-mer be my judge, I will be the executioner and the jury!"
 GabText The inquisitor is immensely disgusted by your presence.
 GabText The police officer comes to inquisitor's aid.
 "Sit boy...!"
 "Stay away...!"
 "Give paw...!"
-You have trouble saying anything to the beast because of the/#overwhelming stench the creature emits.
-The beast doesn't seem understand a thing you say. Or it chooses/#to ignore you entirely. Either one could be true.
+You have trouble saying anything to the beast because of the^overwhelming stench the creature emits.
+The beast doesn't seem understand a thing you say. Or it chooses^to ignore you entirely. Either one could be true.
 GabText The hounds are rotting before your eyes...
 GabText You've exposed the weaknesses of the beasts!
 GabText The beast is blinded! Its eyes are bleeding!
@@ -774,48 +774,48 @@ GabText The hound hisses at you with its saliva splattering around!
 GabText You feel nauseous just being this close to the creature...
 GabText A striking stench follows the hound as it approaches you...
 GabText You are starting to feel severe nausea because of the foul stench.
-The creature has no heads or mouths to speak to. It doesn't seem /#to react to speech in any way.
+The creature has no heads or mouths to speak to. It doesn't seem ^to react to speech in any way.
 The heads of the sew job are confronting you.
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"You ugly! What'd ya want!?" 
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"You ugly! What'd ya want!?" 
 choice_text 2 \}[PERSUADE]\{ "I apologize. Can we make amends?"
 choice_text 3 \}[INTIMIDATE]\{ "More faces for me to step over."
 "What are you?"
-\>\i[64]\}NOTHER HEAD\{\</#"Staring at us. Like we're the freak!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"We are many. The lady made us like this."
-\>\i[64]\}NOTHER HEAD\{\</#"Each of us struggled. But it's better this way."
+\>\i[64]\}NOTHER HEAD\{\<^"Staring at us. Like we're the freak!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"We are many. The lady made us like this."
+\>\i[64]\}NOTHER HEAD\{\<^"Each of us struggled. But it's better this way."
 Pay 15 \c[2]Shillings\c[0]
 "I don't have that much..."
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Money will always work! 15 Shillings! Pay up or we'll break you!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Money will always work! 15 Shillings! Pay up or we'll break you!"
 You throw 15 \c[2]Shillings\c[0] to the sew job.
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Did the moron really pay!?"
-\>\i[64]\}NOTHER HEAD OF THE SEW JOB\{\</#"Let's see! 1...\. 2...\. 3...\. 4...\."
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Did the moron really pay!?"
+\>\i[64]\}NOTHER HEAD OF THE SEW JOB\{\<^"Let's see! 1...\. 2...\. 3...\. 4...\."
 The sew job is counting the shillings on the ground.
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Tough!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Who cares!?"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"That's what I thought!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"We got all we need from you! Unless you want to pay another 15?"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Under the moon, each of us has to fight."
-\>\i[64]\}NOTHER HEAD\{\</#"Only joining together, you can prevent the bloody fate."
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"This guy... You're dead!"
-The sew job was surprisingly easy to aggravate. The thing drops its/#defence and charges towards you blindly.
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"You've stepped into the world of survival horror."
-\>\i[64]\}NOTHER HEAD\{\</#"Only one way to survive."
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Tough!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Who cares!?"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"That's what I thought!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"We got all we need from you! Unless you want to pay another 15?"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Under the moon, each of us has to fight."
+\>\i[64]\}NOTHER HEAD\{\<^"Only joining together, you can prevent the bloody fate."
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"This guy... You're dead!"
+The sew job was surprisingly easy to aggravate. The thing drops its^defence and charges towards you blindly.
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"You've stepped into the world of survival horror."
+\>\i[64]\}NOTHER HEAD\{\<^"Only one way to survive."
 The head of the sew job is confronting you.
-\>\i[64]\}NOTHER HEAD\{\</#"Staring at me. Like I'm the freak!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"We were many. But because of you my brothers are gone!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"You'll pay ugly!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Money will always work! 15 Shillings! Pay up or I'll break you!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Stupid! I can't believe how gullible you can be!"
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"Let's see! 1...\. 2...\. 3...\. 4...\."
-\>\i[71]\}EAD OF THE SEW JOB\{\</#"I got all I need from you! Unless you want to pay another 15?"
+\>\i[64]\}NOTHER HEAD\{\<^"Staring at me. Like I'm the freak!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"We were many. But because of you my brothers are gone!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"You'll pay ugly!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Money will always work! 15 Shillings! Pay up or I'll break you!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Stupid! I can't believe how gullible you can be!"
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"Let's see! 1...\. 2...\. 3...\. 4...\."
+\>\i[71]\}EAD OF THE SEW JOB\{\<^"I got all I need from you! Unless you want to pay another 15?"
 GabText The sew job's skin begins to rot...
 GabText The sew job doesn't seem to have a clear weakness.
 GabText A sew job floats slowly on your path...
 "I mean no harm."
 "Don't come closer!"
 "Die, you miserable thing."
-The small creature keeps stumbling towards you as you try to/#speak some sense to it.
-The creature is just pursing its lips back and forth. Whether it/#means something is a complete mystery to you.
+The small creature keeps stumbling towards you as you try to^speak some sense to it.
+The creature is just pursing its lips back and forth. Whether it^means something is a complete mystery to you.
 GabText The cherub is rotting before your eyes...
 GabText You've exposed the weaknesses of the cherub!
 GabText The cherub is blinded! Its eyes are bleeding!
@@ -823,8 +823,8 @@ GabText A cherub stumbles upon your path. Its eyes are set on you.
 GabText The cherubs are rotting before your eyes...
 GabText You've exposed the weaknesses of the cherubs!
 "Wait, what is happening here!?"
-\>\i[71]\}ALF-COCOONED\{\</#"You're... dead."
-\>\i[71]\}ALF-COCOONED\{\</#"Die! Die! DIE!"
+\>\i[71]\}ALF-COCOONED\{\<^"You're... dead."
+\>\i[71]\}ALF-COCOONED\{\<^"Die! Die! DIE!"
 GabText The half-cocooned's skin begins to rot...
 GabText You've exposed the weaknesses of the half-cocooned!
 GabText You stole 7 \c[2]Shillings\c[0]!
@@ -832,44 +832,44 @@ GabText You stole a \c[2]12-gauge shells\c[0]!
 GabText The half-cocooned loses his balance!
 GabText The half-cocooned is blinded! His sole eye is bleeding!
 GabText A half-cocooned man swings his mallets furiously!
-The man raises his meat mallet is clear fury. He clearly has intentions/#of violence...
+The man raises his meat mallet is clear fury. He clearly has intentions^of violence...
 GabText You dodge the swing of the half-cocooned!
 GabText The skin of the decrepit priest begins to rot...
 GabText The decrepit priest loses his balance!
 GabText The decrepit priest loses his balance.
 GabText A crazed madman runs straight at you in a blind fury!
-\>\i[80]\}ATKIN\{\</#"N-no more talking! I'm done with you!"
-\>\i[80]\}ATKIN\{\</#"M-master! J-just because you know our tongue doesn't make you /#our master! W-who do you think you are?"
+\>\i[80]\}ATKIN\{\<^"N-no more talking! I'm done with you!"
+\>\i[80]\}ATKIN\{\<^"M-master! J-just because you know our tongue doesn't make you ^our master! W-who do you think you are?"
 "What's your problem with me?"
 "Sure thing tough guy."
 "Give up and you might just survive."
 "Don't you obey your master?"
-\>\i[80]\}ATKIN\{\</#"Ah-- Ah... I'll tear you to shreds. Hear me! T-tear you to /#shreds!"
-\>\i[80]\}ATKIN\{\</#"D-do you know whose domain this is!? It's ours! Ours!"
-\>\i[80]\}ATKIN\{\</#"L-listen-- We don't care what's going on with the surface. J-just/#deal with it and don't come barging in on our home!"
+\>\i[80]\}ATKIN\{\<^"Ah-- Ah... I'll tear you to shreds. Hear me! T-tear you to ^shreds!"
+\>\i[80]\}ATKIN\{\<^"D-do you know whose domain this is!? It's ours! Ours!"
+\>\i[80]\}ATKIN\{\<^"L-listen-- We don't care what's going on with the surface. J-just^deal with it and don't come barging in on our home!"
 "I'm not invested enough to mock you."
 "What do you think?"
 "Sorry about that."
-\>\i[80]\}ATKIN\{\</#"A-are you mocking me? A-a-are you!?"
+\>\i[80]\}ATKIN\{\<^"A-are you mocking me? A-a-are you!?"
 "I'm not the one babbling on about here."
 "We'll see about that."
-\>\i[80]\}ATKIN\{\</#"A-acting tough? I know your kind! You're all talk!"
-\>\i[80]\}ATKIN\{\</#"Ack!"
+\>\i[80]\}ATKIN\{\<^"A-acting tough? I know your kind! You're all talk!"
+\>\i[80]\}ATKIN\{\<^"Ack!"
 The ratkin seems shook.
-\>\i[80]\}ATKIN\{\</#"Y-you were! You totally were! Y-you're not as witty as you think!"
+\>\i[80]\}ATKIN\{\<^"Y-you were! You totally were! Y-you're not as witty as you think!"
 "Yes, I mean no harm."
 "No that was sarcasm."
-\>\i[80]\}ATKIN\{\</#"D-do you mean that?"
-\>\i[80]\}ATKIN\{\</#"I-I see..."
-\>\i[80]\}ATKIN\{\</#"Y-you're not so bad are you?"
-\>\i[80]\}ATKIN\{\</#"S-sarcasm is used only by those who fail to impress otherwise!"
-\>\i[80]\}ATKIN\{\</#"Y-you don't impress anyone! I'll kill you! I will!"
-\>\i[80]\}ATKIN\{\</#"Y-you'll be sorry!"
+\>\i[80]\}ATKIN\{\<^"D-do you mean that?"
+\>\i[80]\}ATKIN\{\<^"I-I see..."
+\>\i[80]\}ATKIN\{\<^"Y-you're not so bad are you?"
+\>\i[80]\}ATKIN\{\<^"S-sarcasm is used only by those who fail to impress otherwise!"
+\>\i[80]\}ATKIN\{\<^"Y-you don't impress anyone! I'll kill you! I will!"
+\>\i[80]\}ATKIN\{\<^"Y-you'll be sorry!"
 "Even more the reason to deal with you."
-\>\i[80]\}ATKIN\{\</#"Pft. A-acting tough! I've killed human before, j-just so you/#know!"
-\>\i[80]\}ATKIN\{\</#"N-no human has ever been our master!"
-\>\i[80]\}ATKIN\{\</#"A-and never will!"
-\>\i[80]\}ATKIN\{\</#*Squeek* *Squeek*
+\>\i[80]\}ATKIN\{\<^"Pft. A-acting tough! I've killed human before, j-just so you^know!"
+\>\i[80]\}ATKIN\{\<^"N-no human has ever been our master!"
+\>\i[80]\}ATKIN\{\<^"A-and never will!"
+\>\i[80]\}ATKIN\{\<^*Squeek* *Squeek*
 You can't make any sense of ratkin's speech.
 GabText The ratkin's skin begins to rot...
 GabText You've exposed the weaknesses of the ratkin!
@@ -877,25 +877,25 @@ GabText The ratkin loses its balance!
 GabText The ratkin is blinded! Its eyes are bleeding!
 GabText A ratkin seems to awkwardly start a fight with you...
 GabText The ratkin loses its balance.
-\>\i[80]\}AT HAG\{\</#"Ka ka kaa kaaah!"
+\>\i[80]\}AT HAG\{\<^"Ka ka kaa kaaah!"
 choice_text 2 \}[PERSUADE]\{ "Is there anything I can do for you ma'am?"
 choice_text 3 \}[INTIMIDATE]\{ "It'll be a cakewalk to snap those frail little bones.."
 "What's so funny?"
 "Are you alright lady?"
 "Let's see who will have the last laugh."
 The hag is just cackling at you.
-\>\i[80]\}AT HAG\{\</#"Ka! Why so serious stranger?"
-\>\i[80]\}AT HAG\{\</#"Let the granny give you a hug! Kaah!"
-\>\i[80]\}AT HAG\{\</#"Dats sweet. You can always give me a good rubbin'. My back has/#been aching for a good bit now."
-\>\i[80]\}AT HAG\{\</#"Don't be scared, just come a little closer... Come CLOSER!"
-How do you persuade someone who dwells in the deepest levels of/#madness?
-\>\i[80]\}AT HAG\{\</#"M' back aches. My poor dirty feet is cramping and my eye sight/#ain't what it used to be."
-\>\i[80]\}AT HAG\{\</#"But nothing like some company to relieve all that. Why don'tcha /#stay here a fair bit longer stranger?"
-\>\i[80]\}AT HAG\{\</#"Kaah kaah kaa!"
-\>\i[80]\}AT HAG\{\</#"Is that so? Such spite. Let me muster some more spirit from ya/#laddie!"
-How do you intimidate someone who dwells in the deepest levels of/#madness?
-\>\i[80]\}AT HAG\{\</#"Youngsters always making a sport out of everythin'. Why don'tcha/#sit on granny's lap for a bit?"
-\>\i[80]\}AT HAG\{\</#"I'll even nibble yar ear if you'd like that."
+\>\i[80]\}AT HAG\{\<^"Ka! Why so serious stranger?"
+\>\i[80]\}AT HAG\{\<^"Let the granny give you a hug! Kaah!"
+\>\i[80]\}AT HAG\{\<^"Dats sweet. You can always give me a good rubbin'. My back has^been aching for a good bit now."
+\>\i[80]\}AT HAG\{\<^"Don't be scared, just come a little closer... Come CLOSER!"
+How do you persuade someone who dwells in the deepest levels of^madness?
+\>\i[80]\}AT HAG\{\<^"M' back aches. My poor dirty feet is cramping and my eye sight^ain't what it used to be."
+\>\i[80]\}AT HAG\{\<^"But nothing like some company to relieve all that. Why don'tcha ^stay here a fair bit longer stranger?"
+\>\i[80]\}AT HAG\{\<^"Kaah kaah kaa!"
+\>\i[80]\}AT HAG\{\<^"Is that so? Such spite. Let me muster some more spirit from ya^laddie!"
+How do you intimidate someone who dwells in the deepest levels of^madness?
+\>\i[80]\}AT HAG\{\<^"Youngsters always making a sport out of everythin'. Why don'tcha^sit on granny's lap for a bit?"
+\>\i[80]\}AT HAG\{\<^"I'll even nibble yar ear if you'd like that."
 GabText The rat lady's skin begins to rot...
 GabText You've exposed the weaknesses of the rat hag!
 GabText You stole a \c[2]Fly amanita\c[0]!
@@ -911,136 +911,136 @@ choice_text 3 \}[INTIMIDATE]\{ "No one will help you out of this, you weasel."
 "Wait, don't attack!"
 "We don't need to do this!"
 "Ready to die?"
-\>\i[71]\}ENRYK\{\</#"Fancy a small talk while we're at it?"
-\>\i[71]\}ENRYK\{\</#"You wait! Let's see how that pans out!"
+\>\i[71]\}ENRYK\{\<^"Fancy a small talk while we're at it?"
+\>\i[71]\}ENRYK\{\<^"You wait! Let's see how that pans out!"
 "None of us did, so let's not play along!"
 "Just lower your weapon and we can find a solution..."
-\>\i[71]\}ENRYK\{\</#"Hey I didn't ask for any of this!"
-\>\i[71]\}ENRYK\{\</#"..."
-\>\i[71]\}ENRYK\{\</#"J-just stay back! Let me think..."
+\>\i[71]\}ENRYK\{\<^"Hey I didn't ask for any of this!"
+\>\i[71]\}ENRYK\{\<^"..."
+\>\i[71]\}ENRYK\{\<^"J-just stay back! Let me think..."
 Henryk is hesitating.
-\>\i[71]\}ENRYK\{\</#"So you can jump at me again!? I don't think so!"
-\>\i[71]\}ENRYK\{\</#"You should've thought of that sooner!"
+\>\i[71]\}ENRYK\{\<^"So you can jump at me again!? I don't think so!"
+\>\i[71]\}ENRYK\{\<^"You should've thought of that sooner!"
 "Frankly, yes."
 "You tell me."
-\>\i[71]\}ENRYK\{\</#"Do I look like I need someone to rescue me?"
-\>\i[71]\}ENRYK\{\</#"Tsk. I'll show you."
-You managed to intimidate Henryk. His attack is wavering despite/#putting on a strong face.
-\>\i[71]\}ENRYK\{\</#"I've got nothing to lose, but my own life... so no."
-\>\i[71]\}ENRYK\{\</#"Hopefully it's not an issue to you."
+\>\i[71]\}ENRYK\{\<^"Do I look like I need someone to rescue me?"
+\>\i[71]\}ENRYK\{\<^"Tsk. I'll show you."
+You managed to intimidate Henryk. His attack is wavering despite^putting on a strong face.
+\>\i[71]\}ENRYK\{\<^"I've got nothing to lose, but my own life... so no."
+\>\i[71]\}ENRYK\{\<^"Hopefully it's not an issue to you."
 GabText Henryk's skin begins to rot...
 GabText You've exposed the weaknesses of Henryk!
 GabText You stole a \c[2]Meatpie+\c[0] and a \c[2]Goulash+\c[0]!
-\>\i[71]\}ENRYK\{\</#"H-hey! I spent an eternity cooking those up!"
-\>\i[71]\}ENRYK\{\</#"You are not going anywhere!"
-\>\i[71]\}ENRYK\{\</#"Aaargh! My chopping arm! MY CHOPPING ARM!"
-\>\i[71]\}ENRYK\{\</#"Tsk... But a flesh wound..."
-\>\i[71]\}ENRYK\{\</#"You'll pay for that..."
-\>\i[71]\}ENRYK\{\</#"Argh. My leg... You bastard."
+\>\i[71]\}ENRYK\{\<^"H-hey! I spent an eternity cooking those up!"
+\>\i[71]\}ENRYK\{\<^"You are not going anywhere!"
+\>\i[71]\}ENRYK\{\<^"Aaargh! My chopping arm! MY CHOPPING ARM!"
+\>\i[71]\}ENRYK\{\<^"Tsk... But a flesh wound..."
+\>\i[71]\}ENRYK\{\<^"You'll pay for that..."
+\>\i[71]\}ENRYK\{\<^"Argh. My leg... You bastard."
 GabText Henryk loses his balance!
 GabText Henryk is blinded! His eyes are bleeding!
 GabText Henryk pulls out a kitchen knife.
-\>\i[71]\}ENRYK\{\</#"It's come down to this. No hard feelings."
+\>\i[71]\}ENRYK\{\<^"It's come down to this. No hard feelings."
 GabText Henryk loses his balance.
 choice_text 1 \}[PERSUADE]\{ "We can still talk this through, right?"
 choice_text 2 \}[INTIMIDATE]\{ "What do you think you'll achieve with that wrench of yours?"
 "Wait! We don't need to do this!"
 "Bring it!"
-\>\i[64]\}BELLA\{\</#"Your talking days are over! You're dead!"
-\>\i[64]\}BELLA\{\</#"You should've thought of that earlier!"
-\>\i[64]\}BELLA\{\</#"I've got zero interest in your rambling at this point."
-\>\i[64]\}BELLA\{\</#"You'll regret acting big!"
+\>\i[64]\}BELLA\{\<^"Your talking days are over! You're dead!"
+\>\i[64]\}BELLA\{\<^"You should've thought of that earlier!"
+\>\i[64]\}BELLA\{\<^"I've got zero interest in your rambling at this point."
+\>\i[64]\}BELLA\{\<^"You'll regret acting big!"
 Abella became just more furious with your intimidation tactics.
 GabText The skin of Abella begins to rot...
 GabText You've exposed Abella's weaknesses!
 GabText You stole 4 \c[2]Bolts\c[0], 2 \c[2]Duct tapes\c[0] and a \c[2]Bench grinder\c[0]!
-\>\i[64]\}BELLA\{\</#"I don't think so!"
+\>\i[64]\}BELLA\{\<^"I don't think so!"
 GabText Abella loses her balance!
 GabText Abella is blinded! Her eyes are bleeding!
 GabText Abella whips out her wrench with a serious expression on her face.
 GabText Abella loses her balance.
 choice_text 2 \}[PERSUADE]\{ "Why did it come down to this? I don't want to fight you."
 choice_text 3 \}[INTIMIDATE]\{ "Brawn before brains? Has that worked out for you?"
-\>\i[76]\}ARCOH\{\</#"..."
-\>\i[76]\}ARCOH\{\</#"Your mindgames have no effect on me."
+\>\i[76]\}ARCOH\{\<^"..."
+\>\i[76]\}ARCOH\{\<^"Your mindgames have no effect on me."
 "It was all just a misunderstanding!"
 "Just stand back and we can both continue on our own ways."
-\>\i[76]\}ARCOH\{\</#"You tell me."
-\>\i[76]\}ARCOH\{\</#"So... You suggest we drop this?"
+\>\i[76]\}ARCOH\{\<^"You tell me."
+\>\i[76]\}ARCOH\{\<^"So... You suggest we drop this?"
 Marcoh is hesitating.
-\>\i[76]\}ARCOH\{\</#"I don't think so. \.Your mindgames have no effect on me."
-\>\i[76]\}ARCOH\{\</#"Listen,\. I'm just not going to hear you out so don't even bother."
+\>\i[76]\}ARCOH\{\<^"I don't think so. \.Your mindgames have no effect on me."
+\>\i[76]\}ARCOH\{\<^"Listen,\. I'm just not going to hear you out so don't even bother."
 "In a boxing ring you have the couch tell you what to do..."
 "We'll see about that!"
-\>\i[76]\}ARCOH\{\</#"It has worked just fine so far. I don't see it changing here."
-Looks like your words managed to create a seed of doubt in Marcoh's/#mind.
-\>\i[76]\}ARCOH\{\</#"You just like to talk, don't you? To hear your own voice?"
-\>\i[76]\}ARCOH\{\</#"I got no intentions of dying here."
+\>\i[76]\}ARCOH\{\<^"It has worked just fine so far. I don't see it changing here."
+Looks like your words managed to create a seed of doubt in Marcoh's^mind.
+\>\i[76]\}ARCOH\{\<^"You just like to talk, don't you? To hear your own voice?"
+\>\i[76]\}ARCOH\{\<^"I got no intentions of dying here."
 GabText Marcoh's skin begins to rot...
 GabText You've exposed the weaknesses of Marcoh!
 GabText You stole 12 \c[2]Shillings\c[0]!
-\>\i[76]\}ARCOH\{\</#"Trying to run? I don't think so."
+\>\i[76]\}ARCOH\{\<^"Trying to run? I don't think so."
 GabText Marcoh loses his balance!
 GabText Marcoh is blinded! His eyes are bleeding!
 GabText Marcoh takes a boxing stance and looks very focused.
-\>\i[76]\}ARCOH\{\</#"Fine. Give it your best."
+\>\i[76]\}ARCOH\{\<^"Fine. Give it your best."
 GabText Marcoh loses his balance.
-\>\i[76]\}ARCOH\{\</#*Pant* *Pant*
-\>\i[76]\}ARCOH\{\</#"It's not over yet..."
+\>\i[76]\}ARCOH\{\<^*Pant* *Pant*
+\>\i[76]\}ARCOH\{\<^"It's not over yet..."
 choice_text 1 \}[PERSUADE]\{ "I'm so sorry for this! Let's just talk this through!"
 choice_text 3 \}[INTIMIDATE]\{ "Do I just push you down the stairs or how should we do this?"
 "It's all just a misunderstanding!"
 "You're the one who started this!"
 "This has to be done."
-\>\i[78]\}LIVIA\{\</#"Why would you do this?"
-\>\i[78]\}LIVIA\{\</#"..."
-\>\i[78]\}LIVIA\{\</#"Do you really mean it?"
-\>\i[78]\}LIVIA\{\</#"Why should I believe you?"
+\>\i[78]\}LIVIA\{\<^"Why would you do this?"
+\>\i[78]\}LIVIA\{\<^"..."
+\>\i[78]\}LIVIA\{\<^"Do you really mean it?"
+\>\i[78]\}LIVIA\{\<^"Why should I believe you?"
 Olivia is hesitating.
-\>\i[78]\}LIVIA\{\</#"I'm not just going to keep giving you second chances! You started/#this so better be ready for this too!"
-\>\i[78]\}LIVIA\{\</#"I don't believe you for one second!"
-\>\i[78]\}LIVIA\{\</#"What's wrong with you!?"
-\>\i[78]\}LIVIA\{\</#"What!? How does that make even sense!?"
-\>\i[78]\}LIVIA\{\</#"You're just making this up as you go, right? Just to ease your own/#guilt!?"
-\>\i[78]\}LIVIA\{\</#"W-what's wrong with you!? You're a monster!"
+\>\i[78]\}LIVIA\{\<^"I'm not just going to keep giving you second chances! You started^this so better be ready for this too!"
+\>\i[78]\}LIVIA\{\<^"I don't believe you for one second!"
+\>\i[78]\}LIVIA\{\<^"What's wrong with you!?"
+\>\i[78]\}LIVIA\{\<^"What!? How does that make even sense!?"
+\>\i[78]\}LIVIA\{\<^"You're just making this up as you go, right? Just to ease your own^guilt!?"
+\>\i[78]\}LIVIA\{\<^"W-what's wrong with you!? You're a monster!"
 Olivia seems very unsure about what to do.
-\>\i[78]\}LIVIA\{\</#"N-no! It really doesn't! We can work together too!"
+\>\i[78]\}LIVIA\{\<^"N-no! It really doesn't! We can work together too!"
 GabText Olivia's skin begins to rot...
 GabText You've exposed the weaknesses of Olivia!
 GabText You stole a \c[2]Condensed green\c[0] and a \c[2]Condensed blue\c[0]!
-\>\i[78]\}LIVIA\{\</#"Where do you think you're going!?"
-\>\i[78]\}LIVIA\{\</#"Aaah! W-why are you doing this!?"
-\>\i[78]\}LIVIA\{\</#"Ah!!"
-\>\i[78]\}LIVIA\{\</#"Just what are you!? A monster!?"
+\>\i[78]\}LIVIA\{\<^"Where do you think you're going!?"
+\>\i[78]\}LIVIA\{\<^"Aaah! W-why are you doing this!?"
+\>\i[78]\}LIVIA\{\<^"Ah!!"
+\>\i[78]\}LIVIA\{\<^"Just what are you!? A monster!?"
 GabText Olivia is vulnerable!
 GabText Olivia is blinded! Her eyes are bleeding!
 GabText Olivia tries to prepare for a fight...
-\>\i[78]\}LIVIA\{\</#"You think this is a fair fight!? Why are you doing this!?"
-\>\i[82]\}ANAKA\{\</#"You must think I'm some kind of an idiot?"
-\>\i[82]\}ANAKA\{\</#"You try to persuade me with your talk while still holding the/#nefarious thoughts?"
-\>\i[82]\}ANAKA\{\</#"Fool me once, shame on me. Fool me twice... I don't know what/#happens. I never let things get to that point."
+\>\i[78]\}LIVIA\{\<^"You think this is a fair fight!? Why are you doing this!?"
+\>\i[82]\}ANAKA\{\<^"You must think I'm some kind of an idiot?"
+\>\i[82]\}ANAKA\{\<^"You try to persuade me with your talk while still holding the^nefarious thoughts?"
+\>\i[82]\}ANAKA\{\<^"Fool me once, shame on me. Fool me twice... I don't know what^happens. I never let things get to that point."
 "You're right. Let us find peace."
 "Speak for yourself."
 "Just give up and we're done with this."
-\>\i[82]\}ANAKA\{\</#"We live in the 1940s. We are civilized people, not some bloodthirsty/#barbarians of the yore. Let's act like it!"
-\>\i[82]\}ANAKA\{\</#"良い。"
-\>\i[82]\}ANAKA\{\</#"I knew you were a sensible one..."
+\>\i[82]\}ANAKA\{\<^"We live in the 1940s. We are civilized people, not some bloodthirsty^barbarians of the yore. Let's act like it!"
+\>\i[82]\}ANAKA\{\<^"良い。"
+\>\i[82]\}ANAKA\{\<^"I knew you were a sensible one..."
 Tanaka lowers his guard. He seems to be a bit wary of you still.
-\>\i[82]\}ANAKA\{\</#"I take it that you only understand one kind of language."
-\>\i[82]\}ANAKA\{\</#"That's not something we do in my family."
-\>\i[82]\}ANAKA\{\</#"I guess I will have to see this through."
+\>\i[82]\}ANAKA\{\<^"I take it that you only understand one kind of language."
+\>\i[82]\}ANAKA\{\<^"That's not something we do in my family."
+\>\i[82]\}ANAKA\{\<^"I guess I will have to see this through."
 GabText Tanaka's skin begins to rot...
 GabText You've exposed the weaknesses of Tanaka!
 GabText You stole 35 \c[2]Shillings\c[0]!
-\>\i[82]\}ANAKA\{\</#"H-hey! Those are my savings!"
-\>\i[82]\}ANAKA\{\</#"I just can't let you go at this point."
-\>\i[82]\}ANAKA\{\</#"M-my arm!"
-\>\i[82]\}ANAKA\{\</#"YOU CUT IT!"
-\>\i[82]\}ANAKA\{\</#"S-stop it! You're mad!"
+\>\i[82]\}ANAKA\{\<^"H-hey! Those are my savings!"
+\>\i[82]\}ANAKA\{\<^"I just can't let you go at this point."
+\>\i[82]\}ANAKA\{\<^"M-my arm!"
+\>\i[82]\}ANAKA\{\<^"YOU CUT IT!"
+\>\i[82]\}ANAKA\{\<^"S-stop it! You're mad!"
 GabText Tanaka loses his balance!
 GabText Tanaka is blinded! His eyes are bleeding!
 GabText Tanaka is cautiously measuring you from afar...
-\>\i[82]\}ANAKA\{\</#"I don't know just what you are trying to pull, but know that I'm/#prepared to answer violence with violence!"
+\>\i[82]\}ANAKA\{\<^"I don't know just what you are trying to pull, but know that I'm^prepared to answer violence with violence!"
 GabText Tanaka loses his balance.
 GabText You stole 25 \c[2]Shillings\c[0]!
 GabText You stole 15 \c[2]Shillings\c[0]!
@@ -1048,132 +1048,132 @@ choice_text 1 \}[PERSUADE]\{ "If you wanted me dead, we wouldn't be having this 
 choice_text 3 \}[INTIMIDATE]\{ "Just wanted to tell how much I want to kill you.."
 "You don't have to do this, we're not in a war anymore!"
 "We can work together!"
-\>\i[144]\}AV\{\</#"Well what is it? You wanted to talk? Talk!"
-\>\i[144]\}AV\{\</#"You're referring to the train? Yeah I could've killed all you lot/#easy."
+\>\i[144]\}AV\{\<^"Well what is it? You wanted to talk? Talk!"
+\>\i[144]\}AV\{\<^"You're referring to the train? Yeah I could've killed all you lot^easy."
 "But why didn't you? I'm sure I can help you somehow..."
 "You missed your chance."
-\>\i[144]\}AV\{\</#"Looks like I should've done that too."
-\>\i[144]\}AV\{\</#"..."
+\>\i[144]\}AV\{\<^"Looks like I should've done that too."
+\>\i[144]\}AV\{\<^"..."
 "I don't want to kill you, you don't to kill me..."
 "What's that?"
-\>\i[144]\}AV\{\</#"I didn't come here to play these petty games. I got something more/#urgent."
+\>\i[144]\}AV\{\<^"I didn't come here to play these petty games. I got something more^urgent."
 Pav is busy thinking, now's your chance!
-\>\i[144]\}AV\{\</#"None of your business. You're turning out to be a real bore."
-\>\i[144]\}AV\{\</#"Ever hear you talk too much?"
-\>\i[144]\}AV\{\</#"Good thing I never miss my shots then."
-\>\i[144]\}AV\{\</#"Don't I know it. Love it infact.\. Now I get to choose myself who /#I kill and when."
-\>\i[144]\}AV\{\</#"I just got out of the army. I need some alone time."
-\>\i[144]\}AV\{\</#"Bwahaha! Is that a threat?"
-\>\i[144]\}AV\{\</#"You're too funny. A real funny guy."
-\>\i[144]\}AV\{\</#"You're too funny. A real funny girl."
-\>\i[144]\}AV\{\</#"You're too funny. A real funny man."
-\>\i[144]\}AV\{\</#"Tsk. Charming."
+\>\i[144]\}AV\{\<^"None of your business. You're turning out to be a real bore."
+\>\i[144]\}AV\{\<^"Ever hear you talk too much?"
+\>\i[144]\}AV\{\<^"Good thing I never miss my shots then."
+\>\i[144]\}AV\{\<^"Don't I know it. Love it infact.\. Now I get to choose myself who ^I kill and when."
+\>\i[144]\}AV\{\<^"I just got out of the army. I need some alone time."
+\>\i[144]\}AV\{\<^"Bwahaha! Is that a threat?"
+\>\i[144]\}AV\{\<^"You're too funny. A real funny guy."
+\>\i[144]\}AV\{\<^"You're too funny. A real funny girl."
+\>\i[144]\}AV\{\<^"You're too funny. A real funny man."
+\>\i[144]\}AV\{\<^"Tsk. Charming."
 GabText Pav's skin begins to rot...
 GabText You've exposed the weaknesses of Pav!
 GabText You stole 10 \c[2]9mm Bullets\c[0]!
-\>\i[144]\}AV\{\</#"Sorry, you're not going anywhere."
+\>\i[144]\}AV\{\<^"Sorry, you're not going anywhere."
 GabText Pav loses his balance!
 GabText Pav is blinded! His eyes are bleeding!
 GabText Pav whips out his pistol faster than you're able to react!
-\>\i[144]\}AV\{\</#"Too slow! Too slow!"
+\>\i[144]\}AV\{\<^"Too slow! Too slow!"
 GabText Pav loses his balance.
 choice_text 2 \}[INTIMIDATE]\{ "That the size of you blade?"
-\>\i[67]\}AAN\{\</#"You want to fight? Fine."
-\>\i[67]\}AAN\{\</#"..."
-\>\i[67]\}AAN\{\</#"Nope. We're done actually."
-Daan looks irritated by you. You managed to anger him with your/#persuasion efforts.
-\>\i[67]\}AAN\{\</#"You're really giving some mixed signals here. Better get your/#story straight before picking on others."
-\>\i[67]\}AAN\{\</#"We're not really having this talk are we?"
-\>\i[67]\}AAN\{\</#"Good talk."
+\>\i[67]\}AAN\{\<^"You want to fight? Fine."
+\>\i[67]\}AAN\{\<^"..."
+\>\i[67]\}AAN\{\<^"Nope. We're done actually."
+Daan looks irritated by you. You managed to anger him with your^persuasion efforts.
+\>\i[67]\}AAN\{\<^"You're really giving some mixed signals here. Better get your^story straight before picking on others."
+\>\i[67]\}AAN\{\<^"We're not really having this talk are we?"
+\>\i[67]\}AAN\{\<^"Good talk."
 GabText Daan's skin begins to rot...
 GabText You've exposed the weaknesses of Daan!
 GabText You stole 3 \c[2]Cloth fragments\c[0], a \c[2]White vial\c[0] and a \c[2]Light blue vial\c[0]!
-\>\i[67]\}AAN\{\</#"Were you going somewhere?"
+\>\i[67]\}AAN\{\<^"Were you going somewhere?"
 GabText Daan loses his balance!
 GabText Daan is blinded! His eyes are bleeding!
 GabText Daan carefully handles his scalpel.
-\>\i[67]\}AAN\{\</#"Let's slice and dice.\| No? I thought that's something you say/#in situations like this."
+\>\i[67]\}AAN\{\<^"Let's slice and dice.\| No? I thought that's something you say^in situations like this."
 GabText Daan loses his balance.
 choice_text 1 \}[PERSUADE]\{ "I'm sure we can settle this with money, right?"
 choice_text 2 \}[INTIMIDATE]\{ "You bring a pipe to a firefight?"
 "Bring it on!"
-\>\i[66]\}ALIGURA\{\</#"I'll fuck you up you piece of shit!"
-\>\i[66]\}ALIGURA\{\</#"..."
-\>\i[66]\}ALIGURA\{\</#"How thick are ya?! Once you're lying face first on the ground, I/#can take all I want."
-\>\i[66]\}ALIGURA\{\</#"Just kneel down and it'll be over then."
-\>\i[66]\}ALIGURA\{\</#*Spit*
-\>\i[66]\}ALIGURA\{\</#"I'll call your bluff."
-Despite his words, Caligura seems to hesitate a bit and keep his/#distance.
-\>\i[66]\}ALIGURA\{\</#"I'll shove this pipe so deep you'll be taken for a cockhorse!"
+\>\i[66]\}ALIGURA\{\<^"I'll fuck you up you piece of shit!"
+\>\i[66]\}ALIGURA\{\<^"..."
+\>\i[66]\}ALIGURA\{\<^"How thick are ya?! Once you're lying face first on the ground, I^can take all I want."
+\>\i[66]\}ALIGURA\{\<^"Just kneel down and it'll be over then."
+\>\i[66]\}ALIGURA\{\<^*Spit*
+\>\i[66]\}ALIGURA\{\<^"I'll call your bluff."
+Despite his words, Caligura seems to hesitate a bit and keep his^distance.
+\>\i[66]\}ALIGURA\{\<^"I'll shove this pipe so deep you'll be taken for a cockhorse!"
 GabText Caligura's skin begins to rot...
 GabText You've exposed the weaknesses of Caligura!
 GabText You stole a \c[2]Pipe bomb\c[0]!
-\>\i[66]\}ALIGURA\{\</#"You weasel! Trying to run away!?"
+\>\i[66]\}ALIGURA\{\<^"You weasel! Trying to run away!?"
 GabText Caligura loses his balance!
 GabText Caligura is blinded! His eyes are bleeding!
 GabText Caligura swings his pipe furiously.
-\>\i[66]\}ALIGURA\{\</#"Get ready to die you fucking piece of shit."
+\>\i[66]\}ALIGURA\{\<^"Get ready to die you fucking piece of shit."
 GabText Caligura loses his balance.
 choice_text 1 \}[PERSUADE]\{ "You're a journalist, there should always be room for a talk!"
 choice_text 2 \}[INTIMIDATE]\{ "You hold on to that pistol as if it's going to save you."
 "Hope you're prepared to die."
-\>\i[74]\}ARIN\{\</#"It's no use. We are done talking."
-\>\i[74]\}ARIN\{\</#"..."
-\>\i[74]\}ARIN\{\</#"J-just shut up!"
-\>\i[74]\}ARIN\{\</#"I said we're done. You only get to burn bridges once with me."
+\>\i[74]\}ARIN\{\<^"It's no use. We are done talking."
+\>\i[74]\}ARIN\{\<^"..."
+\>\i[74]\}ARIN\{\<^"J-just shut up!"
+\>\i[74]\}ARIN\{\<^"I said we're done. You only get to burn bridges once with me."
 You managed to shake Karin's beliefs.
-\>\i[74]\}ARIN\{\</#"You've shown your colours already. It's high time you learn that/#actions have consequences!"
-\>\i[74]\}ARIN\{\</#"It's done so before, no reason to doubt why it wouldn't work here."
-\>\i[74]\}ARIN\{\</#"I've seen a lot scarier people during my time. You're nothing."
+\>\i[74]\}ARIN\{\<^"You've shown your colours already. It's high time you learn that^actions have consequences!"
+\>\i[74]\}ARIN\{\<^"It's done so before, no reason to doubt why it wouldn't work here."
+\>\i[74]\}ARIN\{\<^"I've seen a lot scarier people during my time. You're nothing."
 Looks like your intimidation tactics don't work on Karin.
 GabText Karin's skin begins to rot...
 GabText You've exposed the weaknesses of Karin!
 GabText You stole 8 \c[2]9mm Bullets\c[0]!
-\>\i[74]\}ARIN\{\</#"You had your chance! Now we fight!"
+\>\i[74]\}ARIN\{\<^"You had your chance! Now we fight!"
 GabText Karin loses her balance!
 GabText Karin is blinded! Her eyes are bleeding!
 GabText Karin cocks the gun and takes it in a firm grip.
-\>\i[74]\}ARIN\{\</#"I've killed before too. Don't think for a second that I wouldn't/#have guts to use this pistol."
+\>\i[74]\}ARIN\{\<^"I've killed before too. Don't think for a second that I wouldn't^have guts to use this pistol."
 GabText Karin loses her balance.
 choice_text 1 \}[PERSUADE]\{ "You can sense I mean no harm, right?"
 choice_text 2 \}[INTIMIDATE]\{ "What's with the pose? Are you trying to attack or dance?"
-\>\i[76]\}ARINA\{\</#"I'm not backing down anymore if that's what you're after!"
+\>\i[76]\}ARINA\{\<^"I'm not backing down anymore if that's what you're after!"
 "I thought you were going to attack me!"
 "I misread the situations..."
-\>\i[76]\}ARINA\{\</#"Well why did you attack me then? Makes no sense!"
-\>\i[76]\}ARINA\{\</#"What!?"
+\>\i[76]\}ARINA\{\<^"Well why did you attack me then? Makes no sense!"
+\>\i[76]\}ARINA\{\<^"What!?"
 "This place must be getting to my head..."
 "I was wrong?"
-\>\i[76]\}ARINA\{\</#"What are you going on about!?"
-\>\i[76]\}ARINA\{\</#"Well do something for that head of yours then!"
+\>\i[76]\}ARINA\{\<^"What are you going on about!?"
+\>\i[76]\}ARINA\{\<^"Well do something for that head of yours then!"
 Marina is backing down a bit.
-\>\i[76]\}ARINA\{\</#"Well yeah! \. What the hell?"
-\>\i[76]\}ARINA\{\</#"Right! By thinking you could take me on!"
-\>\i[76]\}ARINA\{\</#"Says the one who attacked me point blank? You've got some serious/#issues!"
-\>\i[76]\}ARINA\{\</#"(Marina, stay tough.)\. Too bad. Cry me a river."
-\>\i[76]\}ARINA\{\</#"What kind of psycho are you?"
-\>\i[76]\}ARINA\{\</#"You've got some serious issues."
+\>\i[76]\}ARINA\{\<^"Well yeah! \. What the hell?"
+\>\i[76]\}ARINA\{\<^"Right! By thinking you could take me on!"
+\>\i[76]\}ARINA\{\<^"Says the one who attacked me point blank? You've got some serious^issues!"
+\>\i[76]\}ARINA\{\<^"(Marina, stay tough.)\. Too bad. Cry me a river."
+\>\i[76]\}ARINA\{\<^"What kind of psycho are you?"
+\>\i[76]\}ARINA\{\<^"You've got some serious issues."
 Despite acting tough, her voice wavers a little bit.
-\>\i[76]\}ARINA\{\</#"You're just going on and on and on and on about this, aren't you?"
-\>\i[76]\}ARINA\{\</#"Is that's what you do on your spare time, scare kids and girls?"
+\>\i[76]\}ARINA\{\<^"You're just going on and on and on and on about this, aren't you?"
+\>\i[76]\}ARINA\{\<^"Is that's what you do on your spare time, scare kids and girls?"
 GabText Marina's skin begins to rot...
 GabText You've exposed the weaknesses of Marina!
-\>\i[76]\}ARINA\{\</#"What do you mean? You're running away? I don't think so!"
+\>\i[76]\}ARINA\{\<^"What do you mean? You're running away? I don't think so!"
 GabText Marina loses her balance!
 GabText Marina is blinded! Her eyes are bleeding!
 GabText Marina lifts her hands gently.
-\>\i[76]\}ARINA\{\</#"I don't want to do this, but fine."
+\>\i[76]\}ARINA\{\<^"I don't want to do this, but fine."
 GabText Marina loses her balance.
 "What are you doing!?"
 "Is something wrong?"
 "We don't have to fight!"
 "You'll regret attacking me!"
-\>\i[82]\}ANAKA\{\</#"..."
-Tanaka doesn't react to your words in any way. He look almost/#possessed, or crazed, or hellbent in killing you.
+\>\i[82]\}ANAKA\{\<^"..."
+Tanaka doesn't react to your words in any way. He look almost^possessed, or crazed, or hellbent in killing you.
 GabText Without a word, Tanaka keep on marching towards you.
 choice_text 1 \}[PERSUADE]\{ "The war is over, we don't need to do this!"
 choice_text 2 \}[INTIMIDATE]\{ "You survived the war just to die here and now?"
-\>\i[75]\}EVI\{\</#"..."
+\>\i[75]\}EVI\{\<^"..."
 "Just hold it! I'm sure we can find an understanding here!"
 "Prepared to die, soldier?"
 Levi doesn't seem interested in talk.
@@ -1182,7 +1182,7 @@ Levi doesn't show any signs of fear.
 GabText Levi's skin begins to rot...
 GabText You've exposed the weaknesses of Levi!
 GabText You stole 10 \c[2].303 Ammo\c[0]!
-\>\i[75]\}EVI\{\</#"I can't let you go... Not anymore."
+\>\i[75]\}EVI\{\<^"I can't let you go... Not anymore."
 GabText Levi loses his balance!
 GabText Levi is blinded! His eyes are bleeding!
 GabText Levi takes a low stance with his rifle...
@@ -1193,40 +1193,40 @@ choice_text 4 \}[INTIMIDATE]\{ "You travelled all the way here just to get kille
 "What gods do you follow?"
 "Can you teach me magic?"
 "Your tricks won't save you here."
-\>\i[78]\}'SAA\{\</#"Let's see how the stars align...\. Looks like it's your time to /#go my friend."
+\>\i[78]\}'SAA\{\<^"Let's see how the stars align...\. Looks like it's your time to ^go my friend."
 "You have greater understading of this situation..."
 "Could I be of any assistance to you?"
-\>\i[78]\}'SAA\{\</#"I'm not above flattery. Please do go on..."
+\>\i[78]\}'SAA\{\<^"I'm not above flattery. Please do go on..."
 "Your otherwordly powers are beyond anything I've seen before."
 "You looks and attire create a strong impression."
-\>\i[78]\}'SAA\{\</#"Right, right. What else?"
-\>\i[78]\}'SAA\{\</#"And I've barely even shown you anything yet!"
-\>\i[78]\}'SAA\{\</#"I would like to think so yes..."
-\>\i[78]\}'SAA\{\</#"..."
-\>\i[78]\}'SAA\{\</#"But enough is enough. Your flattery will get you nowhere but/#grave fast.
+\>\i[78]\}'SAA\{\<^"Right, right. What else?"
+\>\i[78]\}'SAA\{\<^"And I've barely even shown you anything yet!"
+\>\i[78]\}'SAA\{\<^"I would like to think so yes..."
+\>\i[78]\}'SAA\{\<^"..."
+\>\i[78]\}'SAA\{\<^"But enough is enough. Your flattery will get you nowhere but^grave fast.
 Looks like your persuasion and flattery won't work on O'saa.
-\>\i[78]\}'SAA\{\</#"Ah, enough with the flattery? Straight to your exit strategy?"
-\>\i[78]\}'SAA\{\</#"The festival demands self-reliance. I have no use for you in /#other words."
-\>\i[78]\}'SAA\{\</#"Ah, enough with the flattery? Shame."
-\>\i[78]\}'SAA\{\</#"I'm going to save you some time. Just don't bother."
-\>\i[78]\}'SAA\{\</#"The time for words is over. You chose this fate for yourself."
-\>\i[78]\}'SAA\{\</#"A yellow mage does not follow gods. You must confuse us with the/#feeble and immoral priests that inhabit the west."
+\>\i[78]\}'SAA\{\<^"Ah, enough with the flattery? Straight to your exit strategy?"
+\>\i[78]\}'SAA\{\<^"The festival demands self-reliance. I have no use for you in ^other words."
+\>\i[78]\}'SAA\{\<^"Ah, enough with the flattery? Shame."
+\>\i[78]\}'SAA\{\<^"I'm going to save you some time. Just don't bother."
+\>\i[78]\}'SAA\{\<^"The time for words is over. You chose this fate for yourself."
+\>\i[78]\}'SAA\{\<^"A yellow mage does not follow gods. You must confuse us with the^feeble and immoral priests that inhabit the west."
 "Who do you follow then?"
 "But how can you use magic then?"
-\>\i[78]\}'SAA\{\</#"There is a reason why their reign is heading towards its end./#Such weakness."
-\>\i[78]\}'SAA\{\</#"A yellow mage dedicates their life to improving self and studying/#the endless depths of wizardry. We are our own masters."
-\>\i[78]\}'SAA\{\</#"We bend the will of the gods to our own benefit."
-\>\i[78]\}'SAA\{\</#"The forces you call the older gods... They are just that, like/#forces of nature."
-\>\i[78]\}'SAA\{\</#"A blacksmith doesn't pray for Vinushka to bend his iron, he/#harnesses the flame and does it himself."
-\>\i[78]\}'SAA\{\</#"You truly have the nerves of steel. Asking for me to mentor you/#in the middle of a battle."
-\>\i[78]\}'SAA\{\</#"Watch and learn."
-\>\i[78]\}'SAA\{\</#"And I would do it again just to deal with you."
-\>\i[78]\}'SAA\{\</#"You cannot begin to understand what I've witnessed. A mere mortal/#like you cannot intimidate me."
-\>\i[78]\}'SAA\{\</#"You haven't got the slightest clue what my little tricks can/#achieve."
-\>\i[78]\}'SAA\{\</#"Once you do, it is too late for you already I'm afraid."
+\>\i[78]\}'SAA\{\<^"There is a reason why their reign is heading towards its end.^Such weakness."
+\>\i[78]\}'SAA\{\<^"A yellow mage dedicates their life to improving self and studying^the endless depths of wizardry. We are our own masters."
+\>\i[78]\}'SAA\{\<^"We bend the will of the gods to our own benefit."
+\>\i[78]\}'SAA\{\<^"The forces you call the older gods... They are just that, like^forces of nature."
+\>\i[78]\}'SAA\{\<^"A blacksmith doesn't pray for Vinushka to bend his iron, he^harnesses the flame and does it himself."
+\>\i[78]\}'SAA\{\<^"You truly have the nerves of steel. Asking for me to mentor you^in the middle of a battle."
+\>\i[78]\}'SAA\{\<^"Watch and learn."
+\>\i[78]\}'SAA\{\<^"And I would do it again just to deal with you."
+\>\i[78]\}'SAA\{\<^"You cannot begin to understand what I've witnessed. A mere mortal^like you cannot intimidate me."
+\>\i[78]\}'SAA\{\<^"You haven't got the slightest clue what my little tricks can^achieve."
+\>\i[78]\}'SAA\{\<^"Once you do, it is too late for you already I'm afraid."
 GabText O'saa's skin begins to rot...
 GabText You've exposed the weaknesses of O'saa!
-\>\i[78]\}'SAA\{\</#"No use. My hurting will reach you even if you ran away."
+\>\i[78]\}'SAA\{\<^"No use. My hurting will reach you even if you ran away."
 GabText O'saa loses his balance!
 GabText O'saa is blinded! His eyes are bleeding!
 GabText O'saa begins his ritual dance. An ominous aura fills the air.
@@ -1234,127 +1234,127 @@ GabText O'saa loses his balance.
 choice_text 1 \}[PERSUADE]\{ "This was all just a misunderstanding! I'm so sorry!"
 choice_text 3 \}[INTIMIDATE]\{ "Ready to meet your maker, old man?"
 "Why are you doing this?"
-\>\i[64]\}UGUST\{\</#"I'm giving you 30 seconds to make your case,\. go!"
-\>\i[64]\}UGUST\{\</#"..."
-\>\i[64]\}UGUST\{\</#*Sigh*
+\>\i[64]\}UGUST\{\<^"I'm giving you 30 seconds to make your case,\. go!"
+\>\i[64]\}UGUST\{\<^"..."
+\>\i[64]\}UGUST\{\<^*Sigh*
 "We both lower our weapons and move to our separate ways."
 "Just lower your bow first and then we can talk."
 "I'll do whatever you want."
-\>\i[64]\}UGUST\{\</#"How do you suppose we deal with this then?"
-\>\i[64]\}UGUST\{\</#"I'm not lowering anything as of now."
-\>\i[64]\}UGUST\{\</#"Looks like we go a stalemate..."
+\>\i[64]\}UGUST\{\<^"How do you suppose we deal with this then?"
+\>\i[64]\}UGUST\{\<^"I'm not lowering anything as of now."
+\>\i[64]\}UGUST\{\<^"Looks like we go a stalemate..."
 August looks to be thinking of his next move...
-\>\i[64]\}UGUST\{\</#"Not going to happen."
-\>\i[64]\}UGUST\{\</#"I can't just attack a defenseless opponent, now can I?"
-\>\i[64]\}UGUST\{\</#"I understand your intentions loud and clear now."
-\>\i[64]\}UGUST\{\</#"Our understanding crumbled the moment you lifted your sword against/#me."
-\>\i[64]\}UGUST\{\</#"You are blaming me for this?"
-\>\i[64]\}UGUST\{\</#"Sure, if it helps you sleep better at night."
-\>\i[64]\}UGUST\{\</#"What an ugly tone you got there. I bet you've been practicing that /#intimidation tone in front of a mirror, am I wrong?"
-\>\i[64]\}UGUST\{\</#"Too bad I've seen horrors beyond comprehension on my travels. No /#man can intimidate me at this point."
-\>\i[64]\}UGUST\{\</#"But don't fret. I'm sure your voice might've had effect on me/#when I was still a wee lad."
-\>\i[64]\}UGUST\{\</#"You're full of clichés young man.
-\>\i[64]\}UGUST\{\</#"You're full of clichés my dear lady."
+\>\i[64]\}UGUST\{\<^"Not going to happen."
+\>\i[64]\}UGUST\{\<^"I can't just attack a defenseless opponent, now can I?"
+\>\i[64]\}UGUST\{\<^"I understand your intentions loud and clear now."
+\>\i[64]\}UGUST\{\<^"Our understanding crumbled the moment you lifted your sword against^me."
+\>\i[64]\}UGUST\{\<^"You are blaming me for this?"
+\>\i[64]\}UGUST\{\<^"Sure, if it helps you sleep better at night."
+\>\i[64]\}UGUST\{\<^"What an ugly tone you got there. I bet you've been practicing that ^intimidation tone in front of a mirror, am I wrong?"
+\>\i[64]\}UGUST\{\<^"Too bad I've seen horrors beyond comprehension on my travels. No ^man can intimidate me at this point."
+\>\i[64]\}UGUST\{\<^"But don't fret. I'm sure your voice might've had effect on me^when I was still a wee lad."
+\>\i[64]\}UGUST\{\<^"You're full of clichés young man.
+\>\i[64]\}UGUST\{\<^"You're full of clichés my dear lady."
 GabText August's skin begins to rot...
 GabText You've exposed the weaknesses of August!
 GabText You stole 3 \c[2]Bear traps\c[0]!
-\>\i[64]\}UGUST\{\</#"You think you can outrun my arrows?"
+\>\i[64]\}UGUST\{\<^"You think you can outrun my arrows?"
 GabText August loses his balance!
 GabText August is blinded! His eyes are bleeding!
 GabText August takes an arrow and slowly but firmly loads his bow.
-\>\i[64]\}UGUST\{\</#"Only one arrow. That is all I need."
+\>\i[64]\}UGUST\{\<^"Only one arrow. That is all I need."
 GabText August loses his balance.
-\>\i[64]\}UGUST\{\</#"You're still adamant about this? So be it."
-\>\i[64]\}UGUST\{\</#"Let's see you dodge the next one..."
+\>\i[64]\}UGUST\{\<^"You're still adamant about this? So be it."
+\>\i[64]\}UGUST\{\<^"Let's see you dodge the next one..."
 GabText You dodge the arrow just barely!
-\>\i[81]\}AMARIE\{\</#"\N[3]..."
-\>\i[81]\}AMARIE\{\</#"Why...?"
+\>\i[81]\}AMARIE\{\<^"\N[3]..."
+\>\i[81]\}AMARIE\{\<^"Why...?"
 "You're right. Just stand back and I'll do the same!"
 "Oh yes we do!"
 "You should've thought of that before."
-\>\i[81]\}AMARIE\{\</#"\N[3]! We don't have to do this!"
-\>\i[81]\}AMARIE\{\</#"..."
-\>\i[81]\}AMARIE\{\</#"I trust you. Please... Things don't have to go like this..."
-Samarie is lowering her stance, but something tells you that the/#danger is not over yet. But this might be your chance.
-\>\i[81]\}AMARIE\{\</#"Thank you, thank you \N[3]..."
-\>\i[81]\}AMARIE\{\</#"B-but... What will it take for you to believe me?"
-\>\i[81]\}AMARIE\{\</#"Can't you see I'd do anything for you!"
+\>\i[81]\}AMARIE\{\<^"\N[3]! We don't have to do this!"
+\>\i[81]\}AMARIE\{\<^"..."
+\>\i[81]\}AMARIE\{\<^"I trust you. Please... Things don't have to go like this..."
+Samarie is lowering her stance, but something tells you that the^danger is not over yet. But this might be your chance.
+\>\i[81]\}AMARIE\{\<^"Thank you, thank you \N[3]..."
+\>\i[81]\}AMARIE\{\<^"B-but... What will it take for you to believe me?"
+\>\i[81]\}AMARIE\{\<^"Can't you see I'd do anything for you!"
 choice_text 1 \}[PERSUADE]\{ "You were in the train too! Me too! We're on the same side!"
 choice_text 2 \}[INTIMIDATE]\{ "I'll teach you to creep around, you freak!"
 "What's your deal anyway?"
-\>\i[81]\}AMARIE\{\</#"O-oh... You saw me?"
-\>\i[81]\}AMARIE\{\</#"What do you want?"
-\>\i[81]\}AMARIE\{\</#"Actually, no!"
-\>\i[81]\}AMARIE\{\</#"No! No! I can't trust you. I can't trust anyone!"
+\>\i[81]\}AMARIE\{\<^"O-oh... You saw me?"
+\>\i[81]\}AMARIE\{\<^"What do you want?"
+\>\i[81]\}AMARIE\{\<^"Actually, no!"
+\>\i[81]\}AMARIE\{\<^"No! No! I can't trust you. I can't trust anyone!"
 Samarie is in a confused state. Now's your chance!
-\>\i[81]\}AMARIE\{\</#"N-no! No! This is all your fault!"
+\>\i[81]\}AMARIE\{\<^"N-no! No! This is all your fault!"
 Samarie's expression tightens.
-\>\i[81]\}AMARIE\{\</#"Ack!"
-\>\i[81]\}AMARIE\{\</#"W-who do you think... Who do you think you're calling a freak!?"
+\>\i[81]\}AMARIE\{\<^"Ack!"
+\>\i[81]\}AMARIE\{\<^"W-who do you think... Who do you think you're calling a freak!?"
 You just managed to anger Samarie with your intimidation efforts.
 Your intimidation efforts don't seem to work on her.
 GabText Samarie's skin begins to rot...
 GabText You've exposed the weaknesses of Samarie!
 GabText You stole a \c[2]Soul stone shard\c[0] and a \c[2]Fly amanita\c[0]!
-\>\i[81]\}AMARIE\{\</#"... Don't..."
-\>\i[81]\}AMARIE\{\</#"\N[3]! P-please! I... I... love you..."
+\>\i[81]\}AMARIE\{\<^"... Don't..."
+\>\i[81]\}AMARIE\{\<^"\N[3]! P-please! I... I... love you..."
 GabText Samarie loses her balance!
 GabText Samarie is blinded! Her eyes are bleeding!
 GabText Samarie slowly creeps around you...
-\>\i[81]\}AMARIE\{\</#"\}\N[3]...\{"
-\>\i[81]\}AMARIE\{\</#"Why would you do this!?"
+\>\i[81]\}AMARIE\{\<^"\}\N[3]...\{"
+\>\i[81]\}AMARIE\{\<^"Why would you do this!?"
 GabText Samarie loses her balance.
-\>\i[144]\}AV\{\</#"What the hell are you talking about!?"
-\>\i[144]\}AV\{\</#"What are you going on about!? You're the one who attacked me!"
-\>\i[144]\}AV\{\</#"Did you hit your head or what!?"
-\>\i[144]\}AV\{\</#"You're the one who attacked me!"
-\>\i[144]\}AV\{\</#"I'll give you some handicap out of kindness. I'll finish this with/#my left hand only."
-\>\i[76]\}ARINA\{\</#"I'LL SWALLOW YOU WHOLE!"
-\>\i[76]\}ARINA\{\</#"S-SWALLOW!"
-\>\i[76]\}ARINA\{\</#"YOU WHOLE!"
-\>\i[76]\}ARINA\{\</#"SWALLOW! SWALLOW YOU WHOLE!"
-\>\i[76]\}ECHANICAL DANCE\{\</#"Freak..."
-\>\i[76]\}ECHANICAL DANCE\{\</#"I'm a... monster."
-\>\i[76]\}ECHANICAL DANCE\{\</#"I AM A FREAK. A MONSTER!"
+\>\i[144]\}AV\{\<^"What the hell are you talking about!?"
+\>\i[144]\}AV\{\<^"What are you going on about!? You're the one who attacked me!"
+\>\i[144]\}AV\{\<^"Did you hit your head or what!?"
+\>\i[144]\}AV\{\<^"You're the one who attacked me!"
+\>\i[144]\}AV\{\<^"I'll give you some handicap out of kindness. I'll finish this with^my left hand only."
+\>\i[76]\}ARINA\{\<^"I'LL SWALLOW YOU WHOLE!"
+\>\i[76]\}ARINA\{\<^"S-SWALLOW!"
+\>\i[76]\}ARINA\{\<^"YOU WHOLE!"
+\>\i[76]\}ARINA\{\<^"SWALLOW! SWALLOW YOU WHOLE!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"Freak..."
+\>\i[76]\}ECHANICAL DANCE\{\<^"I'm a... monster."
+\>\i[76]\}ECHANICAL DANCE\{\<^"I AM A FREAK. A MONSTER!"
 "I won't, just calm down!"
 "What on earth has happened to you?"
-\>\i[76]\}ECHANICAL DANCE\{\</#"DON'T LOOK AT ME!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"DON'T LOOK AT ME!"
 Close your eyes
 "Why?"
-\>\i[76]\}ECHANICAL DANCE\{\</#"D-DON'T! LOOK! AT! ME!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"D-DON'T! LOOK! AT! ME!"
 Your body... You cannot move.
-\>\i[76]\}ECHANICAL DANCE\{\</#"I'M A MONSTROSITY! AN ABOMINATION!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"I'M A MONSTROSITY! AN ABOMINATION!"
 \}[INTIMIDATE]\{ "Enough with the self-pity, you're a true eyesore, a freak!"
-\>\i[76]\}ECHANICAL DANCE\{\</#"PART MACHINE! BARELY HUMAN!"
-\>\i[76]\}ECHANICAL DANCE\{\</#"!!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"PART MACHINE! BARELY HUMAN!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"!!"
 The mechanical dance seems shaken by your words...
-\>\i[76]\}ECHANICAL DANCE\{\</#"HAPPENED!?"
-\>\i[76]\}ECHANICAL DANCE\{\</#"I'VE BEEN THIS WAY FOREVER!"
+\>\i[76]\}ECHANICAL DANCE\{\<^"HAPPENED!?"
+\>\i[76]\}ECHANICAL DANCE\{\<^"I'VE BEEN THIS WAY FOREVER!"
 GabText The rot doesn't seem to affect the Mechanical dance.
 GabText You can't figure out the weakness of the Mechanical dance...
 GabText You stole \c[2]Condensed green\c[0], \c[2]Condensed blue\c[0]...
 GabText And \c[2]Condensed lavender\c[0]!
 GabText The thing is blinded! Her eyes are bleeding!
 GabText The Mechanical dance slowly approaches you...
-\>\i[73]\}UDGEMENT\{\</#"Morning waits no one. Morning has gold in store, in its mouth."
+\>\i[73]\}UDGEMENT\{\<^"Morning waits no one. Morning has gold in store, in its mouth."
 "Are you alright...? You look injured."
 "That sounds familiar. Did you fill this \c[2]Crosswords puzzle\c[0]?"
-\>\i[73]\}UDGEMENT\{\</#"The grind never stops!"
-\>\i[73]\}UDGEMENT\{\</#"Work it. Harder, faster, so you get stronger."
+\>\i[73]\}UDGEMENT\{\<^"The grind never stops!"
+\>\i[73]\}UDGEMENT\{\<^"Work it. Harder, faster, so you get stronger."
 "There is more to life than work."
 "Can't argue with that one."
-\>\i[73]\}UDGEMENT\{\</#"The world doesn't wait still as the weak loiter around."
-\>\i[73]\}UDGEMENT\{\</#"If it helps you sleep at night, you can keep convincing yourself/#of that."
-\>\i[73]\}UDGEMENT\{\</#"But don't sleep late, the morning glimmers of gold."
-\>\i[73]\}UDGEMENT\{\</#"I only deal with absolute truths."
-\>\i[73]\}UDGEMENT\{\</#"I have no time for child's play."
-\>\i[73]\}UDGEMENT\{\</#"This place... It has awakened something in me..."
-\>\i[73]\}UDGEMENT\{\</#"What you see on the outside is but a fraction of the change I've/#gone through."
-\>\i[73]\}UDGEMENT\{\</#"I've gone through the glass ceiling that once might have hindered/#me."
-\>\i[73]\}UDGEMENT\{\</#"Can you see me now father!?"
-\>\i[73]\}UDGEMENT\{\</#"What of it?"
-\>\i[73]\}UDGEMENT\{\</#"Back when I first arrived here, I lacked the ambition and determination."
-\>\i[73]\}UDGEMENT\{\</#"I would waste my time on this planet on the most useless of things."
+\>\i[73]\}UDGEMENT\{\<^"The world doesn't wait still as the weak loiter around."
+\>\i[73]\}UDGEMENT\{\<^"If it helps you sleep at night, you can keep convincing yourself^of that."
+\>\i[73]\}UDGEMENT\{\<^"But don't sleep late, the morning glimmers of gold."
+\>\i[73]\}UDGEMENT\{\<^"I only deal with absolute truths."
+\>\i[73]\}UDGEMENT\{\<^"I have no time for child's play."
+\>\i[73]\}UDGEMENT\{\<^"This place... It has awakened something in me..."
+\>\i[73]\}UDGEMENT\{\<^"What you see on the outside is but a fraction of the change I've^gone through."
+\>\i[73]\}UDGEMENT\{\<^"I've gone through the glass ceiling that once might have hindered^me."
+\>\i[73]\}UDGEMENT\{\<^"Can you see me now father!?"
+\>\i[73]\}UDGEMENT\{\<^"What of it?"
+\>\i[73]\}UDGEMENT\{\<^"Back when I first arrived here, I lacked the ambition and determination."
+\>\i[73]\}UDGEMENT\{\<^"I would waste my time on this planet on the most useless of things."
 GabText The skin of the Judgement begins to rot...
 GabText You can't figure out the weaknesses of the judgement...
 GabText You stole 5 \c[2]Glass shards\c[0]!
@@ -1363,18 +1363,18 @@ GabText The judgement marches towards you without hesitation.
 GabText The judgement loses his balance.
 choice_text 1 \}[PERSUADE]\{ "Don't do anything more you'd regret later!"
 choice_text 1 "Don't do this! There's no need for violence!"
-\>\i[70]\}IANT\{\</#"G-GUILT! GUILT!"
+\>\i[70]\}IANT\{\<^"G-GUILT! GUILT!"
 "Please don't do this!"
 "Just calm down! There's no need for violence!"
 "A raging beast should be put down."
-The giant is furiously shaking its head... It doesn't seem very/#receptive at the moment...
-The body of the monstrosity is contracting violently! Your words/#don't seem to have a positive effect any longer. If anything the/#thing seems to get even more furious from your persuasion.
-The movements of the monstrosity are slowing down... It seems to/#doubt its conviction in killing you...
+The giant is furiously shaking its head... It doesn't seem very^receptive at the moment...
+The body of the monstrosity is contracting violently! Your words^don't seem to have a positive effect any longer. If anything the^thing seems to get even more furious from your persuasion.
+The movements of the monstrosity are slowing down... It seems to^doubt its conviction in killing you...
 You are able to pacify the giant just a little bit...
-The whole body of the monstrosity is contracting. It seems to feed/#off of its own rage and violence.
-Although you do recognize a slight hint of comprehension buried deep/#within the hulking beast...
-The giant seems to be calming down a little bit... But just a little/#bit. It's still clearly after you.
-\>\i[70]\}IANT\{\</#"Mmggraaaaawh!!!"
+The whole body of the monstrosity is contracting. It seems to feed^off of its own rage and violence.
+Although you do recognize a slight hint of comprehension buried deep^within the hulking beast...
+The giant seems to be calming down a little bit... But just a little^bit. It's still clearly after you.
+\>\i[70]\}IANT\{\<^"Mmggraaaaawh!!!"
 The creature doesn't seem to calm down.
 Your threats go to deaf ears.
 GabText The skin of the Giant begins to rot...
@@ -1384,108 +1384,108 @@ GabText The hulking creature eminates rage and violence!
 GabText The Giant loses its balance.
 GabText The head of the giant pushes out from its socket.
 GabText You dodge the fists of the giant!
-\>\i[144]\}OCKETCAT\{\</#"I've given these past few days some thought and...\. I can't really/#put my finger on it. There's something awfully familiar about all/#of this, don't you think old sport?"
-\>\i[144]\}OCKETCAT\{\</#"I've got this weird sense of déjà vu from the most random of/#things."
-\>\i[144]\}OCKETCAT\{\</#"Like please do stop me if you've heard this before - There is/#an ominous moon staring down on us, this term 'Termina' thrown/#around awfully lot..."
-\>\i[144]\}OCKETCAT\{\</#"...The accidental inclusion of Bremen army to all this, the/#three day time limit... And did you get to see those lovely owl /#cultist chaps yet?"
+\>\i[144]\}OCKETCAT\{\<^"I've given these past few days some thought and...\. I can't really^put my finger on it. There's something awfully familiar about all^of this, don't you think old sport?"
+\>\i[144]\}OCKETCAT\{\<^"I've got this weird sense of déjà vu from the most random of^things."
+\>\i[144]\}OCKETCAT\{\<^"Like please do stop me if you've heard this before - There is^an ominous moon staring down on us, this term 'Termina' thrown^around awfully lot..."
+\>\i[144]\}OCKETCAT\{\<^"...The accidental inclusion of Bremen army to all this, the^three day time limit... And did you get to see those lovely owl ^cultist chaps yet?"
 "...Familiar!"
 "I don't know what you're talking about."
-\>\i[144]\}OCKETCAT\{\</#"It's all just so--"
-\>\i[144]\}OCKETCAT\{\</#"Right!!"
-\>\i[144]\}OCKETCAT\{\</#"I'm so glad to have met you! There is some sssserious brain /#leakage going on between the two of us!"
-\>\i[144]\}OCKETCAT\{\</#"Oh...?"
-\>\i[144]\}OCKETCAT\{\</#"You're not seeing what I'm seeing?"
-\>\i[144]\}OCKETCAT\{\</#"Hm. Ain't that a pickle to suckle on?"
-\>\i[144]\}OCKETCAT\{\</#"It's all just so familiar, isn't it?"
-\>\i[144]\}OCKETCAT\{\</#"That has lead me to think how myths and legends are born in/#the first place."
-\>\i[144]\}OCKETCAT\{\</#"Everyone knows the classics that originate from mere fairy tales/#told to children before their bedtime. I would be one to know/#them better than many, if you catch my drift my dear friend."
-\>\i[144]\}OCKETCAT\{\</#"Time took those tales and kept telling them again and again./#Like a good broken telephone, the stories took new forms depending/#on who was telling them."
-\>\i[144]\}OCKETCAT\{\</#"The living pictures we see on the silver screen would barely be/#recognizable to the sweet little children folk who first heard /#the tales hundreds of years ago, told by their mothers."
-\>\i[144]\}OCKETCAT\{\</#"It's a wild ride for sure. What do you think will happen to/#modern tales crafted straight to the silver screen in this day/#and age?"
-\>\i[144]\}OCKETCAT\{\</#"Are we going to take elements from those stories and keep honing/#them to perfection as well? Let the good old broken telephone keep/#the good bits while we selfishly craft new meat around them?"
-\>\i[144]\}OCKETCAT\{\</#"Are we going to see this ill-tempered (rightly so), pale old moon/#threat mankind time and time again with his strict three day limit?"
-\>\i[144]\}OCKETCAT\{\</#"Are we going to dress into these silly masks and act the parts/#meant for the people that came before us?"
-\>\i[144]\}OCKETCAT\{\</#"What do you reckon, love?"
-You read his mind.../#\c[1]"I did it! I dropped the 'L' bomb! What a rush!"\c[0]
-You read his mind.../#\c[1]"I'd tap my back if my tapping hand wasn't so deep in my/#pocket..."\c[0]
-You read his mind.../#\c[1]"Maybe you can do it in my stead, you little eavesdropper?\./#Or you rather dig into my pocket while I tap myself?"\c[0]
-You read his mind.../#\c[1]"I jest. I jest. Don't worry, we both share the same gift of /#eavesdropping. Let us get back to our subject."\c[0]
+\>\i[144]\}OCKETCAT\{\<^"It's all just so--"
+\>\i[144]\}OCKETCAT\{\<^"Right!!"
+\>\i[144]\}OCKETCAT\{\<^"I'm so glad to have met you! There is some sssserious brain ^leakage going on between the two of us!"
+\>\i[144]\}OCKETCAT\{\<^"Oh...?"
+\>\i[144]\}OCKETCAT\{\<^"You're not seeing what I'm seeing?"
+\>\i[144]\}OCKETCAT\{\<^"Hm. Ain't that a pickle to suckle on?"
+\>\i[144]\}OCKETCAT\{\<^"It's all just so familiar, isn't it?"
+\>\i[144]\}OCKETCAT\{\<^"That has lead me to think how myths and legends are born in^the first place."
+\>\i[144]\}OCKETCAT\{\<^"Everyone knows the classics that originate from mere fairy tales^told to children before their bedtime. I would be one to know^them better than many, if you catch my drift my dear friend."
+\>\i[144]\}OCKETCAT\{\<^"Time took those tales and kept telling them again and again.^Like a good broken telephone, the stories took new forms depending^on who was telling them."
+\>\i[144]\}OCKETCAT\{\<^"The living pictures we see on the silver screen would barely be^recognizable to the sweet little children folk who first heard ^the tales hundreds of years ago, told by their mothers."
+\>\i[144]\}OCKETCAT\{\<^"It's a wild ride for sure. What do you think will happen to^modern tales crafted straight to the silver screen in this day^and age?"
+\>\i[144]\}OCKETCAT\{\<^"Are we going to take elements from those stories and keep honing^them to perfection as well? Let the good old broken telephone keep^the good bits while we selfishly craft new meat around them?"
+\>\i[144]\}OCKETCAT\{\<^"Are we going to see this ill-tempered (rightly so), pale old moon^threat mankind time and time again with his strict three day limit?"
+\>\i[144]\}OCKETCAT\{\<^"Are we going to dress into these silly masks and act the parts^meant for the people that came before us?"
+\>\i[144]\}OCKETCAT\{\<^"What do you reckon, love?"
+You read his mind...^\c[1]"I did it! I dropped the 'L' bomb! What a rush!"\c[0]
+You read his mind...^\c[1]"I'd tap my back if my tapping hand wasn't so deep in my^pocket..."\c[0]
+You read his mind...^\c[1]"Maybe you can do it in my stead, you little eavesdropper?\.^Or you rather dig into my pocket while I tap myself?"\c[0]
+You read his mind...^\c[1]"I jest. I jest. Don't worry, we both share the same gift of ^eavesdropping. Let us get back to our subject."\c[0]
 "The stories will keep on changing with times..."
 "We will stick to the originals."
 "There will always be someone to rip off popular stories."
 "The stories will only briefly live in this day and then vanish."
 "I don't care."
-\>\i[144]\}OCKETCAT\{\</#"I genuinely don't know myself..."
-\>\i[144]\}OCKETCAT\{\</#"Hmm... It's food for thought, that's for sure."
+\>\i[144]\}OCKETCAT\{\<^"I genuinely don't know myself..."
+\>\i[144]\}OCKETCAT\{\<^"Hmm... It's food for thought, that's for sure."
 GabText The skin of the Pocketcat begins to rot...
 GabText You can't figure out the weaknesses of the Pocketcat...
 GabText You stole a \c[2]Catnip\c[0]!
-\>\i[144]\}OCKETCAT\{\</#"Oh you nicked that one? Sure thing old chap, you can keep it."
-\>\i[144]\}OCKETCAT\{\</#"I got plenty more. My pockets are very deep you see..."
+\>\i[144]\}OCKETCAT\{\<^"Oh you nicked that one? Sure thing old chap, you can keep it."
+\>\i[144]\}OCKETCAT\{\<^"I got plenty more. My pockets are very deep you see..."
 GabText Pocketcat is blinded! Its eyes are bleeding!
-\>\i[144]\}OCKETCAT\{\</#"Is that a way to treat a fellow gentleman?"
-\>\i[144]\}OCKETCAT\{\</#"Oh behave!"
+\>\i[144]\}OCKETCAT\{\<^"Is that a way to treat a fellow gentleman?"
+\>\i[144]\}OCKETCAT\{\<^"Oh behave!"
 GabText The Pocketcat gives you a genuine smile.
 GabText The Pocketcat loses his balance.
-\>\i[144]\}OCKETCAT\{\</#"We've got quite a pickle here."
-\>\i[144]\}OCKETCAT\{\</#"You see my master has made it very very VERY clear that I shall /#not let my dirty little paws affect the course of events during the/#festival..."
-\>\i[144]\}OCKETCAT\{\</#"But what is a gentleman duel without an adrenaline rush of an/#excitement?"
-\>\i[144]\}OCKETCAT\{\</#"I cannot just stand here idle, now can I old sport?"
-\>\i[144]\}OCKETCAT\{\</#"So~ I came up with the most perfect solution!"
-\>\i[144]\}OCKETCAT\{\</#"If YOU tell me what to do, I'm just following your wishes, right?/#Right!?"
+\>\i[144]\}OCKETCAT\{\<^"We've got quite a pickle here."
+\>\i[144]\}OCKETCAT\{\<^"You see my master has made it very very VERY clear that I shall ^not let my dirty little paws affect the course of events during the^festival..."
+\>\i[144]\}OCKETCAT\{\<^"But what is a gentleman duel without an adrenaline rush of an^excitement?"
+\>\i[144]\}OCKETCAT\{\<^"I cannot just stand here idle, now can I old sport?"
+\>\i[144]\}OCKETCAT\{\<^"So~ I came up with the most perfect solution!"
+\>\i[144]\}OCKETCAT\{\<^"If YOU tell me what to do, I'm just following your wishes, right?^Right!?"
 "Rip my arm."
 "Rip my leg."
 "Behead me."
 "I don't want you to do anything!"
-\>\i[144]\}OCKETCAT\{\</#"So tell me - Which limb would you have me remove? Do not worry,/#my touch is gentle yet firm."
-\>\i[144]\}OCKETCAT\{\</#"I can't just be choosing your arms all the time. There are no/#loop holes in this little game of ours."
-\>\i[144]\}OCKETCAT\{\</#"Now be a good sport and choose something else. No one likes a /#bad loser or a cheater."
-\>\i[144]\}OCKETCAT\{\</#"Arms it is~! Your wish is my command."
-\>\i[144]\}OCKETCAT\{\</#"I can't just be choosing your legs all the time. There are no/#loop holes in this little game of ours."
-\>\i[144]\}OCKETCAT\{\</#"Legs it is~! Your wish is my command."
-\>\i[144]\}OCKETCAT\{\</#"Head it is~! Your wish is my command."
-\>\i[144]\}OCKETCAT\{\</#"Oh what poppycock! Sure you do. Don't be shy!"
-\>\i[144]\}OCKETCAT\{\</#"You.\.\. Oh you're my chosen one."
-\>\i[144]\}OCKETCAT\{\</#"Let's have a little one-to-one, shall we?"
-Pocketcat is whispering his secrets to you...\./#Oh no...\! It can't be!\! Outrageous!\! You feel sick!\! No more! Please!
-All manner of emotions and knee jerk reactions tingle your spine as /#Pocketcat's secrets invade your mind. Not much unlike his fingers /#that invaded your privacy last night.
+\>\i[144]\}OCKETCAT\{\<^"So tell me - Which limb would you have me remove? Do not worry,^my touch is gentle yet firm."
+\>\i[144]\}OCKETCAT\{\<^"I can't just be choosing your arms all the time. There are no^loop holes in this little game of ours."
+\>\i[144]\}OCKETCAT\{\<^"Now be a good sport and choose something else. No one likes a ^bad loser or a cheater."
+\>\i[144]\}OCKETCAT\{\<^"Arms it is~! Your wish is my command."
+\>\i[144]\}OCKETCAT\{\<^"I can't just be choosing your legs all the time. There are no^loop holes in this little game of ours."
+\>\i[144]\}OCKETCAT\{\<^"Legs it is~! Your wish is my command."
+\>\i[144]\}OCKETCAT\{\<^"Head it is~! Your wish is my command."
+\>\i[144]\}OCKETCAT\{\<^"Oh what poppycock! Sure you do. Don't be shy!"
+\>\i[144]\}OCKETCAT\{\<^"You.\.\. Oh you're my chosen one."
+\>\i[144]\}OCKETCAT\{\<^"Let's have a little one-to-one, shall we?"
+Pocketcat is whispering his secrets to you...\.^Oh no...\! It can't be!\! Outrageous!\! You feel sick!\! No more! Please!
+All manner of emotions and knee jerk reactions tingle your spine as ^Pocketcat's secrets invade your mind. Not much unlike his fingers ^that invaded your privacy last night.
 You are shocked and paralyzed. Of fear or confusion? No one knows.
-Pocketcat is whispering his secrets to \N[1]...\./#\N[1] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[3]...\./#\N[3] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[4]...\./#\N[4] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[5]...\./#\N[5] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[6]...\./#\N[6] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[7]...\./#\N[7] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[10]...\./#\N[10] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[13]...\./#\N[13] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[14]...\./#\N[14] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[15]...\./#\N[15] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[16]...\./#\N[16] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[17]...\./#\N[17] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[18]...\./#\N[18] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[22]...\./#\N[22] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[28]...\./#\N[28] is looking shocked and paralyzed over every minute /#detail.
-Pocketcat is whispering his secrets to \N[29]...\./#\N[29] is looking shocked and paralyzed over every minute /#detail.
+Pocketcat is whispering his secrets to \N[1]...\.^\N[1] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[3]...\.^\N[3] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[4]...\.^\N[4] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[5]...\.^\N[5] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[6]...\.^\N[6] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[7]...\.^\N[7] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[10]...\.^\N[10] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[13]...\.^\N[13] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[14]...\.^\N[14] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[15]...\.^\N[15] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[16]...\.^\N[16] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[17]...\.^\N[17] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[18]...\.^\N[18] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[22]...\.^\N[22] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[28]...\.^\N[28] is looking shocked and paralyzed over every minute ^detail.
+Pocketcat is whispering his secrets to \N[29]...\.^\N[29] is looking shocked and paralyzed over every minute ^detail.
 GabText The Pocketcat is sizing you up... You feel dirty.
-\>\i[85]\}EEPING SCOPE\{\</#*Sob* *Sob*
+\>\i[85]\}EEPING SCOPE\{\<^*Sob* *Sob*
 choice_text 1 \}[INTIMIDATE]\{ "That's right, cry you miserable freak!"
 "...Is something wrong?"
 The creature is seemingly just crying...
-\>\i[85]\}EEPING SCOPE\{\</#*Sob*
-\>\i[85]\}EEPING SCOPE\{\</#"..."
+\>\i[85]\}EEPING SCOPE\{\<^*Sob*
+\>\i[85]\}EEPING SCOPE\{\<^"..."
 "You must be the most pathetic thing I've seen here."
 The crying of the weeping scope seems to cease...
-\>\i[85]\}EEPING SCOPE\{\</#"UWAAAAHHHH...!"
+\>\i[85]\}EEPING SCOPE\{\<^"UWAAAAHHHH...!"
 The weeping scope bursts into tears.
 No reaction.
 GabText The skin of the Weeping scope begins to rot...
 GabText The Weeping scope doesn't seem to have apparent weaknesses.
 GabText You stole 15 \c[2].303 Ammo\c[0]!
 GabText The Weeping scope scans its surroundings with the scope...
-\>\i[76]\}ASTERMIND\{\</#*Mumble* *Mumble*
+\>\i[76]\}ASTERMIND\{\<^*Mumble* *Mumble*
 "Are you the yellow mage from the train?"
 "What happened to you?"
-The mastermind is mumbling something, but you cannot make sense /#of it.
+The mastermind is mumbling something, but you cannot make sense ^of it.
 Whatever that meant.
 GabText Mastermind's skin begins to rot...
 GabText You've exposed the weaknesses of the Mastermind!
@@ -1495,44 +1495,44 @@ GabText Mastermind rises up with determined movements.
 GabText Mastermind loses his balance.
 GabText A phantom arm replaces the right arm of the Mastermind.
 GabText A phantom arm replaces the left arm of the Mastermind.
-\>\i[76]\}ONSTER\{\</#*Burb* *Burb*
+\>\i[76]\}ONSTER\{\<^*Burb* *Burb*
 "Is that the best you've got?"
 "You're a miserable little vermin."
-\>\i[76]\}ONSTER\{\</#"C-choke on my baaallsss..."
-\>\i[76]\}ONSTER\{\</#"The b-best *burb* ??"
-\>\i[76]\}ONSTER\{\</#"J-just have a taste of this!"
-\>\i[76]\}ONSTER\{\</#"L-little!? L-l-little!?"
-\>\i[76]\}ONSTER\{\</#*Burb* "I-I've had enough... of you..." *Burb*
-\>\i[76]\}ONSTER\{\</#"Y-your still body will r-retch from my balls!"
+\>\i[76]\}ONSTER\{\<^"C-choke on my baaallsss..."
+\>\i[76]\}ONSTER\{\<^"The b-best *burb* ??"
+\>\i[76]\}ONSTER\{\<^"J-just have a taste of this!"
+\>\i[76]\}ONSTER\{\<^"L-little!? L-l-little!?"
+\>\i[76]\}ONSTER\{\<^*Burb* "I-I've had enough... of you..." *Burb*
+\>\i[76]\}ONSTER\{\<^"Y-your still body will r-retch from my balls!"
 The monster is clearly getting furious and reckless with his attacks!
 choice_text 1 \}[PERSUADE]\{ "Did I strike a nerve?"
 choice_text 1 "You know yourself what you got!"
 "You know yourself what you got!"
 "Sorry about that! I mean no insult."
-\>\i[76]\}ONSTER\{\</#"W-who you c-c-calling little!?"
-\>\i[76]\}ONSTER\{\</#"O-oh I'll show ya..." *Burb*
-\>\i[76]\}ONSTER\{\</#*Burb*
-\>\i[76]\}ONSTER\{\</#"Y-you fuck..."
+\>\i[76]\}ONSTER\{\<^"W-who you c-c-calling little!?"
+\>\i[76]\}ONSTER\{\<^"O-oh I'll show ya..." *Burb*
+\>\i[76]\}ONSTER\{\<^*Burb*
+\>\i[76]\}ONSTER\{\<^"Y-you fuck..."
 GabText The monster's skin was rotting from the start...
 GabText You can't figure out the weaknesses of the monster...
 GabText You stole a \c[2]Thorned ring\c[0]!
 GabText Slime and mucus is dripping from the gaping mouth of the creature...
-\>\i[76]\}ONSTER\{\</#*Burb* "C-choke on my baaallsss..."
-\>\i[66]\}OCOON HOST\{\</#"G-ghaah... W-why...?"
+\>\i[76]\}ONSTER\{\<^*Burb* "C-choke on my baaallsss..."
+\>\i[66]\}OCOON HOST\{\<^"G-ghaah... W-why...?"
 "Who is telling you this?"
 "So that's how it's going to be?"
-\>\i[66]\}OCOON HOST\{\</#"He tells... Y-you must die..."
+\>\i[66]\}OCOON HOST\{\<^"He tells... Y-you must die..."
 choice_text 1 \}[PERSUADE]\{ "You don't have to listen to him!"
 choice_text 1 "Are you talking about that 'thing' on your back?"
 "Are you talking about that 'thing' on your back?"
 "The feeling is mutual."
-\>\i[66]\}OCOON HOST\{\</#"H-him... H-he wants you... dead..."
-\>\i[66]\}OCOON HOST\{\</#"Ghaaaah... Ghaaah..."
+\>\i[66]\}OCOON HOST\{\<^"H-him... H-he wants you... dead..."
+\>\i[66]\}OCOON HOST\{\<^"Ghaaaah... Ghaaah..."
 The host body is breathing heavily.
-\>\i[66]\}OCOON HOST\{\</#"F-father... Please..."
-\>\i[66]\}OCOON HOST\{\</#"...Please....."
-\>\i[66]\}OCOON HOST\{\</#"N-no... Not..."
-\>\i[66]\}OCOON HOST\{\</#"W-we'll shred you to... pieces..."
+\>\i[66]\}OCOON HOST\{\<^"F-father... Please..."
+\>\i[66]\}OCOON HOST\{\<^"...Please....."
+\>\i[66]\}OCOON HOST\{\<^"N-no... Not..."
+\>\i[66]\}OCOON HOST\{\<^"W-we'll shred you to... pieces..."
 GabText The cocoon's human host begins to rot...
 GabText You've exposed the weaknesses of the cocoon!
 GabText You stole a \c[2]Ring of wraiths\c[0]!
@@ -1546,9 +1546,9 @@ GabText The host body engraved sigils of Fear and Hunger on the cocoon.
 "You can actually talk?"
 "Stay back beast!"
 "Come an inch closer and I'll clip those wings."
-\>\i[84]\}ALKYRIE\{\</#"Kaaaa... Join... The flight of the valkyrie..."
-\>\i[84]\}ALKYRIE\{\</#"I immortalize those fallen and perished... Kaaa..."
-\>\i[84]\}ALKYRIE\{\</#"They will forever live in our memories..."
+\>\i[84]\}ALKYRIE\{\<^"Kaaaa... Join... The flight of the valkyrie..."
+\>\i[84]\}ALKYRIE\{\<^"I immortalize those fallen and perished... Kaaa..."
+\>\i[84]\}ALKYRIE\{\<^"They will forever live in our memories..."
 The valkyrie doesn't seem to react to your words in any way.
 GabText The skin of the Valkyrie begins to rot...
 GabText You can't figure out the weaknesses of the Valkyrie...
@@ -1558,24 +1558,24 @@ GabText The mastermind's skin begins to rot...
 GabText You've exposed the weaknesses of the mastermind!
 GabText The mastermind loses his balance!
 GabText The mastermind is blinded! His eyes are bleeding!
-\>\i[144]\}LATOON\{\</#"Grroumph... groumph..."
-The platoon doesn't seem to be capable of speech. You can however see/#a glimmer of understanding in the various heads and faces you see /#joint in this tangled mess.
-\>\i[81]\}YLVIAN TROOPER\{\</#"..."
+\>\i[144]\}LATOON\{\<^"Grroumph... groumph..."
+The platoon doesn't seem to be capable of speech. You can however see^a glimmer of understanding in the various heads and faces you see ^joint in this tangled mess.
+\>\i[81]\}YLVIAN TROOPER\{\<^"..."
 choice_text 1 \}[PERSUADE]\{ "You've seen the carnage, why continue serving the army?"
 choice_text 3 \}[INTIMIDATE]\{ "This deep no one will hear you scream."
 "The war is over, we don't need to do this!"
 "What is this bunker?"
 The sylvian trooper just whips her whip and points towards you.
-\>\i[81]\}YLVIAN TROOPER\{\</#"You gave the answer yourself already. Our time is coming to a/#close. There is no need for us in the new world."
-\>\i[81]\}YLVIAN TROOPER\{\</#"This is our one last thrill ride. We get to dance in the red rain/#one last time."
-The sylvian trooper tilts her head slightly and takes a mocking/#stance.
-\>\i[81]\}YLVIAN TROOPER\{\</#"The war might be over but Kaiser gave us this one last thrill /#ride."
-\>\i[81]\}YLVIAN TROOPER\{\</#"Let's make it count, shall we~?"
-\>\i[81]\}YLVIAN TROOPER\{\</#"From the blood soaked soil a new sprout rises."
-\>\i[81]\}YLVIAN TROOPER\{\</#"Exciting, isn't it~?"
-\>\i[81]\}YLVIAN TROOPER\{\</#"Is that a promise~?"
-\>\i[81]\}YLVIAN TROOPER\{\</#"Always."
-\>\i[81]\}YLVIAN TROOPER\{\</#"You?"
+\>\i[81]\}YLVIAN TROOPER\{\<^"You gave the answer yourself already. Our time is coming to a^close. There is no need for us in the new world."
+\>\i[81]\}YLVIAN TROOPER\{\<^"This is our one last thrill ride. We get to dance in the red rain^one last time."
+The sylvian trooper tilts her head slightly and takes a mocking^stance.
+\>\i[81]\}YLVIAN TROOPER\{\<^"The war might be over but Kaiser gave us this one last thrill ^ride."
+\>\i[81]\}YLVIAN TROOPER\{\<^"Let's make it count, shall we~?"
+\>\i[81]\}YLVIAN TROOPER\{\<^"From the blood soaked soil a new sprout rises."
+\>\i[81]\}YLVIAN TROOPER\{\<^"Exciting, isn't it~?"
+\>\i[81]\}YLVIAN TROOPER\{\<^"Is that a promise~?"
+\>\i[81]\}YLVIAN TROOPER\{\<^"Always."
+\>\i[81]\}YLVIAN TROOPER\{\<^"You?"
 GabText The sylvian trooper's skin begins to rot...
 GabText You've exposed the weaknesses of the sergeant!
 GabText You stole 6 \c[2]12-gauge shells\c[0]!
@@ -1584,32 +1584,32 @@ GabText The sylvian trooper loses her balance!
 GabText The sylvian trooper is blinded! Her eyes are bleeding!
 GabText The platoon is confused...
 GabText You catch the Sylvian trooper!
-\>\i[81]\}YLVIAN TROOPER\{\</#"Hm. Aren't you impatient."
+\>\i[81]\}YLVIAN TROOPER\{\<^"Hm. Aren't you impatient."
 GabText Something is advancing from the darkness...
 GabText A platoon joins the battle!
-\>\i[81]\}YLVIAN TROOPER\{\</#"Dimwit. Took you long enough."
+\>\i[81]\}YLVIAN TROOPER\{\<^"Dimwit. Took you long enough."
 GabText You can't dodge the massive platoon that easily.
 GabText The rot doesn't seem to affect Platoon...
 GabText The Platoon has got no obvious weaknesses...
 GabText A platoon faces off with you.
 GabText A platoon and its commander face off with you.
-\>\i[81]\}TITCHES\{\</#"Mmmf...mmm..."
+\>\i[81]\}TITCHES\{\<^"Mmmf...mmm..."
 choice_text 2 \}[PERSUADE]\{ "You don't look like one of those monsters above..."
 choice_text 3 \}[INTIMIDATE]\{ "I'll break you like a twig you are."
-Stitches is mumbling something, but her mouth is stitched shut so/#she cannot talk properly.
-\>\i[81]\}TITCHES\{\</#"Mmmf...hm..."
-\>\i[81]\}TITCHES\{\</#"Mmffft... hmm."
+Stitches is mumbling something, but her mouth is stitched shut so^she cannot talk properly.
+\>\i[81]\}TITCHES\{\<^"Mmmf...hm..."
+\>\i[81]\}TITCHES\{\<^"Mmffft... hmm."
 Stitches swipes her hair to the sides of her head.
 She swirls around in a clumsy manner while admiring her own body.
-Stitches seems to be halting her attacks briefly. You are surprised/#yourself how easy it was to actually persuade her...
-\>\i[81]\}TITCHES\{\</#"Mffm!"
+Stitches seems to be halting her attacks briefly. You are surprised^yourself how easy it was to actually persuade her...
+\>\i[81]\}TITCHES\{\<^"Mffm!"
 Your persuasion efforts don't seem to work anymore.
-\>\i[81]\}TITCHES\{\</#"Mmfka, mmfka, mmfkaa..."
+\>\i[81]\}TITCHES\{\<^"Mmfka, mmfka, mmfkaa..."
 Sounds like cackling.
-\>\i[81]\}TITCHES\{\</#"Ffffffmmmm...!"
-Stitches tries to mime spitting, but because of her stitches it/#doesn't quite work. You interpret this as her getting angry though.
+\>\i[81]\}TITCHES\{\<^"Ffffffmmmm...!"
+Stitches tries to mime spitting, but because of her stitches it^doesn't quite work. You interpret this as her getting angry though.
 Your intimidation tactics don't seem to work anymore.
-The creature doesn't have a mouth, or even a distinct head... Your/#attempts to discuss with the creature are in vain.
+The creature doesn't have a mouth, or even a distinct head... Your^attempts to discuss with the creature are in vain.
 GabText The skin of the Stitches and the thing begin to rot...
 GabText The skin of the Stitches begins to rot...
 GabText You've exposed the weaknesses of the Stitches!
@@ -1617,28 +1617,28 @@ GabText You stole 3 piles of \c[2]Gun powder\c[0]!
 GabText Stitches loses her balance!
 GabText Stitches is blinded! Her eyes are bleeding!
 GabText Stitches approaches you with a degenerate cackle...
-Stitches is trying to gesture something, but you make sense of/#her...
+Stitches is trying to gesture something, but you make sense of^her...
 Something about her feels strange...
 GabText Living flesh slowly drags itself to join the battle!
 GabText The skin of the living flesh begins to rot...
 GabText Living flesh slowly drags itself towards you!
 GabText Stitches joins the battle with a degenerate cackle.
 GabText You are assaulted by the half-cocooned!
-\>\i[76]\}OONSCORCHED\{\</#"Well you called my bluff wrong!"
-\>\i[76]\}OONSCORCHED\{\</#"Now die you pathetic fool!"
+\>\i[76]\}OONSCORCHED\{\<^"Well you called my bluff wrong!"
+\>\i[76]\}OONSCORCHED\{\<^"Now die you pathetic fool!"
 choice_text 1 \}[INTIMIDATE]\{ "What the hell are you!?"
 choice_text 2 \}[PERSUADE]\{ "Let's cut to the chase - I want answers!"
 "What is the meaning of this?"
 "Why now?"
 "Why here?"
-\>\i[72]\}RRATIONAL OBELISK\{\</#"..."
+\>\i[72]\}RRATIONAL OBELISK\{\<^"..."
 You ask but the obelisk gives no answers.
 GabText The rot doesn't seem to affect the obelisk.
 GabText The thing has no weaknesses.
 GabText The obelisk stands tall before you...
 "Stay away, I mean no harm!"
 "Prepare to die Bremen scum!"
-\>\i[68]\}LITE TROOPER\{\</#"..."
+\>\i[68]\}LITE TROOPER\{\<^"..."
 The trooper shows absolutely no reaction to your words...
 GabText The trooper's skin begins to rot...
 GabText You've exposed the weaknesses of the trooper!
@@ -1648,10 +1648,10 @@ GabText The face mask protects the trooper's eyes!
 GabText An elite trooper marches towards you in total silence.
 GabText The trooper loses his balance.
 GabText You dodge the trooper's aim just barely!
-\>\i[69]\}LAME TROOPER\{\</#"..."
+\>\i[69]\}LAME TROOPER\{\<^"..."
 GabText You stole 4 piles of \c[2]Gun powder\c[0]!
 GabText The trooper is cackling behind his gas mask.
-\>\i[75]\}OGIC\{\</#"..."
+\>\i[75]\}OGIC\{\<^"..."
 "Do you understand me?"
 "Please just let me go..."
 "I'm going to wreck you."
@@ -1662,56 +1662,56 @@ GabText You find no obvious weaknesses in the Logic.
 GabText A monolith stands tall before you...
 GabText The exhaust system is heating up...
 GabText The exhaust system is running at full force.
-Violently the thing thrusts its tentacles down the throat./#Cold tendrils can be felt squirming deeper and deeper as/#\N[1] tries to vomit.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[1] with something.
-Violently the thing thrusts its tentacles down the throat./#Cold tendrils can be felt squirming deeper and deeper as/#\N[3] tries to vomit.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[3] with something.
-Violently the thing thrusts its tentacles down the throat./#Cold tendrils can be felt squirming deeper and deeper.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[7] with something.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[16] with something.
+Violently the thing thrusts its tentacles down the throat.^Cold tendrils can be felt squirming deeper and deeper as^\N[1] tries to vomit.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[1] with something.
+Violently the thing thrusts its tentacles down the throat.^Cold tendrils can be felt squirming deeper and deeper as^\N[3] tries to vomit.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[3] with something.
+Violently the thing thrusts its tentacles down the throat.^Cold tendrils can be felt squirming deeper and deeper.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[7] with something.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[16] with something.
 ...The appenpage let's go for some reason...
-Apparently \N[16] is not fertile grounds for the /#creature.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[17] with something.
-Apparently \N[17] is not fertile grounds for the /#creature.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[4] with something.
-Apparently \N[4] is not fertile grounds for the /#creature.
-The vile things squirts warm fluids in. Feels like it's/#injecting \N[5] with something.
-Apparently \N[5] is not fertile grounds for the /#creature.
+Apparently \N[16] is not fertile grounds for the ^creature.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[17] with something.
+Apparently \N[17] is not fertile grounds for the ^creature.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[4] with something.
+Apparently \N[4] is not fertile grounds for the ^creature.
+The vile things squirts warm fluids in. Feels like it's^injecting \N[5] with something.
+Apparently \N[5] is not fertile grounds for the ^creature.
 choice_text 1 \}[PERSUADE]\{ "I thought I won the festival?"
 choice_text 4 \}[INTIMIDATE]\{ "So your decomposing torso is all I need to slaugher anymore?"
 "Why kill me now? You had the chance all this time!"
 "I just want to understand why you do this."
 "I've been waiting for this since day one."
-\>\i[144]\}ER'KELE\{\</#"The time for words has come and gone. Show me violence."
-\>\i[144]\}ER'KELE\{\</#"You did. Congratulations for that."
+\>\i[144]\}ER'KELE\{\<^"The time for words has come and gone. Show me violence."
+\>\i[144]\}ER'KELE\{\<^"You did. Congratulations for that."
 "That was never part of the deal!"
 "How can I trust you after you keep moving the goal post?"
-\>\i[144]\}ER'KELE\{\</#"Just get past me and you will receive the heavenly gifts you yearn."
-\>\i[144]\}ER'KELE\{\</#"The deal is what I make it out to be!"
-\>\i[144]\}ER'KELE\{\</#"Why do you have to be such an annoyance 'till the end!?"
-\>\i[144]\}ER'KELE\{\</#"A pesky little rat!"
+\>\i[144]\}ER'KELE\{\<^"Just get past me and you will receive the heavenly gifts you yearn."
+\>\i[144]\}ER'KELE\{\<^"The deal is what I make it out to be!"
+\>\i[144]\}ER'KELE\{\<^"Why do you have to be such an annoyance 'till the end!?"
+\>\i[144]\}ER'KELE\{\<^"A pesky little rat!"
 You managed to infuriate Per'kele.
-\>\i[144]\}ER'KELE\{\</#"Do you have a choice?"
-\>\i[144]\}ER'KELE\{\</#"You can always just die too."
-\>\i[144]\}ER'KELE\{\</#"Did I just give that lengthy speech on deaf ears?"
-\>\i[144]\}ER'KELE\{\</#"There won't exist understanding between us other than that of /#violence and blood."
-\>\i[144]\}ER'KELE\{\</#"It is not my place to take part in a festival. The blood must run/#free for it to be pure."
-\>\i[144]\}ER'KELE\{\</#"Now that the slaughter is over, I'm free to do what I please."
-\>\i[144]\}ER'KELE\{\</#"A dim-witted too? You truly have no redeeming qualities."
+\>\i[144]\}ER'KELE\{\<^"Do you have a choice?"
+\>\i[144]\}ER'KELE\{\<^"You can always just die too."
+\>\i[144]\}ER'KELE\{\<^"Did I just give that lengthy speech on deaf ears?"
+\>\i[144]\}ER'KELE\{\<^"There won't exist understanding between us other than that of ^violence and blood."
+\>\i[144]\}ER'KELE\{\<^"It is not my place to take part in a festival. The blood must run^free for it to be pure."
+\>\i[144]\}ER'KELE\{\<^"Now that the slaughter is over, I'm free to do what I please."
+\>\i[144]\}ER'KELE\{\<^"A dim-witted too? You truly have no redeeming qualities."
 "How long have you been doing this?"
 "Can you tell me about the god you follow?"
 "Are you a human?"
-\>\i[144]\}ER'KELE\{\</#"Well what is it that you want to know?"
-\>\i[144]\}ER'KELE\{\</#"I've lost the count ages ago."
-\>\i[144]\}ER'KELE\{\</#"Time loses its meaning once you're not tied to mortal existence/#anymore."
-\>\i[144]\}ER'KELE\{\</#"The sulfur god... The name is all you need to know for now."
-\>\i[144]\}ER'KELE\{\</#"I once was, at least according to the loosest meaning of that/#term."
-\>\i[144]\}ER'KELE\{\</#"I was lucky enough to stumble upon a festival, just like you..."
-\>\i[144]\}ER'KELE\{\</#"Afterwards was when I was truly born."
-\>\i[144]\}ER'KELE\{\</#"That is amusing."
-\>\i[144]\}ER'KELE\{\</#"I hope you didn't put too much faith in your silly little intimidation /#antics."
+\>\i[144]\}ER'KELE\{\<^"Well what is it that you want to know?"
+\>\i[144]\}ER'KELE\{\<^"I've lost the count ages ago."
+\>\i[144]\}ER'KELE\{\<^"Time loses its meaning once you're not tied to mortal existence^anymore."
+\>\i[144]\}ER'KELE\{\<^"The sulfur god... The name is all you need to know for now."
+\>\i[144]\}ER'KELE\{\<^"I once was, at least according to the loosest meaning of that^term."
+\>\i[144]\}ER'KELE\{\<^"I was lucky enough to stumble upon a festival, just like you..."
+\>\i[144]\}ER'KELE\{\<^"Afterwards was when I was truly born."
+\>\i[144]\}ER'KELE\{\<^"That is amusing."
+\>\i[144]\}ER'KELE\{\<^"I hope you didn't put too much faith in your silly little intimidation ^antics."
 Per'kele doesn't seem easily intimidated.
-\>\i[144]\}ER'KELE\{\</#"Is that so? I guess it makes two of us then."
+\>\i[144]\}ER'KELE\{\<^"Is that so? I guess it makes two of us then."
 GabText The Per'kele's skin begins to rot...
 GabText You've exposed the weaknesses of Per'kele!
 GabText You stole 3 \c[2]Lucky coins\c[0]!
@@ -1719,28 +1719,28 @@ GabText You stole 3 \c[2]Light blue vials\c[0]!
 GabText Per'kele loses his balance!
 GabText The Per'kele is blinded! His eyes are bleeding!
 GabText Per'kele bows gently and prepares for the battle.
-\>\i[144]\}ER'KELE\{\</#"Have you seen the colour blood takes under the moonlight?"
-\>\i[144]\}ER'KELE\{\</#"Such beautiful blend of pale red and sickly green drenched in/#cold hues of blue."
-\>\i[74]\}AISER\{\</#"I am sorry that you will have to suffer in your master's stead, /#but we each choose our paths and company."
-\>\i[74]\}AISER\{\</#"Time for words is over."
+\>\i[144]\}ER'KELE\{\<^"Have you seen the colour blood takes under the moonlight?"
+\>\i[144]\}ER'KELE\{\<^"Such beautiful blend of pale red and sickly green drenched in^cold hues of blue."
+\>\i[74]\}AISER\{\<^"I am sorry that you will have to suffer in your master's stead, ^but we each choose our paths and company."
+\>\i[74]\}AISER\{\<^"Time for words is over."
 choice_text 2 \}[PERSUADE]\{ "The war is over, we don't need to do this!"
 choice_text 6 \}[INTIMIDATE]\{ "I get to kill the Kaiser himself!"
 "I'm not trash talking, I just want to know why we fight?"
 "Please, I just want all this to be over with..."
 "Are you really the Kaiser of Bremen?"
-\>\i[74]\}AISER\{\</#"I'll honor your valiant efforts by not lowering myself to your/#trash talking standards."
-\>\i[74]\}AISER\{\</#"I cannot let you pass. It's that simple."
-\>\i[74]\}AISER\{\</#"Now... En garde!"
-\>\i[74]\}AISER\{\</#"This is nothing personal. I just cannot leave any room for chance/#this late in the Logic's activation."
-\>\i[74]\}AISER\{\</#"I fear she might still be vulnerable to outside intervention.../#That is if the telelectroscope terminals in other regions aren't/#fully online yet."
-\>\i[74]\}AISER\{\</#"Do not worry. I will make this quick and painless."
-\>\i[74]\}AISER\{\</#"I will even carry you to the afterlife of the new world myself."
-\>\i[74]\}AISER\{\</#"You will be one of the first to live on forever in the stream of/#human consciousness."
-\>\i[74]\}AISER\{\</#"That's right. It is the name I've adopted in modern times."
-\>\i[74]\}AISER\{\</#"It is not ideal, but among the options I had... I felt the most/#appropriate."
-\>\i[74]\}AISER\{\</#"You've delved this deep without understanding what you're getting/#yourself into?"
-\>\i[74]\}AISER\{\</#"How amusing."
-\>\i[74]\}AISER\{\</#"..."
+\>\i[74]\}AISER\{\<^"I'll honor your valiant efforts by not lowering myself to your^trash talking standards."
+\>\i[74]\}AISER\{\<^"I cannot let you pass. It's that simple."
+\>\i[74]\}AISER\{\<^"Now... En garde!"
+\>\i[74]\}AISER\{\<^"This is nothing personal. I just cannot leave any room for chance^this late in the Logic's activation."
+\>\i[74]\}AISER\{\<^"I fear she might still be vulnerable to outside intervention...^That is if the telelectroscope terminals in other regions aren't^fully online yet."
+\>\i[74]\}AISER\{\<^"Do not worry. I will make this quick and painless."
+\>\i[74]\}AISER\{\<^"I will even carry you to the afterlife of the new world myself."
+\>\i[74]\}AISER\{\<^"You will be one of the first to live on forever in the stream of^human consciousness."
+\>\i[74]\}AISER\{\<^"That's right. It is the name I've adopted in modern times."
+\>\i[74]\}AISER\{\<^"It is not ideal, but among the options I had... I felt the most^appropriate."
+\>\i[74]\}AISER\{\<^"You've delved this deep without understanding what you're getting^yourself into?"
+\>\i[74]\}AISER\{\<^"How amusing."
+\>\i[74]\}AISER\{\<^"..."
 GabText Kaiser's skin begins to rot...
 GabText You've exposed the weaknesses of the kaiser!
 GabText Kaiser loses his balance!
@@ -1752,82 +1752,82 @@ The figure only giggles at you faintly.
 GabText Rot does not affect the shadowy figure...
 GabText The spirit appears to have no obvious weaknesses.
 GabText A quiet shadowy figure sits on your path...
-\>\i[65]\}EEKEEPER\{\</#"..."
+\>\i[65]\}EEKEEPER\{\<^"..."
 choice_text 2 \}[PERSUADE]\{ "Look, I'm stepping away, I mean no harm."
 choice_text 3 \}[INTIMIDATE]\{ "I'll smash that stupid empty face in!"
 "I mean no harm... You understand me?"
 The beekeeper just stares at you with his empty gaze.
-Is the beekeeper smiling at you? It is hard to tell from him blank/#expression.
-A bee flies in from one eye and exits another. Maybe this thing/#has no brains to begin with? No use trying to talk to him.
-Sounds like the bee hive inside this creature is activating.../#The buzzing sounds intensify.
+Is the beekeeper smiling at you? It is hard to tell from him blank^expression.
+A bee flies in from one eye and exits another. Maybe this thing^has no brains to begin with? No use trying to talk to him.
+Sounds like the bee hive inside this creature is activating...^The buzzing sounds intensify.
 GabText The surface of the beekeeper begins to rot...
 GabText You've exposed the weaknesses of the beekeeper!
 GabText The beekeeper loses his balance!
 GabText The beekeeper is blinded! His eyes are bleeding!
 GabText The beekeeper loses his balance.
-\>\i[80]\}ANCID SERGAL\{\</#"Let's howl while we slice each other to pieces!"
+\>\i[80]\}ANCID SERGAL\{\<^"Let's howl while we slice each other to pieces!"
 choice_text 1 \}[PERSUADE]\{ "You're missing real battlefield at the town!"
 choice_text 3 \}[INTIMIDATE]\{ "I don't deal with animals, but this once I'll put you down."
 "I don't want any part in this!"
 "What are you even?"
 "Let's see how much you enjoy it once we're done here."
-\>\i[80]\}ANCID SERGAL\{\</#"A sergal never backs down from a chance to bask in euprhoric /#mutilation!"
-\>\i[80]\}ANCID SERGAL\{\</#"What are you talking about? The town?"
+\>\i[80]\}ANCID SERGAL\{\<^"A sergal never backs down from a chance to bask in euprhoric ^mutilation!"
+\>\i[80]\}ANCID SERGAL\{\<^"What are you talking about? The town?"
 "I thought you were looking for the ultimate challenge?"
 "You're missing out on all the battles."
-\>\i[80]\}ANCID SERGAL\{\</#"I don't step inside those filthy human cesspools anymore. I saw/#enough!"
-\>\i[80]\}ANCID SERGAL\{\</#"... That so?"
-\>\i[80]\}ANCID SERGAL\{\</#"I say fuck it! Let's get this over with fast then!"
-The sergal became reckless. Looks like the beast is trying to/#finish the fight fast now.
-\>\i[80]\}ANCID SERGAL\{\</#"Nonsense!"
-\>\i[80]\}ANCID SERGAL\{\</#"You'll feel the blood rushing soon enough!"
-\>\i[80]\}ANCID SERGAL\{\</#"It's intoxicating!"
-\>\i[80]\}ANCID SERGAL\{\</#"What? I'm from the proud race of sergals of course!"
-\>\i[80]\}ANCID SERGAL\{\</#"We live to die on a battlefield."
-\>\i[80]\}ANCID SERGAL\{\</#"I do not blame you for not having heard of us. Not many live to/#tell the tales."
-\>\i[80]\}ANCID SERGAL\{\</#"Animal!? ANIMAL!?"
-\>\i[80]\}ANCID SERGAL\{\</#"A bald testicle looking ape here dares to call me an animal!?"
-\>\i[80]\}ANCID SERGAL\{\</#"That's the first mistake, the last mistake!"
+\>\i[80]\}ANCID SERGAL\{\<^"I don't step inside those filthy human cesspools anymore. I saw^enough!"
+\>\i[80]\}ANCID SERGAL\{\<^"... That so?"
+\>\i[80]\}ANCID SERGAL\{\<^"I say fuck it! Let's get this over with fast then!"
+The sergal became reckless. Looks like the beast is trying to^finish the fight fast now.
+\>\i[80]\}ANCID SERGAL\{\<^"Nonsense!"
+\>\i[80]\}ANCID SERGAL\{\<^"You'll feel the blood rushing soon enough!"
+\>\i[80]\}ANCID SERGAL\{\<^"It's intoxicating!"
+\>\i[80]\}ANCID SERGAL\{\<^"What? I'm from the proud race of sergals of course!"
+\>\i[80]\}ANCID SERGAL\{\<^"We live to die on a battlefield."
+\>\i[80]\}ANCID SERGAL\{\<^"I do not blame you for not having heard of us. Not many live to^tell the tales."
+\>\i[80]\}ANCID SERGAL\{\<^"Animal!? ANIMAL!?"
+\>\i[80]\}ANCID SERGAL\{\<^"A bald testicle looking ape here dares to call me an animal!?"
+\>\i[80]\}ANCID SERGAL\{\<^"That's the first mistake, the last mistake!"
 The sergal became furious.
-\>\i[80]\}ANCID SERGAL\{\</#"Animal...? Preposterous!"
-\>\i[80]\}ANCID SERGAL\{\</#"Filthy hairless monkey!"
-\>\i[80]\}ANCID SERGAL\{\</#"That's more like it!"
-\>\i[80]\}ANCID SERGAL\{\</#"The blood will spill wild!"
-\>\i[80]\}ANCID SERGAL\{\</#"Enough talking! Let's get this over with!"
+\>\i[80]\}ANCID SERGAL\{\<^"Animal...? Preposterous!"
+\>\i[80]\}ANCID SERGAL\{\<^"Filthy hairless monkey!"
+\>\i[80]\}ANCID SERGAL\{\<^"That's more like it!"
+\>\i[80]\}ANCID SERGAL\{\<^"The blood will spill wild!"
+\>\i[80]\}ANCID SERGAL\{\<^"Enough talking! Let's get this over with!"
 GabText The skin of the sergal begins to rot...
 GabText You've exposed the weaknesses of the sergal!
 GabText You stole 4 \c[2]Silver shillings\c[0]!
 GabText The sergal loses his balance!
-\>\i[80]\}ANCID THE SERGAL\{\</#"What the hell is this!?"
-\>\i[80]\}ANCID THE SERGAL\{\</#"Fight like a man! Only a coward tries to disarm their opponent!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"Such a weakling strategy! Can't take a punch!?"
+\>\i[80]\}ANCID THE SERGAL\{\<^"What the hell is this!?"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Fight like a man! Only a coward tries to disarm their opponent!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Such a weakling strategy! Can't take a punch!?"
 GabText Rancid the sergal challenges you to a duel.
-\>\i[80]\}ANCID THE SERGAL\{\</#"Round 2!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"See this spear? It's the very same that beheaded that half-god over/#there!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"What do you reckon it'll do to soft human skin!?"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Round 2!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"See this spear? It's the very same that beheaded that half-god over^there!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"What do you reckon it'll do to soft human skin!?"
 GabText The sergal loses his balance.
-\>\i[80]\}ANCID THE SERGAL\{\</#"Weak, weak, weak, WEAK!!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"Getting tired? I could do this all day!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"My spears yearn blood! Get ready!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"My blood is rushing wild, wild, wild, WILD!!!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Weak, weak, weak, WEAK!!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Getting tired? I could do this all day!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"My spears yearn blood! Get ready!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"My blood is rushing wild, wild, wild, WILD!!!"
 GabText You dodge the attack just barely!
 choice_text 1 \}[PERSUADE]\{ "But I'm the one who saved you!"
 choice_text 3 \}[INTIMIDATE]\{ "You'll come to regret those words."
-\>\i[71]\}EARTLESS ONE\{\</#"What bore."
+\>\i[71]\}EARTLESS ONE\{\<^"What bore."
 "I don't want to fight you!"
 "Hope you are prepared to die."
-\>\i[71]\}EARTLESS ONE\{\</#"You better put up a good show!"
-\>\i[71]\}EARTLESS ONE\{\</#"...And now I owe you something?\. Hardly!"
+\>\i[71]\}EARTLESS ONE\{\<^"You better put up a good show!"
+\>\i[71]\}EARTLESS ONE\{\<^"...And now I owe you something?\. Hardly!"
 You persuasion tactics don't seem to work on the heartless one.
-\>\i[71]\}EARTLESS ONE\{\</#"Summoning me is to challenge me."
-\>\i[71]\}EARTLESS ONE\{\</#"Your pleads are useless here."
-\>\i[71]\}EARTLESS ONE\{\</#"..."
-\>\i[71]\}EARTLESS ONE\{\</#"Technically I'm what you people call a 'new god'..."
-\>\i[71]\}EARTLESS ONE\{\</#"But I hate to be associated with that group of senile warmongering/#old farts."
-\>\i[71]\}EARTLESS ONE\{\</#"Big talk for a small human."
+\>\i[71]\}EARTLESS ONE\{\<^"Summoning me is to challenge me."
+\>\i[71]\}EARTLESS ONE\{\<^"Your pleads are useless here."
+\>\i[71]\}EARTLESS ONE\{\<^"..."
+\>\i[71]\}EARTLESS ONE\{\<^"Technically I'm what you people call a 'new god'..."
+\>\i[71]\}EARTLESS ONE\{\<^"But I hate to be associated with that group of senile warmongering^old farts."
+\>\i[71]\}EARTLESS ONE\{\<^"Big talk for a small human."
 You intimidation tactics don't seem to work on the heartless one.
-\>\i[71]\}EARTLESS ONE\{\</#"Hee!? You'd be the one to kill me?"
-\>\i[71]\}EARTLESS ONE\{\</#"Please."
+\>\i[71]\}EARTLESS ONE\{\<^"Hee!? You'd be the one to kill me?"
+\>\i[71]\}EARTLESS ONE\{\<^"Please."
 GabText The heartless one's skin begins to rot...
 GabText You've exposed the weaknesses of the heartless one!
 GabText You stole an \c[2]Yggaegetsu amulet\c[0]!
@@ -1835,14 +1835,14 @@ GabText The heartless one loses her balance!
 GabText The heartless one is blinded! Her eyes are bleeding!
 GabText The heartless one challenged you to a duel.
 GabText The heartless one continues without her head.
-\>\i[71]\}EARTLESS ONE\{\</#"I'll end this quick."
+\>\i[71]\}EARTLESS ONE\{\<^"I'll end this quick."
 GabText The bloodrose vines slow down your movement.
-\>\i[71]\}EARTLESS ONE\{\</#"Let's see just how tough you really are."
+\>\i[71]\}EARTLESS ONE\{\<^"Let's see just how tough you really are."
 GabText The heartless one opens her wings.
-\>\i[71]\}EARTLESS ONE\{\</#"You're not getting away that easy!"
+\>\i[71]\}EARTLESS ONE\{\<^"You're not getting away that easy!"
 GabText The spilled blood attract the bloodrose vines...
 "If you're a genie, do I get to wish anything?"
-The poe shrugs. It looks like it means harm regardless of your/#intentions.
+The poe shrugs. It looks like it means harm regardless of your^intentions.
 The poe is moaning. Whatever that means...
 You take it as 'no'.
 GabText The poe is not affected by the rot...
@@ -1853,7 +1853,7 @@ Throw \c[2]Rotten meat\c[0]
 "Whose a good girl?"
 "Bad girl!"
 The moonless beast is growling at you from a short distance...
-Your pleads go to deaf ears. The beast doesn't react to your words/#in the slightest.
+Your pleads go to deaf ears. The beast doesn't react to your words^in the slightest.
 The creature is too far away to initiate a conversation...
 GabText The skin of the Moonless begins to rot...
 GabText The skin of the beast begins to rot...
@@ -1868,8 +1868,8 @@ GabText Glowing eyes stare down at you...
 GabText A hulking beast reveals itself...
 GabText You pick up \c[2]Black Steel\c[0]!
 "Nevermind."
-\>\i[69]\}ATHER HUGO\{\</#"..."
-Father Hugo is in trance. He doesn't seem to react to your words/#in the slightest.
+\>\i[69]\}ATHER HUGO\{\<^"..."
+Father Hugo is in trance. He doesn't seem to react to your words^in the slightest.
 GabText Father Hugo's skin begins to rot...
 GabText You've exposed the weaknesses of the high priest!
 GabText You stole the \c[2]Book of enlightenment\c[0]!
@@ -1878,30 +1878,30 @@ GabText The high priest is blinded! His eyes are bleeding!
 GabText Father Hugo widens his arms to embrace you.
 Father Hugo wants to take off his clothes.
 choice_text 1 \}[PERSUADE]\{ "I'm not a warrior, there is no challenge to be had here!"
-\>\i[80]\}ANCID SERGAL\{\</#"A sergal never backs down from a chance to bask in euphoric /#mutilation!"
-\>\i[80]\}ANCID SERGAL\{\</#"Not a warrior?"
-\>\i[80]\}ANCID SERGAL\{\</#"With that much begging and pleading you're just a spineless worm!"
-\>\i[80]\}ANCID SERGAL\{\</#"No matter - a warrior or a worm, both falter under my spear."
-\>\i[80]\}ANCID SERGAL\{\</#"Let's get this over with fast then!"
-\>\i[80]\}ANCID SERGAL\{\</#"A bald, testicle looking ape here dares to call me an animal!?"
-\>\i[80]\}ANCID THE SERGAL\{\</#"Ugh! You bastard!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"I don't deal with the likes of you!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"I'm not going to die by the likes of you!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"Mataneko-kone-Magnificat. That is my name. The last name you /#hear before heads start to roll!"
-\>\i[80]\}ANCID THE SERGAL\{\</#"My blood is rushing WIIILLLD!"
-You hear voices echoing from the beheaded wizard.../#\c[7]"This creature is a sergal."\c[0]
-You hear voices echoing from the beheaded wizard.../#\c[7]"Usually they appear more intelligent, but I've heard of/#cases where madness slowly deteriorates their sanity in certain/#circumstances. This lunatic must be one of those."\c[0]
-\>\i[80]\}ANCID THE SERGAL\{\</#"My blood is rushing wild, wild, wild, WILD!!"
-\>\i[80]\}ATKIN\{\</#"Death to the grounddweller!"
-\>\i[80]\}ATKIN\{\</#"Cut its throat!"
-\>\i[80]\}ATKIN\{\</#"Dibs on their liver!"
-\>\i[80]\}ATKIN\{\</#"The liver's all mine!"
-\>\i[80]\}ATKIN\{\</#"I'll poke the human butt with this! Shove it deep!"
-\>\i[80]\}ATKIN\{\</#"I'll scratch the eyes, look at this! Look at me! I said look!"
-\>\i[80]\}ATKIN\{\</#"Fresh and soft! The thighs are mine!"
-\>\i[80]\}ATKIN\{\</#"As long as I get the skin, I'm fine. Need a new blanket."
-The ratkins are bickering loudly. You don't get a turn to ask/#them anything.
-\>\i[80]\}ATKIN\{\</#*Squeek!*
+\>\i[80]\}ANCID SERGAL\{\<^"A sergal never backs down from a chance to bask in euphoric ^mutilation!"
+\>\i[80]\}ANCID SERGAL\{\<^"Not a warrior?"
+\>\i[80]\}ANCID SERGAL\{\<^"With that much begging and pleading you're just a spineless worm!"
+\>\i[80]\}ANCID SERGAL\{\<^"No matter - a warrior or a worm, both falter under my spear."
+\>\i[80]\}ANCID SERGAL\{\<^"Let's get this over with fast then!"
+\>\i[80]\}ANCID SERGAL\{\<^"A bald, testicle looking ape here dares to call me an animal!?"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Ugh! You bastard!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"I don't deal with the likes of you!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"I'm not going to die by the likes of you!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"Mataneko-kone-Magnificat. That is my name. The last name you ^hear before heads start to roll!"
+\>\i[80]\}ANCID THE SERGAL\{\<^"My blood is rushing WIIILLLD!"
+You hear voices echoing from the beheaded wizard...^\c[7]"This creature is a sergal."\c[0]
+You hear voices echoing from the beheaded wizard...^\c[7]"Usually they appear more intelligent, but I've heard of^cases where madness slowly deteriorates their sanity in certain^circumstances. This lunatic must be one of those."\c[0]
+\>\i[80]\}ANCID THE SERGAL\{\<^"My blood is rushing wild, wild, wild, WILD!!"
+\>\i[80]\}ATKIN\{\<^"Death to the grounddweller!"
+\>\i[80]\}ATKIN\{\<^"Cut its throat!"
+\>\i[80]\}ATKIN\{\<^"Dibs on their liver!"
+\>\i[80]\}ATKIN\{\<^"The liver's all mine!"
+\>\i[80]\}ATKIN\{\<^"I'll poke the human butt with this! Shove it deep!"
+\>\i[80]\}ATKIN\{\<^"I'll scratch the eyes, look at this! Look at me! I said look!"
+\>\i[80]\}ATKIN\{\<^"Fresh and soft! The thighs are mine!"
+\>\i[80]\}ATKIN\{\<^"As long as I get the skin, I'm fine. Need a new blanket."
+The ratkins are bickering loudly. You don't get a turn to ask^them anything.
+\>\i[80]\}ATKIN\{\<^*Squeek!*
 You can't make any sense of ratkins speech.
 GabText Your Rot misses its target.
 GabText A gang of ratkins ambush you!
@@ -1921,7 +1921,7 @@ GabText Death is an easy way out...
 "I don't want any confrontation!"
 "Stay back, or else...!"
 "Please, just let me pass!"
-\>\i[67]\}EATH MASK\{\</#"..."
+\>\i[67]\}EATH MASK\{\<^"..."
 The death mask doesn't appear capable of speech or understanding.
 GabText The death mask's skin begins to rot...
 GabText You've exposed the weaknesses of the death mask!
@@ -1930,11 +1930,11 @@ GabText The death mask is blinded! His eyes are bleeding!
 GabText A death mask has risen from his grave.
 GabText The death mask charges towards you relentlessly!
 GabText The death mask loses his balance.
-A masked person walks towards you without a pause. It seems dead/#set on confronting you...
+A masked person walks towards you without a pause. It seems dead^set on confronting you...
 Your words have no effect. The masked man keeps on pursuing you.
-\>\i[80]\}IFLEMAN\{\</#"..."
-The rifleman just keeps on aiming at you, not paying attention /#to your words.
-\>\i[76]\}EAT GRINDER\{\</#"HRGRAAAAHHH!"
+\>\i[80]\}IFLEMAN\{\<^"..."
+The rifleman just keeps on aiming at you, not paying attention ^to your words.
+\>\i[76]\}EAT GRINDER\{\<^"HRGRAAAAHHH!"
 The mob seems to be unwilling to negotiate...
 GabText The skin of the mob begins to rot...
 GabText You are having trouble focusing your analyzing skills...
@@ -1949,26 +1949,26 @@ GabText The centaur loses its balance!
 GabText Centaur charges towards you in a fierce rush!
 choice_text 2 \}[PERSUADE]\{ "I bow down to your greatness..."
 choice_text 3 \}[INTIMIDATE]\{ "I'll ram that mauler so deep your bird brain will feel it."
-\>\i[70]\}ULL BRO\{\</#"Kyaaa kyaaa kyaaa!"
+\>\i[70]\}ULL BRO\{\<^"Kyaaa kyaaa kyaaa!"
 "What is so funny?"
 The gull brothers are cackling at you.
 It seems like you're the punchline in their joke...
-\>\i[70]\}ULL BRO\{\</#"Kyaah kyah kyah kyah!"
-It seems that your persuasion tactics made the gull brothers laugh/#hysterically...
-The gull brothers are only smirking at you. You feel ashamed /#that you tried bowing down again...
-\>\i[70]\}ULL BRO\{\</#"Kyah!"
-Your pleads go to deaf ears. The gull brothers just get more excited/#as you show weakness.
-It seems that your intimidation tactics made the gull brothers laugh/#hysterically...
-\>\i[70]\}ULL BRO\{\</#"Kyaaaaaa!"
-Intimidation doesn't seem to have effect any longer. The gull brothers/#are serious now.
+\>\i[70]\}ULL BRO\{\<^"Kyaah kyah kyah kyah!"
+It seems that your persuasion tactics made the gull brothers laugh^hysterically...
+The gull brothers are only smirking at you. You feel ashamed ^that you tried bowing down again...
+\>\i[70]\}ULL BRO\{\<^"Kyah!"
+Your pleads go to deaf ears. The gull brothers just get more excited^as you show weakness.
+It seems that your intimidation tactics made the gull brothers laugh^hysterically...
+\>\i[70]\}ULL BRO\{\<^"Kyaaaaaa!"
+Intimidation doesn't seem to have effect any longer. The gull brothers^are serious now.
 The creatures are tilting their heads and taunting at you.
 The gull brother is cackling at you.
 It seems like you're the punchline in his joke...
-It seems that your persuasion tactics made the gull brother laugh/#hysterically...
-The gull brother is only smirking at you. You feel ashamed that/#you tried bowing down again...
-Your pleads go to deaf ears. The gull brother just gets more excited/#as you show weakness.
-It seems that your intimidation tactics made the gull brother laugh/#hysterically...
-Intimidation doesn't seem to have effect any longer. The gull brother/#is serious now.
+It seems that your persuasion tactics made the gull brother laugh^hysterically...
+The gull brother is only smirking at you. You feel ashamed that^you tried bowing down again...
+Your pleads go to deaf ears. The gull brother just gets more excited^as you show weakness.
+It seems that your intimidation tactics made the gull brother laugh^hysterically...
+Intimidation doesn't seem to have effect any longer. The gull brother^is serious now.
 The creature is tilting its head and taunting at you.
 GabText The gull bros are rotting before your eyes...
 GabText You've exposed the weaknesses of the brothers!
@@ -1996,28 +1996,28 @@ GabText A washing machine is rocking violently before you...
 The washing machine is too strong for you.
 It's a metal door. There are no conversations to be had here.
 GabText A metal door stands sturdy before you...
-It's a pair of wooden doors. There are no conversations to be /#had here.
+It's a pair of wooden doors. There are no conversations to be ^had here.
 GabText The rot doesn't seem to affect the doors.
 GabText The doors have no obvious weaknesses.
 GabText A pair of wooden doors stand sturdy before you...
 The doors are too strong for you.
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Why would you do this?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"..."
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Do you really mean it?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Why should I believe you?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Why would you do this?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"..."
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Do you really mean it?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Why should I believe you?"
 Doppelgänger Olivia is hesitating.
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"I'm not just going to keep giving you second chances! You started/#this so better be ready for this too!"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"I don't believe you for one second!"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"What's wrong with you!?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"What!? How does that make even sense!?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"You're just making this up as you go, right? Just to ease your own/#guilt!?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"W-what's wrong with you!? You're a monster!"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"N-no! It really doesn't! We can work together too!"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Aaah! W-why are you doing this!?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Just what are you!? A monster!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"I'm not just going to keep giving you second chances! You started^this so better be ready for this too!"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"I don't believe you for one second!"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"What's wrong with you!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"What!? How does that make even sense!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"You're just making this up as you go, right? Just to ease your own^guilt!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"W-what's wrong with you!? You're a monster!"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"N-no! It really doesn't! We can work together too!"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Aaah! W-why are you doing this!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Just what are you!? A monster!?"
 GabText Olivia loses her balance!
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"You think this is a fair fight!? Why are you doing this!?"
-\>\i[67]\}OPPELGÄNGER OLIVIA\{\</#"Want me to SCRATCH YOUR EYES OUT!?"
-\>\i[78]\}LIVIA\{\</#"It's hard for me to wrap my brains around this..."
-\>\i[78]\}LIVIA\{\</#"I'm not like this really, am I?"
-\>\i[78]\}LIVIA\{\</#"Want me to SCRATCH YOUR EYES OUT!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"You think this is a fair fight!? Why are you doing this!?"
+\>\i[67]\}OPPELGÄNGER OLIVIA\{\<^"Want me to SCRATCH YOUR EYES OUT!?"
+\>\i[78]\}LIVIA\{\<^"It's hard for me to wrap my brains around this..."
+\>\i[78]\}LIVIA\{\<^"I'm not like this really, am I?"
+\>\i[78]\}LIVIA\{\<^"Want me to SCRATCH YOUR EYES OUT!?"

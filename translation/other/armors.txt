@@ -1,129 +1,129 @@
 Army jumpsuit
-A standard model army jumpsuit. It's made from a durable/#material that withstands fire well.
+A standard model army jumpsuit. It's made from a durable^material that withstands fire well.
 Collared blouse
-A simple blouse with a fancy collar. Offers next to no protection/#but looks formal and nice.
+A simple blouse with a fancy collar. Offers next to no protection^but looks formal and nice.
 Army uniform
-A standard Bremen uniform. The material is somewhat durable against/#knives and other slashing weapons.
+A standard Bremen uniform. The material is somewhat durable against^knives and other slashing weapons.
 Silk vest
-A tailor-made silk vest. It fits you perfectly. It's defensive/#capabilities are mostly otherwordly.
+A tailor-made silk vest. It fits you perfectly. It's defensive^capabilities are mostly otherwordly.
 Rugged vest
-A simple yet stylish vest. Offers very little protection,/#but it truly is stylish.
+A simple yet stylish vest. Offers very little protection,^but it truly is stylish.
 Sturdy overalls
-Sturdy worker's overalls. They offer decent protection and/#are especially efficient against fire.
+Sturdy worker's overalls. They offer decent protection and^are especially efficient against fire.
 Turtleneck shirt
 Stahlhelm
-A Bremen-style helmet made of steel. Feels uncomfortable but/#offers great protection. Protects against concussion.
+A Bremen-style helmet made of steel. Feels uncomfortable but^offers great protection. Protects against concussion.
 Pickelhaube
-A decorative helmet made from hardened leather with reinforced/#metal trims. It's an out-of-date model but works just fine.
+A decorative helmet made from hardened leather with reinforced^metal trims. It's an out-of-date model but works just fine.
 Eclipse talisman
-An eastern style talisman with decorations depicting/#an eclipse of the sun.
+An eastern style talisman with decorations depicting^an eclipse of the sun.
 Dragoon helmet
-A 18th century cavalry metal helmet. It doesn't stay on very/#well and feels clumsy, but offer great protection.
+A 18th century cavalry metal helmet. It doesn't stay on very^well and feels clumsy, but offer great protection.
 Ballistic shield
 A military grade ballistic shield.
 Plank shield
-A simple makeshift shield. This particular one seems to be/#broken beyond repair...
+A simple makeshift shield. This particular one seems to be^broken beyond repair...
 Shield of the Four
-An enchanted shield with severed hands placed to ward off/#otherwordly powers.
+An enchanted shield with severed hands placed to ward off^otherwordly powers.
 A simple makeshift shield. Offers a little bit protection.
 Betel's stone
-The ring of a long gone new god Betel. The ring has magic/#imbued in it that is constantly leaking from the crystal.
+The ring of a long gone new god Betel. The ring has magic^imbued in it that is constantly leaking from the crystal.
 Ring of the still-blood
-A ring that is said to make blood still and thus prevent/#bleeding. There's no way to explain this but magic.
+A ring that is said to make blood still and thus prevent^bleeding. There's no way to explain this but magic.
 Fluted armpieces
-Armpieces that clearly belong to a larger setup. On their own/#they already offer decent protection and prevent arm loss.
+Armpieces that clearly belong to a larger setup. On their own^they already offer decent protection and prevent arm loss.
 Fluted breastplate
-An old medieval breastplate that seems to belong to a larger/#setup. On its own it already offers great protection.
+An old medieval breastplate that seems to belong to a larger^setup. On its own it already offers great protection.
 Fluted fauld
-A fauld that clearly belong to a larger setup, most likely/#to an armor set. On its own it already offers decent protection.
+A fauld that clearly belong to a larger setup, most likely^to an armor set. On its own it already offers decent protection.
 Fluted armor
-An old medieval armor that is in surprisingly good shape./#The decoration suggests this armor came from Valland originally.
+An old medieval armor that is in surprisingly good shape.^The decoration suggests this armor came from Valland originally.
 Bremen chestplate
-A plate mail armor offers great defence, but is rather clunky/#and uncomfortable to use. The armor has egravings of a Bremen eagle.
+A plate mail armor offers great defence, but is rather clunky^and uncomfortable to use. The armor has egravings of a Bremen eagle.
 Arm guards
 A pair of arm guards that prevent serious injuries.
 Soul devour necklace
-A silver necklace with a soul stone embedded on it. The stone/#protects against otherwordly powers.
+A silver necklace with a soul stone embedded on it. The stone^protects against otherwordly powers.
 Cameo
-A cameo carving of a beautiful woman from a bygone era. The /#jewel emits strange aura...
+A cameo carving of a beautiful woman from a bygone era. The ^jewel emits strange aura...
 Eyeglasses
-You can see the world clearer with these. Improves the/#accuracy of its wearer greatly.
+You can see the world clearer with these. Improves the^accuracy of its wearer greatly.
 Broken eyeglasses
-You can see the world clearer with these. Or you could if/#they weren't broken...
+You can see the world clearer with these. Or you could if^they weren't broken...
 Beheaded wizard
-A dried and burned severed head. The face is forever left/#in a spiteful grimace. The head is not without purpose though,/#somekind of power in it reflects otherwordly attacks occasionally.
+A dried and burned severed head. The face is forever left^in a spiteful grimace. The head is not without purpose though,^somekind of power in it reflects otherwordly attacks occasionally.
 Leechmonger ring
-A hefty ring forged by the Hermit Mages of South who dedicated/#their lives to the God of the Depths hundreds of years ago./#The mages were able to infuse the ring with life draining magic.
+A hefty ring forged by the Hermit Mages of South who dedicated^their lives to the God of the Depths hundreds of years ago.^The mages were able to infuse the ring with life draining magic.
 Guardian cameo
-A cameo carving of a beautiful woman from a bygone era./#The jewel emits strange aura... It is now possessed and grants/#protection to those in low health.
+A cameo carving of a beautiful woman from a bygone era.^The jewel emits strange aura... It is now possessed and grants^protection to those in low health.
 Hardened heart
-A crystalized and hardened heart that has seen its share of pain/#and suffering. It now offers a glimpse of the same determination/#its previous owner had to its new master.
+A crystalized and hardened heart that has seen its share of pain^and suffering. It now offers a glimpse of the same determination^its previous owner had to its new master.
 Small thing's amulet
-A crudely shaped amulet representing a rat deity. The peculiar/#thing is imbued with prayers of the ratkin that grant its wearer/#a small boost in agility to help evade possible dangers.
+A crudely shaped amulet representing a rat deity. The peculiar^thing is imbued with prayers of the ratkin that grant its wearer^a small boost in agility to help evade possible dangers.
 Salmonsnake rune
-An old relic from northern warrior tribes of Oldegård. The rune is said/#to contain a soul of a Salmonsnake that gives its owner a hardened skin/#that prevents limb losses, burns and bleeding.
+An old relic from northern warrior tribes of Oldegård. The rune is said^to contain a soul of a Salmonsnake that gives its owner a hardened skin^that prevents limb losses, burns and bleeding.
 Ring of wraiths
-A ring with a blood diamond embedded on it. The diamond has seen/#so much death that life force is leaking from it. The priests of Rondon/#have slaves digging these diamonds no matter the cost.
+A ring with a blood diamond embedded on it. The diamond has seen^so much death that life force is leaking from it. The priests of Rondon^have slaves digging these diamonds no matter the cost.
 Thorned ring
-A ring with thorns that emit steady flow of poison to its wearer./#Steady flow makes one immune to more potent toxins.
+A ring with thorns that emit steady flow of poison to its wearer.^Steady flow makes one immune to more potent toxins.
 Foldable wheelchair
-A special lightweight foldable wheelchair. It is easy and fast/#to set up and feels surprisingly durable despite its size.
+A special lightweight foldable wheelchair. It is easy and fast^to set up and feels surprisingly durable despite its size.
 Linen vest
-A rather nonchalant linen vest. It's defensive capabilities are /#mostly otherwordly.
+A rather nonchalant linen vest. It's defensive capabilities are ^mostly otherwordly.
 Combat jacket
-A military-issue combat jacket that has become popular with/#civilians as well.
+A military-issue combat jacket that has become popular with^civilians as well.
 Gentleman's hat
-A fine looking gentleman's hat. It's a little bit old fashioned/#but some things are timeless.
+A fine looking gentleman's hat. It's a little bit old fashioned^but some things are timeless.
 Kashmir suit
-A natural white kashmir suit./#You feel especially confident in such a fine suit and thus your/#hit, evasion and critical rates are all boosted.
+A natural white kashmir suit.^You feel especially confident in such a fine suit and thus your^hit, evasion and critical rates are all boosted.
 Pilot jacket
 A pilot jacket.
 Yellow mage robes
-Traditional wear of a yellow mage. The robes have multiple/#different patterns from multiple different cultures. Different/#dangly bits and talismans protect its user from otherwordly powers.
+Traditional wear of a yellow mage. The robes have multiple^different patterns from multiple different cultures. Different^dangly bits and talismans protect its user from otherwordly powers.
 Suede jacket
-A fine suede jacket with button closure on front. It is a little/#bit worn at places but overall in great condition./#Wearing such nice jacket boosts your confidence and critical rate.
+A fine suede jacket with button closure on front. It is a little^bit worn at places but overall in great condition.^Wearing such nice jacket boosts your confidence and critical rate.
 Pigskin gas mask
-A crude gas mask made out of pigskin. It's not the most reliable/#protection against toxic gasses, but better than nothing.
+A crude gas mask made out of pigskin. It's not the most reliable^protection against toxic gasses, but better than nothing.
 Bremen gas mask
-Gas mask of the Bremen flame troopers. Flame troopers were often/#used in city warfare where they would scorch everything in sight.
+Gas mask of the Bremen flame troopers. Flame troopers were often^used in city warfare where they would scorch everything in sight.
 Bremen elite helmet
-The helmet clearly takes inspiration from ancient Lombardia/#where fighters clad in armor would duel for people's entertainment.
+The helmet clearly takes inspiration from ancient Lombardia^where fighters clad in armor would duel for people's entertainment.
 Chac chac
-A seemingly simple shaker instrument. The combination of the/#pebbles inside and the various pearls tied onto it create a/#hypnotic rhytm that helps one to focus on the otherwordly.
+A seemingly simple shaker instrument. The combination of the^pebbles inside and the various pearls tied onto it create a^hypnotic rhytm that helps one to focus on the otherwordly.
 Yggaegetsu amulet
-An eastern style amulet that is said to have belonged to the deity/#of the wandering warriors, Yggaegetsu. The amulet boosts confidence/#in your own prowess and increases the chance of critical hits.
+An eastern style amulet that is said to have belonged to the deity^of the wandering warriors, Yggaegetsu. The amulet boosts confidence^in your own prowess and increases the chance of critical hits.
 Molded doll
-Enchanted doll that is covered in a white substance that can/#only be described as mold.
+Enchanted doll that is covered in a white substance that can^only be described as mold.
 Smelter key
-A key that has seemingly melt in high temperatures. The key feels/#heavier than it's supposed to as if something is attached to it./#A spirit protects the wearer from fire and flames.
+A key that has seemingly melt in high temperatures. The key feels^heavier than it's supposed to as if something is attached to it.^A spirit protects the wearer from fire and flames.
 Epee mask
-A simple mask used in competitive fencing. It isn't particularly/#defensive except against piercing attacks.
+A simple mask used in competitive fencing. It isn't particularly^defensive except against piercing attacks.
 Fencing gambeson
-A traditional armor used in fencing. The armor offers decent/#protection, but it is vulnerable against fire.
+A traditional armor used in fencing. The armor offers decent^protection, but it is vulnerable against fire.
 The darkness
-A living and seeping darkness that attaches itself to whoever/#dares to touch it and live in symbiosis with it.
-A military grade ballistic shield. Used often in riots. If/#you are lucky, it might even stop bullets.
+A living and seeping darkness that attaches itself to whoever^dares to touch it and live in symbiosis with it.
+A military grade ballistic shield. Used often in riots. If^you are lucky, it might even stop bullets.
 Artificial soul
-There are rumours that Bremen experimented with creating artificial/#souls to power their unholy rituals. If this truly is one of those/#it could be used to channel otherwordly more efficiently.
+There are rumours that Bremen experimented with creating artificial^souls to power their unholy rituals. If this truly is one of those^it could be used to channel otherwordly more efficiently.
 Eye of Sylvian
-Said to be an eye of the older god Sylvian herself. How it could/#have ended up here is a mystery. You have your doubts. It does/#seem to boost the recovery effect of healing items and magic...
+Said to be an eye of the older god Sylvian herself. How it could^have ended up here is a mystery. You have your doubts. It does^seem to boost the recovery effect of healing items and magic...
 Leather armor
-Simple armor made from hardened leather. Offers decent protection/#and it's not too heavy.
+Simple armor made from hardened leather. Offers decent protection^and it's not too heavy.
 Makeshift armor
-A makeshift armor made from random kitchenware. The breastplate/#is an old stove lid. Desperate times breed creativity.
+A makeshift armor made from random kitchenware. The breastplate^is an old stove lid. Desperate times breed creativity.
 99 eyes mask
-A mysterious skull mask from a faraway continent of Vinland./#The mask is said to raise one's perception.
+A mysterious skull mask from a faraway continent of Vinland.^The mask is said to raise one's perception.
 Makeshift full armor
 Death mask
-A burial mask used in old Bohemia. The mask is designed so that/#the death gurgle of its wearer sounds more like laughter of joy. Because/#of its connection to death, the mask has otherwordly properties.
+A burial mask used in old Bohemia. The mask is designed so that^the death gurgle of its wearer sounds more like laughter of joy. Because^of its connection to death, the mask has otherwordly properties.
 Chainmail dress
-An armor consisting of small metal rings linked together to form/#a mesh that protects its wearer.
+An armor consisting of small metal rings linked together to form^a mesh that protects its wearer.
 Pinecone pig
-Your very own pinecone pig. It's an old traditional children's trinket/#from the northern land of Oldergård. You can craft one by attaching/#4 sticks to a pinecone and adding a hint of love to the mix.
+Your very own pinecone pig. It's an old traditional children's trinket^from the northern land of Oldergård. You can craft one by attaching^4 sticks to a pinecone and adding a hint of love to the mix.
 One-winged necklace
-A necklace in the shape of a wing of a butterfly. There is a carving/#on the other side: "You cannot have something new before you rip a/#wing of a butterfly and sacrifice something in return."
-It's an old vintage necklace. You and your sister both have one of/#of the wings. It has always been a bit too flashy and big for your/#taste. You prefer more modest jewelry.
+A necklace in the shape of a wing of a butterfly. There is a carving^on the other side: "You cannot have something new before you rip a^wing of a butterfly and sacrifice something in return."
+It's an old vintage necklace. You and your sister both have one of^of the wings. It has always been a bit too flashy and big for your^taste. You prefer more modest jewelry.
 Blue noctuid necklace
-Combining the two wings into one makes it a complete moth necklace./#The necklace eminates special aura that protects from the otherwordly./#Aura that only manifest when one is low on health.
+Combining the two wings into one makes it a complete moth necklace.^The necklace eminates special aura that protects from the otherwordly.^Aura that only manifest when one is low on health.
 Joy mask
-A leathery mask from ancient times. It is trying to mimic human face/#with mixed results. The mask does bring joy to whoever wears it.
+A leathery mask from ancient times. It is trying to mimic human face^with mixed results. The mask does bring joy to whoever wears it.

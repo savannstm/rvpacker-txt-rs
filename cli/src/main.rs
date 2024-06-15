@@ -19,6 +19,9 @@ mod write;
 use read::*;
 use write::*;
 
+mod shuffle;
+use shuffle::shuffle_words;
+
 struct ProgramLocalization<'a> {
     about: &'a str,
     read: &'a str,
@@ -387,27 +390,27 @@ fn main() {
                 let maps_original_text_vec: Vec<String> = read_to_string(dir_paths.maps)
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace("/#", "\n"))
+                    .map(|line: &str| line.replace('^', "\n"))
                     .collect();
 
                 let mut maps_translated_text_vec: Vec<String> =
                     read_to_string(dir_paths.maps_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|line: &str| line.replace("/#", "\n").trim().to_string())
+                        .map(|line: &str| line.replace('^', "\n").trim().to_string())
                         .collect();
 
                 let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace("/#", "\n"))
+                    .map(|line: &str| line.replace('^', "\n"))
                     .collect();
 
                 let mut maps_translated_names_vec: Vec<String> =
                     read_to_string(dir_paths.names_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|line: &str| line.replace("/#", "\n").trim().to_string())
+                        .map(|line: &str| line.replace('^', "\n").trim().to_string())
                         .collect();
 
                 if drunk > 0 {
@@ -421,13 +424,8 @@ fn main() {
                             .iter_mut()
                             .zip(maps_translated_names_vec.iter_mut())
                         {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
-
-                            let mut name_string_split: Vec<&str> = name_string.split(' ').collect();
-                            name_string_split.shuffle(&mut rng);
-                            *name_string = name_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
+                            *name_string = shuffle_words(name_string);
                         }
                     }
                 }
@@ -546,9 +544,7 @@ fn main() {
 
                     if drunk == 2 {
                         for text_string in system_translated_text.iter_mut() {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
                         }
                     }
                 }
@@ -607,9 +603,7 @@ fn main() {
 
                     if drunk == 2 {
                         for text_string in plugins_translated_text_vec.iter_mut() {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
                         }
                     }
                 }
