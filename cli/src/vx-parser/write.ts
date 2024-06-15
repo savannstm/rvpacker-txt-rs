@@ -2,6 +2,7 @@ import { writeFileSync, readFileSync } from "fs";
 import { dump } from "@hyrious/marshal";
 import { deflateSync } from "zlib";
 
+import "./shuffle";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 
 function mergeSeq(objArr: object[]): object[] {
@@ -131,10 +132,8 @@ export function writeMap(
                         } else if (code == 102 && Array.isArray(parameter)) {
                             for (const [j, param] of (parameter as string[]).entries()) {
                                 if (typeof param === "string") {
-                                    if (textTranslationMap.has(param.replaceAll("\\n[", "\\N["))) {
-                                        (parameters[i][j] as string) = textTranslationMap.get(
-                                            param.replaceAll("\\n[", "\\N[")
-                                        )!;
+                                    if (textTranslationMap.has(param)) {
+                                        (parameters[i][j] as string) = textTranslationMap.get(param)!;
 
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
@@ -168,24 +167,21 @@ export function writeOther(
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("/#", "\n"));
+            .map((string) => string.replaceAll("^", "\n"));
 
         let otherTranslatedText = readFileSync(
             `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`,
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("/#", "\n"));
+            .map((string) => string.replaceAll("^", "\n"));
 
         if (drunk > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
 
             if (drunk === 2) {
                 otherTranslatedText = otherTranslatedText.map((string) => {
-                    return string
-                        .split("\n")
-                        .map((line) => line.split(" ").shuffle().join(" "))
-                        .join("\n");
+                    return shuffleWords(string)!;
                 });
             }
         }
@@ -199,7 +195,7 @@ export function writeOther(
                 }
 
                 const name: string = getValueBySymbolDesc(obj, "@name");
-                const nickname = getValueBySymbolDesc(obj, "@nickname");
+                const nickname: string = getValueBySymbolDesc(obj, "@nickname");
                 const description: string = getValueBySymbolDesc(obj, "@description");
                 const note: string = getValueBySymbolDesc(obj, "@note");
 
@@ -225,7 +221,7 @@ export function writeOther(
                 const pagesLength = filename == "Troops.rvdata2" ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
-                    const list =
+                    const list: object =
                         filename == "Troops.rvdata2"
                             ? getValueBySymbolDesc(pages[i], "@list")
                             : getValueBySymbolDesc(obj, "@list");
@@ -252,10 +248,8 @@ export function writeOther(
                                 } else if (code === 102 && Array.isArray(parameter)) {
                                     for (const [j, param] of (parameter as string[]).entries()) {
                                         if (typeof param === "string") {
-                                            if (translationMap.has(param.replaceAll("\\n[", "\\N["))) {
-                                                (parameters[i][j] as string) = translationMap.get(
-                                                    param.replaceAll("\\n[", "\\N[")
-                                                )!;
+                                            if (translationMap.has(param)) {
+                                                (parameters[i][j] as string) = translationMap.get(param)!;
 
                                                 setValueBySymbolDesc(item, "@parameters", parameters);
                                             }
@@ -287,12 +281,12 @@ export function writeSystem(
     const symbolDesc = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
     const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDesc.map((desc) =>
         getValueBySymbolDesc(obj, desc)
-    );
+    ) as [string[], string[], string[], string, object];
 
     for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
         for (const [j, string] of arr.entries()) {
             if (string && translationMap.has(string)) {
-                arr[j] = translationMap.get(string);
+                arr[j] = translationMap.get(string)!;
 
                 setValueBySymbolDesc(obj, symbolDesc[i], arr);
             }
@@ -302,7 +296,7 @@ export function writeSystem(
     setValueBySymbolDesc(obj, currencyUnit, translationMap.get(currencyUnit));
 
     const termsSymbols = Object.getOwnPropertySymbols(terms);
-    const termsValues = termsSymbols.map((symbol) => terms[symbol]);
+    const termsValues: string[][] = termsSymbols.map((symbol) => terms[symbol]);
 
     for (let i = 0; i < termsSymbols.length; i++) {
         for (const [j, termValue] of termsValues.entries()) {
@@ -342,8 +336,7 @@ export function writeScripts(
             uintarrArr[i][1] = decoder.decode(title);
         }
 
-        const data = translationArr[i].replaceAll("/#", "\r\n");
-        uintarrArr[i][2] = deflateSync(data, { level: 6 });
+        uintarrArr[i][2] = deflateSync(translationArr[i].replaceAll("^", "\r\n"));
     }
 
     if (logging) {

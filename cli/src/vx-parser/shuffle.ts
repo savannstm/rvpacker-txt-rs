@@ -12,3 +12,14 @@ Array.prototype.shuffle = function (): any[] {
 
     return self;
 };
+
+function shuffleWords(string: string): string | void {
+    const words = string.match(/\S+/g);
+
+    if (words) {
+        const shuffled = words.shuffle();
+
+        let wordIndex = 0;
+        return string.replace(/\S+/g, () => shuffled[wordIndex++]);
+    }
+}

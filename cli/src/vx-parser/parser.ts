@@ -260,19 +260,19 @@ program
 
         const mapsOriginalText = readFileSync(paths.maps, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("^", "\n").trim());
 
         let mapsTranslatedText = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("^", "\n").trim());
 
         const mapsOriginalNames = readFileSync(paths.names, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("^", "\n").trim());
 
         let mapsTranslatedNames = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("\\n", "\n").trim());
+            .map((line) => line.replaceAll("^", "\n").trim());
 
         if (drunkInt > 0) {
             mapsTranslatedText = mapsTranslatedText.shuffle();
@@ -280,10 +280,7 @@ program
 
             if (drunkInt === 2) {
                 mapsTranslatedText = mapsTranslatedText.map((string) => {
-                    return string
-                        .split("\n")
-                        .map((line) => line.split(" ").shuffle().join(" "))
-                        .join("\n");
+                    return shuffleWords(string)!;
                 });
             }
         }
@@ -319,10 +316,7 @@ program
 
             if (drunkInt === 2) {
                 systemTranslatedText = systemTranslatedText.map((string) => {
-                    return string
-                        .split("\n")
-                        .map((line) => line.split(" ").shuffle().join(" "))
-                        .join("\n");
+                    return shuffleWords(string)!;
                 });
             }
         }

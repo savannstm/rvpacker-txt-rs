@@ -18,7 +18,7 @@ export function readMap(inputDir: string, outputDir: string, logging: boolean, l
     const namesLines = OrderedSet().asMutable() as OrderedSet<string>;
 
     for (const [filename, obj] of objMap) {
-        const displayName = getValueBySymbolDesc(obj, "@display_name");
+        const displayName: string = getValueBySymbolDesc(obj, "@display_name");
 
         if (displayName) {
             namesLines.add(displayName);
@@ -50,7 +50,7 @@ export function readMap(inputDir: string, outputDir: string, logging: boolean, l
                             }
                         } else {
                             if (inSeq) {
-                                const lineJoined = line.join("\\n");
+                                const lineJoined = line.join("^");
 
                                 lines.add(lineJoined);
                                 line.length = 0;
@@ -125,11 +125,11 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                 }
 
                 if (typeof description === "string" && description) {
-                    lines.add(description.replaceAll(/\r\n|\n(?!bt)/g, "\\n"));
+                    lines.add(description.replaceAll(/\r\n|\n/g, "^"));
                 }
 
                 if (typeof note === "string" && note) {
-                    lines.add(note.replaceAll(/\r\n|\n(?!bt)/g, "\\n"));
+                    lines.add(note.replaceAll(/\r\n|\n/g, "^"));
                 }
             }
 
@@ -173,7 +173,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                                 }
                             } else {
                                 if (inSeq) {
-                                    const lineJoined = line.join("\\n");
+                                    const lineJoined = line.join("^");
 
                                     lines.add(lineJoined);
                                     line.length = 0;
@@ -236,7 +236,7 @@ export function readSystem(inputDir: string, outputDir: string, logging: boolean
 
     const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbols.map((symbol) =>
         getValueBySymbolDesc(obj, symbol)
-    );
+    ) as [string[], string[], string[], string, object];
 
     for (const arr of [skillTypes, weaponTypes, armorTypes]) {
         for (const string of arr) {
@@ -272,9 +272,7 @@ export function readScripts(inputDir: string, outputDir: string, logging: boolea
 
     const fullCode = [];
     for (const [_m, _t, code] of uintarrArr) {
-        const codeString = inflateSync(code)
-            .toString("utf8")
-            .replaceAll(/\r\n|\n(?!bt)/g, "\\n");
+        const codeString = inflateSync(code).toString("utf8").replaceAll(/\r?\n/g, "^/");
         fullCode.push(codeString);
     }
 
