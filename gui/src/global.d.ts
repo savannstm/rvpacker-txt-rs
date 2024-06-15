@@ -23,17 +23,14 @@ interface Settings {
     backup: Backup;
     theme: ThemeName;
     firstLaunch: boolean;
+    project: string | null;
+    RPGMVer: "new" | "old" | null;
 }
 
 interface mainTranslation {
     cannotGetSettings: string;
     askCreateSettings: string;
     createdSettings: string;
-    askDownloadTranslation: string;
-    downloadingTranslation: string;
-    downloadedTranslation: string;
-    startBlankProject: string;
-    whatNext: string;
     unsavedChanges: string;
     originalTextIrreplacable: string;
     invalidRegexp: string;
@@ -63,6 +60,10 @@ interface mainTranslation {
     currentPage: string;
     separator: string;
     goToRow: string;
+    missingTranslationDir: string;
+    missingOriginalDir: string;
+    missingTranslationSubdirs: string;
+    noProjectSelected: string;
 }
 
 interface optionsTranslation {

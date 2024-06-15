@@ -2,36 +2,26 @@ import "./string-extensions";
 import "./htmlelement-extensions";
 import { Theme } from "./themes";
 
-import {
-    FileEntry,
-    FsDirOptions,
-    copyFile,
-    exists,
-    readDir,
-    readTextFile,
-    removeDir,
-    removeFile,
-    writeTextFile,
-    createDir,
-} from "@tauri-apps/api/fs";
-import { BaseDirectory, resourceDir, join } from "@tauri-apps/api/path";
-import { ask, message } from "@tauri-apps/api/dialog";
+import { FileEntry, exists, readDir, readTextFile, removeFile, writeTextFile, createDir } from "@tauri-apps/api/fs";
+import { BaseDirectory, join } from "@tauri-apps/api/path";
+import { ask, message, open as openPath } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { exit } from "@tauri-apps/api/process";
 import { appWindow, CloseRequestedEvent, WebviewWindow } from "@tauri-apps/api/window";
-import { Command } from "@tauri-apps/api/shell";
 import { writeText as writeToClipboard, readText as readFromClipboard } from "@tauri-apps/api/clipboard";
-import { platform, locale as getLocale } from "@tauri-apps/api/os";
+import { locale as getLocale } from "@tauri-apps/api/os";
 import { Event, UnlistenFn } from "@tauri-apps/api/event";
 
 import XRegExp from "xregexp";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
-    const resDir: string = "res";
+    let projDir: string = "";
+    let RPGMVer: string = "";
+
+    const resDir = "res";
     const translationDir: string = "translation";
     const originalDir: string = "original";
     const backupDir: string = "backups";
-    const repoDir: string = "main/fh-termina-json-writer-main";
 
     const mapsDir: string = "maps";
     const otherDir: string = "other";
@@ -42,17 +32,83 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const ruTranslation: string = "ru.json";
     const enTranslation: string = "en.json";
 
-    async function copyDir(sourceDir: string, targetDir: string, fsOptions: FsDirOptions | undefined): Promise<void> {
-        await createDir(targetDir, fsOptions);
+    async function ensureProjectIsValid(folder: string): Promise<boolean> {
+        const dirs = [mapsDir, otherDir, pluginsDir];
+        const translationPath = await join(folder, translationDir);
+        const originalPath = await join(folder, originalDir);
 
-        for (const file of await readDir(sourceDir, fsOptions)) {
-            const name: string = file.name as string;
+        if (!(await exists(translationPath))) {
+            await message(mainLanguage.missingTranslationDir);
+            return false;
+        }
 
-            if (file.children) {
-                await copyDir(await join(sourceDir, name), await join(targetDir, name), fsOptions);
-            } else {
-                await copyFile(await join(sourceDir, name), await join(targetDir, name), fsOptions);
+        if (!(await exists(originalPath))) {
+            await message(mainLanguage.missingOriginalDir);
+            return false;
+        }
+
+        for (const dir of dirs) {
+            const subDirPath = await join(translationPath, dir);
+
+            if (dir === pluginsDir && RPGMVer === "old") {
+                continue;
             }
+
+            if (!(await exists(subDirPath))) {
+                await message(mainLanguage.missingTranslationSubdirs);
+                return false;
+            }
+
+            if (dir === otherDir) {
+                const files = await readDir(subDirPath);
+
+                for (const file of files) {
+                    const name = file.name as string;
+
+                    if (name.startsWith("scripts")) {
+                        RPGMVer = "old";
+                        break;
+                    } else {
+                        RPGMVer = "new";
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    async function openFolder(): Promise<void> {
+        const folder = await openPath({ directory: true, multiple: false });
+
+        if (folder) {
+            if (!(await ensureProjectIsValid(folder as string))) {
+                return;
+            }
+
+            projDir = folder as string;
+
+            document.getElementById("no-project-selected")!.remove();
+
+            const settings: Settings = JSON.parse(
+                await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
+            );
+            await writeTextFile(
+                await join(resDir, settingsFile),
+                JSON.stringify({ ...settings, project: projDir, RPGMVer: RPGMVer }),
+                {
+                    dir: BaseDirectory.Resource,
+                }
+            );
+
+            await createDir(await join(projDir, backupDir), { recursive: true });
+            nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
+            if (backupEnabled) {
+                backup(backupPeriod);
+            }
+
+            createLogFile();
+            createContent();
         }
     }
 
@@ -68,6 +124,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     lang: language,
                     theme: "cool-zinc",
                     firstLaunch: true,
+                    project: null,
                 }),
                 {
                     dir: BaseDirectory.Resource,
@@ -79,36 +136,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         } else {
             await exit(0);
         }
-    }
-
-    async function cloneRepository(): Promise<void> {
-        function animateEllipsis(): void {
-            if (!progressText.textContent?.endsWith("...")) {
-                progressText.textContent += ".";
-                setTimeout(animateEllipsis, 500);
-            } else if (progressText.textContent?.endsWith("...")) {
-                progressText.innerHTML = progressText.textContent.slice(0, -3);
-                setTimeout(animateEllipsis, 500);
-            }
-        }
-
-        const progressDisplay: HTMLDivElement = document.getElementById("progress-display") as HTMLDivElement;
-        const progressText: HTMLDivElement = document.getElementById("progress-text") as HTMLDivElement;
-        progressText.innerHTML = mainLanguage.downloadingTranslation;
-
-        progressDisplay.classList.replace("hidden", "flex");
-        animateEllipsis();
-
-        const command: string = (await platform()) === "win32" ? "powershell" : "sh";
-        const resourcePath: string = await join(await resourceDir(), resDir);
-        await new Command(command, [], { cwd: resourcePath }).execute();
-
-        await invoke("unzip", {
-            path: await join(resourcePath, "main.zip"),
-            dest: await join(resourcePath, "main"),
-        });
-
-        progressDisplay.remove();
     }
 
     async function changeLanguage(language: Language): Promise<void> {
@@ -124,82 +151,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             });
 
             location.reload();
-        }
-    }
-
-    async function prepareTranslation(): Promise<void> {
-        const dirsToLeave: [string, string] = [translationDir, originalDir];
-
-        const repoPath: string = await join(resDir, repoDir);
-        const repositoryExists: boolean = await exists(repoPath, {
-            dir: BaseDirectory.Resource,
-        });
-
-        if (repositoryExists) {
-            await removeDir(repoPath, {
-                dir: BaseDirectory.Resource,
-                recursive: true,
-            });
-        }
-
-        await cloneRepository();
-
-        for (const dir of await readDir(repoPath, {
-            dir: BaseDirectory.Resource,
-        })) {
-            if (dir.name && dirsToLeave.includes(dir.name)) {
-                await copyDir(await join(repoPath, dir.name), await join(resDir, dir.name), {
-                    dir: BaseDirectory.Resource,
-                    recursive: true,
-                });
-            }
-        }
-
-        await removeDir(await join(resDir, "main"), { dir: BaseDirectory.Resource, recursive: true });
-    }
-
-    async function ensureStart(): Promise<void> {
-        const dirs: [string, string, string] = [mapsDir, otherDir, pluginsDir];
-
-        for (const dir of dirs) {
-            if (!(await exists(await join(resDir, translationDir, dir), { dir: BaseDirectory.Resource }))) {
-                if (await ask(mainLanguage.askDownloadTranslation)) {
-                    await prepareTranslation();
-                    alert(mainLanguage.downloadedTranslation);
-                } else if (await ask(mainLanguage.startBlankProject)) {
-                    await prepareTranslation();
-
-                    const files: FileEntry[] = await readDir(await join(resDir, translationDir, dir), {
-                        dir: BaseDirectory.Resource,
-                        recursive: true,
-                    });
-
-                    for (const file of (files
-                        .flatMap((dir: FileEntry) => dir.children)
-                        .filter((file: FileEntry | undefined) => file?.name?.endsWith("_trans.txt")) as FileEntry[]) ??
-                        []) {
-                        const name = file.name as string;
-
-                        const numberOfLines: number = (
-                            await readTextFile(await join(resDir, translationDir, dir, name), {
-                                dir: BaseDirectory.Resource,
-                            })
-                        ).count("\n");
-
-                        await removeFile(await join(resDir, translationDir, dir, name), {
-                            dir: BaseDirectory.Resource,
-                        });
-
-                        await writeTextFile(await join(resDir, translationDir, dir, name), "\n".repeat(numberOfLines), {
-                            dir: BaseDirectory.Resource,
-                        });
-                    }
-                } else {
-                    await message(mainLanguage.whatNext);
-                    await exit(0);
-                }
-                return;
-            }
         }
     }
 
@@ -236,7 +187,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function determineLastBackupNumber(): Promise<string> {
-        const backups: FileEntry[] = await readDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource });
+        const backups: FileEntry[] = await readDir(await join(projDir, backupDir));
         return backups.length === 0
             ? "00"
             : backups
@@ -276,11 +227,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const resultElement: HTMLDivElement = document.createElement("div");
         resultElement.classList.add(
             "search-result",
-            current_theme.textSecondary,
+            currentTheme.textSecondary,
             "textSecondary",
-            current_theme.borderPrimary,
+            currentTheme.borderPrimary,
             "borderPrimary",
-            current_theme.secondary,
+            currentTheme.secondary,
             "secondary"
         );
 
@@ -297,7 +248,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(resultDiv);
 
         const originalInfo: HTMLDivElement = document.createElement("div");
-        originalInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
+        originalInfo.classList.add("text-xs", currentTheme.textTertiary, "textTertiary");
 
         const currentFile: string = element.parentElement?.parentElement?.id.slice(
             0,
@@ -307,7 +258,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(originalInfo);
 
         const arrow: HTMLDivElement = document.createElement("div");
-        arrow.classList.add("search-result-arrow", current_theme.textSecondary, "textSecondary");
+        arrow.classList.add("search-result-arrow", currentTheme.textSecondary, "textSecondary");
         arrow.innerHTML = "arrow_downward";
         mainDiv.appendChild(arrow);
 
@@ -319,7 +270,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(counterpart);
 
         const counterpartInfo: HTMLDivElement = document.createElement("div");
-        counterpartInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
+        counterpartInfo.classList.add("text-xs", currentTheme.textTertiary, "textTertiary");
 
         counterpartInfo.innerHTML = `${currentFile} - ${sourceIndex === 0 ? "original" : "translation"} - ${row}`;
         mainDiv.appendChild(counterpartInfo);
@@ -340,7 +291,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             const end: number = start + match.length;
 
             const beforeDiv: string = `<span>${elementText.slice(lastIndex, start)}</span>`;
-            const matchDiv: string = `<span class="${current_theme.tertiary} tertiary">${match}</span>`;
+            const matchDiv: string = `<span class="${currentTheme.tertiary} tertiary">${match}</span>`;
 
             result.push(beforeDiv);
             result.push(matchDiv);
@@ -363,9 +314,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        for (const file of await readDir(resDir, { dir: BaseDirectory.Resource })) {
+        for (const file of await readDir(projDir)) {
             if (file.name?.startsWith("matches")) {
-                await removeFile(await join(resDir, file.name), { dir: BaseDirectory.Resource });
+                await removeFile(await join(projDir, file.name));
             }
         }
 
@@ -426,9 +377,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
 
             if (count % 1000 === 0) {
-                await writeTextFile(await join(resDir, `matches-${file}.json`), JSON.stringify(objectToWrite), {
-                    dir: BaseDirectory.Resource,
-                });
+                await writeTextFile(await join(projDir, `matches-${file}.json`), JSON.stringify(objectToWrite));
 
                 objectToWrite = {};
                 file++;
@@ -436,16 +385,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         if (file === 0) {
-            await writeTextFile(await join(resDir, "matches-0.json"), JSON.stringify(objectToWrite), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, "matches-0.json"), JSON.stringify(objectToWrite));
         }
 
         searchTotalPages.textContent = file.toString();
         searchCurrentPage.textContent = "0";
 
         for (const [id, result] of Object.entries(
-            JSON.parse(await readTextFile(await join(resDir, "matches-0.json"), { dir: BaseDirectory.Resource }))
+            JSON.parse(await readTextFile(await join(projDir, "matches-0.json")))
         )) {
             appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
         }
@@ -482,14 +429,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             element.setAttribute("reverted", "");
 
             const replacementLogContent: { [key: string]: { original: string; translation: string } } = JSON.parse(
-                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(projDir, logFile))
             );
 
             delete replacementLogContent[clicked.id];
 
-            await writeTextFile(await join(resDir, logFile), JSON.stringify(replacementLogContent), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, logFile), JSON.stringify(replacementLogContent));
         }
     }
 
@@ -689,7 +634,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             replaced.set(text.id, { original: text.value, translation: newValue });
             const prevFile: { [key: string]: { [key: string]: string } } = JSON.parse(
-                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(projDir, logFile))
             );
 
             const newObject: { [key: string]: { [key: string]: string } } = {
@@ -697,9 +642,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 ...Object.fromEntries([...replaced]),
             };
 
-            await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, logFile), JSON.stringify(newObject));
             replaced.clear();
 
             text.value = newValue;
@@ -735,7 +678,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         const prevFile: { [key: string]: { [key: string]: string } } = JSON.parse(
-            await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+            await readTextFile(await join(projDir, logFile))
         );
 
         const newObject: { [key: string]: { [key: string]: string } } = {
@@ -743,9 +686,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             ...Object.fromEntries([...replaced]),
         };
 
-        await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
-            dir: BaseDirectory.Resource,
-        });
+        await writeTextFile(await join(projDir, logFile), JSON.stringify(newObject));
         replaced.clear();
     }
 
@@ -757,7 +698,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         saving = true;
         saveButton.firstElementChild?.classList.add("animate-spin");
 
-        let dirName: string = await join(resDir, translationDir);
+        let dirName: string = await join(projDir, translationDir);
 
         if (backup) {
             const date: Date = new Date();
@@ -772,10 +713,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             nextBackupNumber = (nextBackupNumber % backupMax) + 1;
 
-            dirName = await join(resDir, backupDir, `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`);
+            dirName = await join(
+                projDir,
+                backupDir,
+                `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`
+            );
 
             for (const subDir of [mapsDir, otherDir, pluginsDir]) {
-                await createDir(await join(dirName, subDir), { dir: BaseDirectory.Resource, recursive: true });
+                await createDir(await join(dirName, subDir), { recursive: true });
             }
         }
 
@@ -785,15 +730,13 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             for (const child of contentElement.children) {
                 const node: HTMLTextAreaElement = child.firstElementChild?.children[2] as HTMLTextAreaElement;
-                outputArray.push(node.value.replaceAll("\n", "\\n"));
+                outputArray.push(node.value.replaceAll("\n", "/#"));
             }
 
             const dirPath: string = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
             const filePath: string = `${dirPath}/${contentElement.id}_trans.txt`;
 
-            await writeTextFile(await join(dirName, filePath), outputArray.join("\n"), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(dirName, filePath), outputArray.join("\n"));
             i++;
         }
 
@@ -906,6 +849,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function handleKeypress(event: KeyboardEvent): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         if (event.key === "Tab") {
             event.preventDefault();
         }
@@ -1045,10 +992,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea?.classList.replace(
-                                    current_theme.outlineSecondary,
-                                    current_theme.outlinePrimary
-                                );
+                                textarea?.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
                             }
                         }
                     }
@@ -1075,10 +1019,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea.classList.replace(
-                                    current_theme.outlineSecondary,
-                                    current_theme.outlinePrimary
-                                );
+                                textarea.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
                                 textarea.value = "";
                             }
 
@@ -1137,6 +1078,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function handleKeypressSearch(event: KeyboardEvent): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         if (event.code === "Enter") {
             event.preventDefault();
 
@@ -1172,11 +1117,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function createContent(): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         const contentNames: string[] = [];
         const content: string[][] = [];
 
-        for (const folder of await readDir(await join(resDir, translationDir), {
-            dir: BaseDirectory.Resource,
+        for (const folder of await readDir(await join(projDir, translationDir), {
             recursive: true,
         })) {
             const f = folder.name as string;
@@ -1189,13 +1137,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
 
                 contentNames.push(name.slice(0, -4));
-                content.push(
-                    (
-                        await readTextFile(await join(resDir, translationDir, f, name), {
-                            dir: BaseDirectory.Resource,
-                        })
-                    ).split("\n")
-                );
+                content.push((await readTextFile(await join(projDir, translationDir, f, name))).split("\n"));
             }
         }
 
@@ -1218,34 +1160,34 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 const originalTextElement: HTMLDivElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
-                originalTextElement.textContent = originalText.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
+                originalTextElement.textContent = originalText.replaceAll("/#", "\n");
                 originalTextElement.classList.add(
                     "original-text-div",
-                    current_theme.primary,
+                    currentTheme.primary,
                     "primary",
-                    current_theme.outlinePrimary,
+                    currentTheme.outlinePrimary,
                     "outlinePrimary"
                 );
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
-                const translationTextSplit: string[] = translationText.split("\\n");
+                const translationTextSplit: string[] = translationText.split("/#");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplit.length;
                 translationTextElement.value = translationTextSplit.join("\n");
                 translationTextElement.classList.add(
                     "translation-text-input",
-                    current_theme.outlinePrimary,
+                    currentTheme.outlinePrimary,
                     "outlinePrimary",
-                    current_theme.primary,
+                    currentTheme.primary,
                     "primary",
-                    current_theme.outlineFocus,
+                    currentTheme.outlineFocus,
                     "outlineFocus"
                 );
 
                 const rowElement: HTMLDivElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = (j + 1).toString();
-                rowElement.classList.add("row", current_theme.primary, "primary");
+                rowElement.classList.add("row", currentTheme.primary, "primary");
 
                 textContainer.appendChild(rowElement);
                 textContainer.appendChild(originalTextElement);
@@ -1256,6 +1198,16 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             contentContainer.appendChild(contentDiv);
         }
+
+        if (RPGMVer === "old") {
+            for (const element of leftPanel.children) {
+                if (element.innerHTML === "plugins") {
+                    element.innerHTML = "scripts";
+                }
+            }
+        }
+
+        arrangeElements();
     }
 
     async function compile(): Promise<void> {
@@ -1312,7 +1264,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         for (const object of result) {
             const { left, top }: { left: number; top: number } = object;
             const ghostNewLine: HTMLDivElement = document.createElement("div");
-            ghostNewLine.classList.add("ghost-new-line", current_theme.textTertiary, "textTertiary");
+            ghostNewLine.classList.add("ghost-new-line", currentTheme.textTertiary, "textTertiary");
             ghostNewLine.innerHTML = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
@@ -1376,27 +1328,27 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function switchCase(): void {
         searchCase = !searchCase;
-        searchCaseButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle(currentTheme.tertiary);
     }
 
     function switchWhole(): void {
         searchWhole = !searchWhole;
-        searchWholeButton.classList.toggle(current_theme.tertiary);
+        searchWholeButton.classList.toggle(currentTheme.tertiary);
     }
 
     function switchRegExp(): void {
         searchRegex = !searchRegex;
-        searchRegexButton.classList.toggle(current_theme.tertiary);
+        searchRegexButton.classList.toggle(currentTheme.tertiary);
     }
 
     function switchTranslation(): void {
         searchTranslation = !searchTranslation;
-        searchTranslationButton.classList.toggle(current_theme.tertiary);
+        searchTranslationButton.classList.toggle(currentTheme.tertiary);
     }
 
     function switchLocation(): void {
         searchLocation = !searchLocation;
-        searchLocationButton.classList.toggle(current_theme.tertiary);
+        searchLocationButton.classList.toggle(currentTheme.tertiary);
     }
 
     function createOptionsWindow(): void {
@@ -1570,15 +1522,19 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function createLogFile(): Promise<void> {
-        const logPath: string = await join(resDir, logFile);
+        if (!projDir) {
+            return;
+        }
 
-        if (!(await exists(logPath, { dir: BaseDirectory.Resource }))) {
-            await writeTextFile(logPath, "{}", { dir: BaseDirectory.Resource });
+        const logPath: string = await join(projDir, logFile);
+
+        if (!(await exists(logPath))) {
+            await writeTextFile(logPath, "{}");
         }
     }
 
     async function setTheme(theme: Theme): Promise<void> {
-        if (Object.keys(current_theme).length === 0) {
+        if (Object.keys(currentTheme).length === 0) {
             for (const [key, value] of Object.entries(theme)) {
                 const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
                     `.${key}`
@@ -1588,10 +1544,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     element.classList.add(value);
                 }
 
-                current_theme[key as ThemeKey] = value;
+                currentTheme[key as ThemeKey] = value;
             }
         } else {
-            if (theme.name === current_theme.name) {
+            if (theme.name === currentTheme.name) {
                 return;
             }
 
@@ -1601,10 +1557,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 ) as NodeListOf<HTMLElement>;
 
                 for (const element of elements) {
-                    element.classList.replace(current_theme[key as ThemeKey], value);
+                    element.classList.replace(currentTheme[key as ThemeKey], value);
                 }
 
-                current_theme[key as ThemeKey] = value;
+                currentTheme[key as ThemeKey] = value;
             }
         }
 
@@ -1671,7 +1627,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         locale
             ? settings
                 ? settings.lang
-                : ["ru", "uk", "be"].some((x: string): boolean => locale!.startsWith(x))
+                : ["ru", "uk", "be"].some((loc: string): boolean => locale!.startsWith(loc))
                 ? "ru"
                 : "en"
             : "en"
@@ -1692,13 +1648,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     let theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
 
-    let current_theme: {
+    let currentTheme: {
         [key in ThemeKey]: string;
     } = {} as { [key in ThemeKey]: string };
 
     await setTheme(theme);
-
-    await ensureStart();
 
     if (settings.firstLaunch) {
         new WebviewWindow("help", {
@@ -1713,6 +1667,28 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, firstLaunch: false }), {
             dir: BaseDirectory.Resource,
         });
+    }
+
+    if (settings.project) {
+        if (!(await ensureProjectIsValid(settings.project))) {
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: null }), {
+                dir: BaseDirectory.Resource,
+            });
+
+            const noProjectSelected = document.createElement("div");
+            noProjectSelected.classList.add("flex", "items-center", "justify-center");
+            noProjectSelected.id = "no-project-selected";
+            noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
+            contentContainer.appendChild(noProjectSelected);
+        }
+
+        projDir = settings.project;
+    } else {
+        const noProjectSelected = document.createElement("div");
+        noProjectSelected.classList.add("flex", "items-center", "justify-center");
+        noProjectSelected.id = "no-project-selected";
+        noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
+        contentContainer.appendChild(noProjectSelected);
     }
 
     settings = null;
@@ -1762,16 +1738,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
 
-    await createLogFile();
-    await createDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
-
-    let nextBackupNumber: number = Number.parseInt(await determineLastBackupNumber());
-    if (backupEnabled) {
-        backup(backupPeriod);
-    }
+    let nextBackupNumber: number;
 
     await createContent();
-    arrangeElements();
 
     const observerMain: IntersectionObserver = new IntersectionObserver(
         (entries: IntersectionObserverEntry[]): void => {
@@ -1818,6 +1787,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
         switch (target.id) {
             case "menu-button":
+                if (!projDir) {
+                    return;
+                }
+
                 leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
                 break;
             case "save-button":
@@ -1825,6 +1798,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 break;
             case "compile-button":
                 await compile();
+                break;
+            case "open-button":
+                await openFolder();
                 break;
             case "options-button":
                 createOptionsWindow();
@@ -1850,6 +1826,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 );
                 break;
             case "search-button":
+                if (!projDir) {
+                    return;
+                }
+
                 if (searchInput.value) {
                     searchPanelFound.innerHTML = "";
                     await displaySearchResults(searchInput.value, false);
@@ -1858,6 +1838,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
                 break;
             case "replace-button":
+                if (!projDir) {
+                    return;
+                }
+
                 if (searchInput.value && replaceInput.value) {
                     await replaceText(searchInput.value, true);
                 }
@@ -1895,7 +1879,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     searchSwitch.innerHTML = "menu_book";
 
                     const replacementLogContent: { [key: string]: { original: string; translation: string } } =
-                        JSON.parse(await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource }));
+                        JSON.parse(await readTextFile(await join(projDir, logFile)));
 
                     for (const [key, value] of Object.entries(replacementLogContent)) {
                         const replacedContainer: HTMLDivElement = document.createElement("div");
@@ -1903,15 +1887,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         const replacedElement: HTMLDivElement = document.createElement("div");
                         replacedElement.classList.add(
                             "replaced-element",
-                            current_theme.textSecondary,
+                            currentTheme.textSecondary,
                             "textSecondary",
-                            current_theme.borderPrimary,
+                            currentTheme.borderPrimary,
                             "borderPrimary",
-                            current_theme.secondary,
+                            currentTheme.secondary,
                             "secondary"
                         );
 
-                        replacedElement.innerHTML = `<div class="text-base ${current_theme.textTertiary} textTertiary">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl ${current_theme.textPrimary} textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+                        replacedElement.innerHTML = `<div class="text-base ${currentTheme.textTertiary} textTertiary">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl ${currentTheme.textPrimary} textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
 
                         replacedContainer.appendChild(replacedElement);
                         searchPanelReplaced.appendChild(replacedContainer);
@@ -1957,12 +1941,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resDir,
+                                    projDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
-                                ),
-                                {
-                                    dir: BaseDirectory.Resource,
-                                }
+                                )
                             )
                         )
                     )) {
@@ -1981,12 +1962,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resDir,
+                                    projDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
-                                ),
-                                {
-                                    dir: BaseDirectory.Resource,
-                                }
+                                )
                             )
                         )
                     )) {
@@ -2044,14 +2022,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 `${targetId.join("-")}-${focusedElementRow + i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
+                            nextElement.classList.replace(currentTheme.outlinePrimary, currentTheme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         } else if (rowsRange < 0) {
                             const nextElement: HTMLTextAreaElement = document.getElementById(
                                 `${targetId.join("-")}-${focusedElementRow - i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
+                            nextElement.classList.replace(currentTheme.outlinePrimary, currentTheme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         }
                     }
@@ -2061,7 +2039,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 for (const key of selectedTextareas.keys()) {
                     const textarea: HTMLTextAreaElement = document.getElementById(key) as HTMLTextAreaElement;
-                    textarea.classList.replace(current_theme.outlineSecondary, current_theme.outlinePrimary);
+                    textarea.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
                 }
             }
         }

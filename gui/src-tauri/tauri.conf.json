@@ -49,7 +49,7 @@
                 "removeDir": true,
                 "removeFile": true,
                 "renameFile": false,
-                "scope": ["$RESOURCE/**/*"],
+                "scope": ["**/*"],
                 "writeFile": true
             },
             "path": {
@@ -64,7 +64,7 @@
                 "ask": true,
                 "confirm": false,
                 "message": true,
-                "open": false,
+                "open": true,
                 "save": false
             },
             "window": {

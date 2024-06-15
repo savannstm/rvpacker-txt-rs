@@ -3,11 +3,6 @@
         "cannotGetSettings": "Cannot find program's settings.",
         "askCreateSettings": "Create settings?",
         "createdSettings": "Settings created.\nBackups: Enabled\nBackup period: 60 secs.\nMaximum backups: 99.\nTheme: Cool Zinc",
-        "askDownloadTranslation": "Cannot find translation files. Download translation files? Note: If you agree, this will install Russian translation files. If you want to start a project from scratch, disagree.",
-        "downloadingTranslation": "Downloading translation files",
-        "downloadedTranslation": "Translation files downloaded.",
-        "startBlankProject": "Start a new project?\n(You'll get a completely empty project and start from scratch)\nYou'll have to install a translation files anyway (some of them which is unused will be deleted).",
-        "whatNext": "If you want to edit an already existing translation made by me, you should download translation files when program's asking or manually download them from repository.",
         "unsavedChanges": "You have unsaved changes. Save progress and quit?",
         "originalTextIrreplacable": "Original text is irreplacable.",
         "invalidRegexp": "Invalid regular expression.",
@@ -36,7 +31,11 @@
         "noMatches": "No matches",
         "currentPage": "None",
         "separator": "of",
-        "goToRow": "Go to row... from 1 to"
+        "goToRow": "Go to row... from 1 to",
+        "missingTranslationDir": "'translation' directory is missing. Project won't be initialized.",
+        "missingOriginalDir": "'original' directory is missing. Project won't be initialized.",
+        "missingTranslationSubdirs": "'translation' directory's subdirectories 'maps', 'other' and 'plugins' are missing. Project won't be initialized.",
+        "noProjectSelected": "No project selected. Select the project directory, using 'open folder' button in the left-top corner. Directory must contain directories 'original' and 'translation' (with 'maps', 'other' and 'plugins' subdirectories, if it's RPG Maker MV or MZ, or 'maps' and 'other', if it's RPG Maker XP, VX, VX Ace)."
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",

@@ -9,7 +9,7 @@
     </head>
 
     <body class="overflow-x-hidden p-0 m-0 text-2xl textPrimary background">
-        <div class="invisible">
+        <div>
             <div id="menu-bar" class="flex sticky top-0 z-40 items-center mr-2 w-full h-6 text-sm primary">
                 <div class="menu-bar-button hoverSecondary">
                     <button id="file" class="px-2"></button>
@@ -43,6 +43,9 @@
                     </button>
                     <button id="compile-button" class="button hoverPrimary textTertiary">
                         <div>upload</div>
+                    </button>
+                    <button id="open-button" class="button hoverPrimary textTertiary">
+                        <div>folder_open</div>
                     </button>
                     <button id="options-button" class="button hoverPrimary textTertiary">
                         <div>settings</div>
@@ -130,9 +133,6 @@
                     <div id="replace-content" class="hidden flex-col w-full"></div>
                 </div>
             </div>
-        </div>
-        <div id="progress-display" class="hidden flex-col justify-center items-center w-screen h-5/6 text-3xl">
-            <div id="progress-text"></div>
         </div>
     </body>
 </html>
