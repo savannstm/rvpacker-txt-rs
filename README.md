@@ -39,25 +39,6 @@ json-writer поддерживает различные команды и арг
 
 После билдинга в директории `gui/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
 
-## Директория translation
-
-В этой директории хранятся файлы локализации в формате .txt. Если вы хотите что-то изменить - вы должны отредактировать именно их, а затем записать используя бинарные CLI файлы, либо скомпилировать используя программу с графическим интерфейсом.
-
-### Директория maps
-
-В этой директории хранится игровой текст из файлов Maps.json.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
-### Директория other
-
-В этой директории хранится игровой текст НЕ из файлов Maps.json.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
-### Директория plugins
-
-В этой директории хранится игровой текст из файла plugins.js.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
 # EN
 
 # Repository order and program usage
@@ -98,22 +79,3 @@ to build the program for your current OS.
 If you want to make some edits to the source code - edit frontend files in `src` directory, or backend files in `src-tauri/src` directory.
 
 After the build, `target` directory will be created in the `gui/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
-
-## translation Directory
-
-This directory contains translation files with .txt extension. If you want to edit the translation - you need to edit exactly them, and then compile them using CLI binary, or compile with the GUI.
-
-### maps Directory
-
-This directory contains in-game text from Maps.json files.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
-
-### other Directory
-
-This directory contains in-game text NOT from Maps.json files.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
-
-### plugins Directory
-
-This directory contains in-game text from plugins.js file.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
