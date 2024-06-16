@@ -1,37 +1,25 @@
 import "./string-extensions";
 import "./htmlelement-extensions";
-import { Theme } from "./themes";
 
-import {
-    FileEntry,
-    FsDirOptions,
-    copyFile,
-    exists,
-    readDir,
-    readTextFile,
-    removeDir,
-    removeFile,
-    writeTextFile,
-    createDir,
-} from "@tauri-apps/api/fs";
-import { BaseDirectory, resourceDir, join } from "@tauri-apps/api/path";
-import { ask, message } from "@tauri-apps/api/dialog";
+import { FileEntry, exists, readDir, readTextFile, removeFile, writeTextFile, createDir } from "@tauri-apps/api/fs";
+import { BaseDirectory, join } from "@tauri-apps/api/path";
+import { ask, message, open as openPath } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { exit } from "@tauri-apps/api/process";
 import { appWindow, CloseRequestedEvent, WebviewWindow } from "@tauri-apps/api/window";
-import { Command } from "@tauri-apps/api/shell";
 import { writeText as writeToClipboard, readText as readFromClipboard } from "@tauri-apps/api/clipboard";
-import { platform, locale as getLocale } from "@tauri-apps/api/os";
+import { locale as getLocale } from "@tauri-apps/api/os";
 import { Event, UnlistenFn } from "@tauri-apps/api/event";
 
 import XRegExp from "xregexp";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
-    const resDir: string = "res";
+    let projDir: string = "";
+
+    const resDir = "res";
     const translationDir: string = "translation";
     const originalDir: string = "original";
     const backupDir: string = "backups";
-    const repoDir: string = "main/fh-termina-json-writer-main";
 
     const mapsDir: string = "maps";
     const otherDir: string = "other";
@@ -41,18 +29,155 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const logFile: string = "replacement-log.json";
     const ruTranslation: string = "ru.json";
     const enTranslation: string = "en.json";
+    const themesFile: string = "themes.json";
 
-    async function copyDir(sourceDir: string, targetDir: string, fsOptions: FsDirOptions | undefined): Promise<void> {
-        await createDir(targetDir, fsOptions);
+    function showThemeWindow(): void {
+        themeWindow.classList.remove("hidden");
 
-        for (const file of await readDir(sourceDir, fsOptions)) {
-            const name: string = file.name as string;
-
-            if (file.children) {
-                await copyDir(await join(sourceDir, name), await join(targetDir, name), fsOptions);
-            } else {
-                await copyFile(await join(sourceDir, name), await join(targetDir, name), fsOptions);
+        function setStyleProperties(inputElement: HTMLInputElement): void {
+            for (const element of document.querySelectorAll(`.${inputElement.id}`) as NodeListOf<HTMLElement>) {
+                element.style.setProperty(`--${inputElement.id}`, inputElement.value);
             }
+        }
+
+        async function createTheme(): Promise<void> {
+            const themeNameInput = themeWindow.lastElementChild?.firstElementChild
+                ?.lastElementChild as HTMLInputElement;
+            const themeName = themeNameInput.value;
+
+            const newTheme = { name: themeName } as Theme;
+
+            for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                for (const subdiv of div.children) {
+                    const inputElement = subdiv.firstElementChild as HTMLInputElement;
+                    newTheme[inputElement.id] = inputElement.value;
+                }
+            }
+
+            if (!/^[a-zA-Z0-9_-]+$/.test(themeName)) {
+                await message(mainLanguage.invalidThemeName + mainLanguage.allowedThemeNameCharacters);
+                return;
+            }
+
+            themes[themeName] = newTheme;
+
+            await writeTextFile(await join(resDir, themesFile), JSON.stringify(themes));
+
+            const newThemeButton = document.createElement("button");
+            newThemeButton.id = themeName;
+            newThemeButton.textContent = themeName;
+
+            themeMenu.insertBefore(themeMenu.lastElementChild!, newThemeButton);
+        }
+
+        requestAnimationFrame((): void => {
+            themeWindow.style.left = `${(document.body.clientWidth - themeWindow.clientWidth) / 2}px`;
+
+            let i = 1;
+            const themeColors = Object.values(theme);
+
+            for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                for (const subdiv of div.children) {
+                    const inputElement = subdiv.firstElementChild as HTMLInputElement;
+
+                    inputElement.value = themeColors[i];
+                    inputElement.addEventListener("input", (): void => setStyleProperties(inputElement));
+                    i++;
+                }
+            }
+
+            const closeButton = themeWindow.firstElementChild?.firstElementChild as HTMLButtonElement;
+            const createThemeButton = themeWindow.lastElementChild?.lastElementChild as HTMLButtonElement;
+            createThemeButton.addEventListener("click", async (): Promise<void> => await createTheme());
+
+            closeButton.addEventListener("click", (): void => {
+                for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                    for (const subdiv of div.children) {
+                        const inputElement = subdiv.firstElementChild as HTMLInputElement;
+                        inputElement.removeEventListener("input", (): void => setStyleProperties(inputElement));
+                    }
+                }
+
+                createThemeButton.removeEventListener("click", async (): Promise<void> => await createTheme());
+                themeWindow.classList.add("hidden");
+            });
+        });
+    }
+
+    async function ensureProjectIsValid(folder: string): Promise<boolean> {
+        const dirs = [mapsDir, otherDir, pluginsDir];
+        const translationPath = await join(folder, translationDir);
+        const originalPath = await join(folder, originalDir);
+        let RPGMVer: string = "";
+
+        if (!(await exists(translationPath))) {
+            await message(mainLanguage.missingTranslationDir);
+            return false;
+        }
+
+        if (!(await exists(originalPath))) {
+            await message(mainLanguage.missingOriginalDir);
+            return false;
+        }
+
+        for (const dir of dirs) {
+            const subDirPath = await join(translationPath, dir);
+
+            if (dir === pluginsDir && RPGMVer === "old") {
+                continue;
+            }
+
+            if (!(await exists(subDirPath))) {
+                await message(mainLanguage.missingTranslationSubdirs);
+                return false;
+            }
+
+            if (dir === otherDir) {
+                const files = await readDir(subDirPath);
+
+                for (const file of files) {
+                    const name = file.name as string;
+
+                    if (name.startsWith("scripts")) {
+                        RPGMVer = "old";
+                        break;
+                    } else {
+                        RPGMVer = "new";
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    async function openFolder(): Promise<void> {
+        const folder = await openPath({ directory: true, multiple: false });
+
+        if (folder) {
+            if (!(await ensureProjectIsValid(folder as string))) {
+                return;
+            }
+
+            projDir = folder as string;
+
+            document.getElementById("no-project-selected")!.remove();
+
+            const settings: Settings = JSON.parse(
+                await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
+            );
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: projDir }), {
+                dir: BaseDirectory.Resource,
+            });
+
+            await createDir(await join(projDir, backupDir), { recursive: true });
+            nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
+            if (backupEnabled) {
+                backup(backupPeriod);
+            }
+
+            createLogFile();
+            createContent();
         }
     }
 
@@ -68,6 +193,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     lang: language,
                     theme: "cool-zinc",
                     firstLaunch: true,
+                    project: null,
                 }),
                 {
                     dir: BaseDirectory.Resource,
@@ -79,36 +205,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         } else {
             await exit(0);
         }
-    }
-
-    async function cloneRepository(): Promise<void> {
-        function animateEllipsis(): void {
-            if (!progressText.textContent?.endsWith("...")) {
-                progressText.textContent += ".";
-                setTimeout(animateEllipsis, 500);
-            } else if (progressText.textContent?.endsWith("...")) {
-                progressText.innerHTML = progressText.textContent.slice(0, -3);
-                setTimeout(animateEllipsis, 500);
-            }
-        }
-
-        const progressDisplay: HTMLDivElement = document.getElementById("progress-display") as HTMLDivElement;
-        const progressText: HTMLDivElement = document.getElementById("progress-text") as HTMLDivElement;
-        progressText.innerHTML = mainLanguage.downloadingTranslation;
-
-        progressDisplay.classList.replace("hidden", "flex");
-        animateEllipsis();
-
-        const command: string = (await platform()) === "win32" ? "powershell" : "sh";
-        const resourcePath: string = await join(await resourceDir(), resDir);
-        await new Command(command, [], { cwd: resourcePath }).execute();
-
-        await invoke("unzip", {
-            path: await join(resourcePath, "main.zip"),
-            dest: await join(resourcePath, "main"),
-        });
-
-        progressDisplay.remove();
     }
 
     async function changeLanguage(language: Language): Promise<void> {
@@ -124,82 +220,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             });
 
             location.reload();
-        }
-    }
-
-    async function prepareTranslation(): Promise<void> {
-        const dirsToLeave: [string, string] = [translationDir, originalDir];
-
-        const repoPath: string = await join(resDir, repoDir);
-        const repositoryExists: boolean = await exists(repoPath, {
-            dir: BaseDirectory.Resource,
-        });
-
-        if (repositoryExists) {
-            await removeDir(repoPath, {
-                dir: BaseDirectory.Resource,
-                recursive: true,
-            });
-        }
-
-        await cloneRepository();
-
-        for (const dir of await readDir(repoPath, {
-            dir: BaseDirectory.Resource,
-        })) {
-            if (dir.name && dirsToLeave.includes(dir.name)) {
-                await copyDir(await join(repoPath, dir.name), await join(resDir, dir.name), {
-                    dir: BaseDirectory.Resource,
-                    recursive: true,
-                });
-            }
-        }
-
-        await removeDir(await join(resDir, "main"), { dir: BaseDirectory.Resource, recursive: true });
-    }
-
-    async function ensureStart(): Promise<void> {
-        const dirs: [string, string, string] = [mapsDir, otherDir, pluginsDir];
-
-        for (const dir of dirs) {
-            if (!(await exists(await join(resDir, translationDir, dir), { dir: BaseDirectory.Resource }))) {
-                if (await ask(mainLanguage.askDownloadTranslation)) {
-                    await prepareTranslation();
-                    alert(mainLanguage.downloadedTranslation);
-                } else if (await ask(mainLanguage.startBlankProject)) {
-                    await prepareTranslation();
-
-                    const files: FileEntry[] = await readDir(await join(resDir, translationDir, dir), {
-                        dir: BaseDirectory.Resource,
-                        recursive: true,
-                    });
-
-                    for (const file of (files
-                        .flatMap((dir: FileEntry) => dir.children)
-                        .filter((file: FileEntry | undefined) => file?.name?.endsWith("_trans.txt")) as FileEntry[]) ??
-                        []) {
-                        const name = file.name as string;
-
-                        const numberOfLines: number = (
-                            await readTextFile(await join(resDir, translationDir, dir, name), {
-                                dir: BaseDirectory.Resource,
-                            })
-                        ).count("\n");
-
-                        await removeFile(await join(resDir, translationDir, dir, name), {
-                            dir: BaseDirectory.Resource,
-                        });
-
-                        await writeTextFile(await join(resDir, translationDir, dir, name), "\n".repeat(numberOfLines), {
-                            dir: BaseDirectory.Resource,
-                        });
-                    }
-                } else {
-                    await message(mainLanguage.whatNext);
-                    await exit(0);
-                }
-                return;
-            }
         }
     }
 
@@ -236,7 +256,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function determineLastBackupNumber(): Promise<string> {
-        const backups: FileEntry[] = await readDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource });
+        const backups: FileEntry[] = await readDir(await join(projDir, backupDir));
         return backups.length === 0
             ? "00"
             : backups
@@ -274,15 +294,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const resultContainer: HTMLDivElement = document.createElement("div");
 
         const resultElement: HTMLDivElement = document.createElement("div");
-        resultElement.classList.add(
-            "search-result",
-            current_theme.textSecondary,
-            "textSecondary",
-            current_theme.borderPrimary,
-            "borderPrimary",
-            current_theme.secondary,
-            "secondary"
-        );
+        resultElement.classList.add("search-result", "textSecond", "borderPrimary", "backgroundSecond");
 
         const thirdParent: HTMLDivElement = element.parentElement?.parentElement?.parentElement as HTMLDivElement;
 
@@ -297,7 +309,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(resultDiv);
 
         const originalInfo: HTMLDivElement = document.createElement("div");
-        originalInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
+        originalInfo.classList.add("text-xs", "textThird");
 
         const currentFile: string = element.parentElement?.parentElement?.id.slice(
             0,
@@ -307,7 +319,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(originalInfo);
 
         const arrow: HTMLDivElement = document.createElement("div");
-        arrow.classList.add("search-result-arrow", current_theme.textSecondary, "textSecondary");
+        arrow.classList.add("search-result-arrow", "textSecond");
         arrow.innerHTML = "arrow_downward";
         mainDiv.appendChild(arrow);
 
@@ -319,7 +331,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(counterpart);
 
         const counterpartInfo: HTMLDivElement = document.createElement("div");
-        counterpartInfo.classList.add("text-xs", current_theme.textTertiary, "textTertiary");
+        counterpartInfo.classList.add("text-xs", "textThird");
 
         counterpartInfo.innerHTML = `${currentFile} - ${sourceIndex === 0 ? "original" : "translation"} - ${row}`;
         mainDiv.appendChild(counterpartInfo);
@@ -340,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             const end: number = start + match.length;
 
             const beforeDiv: string = `<span>${elementText.slice(lastIndex, start)}</span>`;
-            const matchDiv: string = `<span class="${current_theme.tertiary} tertiary">${match}</span>`;
+            const matchDiv: string = `<span class="backgroundThird">${match}</span>`;
 
             result.push(beforeDiv);
             result.push(matchDiv);
@@ -363,9 +375,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             return;
         }
 
-        for (const file of await readDir(resDir, { dir: BaseDirectory.Resource })) {
+        for (const file of await readDir(projDir)) {
             if (file.name?.startsWith("matches")) {
-                await removeFile(await join(resDir, file.name), { dir: BaseDirectory.Resource });
+                await removeFile(await join(projDir, file.name));
             }
         }
 
@@ -426,9 +438,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
 
             if (count % 1000 === 0) {
-                await writeTextFile(await join(resDir, `matches-${file}.json`), JSON.stringify(objectToWrite), {
-                    dir: BaseDirectory.Resource,
-                });
+                await writeTextFile(await join(projDir, `matches-${file}.json`), JSON.stringify(objectToWrite));
 
                 objectToWrite = {};
                 file++;
@@ -436,16 +446,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         if (file === 0) {
-            await writeTextFile(await join(resDir, "matches-0.json"), JSON.stringify(objectToWrite), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, "matches-0.json"), JSON.stringify(objectToWrite));
         }
 
         searchTotalPages.textContent = file.toString();
         searchCurrentPage.textContent = "0";
 
         for (const [id, result] of Object.entries(
-            JSON.parse(await readTextFile(await join(resDir, "matches-0.json"), { dir: BaseDirectory.Resource }))
+            JSON.parse(await readTextFile(await join(projDir, "matches-0.json")))
         )) {
             appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
         }
@@ -482,14 +490,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             element.setAttribute("reverted", "");
 
             const replacementLogContent: { [key: string]: { original: string; translation: string } } = JSON.parse(
-                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(projDir, logFile))
             );
 
             delete replacementLogContent[clicked.id];
 
-            await writeTextFile(await join(resDir, logFile), JSON.stringify(replacementLogContent), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, logFile), JSON.stringify(replacementLogContent));
         }
     }
 
@@ -689,7 +695,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             replaced.set(text.id, { original: text.value, translation: newValue });
             const prevFile: { [key: string]: { [key: string]: string } } = JSON.parse(
-                await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+                await readTextFile(await join(projDir, logFile))
             );
 
             const newObject: { [key: string]: { [key: string]: string } } = {
@@ -697,9 +703,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 ...Object.fromEntries([...replaced]),
             };
 
-            await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(projDir, logFile), JSON.stringify(newObject));
             replaced.clear();
 
             text.value = newValue;
@@ -735,7 +739,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         const prevFile: { [key: string]: { [key: string]: string } } = JSON.parse(
-            await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource })
+            await readTextFile(await join(projDir, logFile))
         );
 
         const newObject: { [key: string]: { [key: string]: string } } = {
@@ -743,9 +747,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             ...Object.fromEntries([...replaced]),
         };
 
-        await writeTextFile(await join(resDir, logFile), JSON.stringify(newObject), {
-            dir: BaseDirectory.Resource,
-        });
+        await writeTextFile(await join(projDir, logFile), JSON.stringify(newObject));
         replaced.clear();
     }
 
@@ -757,7 +759,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         saving = true;
         saveButton.firstElementChild?.classList.add("animate-spin");
 
-        let dirName: string = await join(resDir, translationDir);
+        let dirName: string = await join(projDir, translationDir);
 
         if (backup) {
             const date: Date = new Date();
@@ -772,10 +774,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             nextBackupNumber = (nextBackupNumber % backupMax) + 1;
 
-            dirName = await join(resDir, backupDir, `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`);
+            dirName = await join(
+                projDir,
+                backupDir,
+                `${formattedDate}_${nextBackupNumber.toString().padStart(2, "0")}`
+            );
 
             for (const subDir of [mapsDir, otherDir, pluginsDir]) {
-                await createDir(await join(dirName, subDir), { dir: BaseDirectory.Resource, recursive: true });
+                await createDir(await join(dirName, subDir), { recursive: true });
             }
         }
 
@@ -785,15 +791,13 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             for (const child of contentElement.children) {
                 const node: HTMLTextAreaElement = child.firstElementChild?.children[2] as HTMLTextAreaElement;
-                outputArray.push(node.value.replaceAll("\n", "\\n"));
+                outputArray.push(node.value.replaceAll("\n", "^"));
             }
 
             const dirPath: string = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
             const filePath: string = `${dirPath}/${contentElement.id}_trans.txt`;
 
-            await writeTextFile(await join(dirName, filePath), outputArray.join("\n"), {
-                dir: BaseDirectory.Resource,
-            });
+            await writeTextFile(await join(dirName, filePath), outputArray.join("\n"));
             i++;
         }
 
@@ -906,6 +910,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function handleKeypress(event: KeyboardEvent): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         if (event.key === "Tab") {
             event.preventDefault();
         }
@@ -1040,16 +1048,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 (document.activeElement as HTMLTextAreaElement).value
                             );
                             await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
-
-                            for (const key of selectedTextareas.keys()) {
-                                const textarea: HTMLTextAreaElement = document.getElementById(
-                                    key
-                                ) as HTMLTextAreaElement;
-                                textarea?.classList.replace(
-                                    current_theme.outlineSecondary,
-                                    current_theme.outlinePrimary
-                                );
-                            }
                         }
                     }
                     break;
@@ -1075,10 +1073,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea.classList.replace(
-                                    current_theme.outlineSecondary,
-                                    current_theme.outlinePrimary
-                                );
                                 textarea.value = "";
                             }
 
@@ -1137,6 +1131,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function handleKeypressSearch(event: KeyboardEvent): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         if (event.code === "Enter") {
             event.preventDefault();
 
@@ -1172,11 +1170,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function createContent(): Promise<void> {
+        if (!projDir) {
+            return;
+        }
+
         const contentNames: string[] = [];
         const content: string[][] = [];
 
-        for (const folder of await readDir(await join(resDir, translationDir), {
-            dir: BaseDirectory.Resource,
+        for (const folder of await readDir(await join(projDir, translationDir), {
             recursive: true,
         })) {
             const f = folder.name as string;
@@ -1189,13 +1190,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
 
                 contentNames.push(name.slice(0, -4));
-                content.push(
-                    (
-                        await readTextFile(await join(resDir, translationDir, f, name), {
-                            dir: BaseDirectory.Resource,
-                        })
-                    ).split("\n")
-                );
+                content.push((await readTextFile(await join(projDir, translationDir, f, name))).split("\n"));
+            }
+        }
+
+        if (contentNames.includes("scripts")) {
+            for (const element of leftPanel.children) {
+                if (element.innerHTML === "plugins") {
+                    element.innerHTML = "scripts";
+                }
             }
         }
 
@@ -1218,34 +1221,25 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 const originalTextElement: HTMLDivElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
-                originalTextElement.textContent = originalText.replaceAll("\\n[", "\\N[").replaceAll("\\n", "\n");
-                originalTextElement.classList.add(
-                    "original-text-div",
-                    current_theme.primary,
-                    "primary",
-                    current_theme.outlinePrimary,
-                    "outlinePrimary"
-                );
+                originalTextElement.textContent = originalText.replaceAll("^", "\n");
+                originalTextElement.classList.add("original-text-div", "backgroundPrimary", "outlinePrimary");
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
-                const translationTextSplit: string[] = translationText.split("\\n");
+                const translationTextSplit: string[] = translationText.split("^");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplit.length;
                 translationTextElement.value = translationTextSplit.join("\n");
                 translationTextElement.classList.add(
                     "translation-text-input",
-                    current_theme.outlinePrimary,
                     "outlinePrimary",
-                    current_theme.primary,
-                    "primary",
-                    current_theme.outlineFocus,
-                    "outlineFocus"
+                    "backgroundPrimary",
+                    "outlineFocused"
                 );
 
                 const rowElement: HTMLDivElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = (j + 1).toString();
-                rowElement.classList.add("row", current_theme.primary, "primary");
+                rowElement.classList.add("row", "backgroundPrimary");
 
                 textContainer.appendChild(rowElement);
                 textContainer.appendChild(originalTextElement);
@@ -1256,6 +1250,8 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             contentContainer.appendChild(contentDiv);
         }
+
+        arrangeElements();
     }
 
     async function compile(): Promise<void> {
@@ -1312,7 +1308,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         for (const object of result) {
             const { left, top }: { left: number; top: number } = object;
             const ghostNewLine: HTMLDivElement = document.createElement("div");
-            ghostNewLine.classList.add("ghost-new-line", current_theme.textTertiary, "textTertiary");
+            ghostNewLine.classList.add("ghost-new-line", "textThird");
             ghostNewLine.innerHTML = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
@@ -1376,27 +1372,27 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function switchCase(): void {
         searchCase = !searchCase;
-        searchCaseButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchWhole(): void {
         searchWhole = !searchWhole;
-        searchWholeButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchRegExp(): void {
         searchRegex = !searchRegex;
-        searchRegexButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchTranslation(): void {
         searchTranslation = !searchTranslation;
-        searchTranslationButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchLocation(): void {
         searchLocation = !searchLocation;
-        searchLocationButton.classList.toggle(current_theme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function createOptionsWindow(): void {
@@ -1570,41 +1566,41 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function createLogFile(): Promise<void> {
-        const logPath: string = await join(resDir, logFile);
+        if (!projDir) {
+            return;
+        }
 
-        if (!(await exists(logPath, { dir: BaseDirectory.Resource }))) {
-            await writeTextFile(logPath, "{}", { dir: BaseDirectory.Resource });
+        const logPath: string = await join(projDir, logFile);
+
+        if (!(await exists(logPath))) {
+            await writeTextFile(logPath, "{}");
         }
     }
 
-    async function setTheme(theme: Theme): Promise<void> {
-        if (Object.keys(current_theme).length === 0) {
-            for (const [key, value] of Object.entries(theme)) {
-                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
-                    `.${key}`
-                ) as NodeListOf<HTMLElement>;
+    async function setTheme(newTheme: Theme): Promise<void> {
+        if (!currentTheme) {
+            currentTheme = newTheme.name;
+
+            for (const [key, value] of Object.entries(newTheme)) {
+                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
 
                 for (const element of elements) {
-                    element.classList.add(value);
+                    element.style.setProperty(`--${key}`, value);
                 }
-
-                current_theme[key as ThemeKey] = value;
             }
         } else {
-            if (theme.name === current_theme.name) {
+            if (newTheme.name === currentTheme) {
                 return;
             }
 
-            for (const [key, value] of Object.entries(theme)) {
-                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
-                    `.${key}`
-                ) as NodeListOf<HTMLElement>;
+            theme = newTheme;
+
+            for (const [key, value] of Object.entries(newTheme)) {
+                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
 
                 for (const element of elements) {
-                    element.classList.replace(current_theme[key as ThemeKey], value);
+                    element.style.setProperty(`--${key}`, value);
                 }
-
-                current_theme[key as ThemeKey] = value;
             }
         }
 
@@ -1614,49 +1610,48 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             })
         );
 
-        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, theme: theme.name }), {
+        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, theme: newTheme.name }), {
             dir: BaseDirectory.Resource,
         });
     }
 
-    const contentContainer: HTMLDivElement = document.getElementById("content-container") as HTMLDivElement;
-    const searchInput: HTMLTextAreaElement = document.getElementById("search-input") as HTMLTextAreaElement;
-    const replaceInput: HTMLTextAreaElement = document.getElementById("replace-input") as HTMLTextAreaElement;
-    const menuButton: HTMLButtonElement = document.getElementById("menu-button") as HTMLButtonElement;
-    const leftPanel: HTMLDivElement = document.getElementById("left-panel") as HTMLDivElement;
-    const searchPanel: HTMLDivElement = document.getElementById("search-results") as HTMLDivElement;
-    const searchPanelFound: HTMLDivElement = document.getElementById("search-content") as HTMLDivElement;
-    const searchPanelReplaced: HTMLDivElement = document.getElementById("replace-content") as HTMLDivElement;
-    const searchCurrentPage: HTMLSpanElement = document.getElementById("search-current-page") as HTMLSpanElement;
-    const searchSeparator: HTMLSpanElement = document.getElementById("search-separator") as HTMLSpanElement;
-    const searchTotalPages: HTMLSpanElement = document.getElementById("search-total-pages") as HTMLSpanElement;
-    const topPanel: HTMLDivElement = document.getElementById("top-panel") as HTMLDivElement;
-    const topPanelButtons: HTMLDivElement = document.getElementById("top-panel-buttons") as HTMLDivElement;
-    const saveButton: HTMLButtonElement = document.getElementById("save-button") as HTMLButtonElement;
-    const compileButton: HTMLButtonElement = document.getElementById("compile-button") as HTMLButtonElement;
-    const optionsButton: HTMLButtonElement = document.getElementById("options-button") as HTMLButtonElement;
-    const themeButton: HTMLButtonElement = document.getElementById("theme-button") as HTMLButtonElement;
-    const themeMenu: HTMLDivElement = document.getElementById("theme-menu") as HTMLDivElement;
-    const searchCaseButton: HTMLButtonElement = document.getElementById("case-button") as HTMLButtonElement;
-    const searchWholeButton: HTMLButtonElement = document.getElementById("whole-button") as HTMLButtonElement;
-    const searchRegexButton: HTMLButtonElement = document.getElementById("regex-button") as HTMLButtonElement;
-    const searchTranslationButton: HTMLButtonElement = document.getElementById(
-        "translation-button"
-    ) as HTMLButtonElement;
-    const searchLocationButton: HTMLButtonElement = document.getElementById("location-button") as HTMLButtonElement;
-    const goToRowInput: HTMLInputElement = document.getElementById("goto-row-input") as HTMLInputElement;
-    const menuBar: HTMLDivElement = document.getElementById("menu-bar") as HTMLDivElement;
-    const fileMenuButton: HTMLButtonElement = document.getElementById("file") as HTMLButtonElement;
-    const helpMenuButton: HTMLButtonElement = document.getElementById("help") as HTMLButtonElement;
-    const languageMenuButton: HTMLButtonElement = document.getElementById("language") as HTMLButtonElement;
-    const fileMenu: HTMLDivElement = document.getElementById("file-menu") as HTMLDivElement;
-    const reloadButton: HTMLButtonElement = document.getElementById("reload-button") as HTMLButtonElement;
-    const helpMenu: HTMLDivElement = document.getElementById("help-menu") as HTMLDivElement;
-    const helpButtonSub: HTMLButtonElement = document.getElementById("help-button-sub") as HTMLButtonElement;
-    const aboutButton: HTMLButtonElement = document.getElementById("about-button") as HTMLButtonElement;
-    const hotkeysButton: HTMLButtonElement = document.getElementById("hotkeys-button") as HTMLButtonElement;
-    const languageMenu: HTMLDivElement = document.getElementById("language-menu") as HTMLDivElement;
-    const currentState: HTMLDivElement = document.getElementById("current-state") as HTMLDivElement;
+    const contentContainer = document.getElementById("content-container") as HTMLDivElement;
+    const searchInput = document.getElementById("search-input") as HTMLTextAreaElement;
+    const replaceInput = document.getElementById("replace-input") as HTMLTextAreaElement;
+    const menuButton = document.getElementById("menu-button") as HTMLButtonElement;
+    const leftPanel = document.getElementById("left-panel") as HTMLDivElement;
+    const searchPanel = document.getElementById("search-results") as HTMLDivElement;
+    const searchPanelFound = document.getElementById("search-content") as HTMLDivElement;
+    const searchPanelReplaced = document.getElementById("replace-content") as HTMLDivElement;
+    const searchCurrentPage = document.getElementById("search-current-page") as HTMLSpanElement;
+    const searchSeparator = document.getElementById("search-separator") as HTMLSpanElement;
+    const searchTotalPages = document.getElementById("search-total-pages") as HTMLSpanElement;
+    const topPanel = document.getElementById("top-panel") as HTMLDivElement;
+    const topPanelButtons = document.getElementById("top-panel-buttons") as HTMLDivElement;
+    const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+    const compileButton = document.getElementById("compile-button") as HTMLButtonElement;
+    const optionsButton = document.getElementById("options-button") as HTMLButtonElement;
+    const themeButton = document.getElementById("theme-button") as HTMLButtonElement;
+    const themeMenu = document.getElementById("theme-menu") as HTMLDivElement;
+    const searchCaseButton = document.getElementById("case-button") as HTMLButtonElement;
+    const searchWholeButton = document.getElementById("whole-button") as HTMLButtonElement;
+    const searchRegexButton = document.getElementById("regex-button") as HTMLButtonElement;
+    const searchTranslationButton = document.getElementById("translation-button") as HTMLButtonElement;
+    const searchLocationButton = document.getElementById("location-button") as HTMLButtonElement;
+    const goToRowInput = document.getElementById("goto-row-input") as HTMLInputElement;
+    const menuBar = document.getElementById("menu-bar") as HTMLDivElement;
+    const fileMenuButton = document.getElementById("file") as HTMLButtonElement;
+    const helpMenuButton = document.getElementById("help") as HTMLButtonElement;
+    const languageMenuButton = document.getElementById("language") as HTMLButtonElement;
+    const fileMenu = document.getElementById("file-menu") as HTMLDivElement;
+    const reloadButton = document.getElementById("reload-button") as HTMLButtonElement;
+    const helpMenu = document.getElementById("help-menu") as HTMLDivElement;
+    const helpButtonSub = document.getElementById("help-button-sub") as HTMLButtonElement;
+    const aboutButton = document.getElementById("about-button") as HTMLButtonElement;
+    const hotkeysButton = document.getElementById("hotkeys-button") as HTMLButtonElement;
+    const languageMenu = document.getElementById("language-menu") as HTMLDivElement;
+    const currentState = document.getElementById("current-state") as HTMLDivElement;
+    const themeWindow = document.getElementById("theme-window") as HTMLDivElement;
 
     const replaced: Map<string, { [key: string]: string }> = new Map();
     const activeGhostLines: HTMLDivElement[] = [];
@@ -1671,7 +1666,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         locale
             ? settings
                 ? settings.lang
-                : ["ru", "uk", "be"].some((x: string): boolean => locale!.startsWith(x))
+                : ["ru", "uk", "be"].some((loc: string): boolean => locale!.startsWith(loc))
                 ? "ru"
                 : "en"
             : "en"
@@ -1690,15 +1685,15 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
 
-    let theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
+    let themes = JSON.parse(
+        await readTextFile(await join(resDir, themesFile), { dir: BaseDirectory.Resource })
+    ) as ThemeObject;
 
-    let current_theme: {
-        [key in ThemeKey]: string;
-    } = {} as { [key in ThemeKey]: string };
+    let theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
+
+    let currentTheme: null | string = null;
 
     await setTheme(theme);
-
-    await ensureStart();
 
     if (settings.firstLaunch) {
         new WebviewWindow("help", {
@@ -1713,6 +1708,28 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, firstLaunch: false }), {
             dir: BaseDirectory.Resource,
         });
+    }
+
+    if (settings.project) {
+        if (!(await ensureProjectIsValid(settings.project))) {
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: null }), {
+                dir: BaseDirectory.Resource,
+            });
+
+            const noProjectSelected = document.createElement("div");
+            noProjectSelected.classList.add("flex", "items-center", "justify-center");
+            noProjectSelected.id = "no-project-selected";
+            noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
+            contentContainer.appendChild(noProjectSelected);
+        }
+
+        projDir = settings.project;
+    } else {
+        const noProjectSelected = document.createElement("div");
+        noProjectSelected.classList.add("flex", "items-center", "justify-center");
+        noProjectSelected.id = "no-project-selected";
+        noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
+        contentContainer.appendChild(noProjectSelected);
     }
 
     settings = null;
@@ -1741,6 +1758,42 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     searchCurrentPage.innerHTML = mainLanguage.currentPage;
     searchSeparator.innerHTML = mainLanguage.separator;
 
+    for (const themeName of Object.keys(themes)) {
+        const themeButton = document.createElement("button");
+        themeButton.id = themeName;
+        themeButton.innerHTML = themeName;
+        themeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
+
+        themeMenu.appendChild(themeButton);
+    }
+
+    {
+        const createThemeButton = document.createElement("button");
+        createThemeButton.id = "create-theme";
+        createThemeButton.innerHTML = mainLanguage.createTheme;
+        createThemeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
+
+        themeMenu.appendChild(createThemeButton);
+    }
+
+    for (const div of themeWindow.children[1].children) {
+        for (const subdiv of div.children) {
+            const label = subdiv.lastElementChild as HTMLLabelElement;
+            label.innerHTML = mainLanguage[subdiv.firstElementChild?.id!];
+        }
+    }
+
+    {
+        const allowedThemeNameCharactersDiv = themeWindow.lastElementChild?.children[1]!;
+        allowedThemeNameCharactersDiv.innerHTML = mainLanguage.allowedThemeNameCharacters;
+
+        const createThemeButton = themeWindow.lastElementChild?.lastElementChild!;
+        createThemeButton.innerHTML = mainLanguage.createTheme;
+
+        const themeNameLabel = themeWindow.lastElementChild?.firstElementChild?.firstElementChild!;
+        themeNameLabel.innerHTML = mainLanguage.themeName;
+    }
+
     let searchRegex: boolean = false;
     let searchWhole: boolean = false;
     let searchCase: boolean = false;
@@ -1762,16 +1815,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
 
-    await createLogFile();
-    await createDir(await join(resDir, backupDir), { dir: BaseDirectory.Resource, recursive: true });
-
-    let nextBackupNumber: number = Number.parseInt(await determineLastBackupNumber());
-    if (backupEnabled) {
-        backup(backupPeriod);
-    }
+    let nextBackupNumber: number;
 
     await createContent();
-    arrangeElements();
 
     const observerMain: IntersectionObserver = new IntersectionObserver(
         (entries: IntersectionObserverEntry[]): void => {
@@ -1818,6 +1864,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
         switch (target.id) {
             case "menu-button":
+                if (!projDir) {
+                    return;
+                }
+
                 leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
                 break;
             case "save-button":
@@ -1826,30 +1876,41 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "compile-button":
                 await compile();
                 break;
+            case "open-button":
+                await openFolder();
+                break;
             case "options-button":
                 createOptionsWindow();
                 break;
             case "theme-button":
                 themeMenu.toggleMultiple("hidden", "flex");
 
-                themeMenu.style.top = `${themeButton.offsetTop + themeButton.offsetHeight}px`;
-                themeMenu.style.left = `${themeButton.offsetLeft}px`;
+                requestAnimationFrame((): void => {
+                    themeMenu.style.left = `${themeButton.offsetLeft}px`;
+                    themeMenu.style.top = `${themeButton.offsetTop + themeButton.clientHeight + 16}px`;
 
-                themeMenu.addEventListener(
-                    "click",
-                    async (event: MouseEvent): Promise<void> => {
+                    themeMenu.addEventListener("click", async (event: MouseEvent): Promise<void> => {
                         const target: HTMLButtonElement = event.target as HTMLButtonElement;
 
                         if (!themeMenu.contains(target)) {
                             return;
                         }
 
-                        await setTheme(new Theme(target.id));
-                    },
-                    { once: true }
-                );
+                        if (target.id === "create-theme") {
+                            showThemeWindow();
+                            return;
+                        }
+
+                        await setTheme(themes[target.id]);
+                    });
+                });
+
                 break;
             case "search-button":
+                if (!projDir) {
+                    return;
+                }
+
                 if (searchInput.value) {
                     searchPanelFound.innerHTML = "";
                     await displaySearchResults(searchInput.value, false);
@@ -1858,6 +1919,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
                 break;
             case "replace-button":
+                if (!projDir) {
+                    return;
+                }
+
                 if (searchInput.value && replaceInput.value) {
                     await replaceText(searchInput.value, true);
                 }
@@ -1895,7 +1960,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     searchSwitch.innerHTML = "menu_book";
 
                     const replacementLogContent: { [key: string]: { original: string; translation: string } } =
-                        JSON.parse(await readTextFile(await join(resDir, logFile), { dir: BaseDirectory.Resource }));
+                        JSON.parse(await readTextFile(await join(projDir, logFile)));
 
                     for (const [key, value] of Object.entries(replacementLogContent)) {
                         const replacedContainer: HTMLDivElement = document.createElement("div");
@@ -1903,15 +1968,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         const replacedElement: HTMLDivElement = document.createElement("div");
                         replacedElement.classList.add(
                             "replaced-element",
-                            current_theme.textSecondary,
-                            "textSecondary",
-                            current_theme.borderPrimary,
+                            "textSecond",
                             "borderPrimary",
-                            current_theme.secondary,
-                            "secondary"
+                            "backgroundSecond"
                         );
 
-                        replacedElement.innerHTML = `<div class="text-base ${current_theme.textTertiary} textTertiary">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl ${current_theme.textPrimary} textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+                        replacedElement.innerHTML = `<div class="text-base textThird">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
 
                         replacedContainer.appendChild(replacedElement);
                         searchPanelReplaced.appendChild(replacedContainer);
@@ -1948,7 +2010,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "previous-page-button":
                 page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (Number.parseInt(searchCurrentPage.textContent!) > 1) {
+                if (page > 1) {
                     searchCurrentPage.textContent = (page - 1).toString();
 
                     searchPanelFound.innerHTML = "";
@@ -1957,12 +2019,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resDir,
+                                    projDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
-                                ),
-                                {
-                                    dir: BaseDirectory.Resource,
-                                }
+                                )
                             )
                         )
                     )) {
@@ -1973,7 +2032,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "next-page-button":
                 page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (Number.parseInt(searchCurrentPage.textContent!) < Number.parseInt(searchTotalPages.textContent!)) {
+                if (page < Number.parseInt(searchTotalPages.textContent!)) {
                     searchCurrentPage.textContent = (page + 1).toString();
                     searchPanelFound.innerHTML = "";
 
@@ -1981,12 +2040,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         JSON.parse(
                             await readTextFile(
                                 await join(
-                                    resDir,
+                                    projDir,
                                     `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
-                                ),
-                                {
-                                    dir: BaseDirectory.Resource,
-                                }
+                                )
                             )
                         )
                     )) {
@@ -2044,25 +2100,18 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 `${targetId.join("-")}-${focusedElementRow + i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         } else if (rowsRange < 0) {
                             const nextElement: HTMLTextAreaElement = document.getElementById(
                                 `${targetId.join("-")}-${focusedElementRow - i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(current_theme.outlinePrimary, current_theme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         }
                     }
                 }
             } else {
                 selectedMultiple = false;
-
-                for (const key of selectedTextareas.keys()) {
-                    const textarea: HTMLTextAreaElement = document.getElementById(key) as HTMLTextAreaElement;
-                    textarea.classList.replace(current_theme.outlineSecondary, current_theme.outlinePrimary);
-                }
             }
         }
     }

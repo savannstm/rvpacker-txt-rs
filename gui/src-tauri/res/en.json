@@ -3,11 +3,6 @@
         "cannotGetSettings": "Cannot find program's settings.",
         "askCreateSettings": "Create settings?",
         "createdSettings": "Settings created.\nBackups: Enabled\nBackup period: 60 secs.\nMaximum backups: 99.\nTheme: Cool Zinc",
-        "askDownloadTranslation": "Cannot find translation files. Download translation files? Note: If you agree, this will install Russian translation files. If you want to start a project from scratch, disagree.",
-        "downloadingTranslation": "Downloading translation files",
-        "downloadedTranslation": "Translation files downloaded.",
-        "startBlankProject": "Start a new project?\n(You'll get a completely empty project and start from scratch)\nYou'll have to install a translation files anyway (some of them which is unused will be deleted).",
-        "whatNext": "If you want to edit an already existing translation made by me, you should download translation files when program's asking or manually download them from repository.",
         "unsavedChanges": "You have unsaved changes. Save progress and quit?",
         "originalTextIrreplacable": "Original text is irreplacable.",
         "invalidRegexp": "Invalid regular expression.",
@@ -36,7 +31,31 @@
         "noMatches": "No matches",
         "currentPage": "None",
         "separator": "of",
-        "goToRow": "Go to row... from 1 to"
+        "goToRow": "Go to row... from 1 to",
+        "missingTranslationDir": "'translation' directory is missing. Project won't be initialized.",
+        "missingOriginalDir": "'original' directory is missing. Project won't be initialized.",
+        "missingTranslationSubdirs": "'translation' directory's subdirectories 'maps', 'other' and 'plugins' are missing. Project won't be initialized.",
+        "noProjectSelected": "No project selected. Select the project directory, using 'open folder' button in the left-top corner. Directory must contain directories 'original' and 'translation' (with 'maps', 'other' and 'plugins' subdirectories, if it's RPG Maker MV or MZ, or 'maps' and 'other', if it's RPG Maker XP, VX, VX Ace).",
+        "backgroundDark": "Dark background color",
+        "backgroundPrimary": "Primary background color",
+        "backgroundSecond": "Second background color",
+        "backgroundThird": "Third background color",
+        "outlinePrimary": "Primary outline color",
+        "outlineSecond": "Second outline color",
+        "outlineThird": "Third outline color",
+        "outlineFocused": "Focused outline color",
+        "borderPrimary": "Primary border color",
+        "borderSecond": "Second border color",
+        "borderFocused": "Focused border color",
+        "backgroundPrimaryHovered": "Primary background color when hovered",
+        "backgroundSecondHovered": "Second background color when hovered",
+        "textPrimary": "Primary text color",
+        "textSecond": "Second text color",
+        "textThird": "Third text color",
+        "createTheme": "Create theme",
+        "allowedThemeNameCharacters": "Allowed characters: a-z, A-Z, 0-9, -, _.",
+        "invalidThemeName": "Theme name is invalid.",
+        "themeName": "Theme name:"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",
@@ -60,6 +79,6 @@
     },
     "help": {
         "helpTitle": "How to use; what to do; where to click?",
-        "help": "Program is shipped without translation files, and when you launched it, you can either select to download them or create a new project.<br>Program regularly creates backups of translation files in \"res/backups\" path, period of backup and max number of backups can be controlled in the options. By default, the program creates backups every 60 seconds.<br>When you're saving changes in the program, all translation files will be written in the \"res/translation\" folder. If you want to use your own translation files in the program, just put them into this folder.<br>To save your project changes, just press the save button or use Ctrl + S shortcut. It will automatically save your project, and when you start the program again, you can continue from where you left off.<br> To compile your translation into game's JSON files, just press the compile button or use Alt + C shortcut. Make sure to save before you compile your translation. It will create fully functional JSON files in the \"res/data\" folder.<br>You can read this manual again or get help about program's hotkeys by selecting \"About\" and \"Hotkeys\" top menu options respectively."
+        "help": "Program is shipped without translation files. You can parse any game's files using CLI tool from the same repository to use in this program.<br>To start the project and begin translation, use \"open folder\" button in the left-top corner.<br>Program regularly creates backups of translation files in \"project_folder/backups\" path, period of backup and max number of backups can be controlled in the options. By default, the program creates backups every 60 seconds.<br>When you're saving changes in the program, all translation files will be written in the \"project_folder/translation\" folder.<br>To save your project changes, just press the save button or use Ctrl + S shortcut. It will automatically save your project, and when you start the program again, you can continue from where you left off.<br> To compile your translation into game's JSON files, just press the compile button or use Alt + C shortcut. Make sure to save before you compile your translation. It will create fully functional JSON files in the \"project_folder/data\" folder.<br>You can read this manual again or get help about program's hotkeys by selecting \"About\" and \"Hotkeys\" top menu options respectively."
     }
 }

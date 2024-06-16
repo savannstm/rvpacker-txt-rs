@@ -5,14 +5,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="material.css" />
+        <link rel="stylesheet" href="theme-styles.css" />
         <script type="module" src="options.ts" defer></script>
     </head>
-    <body class="text-lg background textPrimary">
+    <body class="text-lg backgroundDark textPrimary">
         <div id="options-menu" class="flex flex-col p-8">
-            <div class="flex z-50 flex-row items-center py-4 background">
+            <div class="flex z-50 flex-row items-center py-4 backgroundDark">
                 <span
                     id="backup-check"
-                    class="flex justify-center items-center mr-2 text-xl rounded-md border-2 cursor-pointer select-none borderSecondary borderPrimary size-8 font-material"
+                    class="flex justify-center items-center mr-2 text-xl rounded-md border-2 cursor-pointer select-none borderSecond borderPrimary size-8 font-material"
                 >
                     check
                 </span>
@@ -26,7 +27,7 @@
                         <input
                             type="number"
                             id="backup-period-input"
-                            class="p-2 w-auto h-8 secondary rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mr-2 text-xl"
+                            class="p-2 w-auto h-8 backgroundSecond rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none mr-2 text-xl"
                         />
                         <span id="backup-period-note"></span>
                     </div>
@@ -35,7 +36,7 @@
                         <input
                             type="number"
                             id="backup-max-input"
-                            class="p-2 w-auto h-8 secondary rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-xl mr-2"
+                            class="p-2 w-auto h-8 backgroundSecond rounded-md outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-xl mr-2"
                         />
                         <span id="backup-max-note"></span>
                     </div>
