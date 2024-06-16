@@ -50,7 +50,7 @@ export function readMap(inputDir: string, outputDir: string, logging: boolean, l
                             }
                         } else {
                             if (inSeq) {
-                                const lineJoined = line.join("^");
+                                const lineJoined = line.join("\\#");
 
                                 lines.add(lineJoined);
                                 line.length = 0;
@@ -125,11 +125,11 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                 }
 
                 if (typeof description === "string" && description) {
-                    lines.add(description.replaceAll(/\r\n|\n/g, "^"));
+                    lines.add(description.replaceAll(/\r\n|\n/g, "\\#"));
                 }
 
                 if (typeof note === "string" && note) {
-                    lines.add(note.replaceAll(/\r\n|\n/g, "^"));
+                    lines.add(note.replaceAll(/\r\n|\n/g, "\\#"));
                 }
             }
 
@@ -173,7 +173,7 @@ export function readOther(inputDir: string, outputDir: string, logging: boolean,
                                 }
                             } else {
                                 if (inSeq) {
-                                    const lineJoined = line.join("^");
+                                    const lineJoined = line.join("\\#");
 
                                     lines.add(lineJoined);
                                     line.length = 0;
@@ -272,7 +272,7 @@ export function readScripts(inputDir: string, outputDir: string, logging: boolea
 
     const fullCode = [];
     for (const [_m, _t, code] of uintarrArr) {
-        const codeString = inflateSync(code).toString("utf8").replaceAll(/\r?\n/g, "^/");
+        const codeString = inflateSync(code).toString("utf8").replaceAll(/\r?\n/g, "\\#/");
         fullCode.push(codeString);
     }
 

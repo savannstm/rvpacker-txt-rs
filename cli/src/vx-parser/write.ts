@@ -167,14 +167,14 @@ export function writeOther(
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("^", "\n"));
+            .map((string) => string.replaceAll("\\#", "\n"));
 
         let otherTranslatedText = readFileSync(
             `${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`,
             "utf8"
         )
             .split("\n")
-            .map((string) => string.replaceAll("^", "\n"));
+            .map((string) => string.replaceAll("\\#", "\n"));
 
         if (drunk > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
@@ -221,38 +221,40 @@ export function writeOther(
                 const pagesLength = filename == "Troops.rvdata2" ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
-                    const list: object =
+                    const list: object[] =
                         filename == "Troops.rvdata2"
                             ? getValueBySymbolDesc(pages[i], "@list")
                             : getValueBySymbolDesc(obj, "@list");
 
                     if (!Array.isArray(list)) {
-                        for (const item of list) {
-                            const code: number = getValueBySymbolDesc(item, "@code");
-                            const parameters: string[] = getValueBySymbolDesc(item, "@parameters");
+                        continue;
+                    }
 
-                            for (const [i, parameter] of parameters.entries()) {
-                                if (typeof parameter === "string") {
-                                    if (
-                                        [401, 402, 324].includes(code) ||
-                                        (code === 356 &&
-                                            (parameter.startsWith("GabText") ||
-                                                (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
-                                    ) {
-                                        if (translationMap.has(parameter)) {
-                                            parameters[i] = translationMap.get(parameter)!;
+                    for (const item of list) {
+                        const code: number = getValueBySymbolDesc(item, "@code");
+                        const parameters: string[] = getValueBySymbolDesc(item, "@parameters");
+
+                        for (const [i, parameter] of parameters.entries()) {
+                            if (typeof parameter === "string") {
+                                if (
+                                    [401, 402, 324].includes(code) ||
+                                    (code === 356 &&
+                                        (parameter.startsWith("GabText") ||
+                                            (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
+                                ) {
+                                    if (translationMap.has(parameter)) {
+                                        parameters[i] = translationMap.get(parameter)!;
+
+                                        setValueBySymbolDesc(item, "@parameters", parameters);
+                                    }
+                                }
+                            } else if (code === 102 && Array.isArray(parameter)) {
+                                for (const [j, param] of (parameter as string[]).entries()) {
+                                    if (typeof param === "string") {
+                                        if (translationMap.has(param)) {
+                                            (parameters[i][j] as string) = translationMap.get(param)!;
 
                                             setValueBySymbolDesc(item, "@parameters", parameters);
-                                        }
-                                    }
-                                } else if (code === 102 && Array.isArray(parameter)) {
-                                    for (const [j, param] of (parameter as string[]).entries()) {
-                                        if (typeof param === "string") {
-                                            if (translationMap.has(param)) {
-                                                (parameters[i][j] as string) = translationMap.get(param)!;
-
-                                                setValueBySymbolDesc(item, "@parameters", parameters);
-                                            }
                                         }
                                     }
                                 }
@@ -336,7 +338,7 @@ export function writeScripts(
             uintarrArr[i][1] = decoder.decode(title);
         }
 
-        uintarrArr[i][2] = deflateSync(translationArr[i].replaceAll("^", "\r\n"));
+        uintarrArr[i][2] = deflateSync(translationArr[i].replaceAll("\\#", "\r\n"));
     }
 
     if (logging) {

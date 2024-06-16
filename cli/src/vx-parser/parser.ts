@@ -214,12 +214,10 @@ program
             original: `${inputDir}/original`,
             maps: `${outputDir}/translation/maps`,
             other: `${outputDir}/translation/other`,
-            plugins: `${outputDir}/translation/plugins`,
         };
 
         mkdirSync(paths.maps, { recursive: true });
         mkdirSync(paths.other, { recursive: true });
-        mkdirSync(paths.plugins, { recursive: true });
 
         readMap(paths.original, paths.maps, log, localization.readLogString);
         readOther(paths.original, paths.other, log, localization.readLogString);
@@ -260,19 +258,19 @@ program
 
         const mapsOriginalText = readFileSync(paths.maps, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("^", "\n").trim());
+            .map((line) => line.replaceAll("\\#", "\n").trim());
 
         let mapsTranslatedText = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("^", "\n").trim());
+            .map((line) => line.replaceAll("\\#", "\n").trim());
 
         const mapsOriginalNames = readFileSync(paths.names, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("^", "\n").trim());
+            .map((line) => line.replaceAll("\\#", "\n").trim());
 
         let mapsTranslatedNames = readFileSync(paths.mapsTrans, "utf8")
             .split("\n")
-            .map((line) => line.replaceAll("^", "\n").trim());
+            .map((line) => line.replaceAll("\\#", "\n").trim());
 
         if (drunkInt > 0) {
             mapsTranslatedText = mapsTranslatedText.shuffle();
