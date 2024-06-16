@@ -1,55 +1,55 @@
 Knife
-A short kitchen knife. What it lacks in size it makes up^in speed.
+A short kitchen knife. What it lacks in size it makes up\#in speed.
 Officer sword
-A sword of an army officer. Swords like these don't see much use^these days. They are kept around more because of tradition.
+A sword of an army officer. Swords like these don't see much use\#these days. They are kept around more because of tradition.
 Rusty pipe
 Rusty iron pipe with hefty weight. Can cause momentary stun.
 Mauler
-A long barbed and spiked rod. The weapon is very heavy and^clumsy to wield but causes severe damage when hit.
+A long barbed and spiked rod. The weapon is very heavy and\#clumsy to wield but causes severe damage when hit.
 Scalpel
-A sharp scalpel. It's very short, but very accurate in experienced ^hands.
+A sharp scalpel. It's very short, but very accurate in experienced \#hands.
 Axe
-A medium sized wood axe. Swinging this as a weapon is sure^to scare away lesser foes.
+A medium sized wood axe. Swinging this as a weapon is sure\#to scare away lesser foes.
 Kassara
-Originally a tool for cutting tree branches. It could be used^for things equal in size, like human limbs for example.
+Originally a tool for cutting tree branches. It could be used\#for things equal in size, like human limbs for example.
 Sickle
-A tool used for harvesting crops. It also has a long history^as a weapon of choice for civilians.
+A tool used for harvesting crops. It also has a long history\#as a weapon of choice for civilians.
 Bayonet
-A rifle with a knife attachment. You switch to close-range^combat easily with this one. Shoot on field with [SHIFT].
+A rifle with a knife attachment. You switch to close-range\#combat easily with this one. Shoot on field with [SHIFT].
 Rifle .303 Mk I
-A bolt-action, magazine-fed repeating rifle. The most common^used rifle in the First Great War. Shoot on field with [SHIFT].
+A bolt-action, magazine-fed repeating rifle. The most common\#used rifle in the First Great War. Shoot on field with [SHIFT].
 12-gauge Trenchgun
-A powerful gun with a serious kick. Fires a number of small^pellets that stop even larger foes. Shoot on field with [SHIFT].
+A powerful gun with a serious kick. Fires a number of small\#pellets that stop even larger foes. Shoot on field with [SHIFT].
 Lugr Pistol
-A toggle-locked, recoil-operated semi-automatic pistol. Typically^used by the Bremen army officers as a secondary arm.
+A toggle-locked, recoil-operated semi-automatic pistol. Typically\#used by the Bremen army officers as a secondary arm.
 Pipe wrench
-A tool used for assembling wide variety of things. Can be used^as a blunt weapons as well.
+A tool used for assembling wide variety of things. Can be used\#as a blunt weapons as well.
 Sandman's kiss
-A syringe with neurotoxins attached to an officer sword.^Each thrust of the sword releases some of the poison.
+A syringe with neurotoxins attached to an officer sword.\#Each thrust of the sword releases some of the poison.
 Reaper's rake
-Four sickles attached to a broomstick. A 2-handed slashing^weapon that causes severe bleeding.
+Four sickles attached to a broomstick. A 2-handed slashing\#weapon that causes severe bleeding.
 Lantern flail
-A makeshift weapon that is a bit hard to wield, but hard to^read properly as well making it an unpredictable weapon with^heavy mass. Can cause burns as well.
+A makeshift weapon that is a bit hard to wield, but hard to\#read properly as well making it an unpredictable weapon with\#heavy mass. Can cause burns as well.
 Meat grinder
-A violent and fierce weapon. A saw blade attached to a bench^grinder that is customized to work without being plugged in.
+A violent and fierce weapon. A saw blade attached to a bench\#grinder that is customized to work without being plugged in.
 Gaelian greatsword
-An old greatsword from the highlands north of Rondon. These^swords were nicknamed 'the king's bane' because of how effective^they were against Rondon knights in the 12th century.
+An old greatsword from the highlands north of Rondon. These\#swords were nicknamed 'the king's bane' because of how effective\#they were against Rondon knights in the 12th century.
 Meat mallet
-A tool used in kitchen that makes up one brutal weapon.^Swinging this will surely score you critical hits every now^and then.
+A tool used in kitchen that makes up one brutal weapon.\#Swinging this will surely score you critical hits every now\#and then.
 Iron spear
-An old iron spear that was still used by the cavalry of Bohemia^few decades ago. Up until firearms became more prevalent in this^region.
+An old iron spear that was still used by the cavalry of Bohemia\#few decades ago. Up until firearms became more prevalent in this\#region.
 Sergal spear
-A finely decorated ornament spear from the warrior tribes^of northern Vinland. The decoration suggests highly advanced^cultures, but sergals remain largely unknown in the old continent.
+A finely decorated ornament spear from the warrior tribes\#of northern Vinland. The decoration suggests highly advanced\#cultures, but sergals remain largely unknown in the old continent.
 Red virtue
-A masterfully forged light sword. The sword is very light and^so excels in finesse. It is said that Red virtue is one of the^two swords forged for the ancient king of Ma'habre.
+A masterfully forged light sword. The sword is very light and\#so excels in finesse. It is said that Red virtue is one of the\#two swords forged for the ancient king of Ma'habre.
 Briefcase
 Blood sword
 A sword forged from the blood of Alll-mer.
 Longinus
-The spear that punctured Alll-mer's side as he was chained and^crucified. A faint trace of the shadow that was cast away for^Alll-mer to reach his ascension.
+The spear that punctured Alll-mer's side as he was chained and\#crucified. A faint trace of the shadow that was cast away for\#Alll-mer to reach his ascension.
 Miasma
-An otherwordly sword that oozes toxic gasses. The sword^is said to house the strength of 6 men.
+An otherwordly sword that oozes toxic gasses. The sword\#is said to house the strength of 6 men.
 Sabbath
-To counter the rising threats of the witch and vampire hunts of^the 1700s the Vatican city developed this otherwordly sword to be^used by the penance knights as their new main weapon.
+To counter the rising threats of the witch and vampire hunts of\#the 1700s the Vatican city developed this otherwordly sword to be\#used by the penance knights as their new main weapon.
 Black steel
-An eastern style sword that is delicate and sharp. Prone to^critical hits. The blade as ancient writing, it translates to:^"The Black Steel of the East".
+An eastern style sword that is delicate and sharp. Prone to\#critical hits. The blade as ancient writing, it translates to:\#"The Black Steel of the East".

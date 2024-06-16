@@ -191,7 +191,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace('^', "\n"))
+            .map(|line: &str| line.to_string().replace(r"\#", "\n"))
             .collect();
 
             let mut other_translated_text: Vec<String> = read_to_string(format!(
@@ -200,7 +200,7 @@ pub fn write_other(
             ))
             .unwrap()
             .par_split('\n')
-            .map(|line: &str| line.to_string().replace('^', "\n"))
+            .map(|line: &str| line.to_string().replace(r"\#", "\n"))
             .collect();
 
             let mut rng: ThreadRng = thread_rng();

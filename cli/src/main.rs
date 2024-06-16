@@ -390,27 +390,27 @@ fn main() {
                 let maps_original_text_vec: Vec<String> = read_to_string(dir_paths.maps)
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace('^', "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
                 let mut maps_translated_text_vec: Vec<String> =
                     read_to_string(dir_paths.maps_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|line: &str| line.replace('^', "\n").trim().to_string())
+                        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                         .collect();
 
                 let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace('^', "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
                 let mut maps_translated_names_vec: Vec<String> =
                     read_to_string(dir_paths.names_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|line: &str| line.replace('^', "\n").trim().to_string())
+                        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                         .collect();
 
                 if drunk > 0 {
