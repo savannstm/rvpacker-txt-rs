@@ -1,0 +1,63 @@
+.backgroundDark {
+    background-color: var(--backgroundDark);
+}
+
+.backgroundPrimary {
+    background-color: var(--backgroundPrimary);
+}
+
+.backgroundSecond {
+    background-color: var(--backgroundSecond);
+}
+
+.backgroundThird {
+    background-color: var(--backgroundThird);
+}
+
+.textPrimary {
+    color: var(--textPrimary);
+}
+
+.textSecond {
+    color: var(--textSecond);
+}
+
+.textThird {
+    color: var(--textThird);
+}
+
+.outlinePrimary {
+    outline-color: var(--outlinePrimary);
+}
+
+.outlineSecond {
+    outline-color: var(--outlineSecond);
+}
+
+.outlineThird {
+    outline-color: var(--outlineThird);
+}
+
+.borderPrimary {
+    border-color: var(--borderPrimary);
+}
+
+.borderSecond {
+    border-color: var(--borderSecond);
+}
+
+.borderFocused:focus {
+    border-color: var(--borderFocused);
+}
+
+.outlineFocused:focus {
+    outline-color: var(--outlineFocused);
+}
+
+.backgroundPrimaryHovered:hover {
+    background-color: var(--backgroundPrimaryHovered);
+}
+
+.backgroundSecondHovered:hover {
+    background-color: var(--backgroundSecondHovered);
+}

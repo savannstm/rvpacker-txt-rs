@@ -24,7 +24,6 @@ interface Settings {
     theme: ThemeName;
     firstLaunch: boolean;
     project: string | null;
-    RPGMVer: "new" | "old" | null;
 }
 
 interface mainTranslation {
@@ -64,6 +63,26 @@ interface mainTranslation {
     missingOriginalDir: string;
     missingTranslationSubdirs: string;
     noProjectSelected: string;
+    backgroundDark: string;
+    backgroundPrimary: string;
+    backgroundSecond: string;
+    backgroundThird: string;
+    outlinePrimary: string;
+    outlineSecond: string;
+    outlineThird: string;
+    outlineFocused: string;
+    borderPrimary: string;
+    borderSecond: string;
+    borderFocused: string;
+    backgroundPrimaryHovered: string;
+    backgroundSecondHovered: string;
+    textPrimary: string;
+    textSecond: string;
+    textThird: string;
+    createTheme: string;
+    allowedThemeNameCharacters: string;
+    invalidThemeName: string;
+    themeName: string;
 }
 
 interface optionsTranslation {
@@ -102,30 +121,28 @@ interface Translation {
     help: helpTranslation;
 }
 
-type ThemeKey =
-    | "name"
-    | "background"
-    | "primary"
-    | "outlinePrimary"
-    | "outlineSecondary"
-    | "outlineTertiary"
-    | "outlineFocus"
-    | "borderPrimary"
-    | "borderSecondary"
-    | "borderFocus"
-    | "secondary"
-    | "hoverPrimary"
-    | "hoverSecondary"
-    | "textPrimary"
-    | "textSecondary"
-    | "textTertiary"
-    | "tertiary";
-
-type ThemeName = "cool-zinc" | "fuflo-light";
+interface ThemeObject {
+    [name: string]: Theme;
+}
 
 interface Theme {
-    name: ThemeName;
-    [key: ThemeKey]: string;
+    name: string;
+    backgroundDark: string;
+    backgroundPrimary: string;
+    backgroundSecond: string;
+    backgroundThird: string;
+    outlinePrimary: string;
+    outlineSecond: string;
+    outlineThird: string;
+    outlineFocused: string;
+    borderPrimary: string;
+    borderSecond: string;
+    borderFocused: string;
+    backgroundPrimaryHovered: string;
+    backgroundSecondHovered: string;
+    textPrimary: string;
+    textSecond: string;
+    textThird: string;
 }
 
 type Language = "en" | "ru";

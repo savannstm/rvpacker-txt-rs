@@ -14,30 +14,7 @@
             "all": false,
             "shell": {
                 "all": false,
-                "open": true,
-                "execute": true,
-                "scope": [
-                    {
-                        "name": "powershell",
-                        "cmd": "powershell",
-                        "args": [
-                            "iwr",
-                            "https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip",
-                            "-OutFile",
-                            "main.zip"
-                        ]
-                    },
-                    {
-                        "name": "sh",
-                        "cmd": "sh",
-                        "args": [
-                            "wget",
-                            "https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip",
-                            "-O",
-                            "main.zip"
-                        ]
-                    }
-                ]
+                "open": true
             },
             "fs": {
                 "all": false,

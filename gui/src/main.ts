@@ -1,6 +1,5 @@
 import "./string-extensions";
 import "./htmlelement-extensions";
-import { Theme } from "./themes";
 
 import { FileEntry, exists, readDir, readTextFile, removeFile, writeTextFile, createDir } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
@@ -16,7 +15,6 @@ import XRegExp from "xregexp";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     let projDir: string = "";
-    let RPGMVer: string = "";
 
     const resDir = "res";
     const translationDir: string = "translation";
@@ -31,11 +29,86 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const logFile: string = "replacement-log.json";
     const ruTranslation: string = "ru.json";
     const enTranslation: string = "en.json";
+    const themesFile: string = "themes.json";
+
+    function showThemeWindow(): void {
+        themeWindow.classList.remove("hidden");
+
+        function setStyleProperties(inputElement: HTMLInputElement): void {
+            for (const element of document.querySelectorAll(`.${inputElement.id}`) as NodeListOf<HTMLElement>) {
+                element.style.setProperty(`--${inputElement.id}`, inputElement.value);
+            }
+        }
+
+        async function createTheme(): Promise<void> {
+            const themeNameInput = themeWindow.lastElementChild?.firstElementChild
+                ?.lastElementChild as HTMLInputElement;
+            const themeName = themeNameInput.value;
+
+            const newTheme = { name: themeName } as Theme;
+
+            for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                for (const subdiv of div.children) {
+                    const inputElement = subdiv.firstElementChild as HTMLInputElement;
+                    newTheme[inputElement.id] = inputElement.value;
+                }
+            }
+
+            if (!/^[a-zA-Z0-9_-]+$/.test(themeName)) {
+                await message(mainLanguage.invalidThemeName + mainLanguage.allowedThemeNameCharacters);
+                return;
+            }
+
+            themes[themeName] = newTheme;
+
+            await writeTextFile(await join(resDir, themesFile), JSON.stringify(themes));
+
+            const newThemeButton = document.createElement("button");
+            newThemeButton.id = themeName;
+            newThemeButton.textContent = themeName;
+
+            themeMenu.insertBefore(themeMenu.lastElementChild!, newThemeButton);
+        }
+
+        requestAnimationFrame((): void => {
+            themeWindow.style.left = `${(document.body.clientWidth - themeWindow.clientWidth) / 2}px`;
+
+            let i = 1;
+            const themeColors = Object.values(theme);
+
+            for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                for (const subdiv of div.children) {
+                    const inputElement = subdiv.firstElementChild as HTMLInputElement;
+
+                    inputElement.value = themeColors[i];
+                    inputElement.addEventListener("input", (): void => setStyleProperties(inputElement));
+                    i++;
+                }
+            }
+
+            const closeButton = themeWindow.firstElementChild?.firstElementChild as HTMLButtonElement;
+            const createThemeButton = themeWindow.lastElementChild?.lastElementChild as HTMLButtonElement;
+            createThemeButton.addEventListener("click", async (): Promise<void> => await createTheme());
+
+            closeButton.addEventListener("click", (): void => {
+                for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
+                    for (const subdiv of div.children) {
+                        const inputElement = subdiv.firstElementChild as HTMLInputElement;
+                        inputElement.removeEventListener("input", (): void => setStyleProperties(inputElement));
+                    }
+                }
+
+                createThemeButton.removeEventListener("click", async (): Promise<void> => await createTheme());
+                themeWindow.classList.add("hidden");
+            });
+        });
+    }
 
     async function ensureProjectIsValid(folder: string): Promise<boolean> {
         const dirs = [mapsDir, otherDir, pluginsDir];
         const translationPath = await join(folder, translationDir);
         const originalPath = await join(folder, originalDir);
+        let RPGMVer: string = "";
 
         if (!(await exists(translationPath))) {
             await message(mainLanguage.missingTranslationDir);
@@ -93,13 +166,9 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             const settings: Settings = JSON.parse(
                 await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
             );
-            await writeTextFile(
-                await join(resDir, settingsFile),
-                JSON.stringify({ ...settings, project: projDir, RPGMVer: RPGMVer }),
-                {
-                    dir: BaseDirectory.Resource,
-                }
-            );
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: projDir }), {
+                dir: BaseDirectory.Resource,
+            });
 
             await createDir(await join(projDir, backupDir), { recursive: true });
             nextBackupNumber = Number.parseInt(await determineLastBackupNumber());
@@ -225,15 +294,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const resultContainer: HTMLDivElement = document.createElement("div");
 
         const resultElement: HTMLDivElement = document.createElement("div");
-        resultElement.classList.add(
-            "search-result",
-            currentTheme.textSecondary,
-            "textSecondary",
-            currentTheme.borderPrimary,
-            "borderPrimary",
-            currentTheme.secondary,
-            "secondary"
-        );
+        resultElement.classList.add("search-result", "textSecond", "borderPrimary", "backgroundSecond");
 
         const thirdParent: HTMLDivElement = element.parentElement?.parentElement?.parentElement as HTMLDivElement;
 
@@ -248,7 +309,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(resultDiv);
 
         const originalInfo: HTMLDivElement = document.createElement("div");
-        originalInfo.classList.add("text-xs", currentTheme.textTertiary, "textTertiary");
+        originalInfo.classList.add("text-xs", "textThird");
 
         const currentFile: string = element.parentElement?.parentElement?.id.slice(
             0,
@@ -258,7 +319,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(originalInfo);
 
         const arrow: HTMLDivElement = document.createElement("div");
-        arrow.classList.add("search-result-arrow", currentTheme.textSecondary, "textSecondary");
+        arrow.classList.add("search-result-arrow", "textSecond");
         arrow.innerHTML = "arrow_downward";
         mainDiv.appendChild(arrow);
 
@@ -270,7 +331,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         mainDiv.appendChild(counterpart);
 
         const counterpartInfo: HTMLDivElement = document.createElement("div");
-        counterpartInfo.classList.add("text-xs", currentTheme.textTertiary, "textTertiary");
+        counterpartInfo.classList.add("text-xs", "textThird");
 
         counterpartInfo.innerHTML = `${currentFile} - ${sourceIndex === 0 ? "original" : "translation"} - ${row}`;
         mainDiv.appendChild(counterpartInfo);
@@ -291,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             const end: number = start + match.length;
 
             const beforeDiv: string = `<span>${elementText.slice(lastIndex, start)}</span>`;
-            const matchDiv: string = `<span class="${currentTheme.tertiary} tertiary">${match}</span>`;
+            const matchDiv: string = `<span class="backgroundThird">${match}</span>`;
 
             result.push(beforeDiv);
             result.push(matchDiv);
@@ -730,7 +791,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             for (const child of contentElement.children) {
                 const node: HTMLTextAreaElement = child.firstElementChild?.children[2] as HTMLTextAreaElement;
-                outputArray.push(node.value.replaceAll("\n", "/#"));
+                outputArray.push(node.value.replaceAll("\n", "^"));
             }
 
             const dirPath: string = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
@@ -987,13 +1048,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 (document.activeElement as HTMLTextAreaElement).value
                             );
                             await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
-
-                            for (const key of selectedTextareas.keys()) {
-                                const textarea: HTMLTextAreaElement = document.getElementById(
-                                    key
-                                ) as HTMLTextAreaElement;
-                                textarea?.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
-                            }
                         }
                     }
                     break;
@@ -1019,7 +1073,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 const textarea: HTMLTextAreaElement = document.getElementById(
                                     key
                                 ) as HTMLTextAreaElement;
-                                textarea.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
                                 textarea.value = "";
                             }
 
@@ -1141,6 +1194,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
         }
 
+        if (contentNames.includes("scripts")) {
+            for (const element of leftPanel.children) {
+                if (element.innerHTML === "plugins") {
+                    element.innerHTML = "scripts";
+                }
+            }
+        }
+
         for (let i = 0; i < contentNames.length - 1; i += 2) {
             const contentName: string = contentNames[i];
             const contentDiv: HTMLDivElement = document.createElement("div");
@@ -1160,34 +1221,25 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 const originalTextElement: HTMLDivElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
-                originalTextElement.textContent = originalText.replaceAll("/#", "\n");
-                originalTextElement.classList.add(
-                    "original-text-div",
-                    currentTheme.primary,
-                    "primary",
-                    currentTheme.outlinePrimary,
-                    "outlinePrimary"
-                );
+                originalTextElement.textContent = originalText.replaceAll("^", "\n");
+                originalTextElement.classList.add("original-text-div", "backgroundPrimary", "outlinePrimary");
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
-                const translationTextSplit: string[] = translationText.split("/#");
+                const translationTextSplit: string[] = translationText.split("^");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplit.length;
                 translationTextElement.value = translationTextSplit.join("\n");
                 translationTextElement.classList.add(
                     "translation-text-input",
-                    currentTheme.outlinePrimary,
                     "outlinePrimary",
-                    currentTheme.primary,
-                    "primary",
-                    currentTheme.outlineFocus,
-                    "outlineFocus"
+                    "backgroundPrimary",
+                    "outlineFocused"
                 );
 
                 const rowElement: HTMLDivElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = (j + 1).toString();
-                rowElement.classList.add("row", currentTheme.primary, "primary");
+                rowElement.classList.add("row", "backgroundPrimary");
 
                 textContainer.appendChild(rowElement);
                 textContainer.appendChild(originalTextElement);
@@ -1197,14 +1249,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             }
 
             contentContainer.appendChild(contentDiv);
-        }
-
-        if (RPGMVer === "old") {
-            for (const element of leftPanel.children) {
-                if (element.innerHTML === "plugins") {
-                    element.innerHTML = "scripts";
-                }
-            }
         }
 
         arrangeElements();
@@ -1264,7 +1308,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         for (const object of result) {
             const { left, top }: { left: number; top: number } = object;
             const ghostNewLine: HTMLDivElement = document.createElement("div");
-            ghostNewLine.classList.add("ghost-new-line", currentTheme.textTertiary, "textTertiary");
+            ghostNewLine.classList.add("ghost-new-line", "textThird");
             ghostNewLine.innerHTML = "\\n";
             ghostNewLine.style.left = `${left}px`;
             ghostNewLine.style.top = `${top}px`;
@@ -1328,27 +1372,27 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function switchCase(): void {
         searchCase = !searchCase;
-        searchCaseButton.classList.toggle(currentTheme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchWhole(): void {
         searchWhole = !searchWhole;
-        searchWholeButton.classList.toggle(currentTheme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchRegExp(): void {
         searchRegex = !searchRegex;
-        searchRegexButton.classList.toggle(currentTheme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchTranslation(): void {
         searchTranslation = !searchTranslation;
-        searchTranslationButton.classList.toggle(currentTheme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function switchLocation(): void {
         searchLocation = !searchLocation;
-        searchLocationButton.classList.toggle(currentTheme.tertiary);
+        searchCaseButton.classList.toggle("backgroundThird");
     }
 
     function createOptionsWindow(): void {
@@ -1533,34 +1577,30 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
     }
 
-    async function setTheme(theme: Theme): Promise<void> {
-        if (Object.keys(currentTheme).length === 0) {
-            for (const [key, value] of Object.entries(theme)) {
-                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
-                    `.${key}`
-                ) as NodeListOf<HTMLElement>;
+    async function setTheme(newTheme: Theme): Promise<void> {
+        if (!currentTheme) {
+            currentTheme = newTheme.name;
+
+            for (const [key, value] of Object.entries(newTheme)) {
+                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
 
                 for (const element of elements) {
-                    element.classList.add(value);
+                    element.style.setProperty(`--${key}`, value);
                 }
-
-                currentTheme[key as ThemeKey] = value;
             }
         } else {
-            if (theme.name === currentTheme.name) {
+            if (newTheme.name === currentTheme) {
                 return;
             }
 
-            for (const [key, value] of Object.entries(theme)) {
-                const elements: NodeListOf<HTMLElement> = document.querySelectorAll(
-                    `.${key}`
-                ) as NodeListOf<HTMLElement>;
+            theme = newTheme;
+
+            for (const [key, value] of Object.entries(newTheme)) {
+                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
 
                 for (const element of elements) {
-                    element.classList.replace(currentTheme[key as ThemeKey], value);
+                    element.style.setProperty(`--${key}`, value);
                 }
-
-                currentTheme[key as ThemeKey] = value;
             }
         }
 
@@ -1570,49 +1610,48 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             })
         );
 
-        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, theme: theme.name }), {
+        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, theme: newTheme.name }), {
             dir: BaseDirectory.Resource,
         });
     }
 
-    const contentContainer: HTMLDivElement = document.getElementById("content-container") as HTMLDivElement;
-    const searchInput: HTMLTextAreaElement = document.getElementById("search-input") as HTMLTextAreaElement;
-    const replaceInput: HTMLTextAreaElement = document.getElementById("replace-input") as HTMLTextAreaElement;
-    const menuButton: HTMLButtonElement = document.getElementById("menu-button") as HTMLButtonElement;
-    const leftPanel: HTMLDivElement = document.getElementById("left-panel") as HTMLDivElement;
-    const searchPanel: HTMLDivElement = document.getElementById("search-results") as HTMLDivElement;
-    const searchPanelFound: HTMLDivElement = document.getElementById("search-content") as HTMLDivElement;
-    const searchPanelReplaced: HTMLDivElement = document.getElementById("replace-content") as HTMLDivElement;
-    const searchCurrentPage: HTMLSpanElement = document.getElementById("search-current-page") as HTMLSpanElement;
-    const searchSeparator: HTMLSpanElement = document.getElementById("search-separator") as HTMLSpanElement;
-    const searchTotalPages: HTMLSpanElement = document.getElementById("search-total-pages") as HTMLSpanElement;
-    const topPanel: HTMLDivElement = document.getElementById("top-panel") as HTMLDivElement;
-    const topPanelButtons: HTMLDivElement = document.getElementById("top-panel-buttons") as HTMLDivElement;
-    const saveButton: HTMLButtonElement = document.getElementById("save-button") as HTMLButtonElement;
-    const compileButton: HTMLButtonElement = document.getElementById("compile-button") as HTMLButtonElement;
-    const optionsButton: HTMLButtonElement = document.getElementById("options-button") as HTMLButtonElement;
-    const themeButton: HTMLButtonElement = document.getElementById("theme-button") as HTMLButtonElement;
-    const themeMenu: HTMLDivElement = document.getElementById("theme-menu") as HTMLDivElement;
-    const searchCaseButton: HTMLButtonElement = document.getElementById("case-button") as HTMLButtonElement;
-    const searchWholeButton: HTMLButtonElement = document.getElementById("whole-button") as HTMLButtonElement;
-    const searchRegexButton: HTMLButtonElement = document.getElementById("regex-button") as HTMLButtonElement;
-    const searchTranslationButton: HTMLButtonElement = document.getElementById(
-        "translation-button"
-    ) as HTMLButtonElement;
-    const searchLocationButton: HTMLButtonElement = document.getElementById("location-button") as HTMLButtonElement;
-    const goToRowInput: HTMLInputElement = document.getElementById("goto-row-input") as HTMLInputElement;
-    const menuBar: HTMLDivElement = document.getElementById("menu-bar") as HTMLDivElement;
-    const fileMenuButton: HTMLButtonElement = document.getElementById("file") as HTMLButtonElement;
-    const helpMenuButton: HTMLButtonElement = document.getElementById("help") as HTMLButtonElement;
-    const languageMenuButton: HTMLButtonElement = document.getElementById("language") as HTMLButtonElement;
-    const fileMenu: HTMLDivElement = document.getElementById("file-menu") as HTMLDivElement;
-    const reloadButton: HTMLButtonElement = document.getElementById("reload-button") as HTMLButtonElement;
-    const helpMenu: HTMLDivElement = document.getElementById("help-menu") as HTMLDivElement;
-    const helpButtonSub: HTMLButtonElement = document.getElementById("help-button-sub") as HTMLButtonElement;
-    const aboutButton: HTMLButtonElement = document.getElementById("about-button") as HTMLButtonElement;
-    const hotkeysButton: HTMLButtonElement = document.getElementById("hotkeys-button") as HTMLButtonElement;
-    const languageMenu: HTMLDivElement = document.getElementById("language-menu") as HTMLDivElement;
-    const currentState: HTMLDivElement = document.getElementById("current-state") as HTMLDivElement;
+    const contentContainer = document.getElementById("content-container") as HTMLDivElement;
+    const searchInput = document.getElementById("search-input") as HTMLTextAreaElement;
+    const replaceInput = document.getElementById("replace-input") as HTMLTextAreaElement;
+    const menuButton = document.getElementById("menu-button") as HTMLButtonElement;
+    const leftPanel = document.getElementById("left-panel") as HTMLDivElement;
+    const searchPanel = document.getElementById("search-results") as HTMLDivElement;
+    const searchPanelFound = document.getElementById("search-content") as HTMLDivElement;
+    const searchPanelReplaced = document.getElementById("replace-content") as HTMLDivElement;
+    const searchCurrentPage = document.getElementById("search-current-page") as HTMLSpanElement;
+    const searchSeparator = document.getElementById("search-separator") as HTMLSpanElement;
+    const searchTotalPages = document.getElementById("search-total-pages") as HTMLSpanElement;
+    const topPanel = document.getElementById("top-panel") as HTMLDivElement;
+    const topPanelButtons = document.getElementById("top-panel-buttons") as HTMLDivElement;
+    const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+    const compileButton = document.getElementById("compile-button") as HTMLButtonElement;
+    const optionsButton = document.getElementById("options-button") as HTMLButtonElement;
+    const themeButton = document.getElementById("theme-button") as HTMLButtonElement;
+    const themeMenu = document.getElementById("theme-menu") as HTMLDivElement;
+    const searchCaseButton = document.getElementById("case-button") as HTMLButtonElement;
+    const searchWholeButton = document.getElementById("whole-button") as HTMLButtonElement;
+    const searchRegexButton = document.getElementById("regex-button") as HTMLButtonElement;
+    const searchTranslationButton = document.getElementById("translation-button") as HTMLButtonElement;
+    const searchLocationButton = document.getElementById("location-button") as HTMLButtonElement;
+    const goToRowInput = document.getElementById("goto-row-input") as HTMLInputElement;
+    const menuBar = document.getElementById("menu-bar") as HTMLDivElement;
+    const fileMenuButton = document.getElementById("file") as HTMLButtonElement;
+    const helpMenuButton = document.getElementById("help") as HTMLButtonElement;
+    const languageMenuButton = document.getElementById("language") as HTMLButtonElement;
+    const fileMenu = document.getElementById("file-menu") as HTMLDivElement;
+    const reloadButton = document.getElementById("reload-button") as HTMLButtonElement;
+    const helpMenu = document.getElementById("help-menu") as HTMLDivElement;
+    const helpButtonSub = document.getElementById("help-button-sub") as HTMLButtonElement;
+    const aboutButton = document.getElementById("about-button") as HTMLButtonElement;
+    const hotkeysButton = document.getElementById("hotkeys-button") as HTMLButtonElement;
+    const languageMenu = document.getElementById("language-menu") as HTMLDivElement;
+    const currentState = document.getElementById("current-state") as HTMLDivElement;
+    const themeWindow = document.getElementById("theme-window") as HTMLDivElement;
 
     const replaced: Map<string, { [key: string]: string }> = new Map();
     const activeGhostLines: HTMLDivElement[] = [];
@@ -1646,11 +1685,13 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
 
-    let theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
+    let themes = JSON.parse(
+        await readTextFile(await join(resDir, themesFile), { dir: BaseDirectory.Resource })
+    ) as ThemeObject;
 
-    let currentTheme: {
-        [key in ThemeKey]: string;
-    } = {} as { [key in ThemeKey]: string };
+    let theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
+
+    let currentTheme: null | string = null;
 
     await setTheme(theme);
 
@@ -1716,6 +1757,42 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     searchCurrentPage.innerHTML = mainLanguage.currentPage;
     searchSeparator.innerHTML = mainLanguage.separator;
+
+    for (const themeName of Object.keys(themes)) {
+        const themeButton = document.createElement("button");
+        themeButton.id = themeName;
+        themeButton.innerHTML = themeName;
+        themeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
+
+        themeMenu.appendChild(themeButton);
+    }
+
+    {
+        const createThemeButton = document.createElement("button");
+        createThemeButton.id = "create-theme";
+        createThemeButton.innerHTML = mainLanguage.createTheme;
+        createThemeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
+
+        themeMenu.appendChild(createThemeButton);
+    }
+
+    for (const div of themeWindow.children[1].children) {
+        for (const subdiv of div.children) {
+            const label = subdiv.lastElementChild as HTMLLabelElement;
+            label.innerHTML = mainLanguage[subdiv.firstElementChild?.id!];
+        }
+    }
+
+    {
+        const allowedThemeNameCharactersDiv = themeWindow.lastElementChild?.children[1]!;
+        allowedThemeNameCharactersDiv.innerHTML = mainLanguage.allowedThemeNameCharacters;
+
+        const createThemeButton = themeWindow.lastElementChild?.lastElementChild!;
+        createThemeButton.innerHTML = mainLanguage.createTheme;
+
+        const themeNameLabel = themeWindow.lastElementChild?.firstElementChild?.firstElementChild!;
+        themeNameLabel.innerHTML = mainLanguage.themeName;
+    }
 
     let searchRegex: boolean = false;
     let searchWhole: boolean = false;
@@ -1808,22 +1885,26 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "theme-button":
                 themeMenu.toggleMultiple("hidden", "flex");
 
-                themeMenu.style.top = `${themeButton.offsetTop + themeButton.offsetHeight}px`;
-                themeMenu.style.left = `${themeButton.offsetLeft}px`;
+                requestAnimationFrame((): void => {
+                    themeMenu.style.left = `${themeButton.offsetLeft}px`;
+                    themeMenu.style.top = `${themeButton.offsetTop + themeButton.clientHeight + 16}px`;
 
-                themeMenu.addEventListener(
-                    "click",
-                    async (event: MouseEvent): Promise<void> => {
+                    themeMenu.addEventListener("click", async (event: MouseEvent): Promise<void> => {
                         const target: HTMLButtonElement = event.target as HTMLButtonElement;
 
                         if (!themeMenu.contains(target)) {
                             return;
                         }
 
-                        await setTheme(new Theme(target.id));
-                    },
-                    { once: true }
-                );
+                        if (target.id === "create-theme") {
+                            showThemeWindow();
+                            return;
+                        }
+
+                        await setTheme(themes[target.id]);
+                    });
+                });
+
                 break;
             case "search-button":
                 if (!projDir) {
@@ -1887,15 +1968,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                         const replacedElement: HTMLDivElement = document.createElement("div");
                         replacedElement.classList.add(
                             "replaced-element",
-                            currentTheme.textSecondary,
-                            "textSecondary",
-                            currentTheme.borderPrimary,
+                            "textSecond",
                             "borderPrimary",
-                            currentTheme.secondary,
-                            "secondary"
+                            "backgroundSecond"
                         );
 
-                        replacedElement.innerHTML = `<div class="text-base ${currentTheme.textTertiary} textTertiary">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl ${currentTheme.textPrimary} textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+                        replacedElement.innerHTML = `<div class="text-base textThird">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
 
                         replacedContainer.appendChild(replacedElement);
                         searchPanelReplaced.appendChild(replacedContainer);
@@ -1932,7 +2010,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "previous-page-button":
                 page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (Number.parseInt(searchCurrentPage.textContent!) > 1) {
+                if (page > 1) {
                     searchCurrentPage.textContent = (page - 1).toString();
 
                     searchPanelFound.innerHTML = "";
@@ -1954,7 +2032,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             case "next-page-button":
                 page = Number.parseInt(searchCurrentPage.textContent!);
 
-                if (Number.parseInt(searchCurrentPage.textContent!) < Number.parseInt(searchTotalPages.textContent!)) {
+                if (page < Number.parseInt(searchTotalPages.textContent!)) {
                     searchCurrentPage.textContent = (page + 1).toString();
                     searchPanelFound.innerHTML = "";
 
@@ -2022,25 +2100,18 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                                 `${targetId.join("-")}-${focusedElementRow + i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(currentTheme.outlinePrimary, currentTheme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         } else if (rowsRange < 0) {
                             const nextElement: HTMLTextAreaElement = document.getElementById(
                                 `${targetId.join("-")}-${focusedElementRow - i}`
                             ) as HTMLTextAreaElement;
 
-                            nextElement.classList.replace(currentTheme.outlinePrimary, currentTheme.outlineSecondary);
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         }
                     }
                 }
             } else {
                 selectedMultiple = false;
-
-                for (const key of selectedTextareas.keys()) {
-                    const textarea: HTMLTextAreaElement = document.getElementById(key) as HTMLTextAreaElement;
-                    textarea.classList.replace(currentTheme.outlineSecondary, currentTheme.outlinePrimary);
-                }
             }
         }
     }
