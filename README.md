@@ -24,7 +24,7 @@ json-writer поддерживает различные команды и арг
 ### Билдинг приложения
 
 Клонируйте репозиторий с помощью\
-`git clone https://github.com/savannstm/fh-termina-json-writer.git`.
+`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
 
 Перейдите в директорию `gui` и установите все необходимые Node.js библиотеки с помощью\
 `npm install`.
@@ -65,7 +65,7 @@ Issues and commits are welcome.
 ### Program manual building
 
 Clone the repository with\
-`git clone https://github.com/savannstm/fh-termina-json-writer.git`.
+`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
 
 cd to the `gui` directory and install all needed node.js dependencies with\
 `npm install`.
