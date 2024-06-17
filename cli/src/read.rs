@@ -4,16 +4,17 @@ use serde_json::{from_str, Value};
 use std::{
     collections::HashMap,
     fs::{read_dir, read_to_string, write, DirEntry},
+    path::{Path, PathBuf},
 };
 
-pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
+pub fn read_map(input_dir: &Path, output_dir: &Path, logging: bool, log_string: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| entry.file_name().into_string().unwrap().starts_with("Map"))
         .collect();
 
-    let obj_map: HashMap<String, Value> = files
+    let maps_obj_map: HashMap<String, Value> = files
         .iter()
         .map(|entry: &DirEntry| {
             (
@@ -26,7 +27,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     let mut lines: IndexSet<String> = IndexSet::new();
     let mut names_lines: IndexSet<String> = IndexSet::new();
 
-    for (filename, obj) in obj_map {
+    for (filename, obj) in maps_obj_map {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
                 names_lines.insert(display_name.to_string());
@@ -55,8 +56,7 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join(r"\#");
-                                lines.insert(line_joined);
+                                lines.insert(line.join(r"\#"));
                                 line.clear();
                                 in_seq = false;
                             }
@@ -100,13 +100,13 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     }
 
     write(
-        format!("{output_dir}/maps.txt"),
+        output_dir.join("maps.txt"),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
     )
     .unwrap();
 
     write(
-        format!("{output_dir}/names.txt"),
+        output_dir.join("names.txt"),
         names_lines
             .iter()
             .cloned()
@@ -116,19 +116,19 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     .unwrap();
 
     write(
-        format!("{output_dir}/maps_trans.txt"),
+        output_dir.join("maps_trans.txt"),
         "\n".repeat(lines.len() - 1),
     )
     .unwrap();
 
     write(
-        format!("{output_dir}/names_trans.txt"),
+        output_dir.join("names_trans.txt"),
         "\n".repeat(names_lines.len() - 1),
     )
     .unwrap();
 }
 
-pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
+pub fn read_other(input_dir: &Path, output_dir: &Path, logging: bool, log_string: &str) {
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
@@ -190,18 +190,18 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
             }
 
             write(
-                format!(
-                    "{output_dir}/{}.txt",
+                output_dir.join(format!(
+                    "{}.txt",
                     filename[0..filename.rfind('.').unwrap()].to_lowercase()
-                ),
+                )),
                 lines.iter().cloned().collect::<Vec<String>>().join("\n"),
             )
             .unwrap();
             write(
-                format!(
-                    "{output_dir}/{}_trans.txt",
+                output_dir.join(format!(
+                    "{}_trans.txt",
                     filename[0..filename.rfind('.').unwrap()].to_lowercase()
-                ),
+                )),
                 "\n".repeat(lines.len() - 1),
             )
             .unwrap();
@@ -242,9 +242,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                             }
                         } else {
                             if in_seq {
-                                let line_joined: String = line.join(r"\#");
-                                lines.insert(line_joined);
-
+                                lines.insert(line.join(r"\#"));
                                 line.clear();
                                 in_seq = false;
                             }
@@ -283,18 +281,18 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
         }
 
         write(
-            format!(
-                "{output_dir}/{}.txt",
+            output_dir.join(format!(
+                "{}.txt",
                 filename[0..filename.rfind('.').unwrap()].to_lowercase()
-            ),
+            )),
             lines.iter().cloned().collect::<Vec<String>>().join("\n"),
         )
         .unwrap();
         write(
-            format!(
-                "{output_dir}/{}_trans.txt",
+            output_dir.join(format!(
+                "{}_trans.txt",
                 filename[0..filename.rfind('.').unwrap()].to_lowercase()
-            ),
+            )),
             "\n".repeat(lines.len() - 1),
         )
         .unwrap();
@@ -305,8 +303,8 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
     }
 }
 
-pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
-    let system_file: String = format!("{input_dir}/System.json");
+pub fn read_system(input_dir: &Path, output_dir: &Path, logging: bool, log_string: &str) {
+    let system_file: PathBuf = input_dir.join("System.json");
 
     let obj: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
 
@@ -361,12 +359,12 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string:
     }
 
     write(
-        format!("{output_dir}/system.txt"),
+        output_dir.join("system.txt"),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
     )
     .unwrap();
     write(
-        format!("{output_dir}/system_trans.txt"),
+        output_dir.join("system_trans.txt"),
         "\n".repeat(lines.len() - 1),
     )
     .unwrap();
