@@ -87,7 +87,8 @@ export function mergeOther(objArr: RubyObject[]): RubyObject[] {
 }
 
 export async function writeMap(
-    paths: { original: string; maps: string; mapsTrans: string; names: string; namesTrans: string },
+    originalPath: string,
+    mapsPath: string,
     outputDir: string,
     drunk: number,
     logging: boolean,
@@ -96,33 +97,33 @@ export async function writeMap(
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const filtered = (await readdir(paths.original)).filter((filename) => filename.startsWith("Map"));
+    const filtered = (await readdir(originalPath)).filter((filename) => filename.startsWith("Map"));
 
     const filesData = await Promise.all(
-        filtered.map((filename) => Bun.file(`${paths.original}/${filename}`).arrayBuffer())
+        filtered.map((filename) => Bun.file(`${originalPath}/${filename}`).arrayBuffer())
     );
 
     const objMap = new Map(filtered.map((filename, i) => [filename, mergeMap(load(filesData[i]) as RubyObject)]));
 
-    const mapsOriginalText = (await Bun.file(paths.maps).text())
+    const mapsOriginalText = (await Bun.file(`${mapsPath}/maps.txt`).text())
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
-    const mapsOriginalNames = (await Bun.file(paths.names).text())
+    const namesOriginalText = (await Bun.file(`${mapsPath}/names.txt`).text())
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
-    let mapsTranslatedText = (await Bun.file(paths.mapsTrans).text())
+    let mapsTranslatedText = (await Bun.file(`${mapsPath}/maps_trans.txt`).text())
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
-    let mapsTranslatedNames = (await Bun.file(paths.mapsTrans).text())
+    let namesTranslatedText = (await Bun.file(`${mapsPath}/names_trans.txt}`).text())
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
     if (drunk > 0) {
         mapsTranslatedText = mapsTranslatedText.shuffle();
-        mapsTranslatedNames = mapsTranslatedNames.shuffle();
+        namesTranslatedText = namesTranslatedText.shuffle();
 
         if (drunk === 2) {
             mapsTranslatedText = mapsTranslatedText.map((string) => {
@@ -132,13 +133,19 @@ export async function writeMap(
     }
 
     const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
-    const namesTranslationMap = new Map(mapsOriginalNames.map((string, i) => [string, mapsTranslatedNames[i]]));
+    const namesTranslationMap = new Map(namesOriginalText.map((string, i) => [string, namesTranslatedText[i]]));
 
     for (const [filename, obj] of objMap) {
-        const displayName: string = getValueBySymbolDesc(obj, "@display_name");
+        const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
 
-        if (namesTranslationMap.has(displayName)) {
+        if (typeof displayName === "string" && namesTranslationMap.has(displayName)) {
             setValueBySymbolDesc(obj, "@display_name", namesTranslationMap.get(displayName)!);
+        } else if (displayName instanceof Uint8Array) {
+            const decoded = decoder.decode(displayName);
+
+            if (namesTranslationMap.has(decoded)) {
+                setValueBySymbolDesc(obj, "@display_name", namesTranslationMap.get(decoded)!);
+            }
         }
 
         const events: object = getValueBySymbolDesc(obj, "@events");

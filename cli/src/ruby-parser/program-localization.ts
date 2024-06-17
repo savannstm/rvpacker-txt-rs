@@ -34,23 +34,24 @@ export class ProgramLocalization {
     timeElapsed: string;
     noSystemFile: string;
     noScriptsFile: string;
+    noOptionDesc: string;
+    noType: string;
 
     constructor(language: string) {
         switch (language) {
             default:
             case "en":
-                this.programDesc = "A tool, that parses .rvdata files into text and writes them back.";
+                this.programDesc = "A tool, that parses .rxdata/.rvdata/.rvdata2 files into text and writes them back.";
                 this.languageDesc = "Sets tool language to specified.";
                 this.inputDirType = "INPUT_PATH";
                 this.outputDirType = "OUTPUT_PATH";
-                this.readInputDirDesc =
-                    'Path to the input directory, containing a "original" folder with .rvdata files.';
+                this.readInputDirDesc = 'Path to the input directory, containing a "original" folder with files.';
                 this.readOutputDirDesc =
-                    'Path to the output directory, where the "parsed" folder with .txt files with text from the parsed .rvdata files will be created.';
+                    'Path to the output directory, where the "translation" folder with .txt files with text from the parsed files will be created.';
                 this.writeInputDirDesc =
-                    'Path to the input directory, containing folders "original" with original game .rvdata files, and "translation" with "maps" and "other" folders with .txt game files.';
+                    'Path to the input directory, containing folders "original" with original game files, and "translation" with "maps" and "other" folders with .txt game files.';
                 this.writeOutputDirDesc =
-                    'Path to the output directory, where the "output" folder with .rvdata files will be created out of .txt translation files.';
+                    'Path to the output directory, where the "output" folder with files will be created out of .txt translation files.';
                 this.helpOptionDesc = "Prints this help message.";
                 this.helpCommandDesc = "Prints a help message for specified command.";
                 this.helpCommandType = "COMMAND_NAME";
@@ -62,9 +63,9 @@ export class ProgramLocalization {
                 this.optionsType = "OPTIONS";
                 this.commandType = "COMMAND";
                 this.readDesc =
-                    'Parses .rvdata files from the "original" folder of input directory to the "parsed" folder of output directory.';
+                    'Parses files from the "original" folder of input directory to the "translation" folder of output directory.';
                 this.writeDesc =
-                    'Writes translated .rvdata files using original files from the "original" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
+                    'Writes translated files using original files from the "original" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
                 this.default = "default:";
                 this.choices = "choices:";
                 this.false = "false";
@@ -79,19 +80,23 @@ export class ProgramLocalization {
                 this.timeElapsed = "Time elapsed (in seconds):";
                 this.noSystemFile = "The system file does not exist.";
                 this.noScriptsFile = "The scripts file does not exist.";
+                this.noOptionDesc =
+                    "Disables parsing/writing specified files.\nPossible values: maps, other, system, scripts.\nExample: --no=maps,other,system,scripts";
+                this.noType = "FILES";
                 break;
             case "ru":
-                this.programDesc = "Инструмент, который парсит .rvdata файлы в текст и записывает их обратно.";
+                this.programDesc =
+                    "Инструмент, который парсит .rxdata/.rvdata/rvdata2 файлы в текст и записывает их обратно.";
                 this.languageDesc = "Устанавливает язык инструмента на введённый.";
                 this.inputDirType = "ВХОДНОЙ_ПУТЬ";
                 this.outputDirType = "ВЫХОДНОЙ_ПУТЬ";
-                this.readInputDirDesc = 'Путь к директории входа, содержащей папку "original" с .rvdata файлами игры.';
+                this.readInputDirDesc = 'Путь к директории входа, содержащей папку "original" с файлами игры.';
                 this.readOutputDirDesc =
-                    'Путь к директории выхода, в которой будет создана папка "parsed" с .txt файлами из распарсенных .rvdata файлов.';
+                    'Путь к директории выхода, в которой будет создана папка "translation" с .txt файлами из распарсенных файлов.';
                 this.writeInputDirDesc =
-                    'Путь к директории входа, содержащей папки "original" с оригинальными .rvdata файлами игры, и "translation" с папками "maps" и "other" с .txt файлами игры.';
+                    'Путь к директории входа, содержащей папки "original" с оригинальными файлами игры, и "translation" с папками "maps" и "other" с .txt файлами игры.';
                 this.writeOutputDirDesc =
-                    'Путь к директории выхода, в которой будет создана папка "output" с .rvdata файлами, созданными из .txt файлов с переводом.';
+                    'Путь к директории выхода, в которой будет создана папка "output" с файлами, созданными из .txt файлов с переводом.';
                 this.helpOptionDesc = "Выводит эту справку.";
                 this.helpCommandDesc = "Выводит справку для указанной команды.";
                 this.helpCommandType = "ИМЯ_КОМАНДЫ";
@@ -103,7 +108,7 @@ export class ProgramLocalization {
                 this.optionsType = "ОПЦИИ";
                 this.commandType = "КОМАНДА";
                 this.readDesc =
-                    'Парсит .rvdata файлы из папки "original" входной директории в папку "parsed" выходной директории.';
+                    'Парсит файлы из папки "original" входной директории в папку "translation" выходной директории.';
                 this.writeDesc = "";
                 this.default = "по умолчанию:";
                 this.choices = "варианты:";
@@ -113,7 +118,7 @@ export class ProgramLocalization {
                 this.languageType = "ЯЗЫК";
                 this.drunkType = "ЧИСЛО";
                 this.writeDesc =
-                    'Записывает переведенные файлы .rvdata, используя исходные файлы из папки "original" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
+                    'Записывает переведенные файлы, используя исходные файлы из папки "original" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
                 this.drunkDesc =
                     "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
                 this.readLogString = "Распарсен файл";
@@ -121,6 +126,9 @@ export class ProgramLocalization {
                 this.timeElapsed = "Время выполнения (в секундах):";
                 this.noSystemFile = "Файл System не существует.";
                 this.noScriptsFile = "Файл Scripts не существует.";
+                this.noOptionDesc =
+                    "Отключает обработку указанных файлов.\nВозможные значения: maps, other, system, scripts.\nПример: --no=maps,other,system,scripts";
+                this.noType = "ФАЙЛЫ";
                 break;
         }
 

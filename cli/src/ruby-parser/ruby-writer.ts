@@ -69,17 +69,23 @@ program
     .option("--log", localization.logOptionDesc, false)
     .addOption(
         new Option(`-l, --language <${localization.languageType}>`, localization.languageDesc).choices(allowedLanguages)
+    )
+    .addOption(
+        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
     );
 
 program
     .command("read")
     .option(`-i, --inputDir <${localization.inputDirType}>`, localization.readInputDirDesc, "./")
     .option(`-o, --outputDir <${localization.outputDirType}>`, localization.readOutputDirDesc, "./")
+    .addOption(
+        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
+    )
     .usage(localization.optionsType)
     .description(localization.readDesc)
     .action(async (_name, options) => {
         const { inputDir, outputDir }: { [key: string]: string } = options.opts();
-        const { log } = program.opts();
+        const { log, no } = program.opts();
 
         const paths: Record<string, string> = {
             original: `${inputDir}/original`,
@@ -90,36 +96,45 @@ program
         await mkdir(paths.maps, { recursive: true });
         await mkdir(paths.other, { recursive: true });
 
-        await readMap(paths.original, paths.maps, log, localization.readLogString);
-        await readOther(paths.original, paths.other, log, localization.readLogString);
+        if (!no || !no.includes("maps")) {
+            await readMap(paths.original, paths.maps, log, localization.readLogString);
+        }
 
-        const systemPaths = [
-            `${paths.original}/System.rvdata2`,
-            `${paths.original}/System.rvdata`,
-            `${paths.original}/System.rxdata`,
-        ];
+        if (!no || !no.includes("other")) {
+            await readOther(paths.original, paths.other, log, localization.readLogString);
+        }
 
-        for (const path of systemPaths) {
-            const file = Bun.file(path);
+        if (!no || !no.includes("system")) {
+            const systemPaths = [
+                `${paths.original}/System.rvdata2`,
+                `${paths.original}/System.rvdata`,
+                `${paths.original}/System.rxdata`,
+            ];
 
-            if (await file.exists()) {
-                await readSystem(path, paths.other, log, localization.readLogString);
-                break;
+            for (const path of systemPaths) {
+                const file = Bun.file(path);
+
+                if (await file.exists()) {
+                    await readSystem(path, paths.other, log, localization.readLogString);
+                    break;
+                }
             }
         }
 
-        const scriptsPaths = [
-            `${paths.original}/Scripts.rvdata2`,
-            `${paths.original}/Scripts.rvdata`,
-            `${paths.original}/Scripts.rxdata`,
-        ];
+        if (!no || !no.includes("scripts")) {
+            const scriptsPaths = [
+                `${paths.original}/Scripts.rvdata2`,
+                `${paths.original}/Scripts.rvdata`,
+                `${paths.original}/Scripts.rxdata`,
+            ];
 
-        for (const scriptsPath of scriptsPaths) {
-            const file = Bun.file(scriptsPath);
+            for (const scriptsPath of scriptsPaths) {
+                const file = Bun.file(scriptsPath);
 
-            if (await file.exists()) {
-                await readScripts(scriptsPath, paths.other, log, localization.readLogString);
-                break;
+                if (await file.exists()) {
+                    await readScripts(scriptsPath, paths.other, log, localization.readLogString);
+                    break;
+                }
             }
         }
 
@@ -131,69 +146,65 @@ program
     .option(`-i, --inputDir <${localization.inputDirType}>`, localization.writeInputDirDesc, "./")
     .option(`-o, --outputDir <${localization.outputDirType}>`, localization.writeOutputDirDesc, "./")
     .option(`-d, --drunk <${localization.drunkType}>`, localization.drunkDesc, "0")
+    .addOption(
+        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
+    )
     .usage(localization.optionsType)
     .description(localization.writeDesc)
     .action(async (_name, options) => {
         const { inputDir, outputDir, drunk }: { [key: string]: string } = options.opts();
-        const { log } = program.opts();
+        const { log, no } = program.opts();
 
         const drunkInt = Number.parseInt(drunk);
 
         const paths: Record<string, string> = {
             original: `${inputDir}/original`,
-            maps: `${inputDir}/translation/maps/maps.txt`,
-            mapsTrans: `${inputDir}/translation/maps/maps_trans.txt`,
-            names: `${inputDir}/translation/maps/names.txt`,
-            namesTrans: `${inputDir}/translation/maps/names_trans.txt`,
+            maps: `${inputDir}/translation/maps`,
             other: `${inputDir}/translation/other`,
             output: `${outputDir}/output/data`,
         };
 
         await mkdir(paths.output, { recursive: true });
 
-        await writeMap(
-            {
-                original: paths.original,
-                maps: paths.maps,
-                mapsTrans: paths.mapsTrans,
-                names: paths.names,
-                namesTrans: paths.namesTrans,
-            },
-            paths.output,
-            drunkInt,
-            log,
-            localization.writeLogString
-        );
+        if (no && !no.includes("maps")) {
+            await writeMap(paths.original, paths.maps, paths.output, drunkInt, log, localization.writeLogString);
+        }
 
-        await writeOther(paths.original, paths.output, paths.other, drunkInt, log, localization.writeLogString);
+        if (no && !no.includes("other")) {
+            await writeOther(paths.original, paths.output, paths.other, drunkInt, log, localization.writeLogString);
+        }
 
-        const systemFilePaths = [
-            `${paths.original}/System.rvdata2`,
-            `${paths.original}/System.rvdata`,
-            `${paths.original}/System.rxdata`,
-        ];
+        if (no && !no.includes("system")) {
+            const systemFilePaths = [
+                `${paths.original}/System.rvdata2`,
+                `${paths.original}/System.rvdata`,
+                `${paths.original}/System.rxdata`,
+            ];
 
-        for (const path of systemFilePaths) {
-            const file = Bun.file(path);
+            for (const path of systemFilePaths) {
+                const file = Bun.file(path);
 
-            if (await file.exists()) {
-                await writeSystem(path, paths.other, paths.output, drunkInt, log, localization.writeLogString);
-                break;
+                if (await file.exists()) {
+                    await writeSystem(path, paths.other, paths.output, drunkInt, log, localization.writeLogString);
+                    break;
+                }
             }
         }
 
-        const scriptsPaths = [
-            `${paths.original}/Scripts.rvdata2`,
-            `${paths.original}/Scripts.rvdata`,
-            `${paths.original}/Scripts.rxdata`,
-        ];
+        if (no && !no.includes("scripts")) {
+            const scriptsPaths = [
+                `${paths.original}/Scripts.rvdata2`,
+                `${paths.original}/Scripts.rvdata`,
+                `${paths.original}/Scripts.rxdata`,
+            ];
 
-        for (const path of scriptsPaths) {
-            const file = Bun.file(path);
+            for (const path of scriptsPaths) {
+                const file = Bun.file(path);
 
-            if (await file.exists()) {
-                await writeScripts(path, paths.other, paths.output, log, localization.writeLogString);
-                break;
+                if (await file.exists()) {
+                    await writeScripts(path, paths.other, paths.output, log, localization.writeLogString);
+                    break;
+                }
             }
         }
 

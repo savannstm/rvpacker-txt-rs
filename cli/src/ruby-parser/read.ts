@@ -22,10 +22,16 @@ export async function readMap(inputDir: string, outputDir: string, logging: bool
     const namesLines = OrderedSet().asMutable() as OrderedSet<string>;
 
     for (const [filename, obj] of objMap) {
-        const displayName: string = getValueBySymbolDesc(obj, "@display_name");
+        const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
 
-        if (displayName) {
+        if (typeof displayName === "string" && displayName.length > 0) {
             namesLines.add(displayName);
+        } else if (displayName instanceof Uint8Array) {
+            const decoded = decoder.decode(displayName);
+
+            if (decoded.length > 0) {
+                namesLines.add(decoded);
+            }
         }
 
         const events: object = getValueBySymbolDesc(obj, "@events");
@@ -299,7 +305,7 @@ export async function readOther(
 export async function readSystem(path: string, outputDir: string, logging: boolean, logString: string): Promise<void> {
     const decoder = new TextDecoder();
 
-    const obj = load(await Bun.file(path).arrayBuffer(), { string: "binary" }) as RubyObject;
+    const obj = load(await Bun.file(path).arrayBuffer()) as RubyObject;
     const type = path.slice(path.lastIndexOf(".") + 1);
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
