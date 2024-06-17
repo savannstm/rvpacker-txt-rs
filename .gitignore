@@ -3,7 +3,7 @@
 /backups
 /cli/Cargo.lock
 /cli/target
-/cli/parsed
+/cli/translation
 /cli/output
 /cli/.cargo
 /cli/src/ruby-parser/output

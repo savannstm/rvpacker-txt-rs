@@ -1,4 +1,4 @@
-use clap::{Arg, ArgMatches, Command};
+use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
 use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng};
 use rayon::prelude::*;
@@ -18,6 +18,9 @@ mod write;
 
 use read::*;
 use write::*;
+
+mod shuffle;
+use shuffle::shuffle_words;
 
 struct ProgramLocalization<'a> {
     about: &'a str,
@@ -187,10 +190,10 @@ fn main() {
     let drunk_arg: Arg = Arg::new("drunk")
         .short('d')
         .long("drunk")
-        .action(clap::ArgAction::Set)
+        .action(ArgAction::Set)
         .value_name(localization.drunk_arg_value_name)
         .default_value("0")
-        .value_parser(clap::value_parser!(u8).range(0..=2))
+        .value_parser(value_parser!(u8).range(0..=2))
         .help(cformat!(
             "{} {} --drunk 1.<bold>\n[{} {}]\n[{} {}]</bold>",
             localization.drunk,
@@ -219,7 +222,7 @@ fn main() {
         .global(true)
         .help(localization.input_dir)
         .value_name(localization.input_dir_value_name)
-        .value_parser(clap::value_parser!(PathBuf));
+        .value_parser(value_parser!(PathBuf));
 
     let output_dir_arg: Arg = Arg::new("output_dir")
         .short('o')
@@ -227,7 +230,7 @@ fn main() {
         .global(true)
         .help(localization.output_dir)
         .value_name(localization.output_dir_value_name)
-        .value_parser(clap::value_parser!(PathBuf));
+        .value_parser(value_parser!(PathBuf));
 
     let language_arg: Arg = Arg::new("language")
         .short('l')
@@ -246,7 +249,7 @@ fn main() {
 
     let log_arg: Arg = Arg::new("log")
         .long("log")
-        .action(clap::ArgAction::SetTrue)
+        .action(ArgAction::SetTrue)
         .global(true)
         .help(localization.log);
 
@@ -274,8 +277,10 @@ fn main() {
 
     let mut write_options = (true, true, true, true, false);
 
+    let current_subcommand: &str = matches.subcommand_name().unwrap();
+
     if let Some(no_values) = matches
-        .subcommand_matches("write")
+        .subcommand_matches(current_subcommand)
         .unwrap()
         .get_one::<String>("no")
     {
@@ -340,13 +345,13 @@ fn main() {
 
             let dir_paths: Paths = Paths {
                 original: format!("{input_dir}/original"),
-                output: format!("{output_dir}/data"),
                 maps: format!("{input_dir}/translation/maps/maps.txt"),
                 maps_trans: format!("{input_dir}/translation/maps/maps_trans.txt"),
                 names: format!("{input_dir}/translation/maps/names.txt"),
                 names_trans: format!("{input_dir}/translation/maps/names_trans.txt"),
                 other: format!("{input_dir}/translation/other"),
                 plugins: format!("{input_dir}/translation/plugins"),
+                output: format!("{output_dir}/data"),
                 plugins_output: format!("{output_dir}/js"),
             };
 
@@ -354,24 +359,24 @@ fn main() {
             create_dir_all(&dir_paths.plugins_output).unwrap();
 
             if write_options.0 {
-                let maps_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+                let maps_obj_map: HashMap<String, Value> = read_dir(&dir_paths.original)
                     .unwrap()
                     .par_bridge()
                     .flatten()
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<String, Value>, path: DirEntry| {
-                            let filename: String = path.file_name().into_string().unwrap();
+                        |mut map: HashMap<String, Value>, entry: DirEntry| {
+                            let filename: String = entry.file_name().into_string().unwrap();
 
                             if filename.starts_with("Map") {
-                                hashmap.insert(
+                                map.insert(
                                     filename,
                                     merge_map(
-                                        from_str(&read_to_string(path.path()).unwrap()).unwrap(),
+                                        from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
                                     ),
                                 );
                             }
-                            hashmap
+                            map
                         },
                     )
                     .reduce(
@@ -385,27 +390,27 @@ fn main() {
                 let maps_original_text_vec: Vec<String> = read_to_string(dir_paths.maps)
                     .unwrap()
                     .par_split('\n')
-                    .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
                 let mut maps_translated_text_vec: Vec<String> =
                     read_to_string(dir_paths.maps_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
+                        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                         .collect();
 
                 let maps_original_names_vec: Vec<String> = read_to_string(dir_paths.names)
                     .unwrap()
                     .par_split('\n')
-                    .map(|x: &str| x.replace("\\n[", "\\N[").replace("\\n", "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
                 let mut maps_translated_names_vec: Vec<String> =
                     read_to_string(dir_paths.names_trans)
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.replace("\\n", "\n").trim().to_string())
+                        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                         .collect();
 
                 if drunk > 0 {
@@ -419,25 +424,20 @@ fn main() {
                             .iter_mut()
                             .zip(maps_translated_names_vec.iter_mut())
                         {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
-
-                            let mut name_string_split: Vec<&str> = name_string.split(' ').collect();
-                            name_string_split.shuffle(&mut rng);
-                            *name_string = name_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
+                            *name_string = shuffle_words(name_string);
                         }
                     }
                 }
 
-                let maps_text_hashmap: HashMap<&str, &str> = maps_original_text_vec
+                let maps_translation_map: HashMap<&str, &str> = maps_original_text_vec
                     .par_iter()
                     .zip(maps_translated_text_vec.par_iter())
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
-                            hashmap.insert(key.as_str(), value.as_str());
-                            hashmap
+                        |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+                            map.insert(key.as_str(), value.as_str());
+                            map
                         },
                     )
                     .reduce(
@@ -448,14 +448,14 @@ fn main() {
                         },
                     );
 
-                let maps_names_hashmap: HashMap<&str, &str> = maps_original_names_vec
+                let names_translation_map: HashMap<&str, &str> = maps_original_names_vec
                     .par_iter()
                     .zip(maps_translated_names_vec.par_iter())
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
-                            hashmap.insert(key.as_str(), value.as_str());
-                            hashmap
+                        |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+                            map.insert(key.as_str(), value.as_str());
+                            map
                         },
                     )
                     .reduce(
@@ -467,10 +467,10 @@ fn main() {
                     );
 
                 write_maps(
-                    maps_hashmap,
+                    maps_obj_map,
                     &dir_paths.output,
-                    maps_text_hashmap,
-                    maps_names_hashmap,
+                    maps_translation_map,
+                    names_translation_map,
                     write_options.4,
                     localization.write_log,
                 );
@@ -479,36 +479,36 @@ fn main() {
             if write_options.1 {
                 const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
 
-                let other_hashmap: HashMap<String, Value> = read_dir(&dir_paths.original)
+                let other_obj_arr_map: HashMap<String, Vec<Value>> = read_dir(&dir_paths.original)
                     .unwrap()
                     .par_bridge()
                     .flatten()
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<String, Value>, path: DirEntry| {
-                            let filename: String = path.file_name().into_string().unwrap();
+                        |mut map: HashMap<String, Vec<Value>>, entry: DirEntry| {
+                            let filename: String = entry.file_name().into_string().unwrap();
 
                             if !PREFIXES.par_iter().any(|x: &&str| filename.starts_with(x)) {
-                                hashmap.insert(
+                                map.insert(
                                     filename,
                                     merge_other(
-                                        from_str(&read_to_string(path.path()).unwrap()).unwrap(),
+                                        from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
                                     ),
                                 );
                             }
-                            hashmap
+                            map
                         },
                     )
                     .reduce(
                         HashMap::new,
-                        |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
+                        |mut a: HashMap<String, Vec<Value>>, b: HashMap<String, Vec<Value>>| {
                             a.extend(b);
                             a
                         },
                     );
 
                 write_other(
-                    other_hashmap,
+                    other_obj_arr_map,
                     &dir_paths.output,
                     &dir_paths.other,
                     write_options.4,
@@ -518,7 +518,7 @@ fn main() {
             }
 
             if write_options.2 {
-                let system_json: Value = from_str(
+                let system_obj: Value = from_str(
                     &read_to_string(format!("{}/System.json", &dir_paths.original)).unwrap(),
                 )
                 .unwrap();
@@ -527,14 +527,14 @@ fn main() {
                     read_to_string(format!("{}/System.txt", dir_paths.other))
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.to_string())
+                        .map(|line: &str| line.to_string())
                         .collect();
 
                 let mut system_translated_text: Vec<String> =
                     read_to_string(format!("{}/System_trans.txt", dir_paths.other))
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.to_string())
+                        .map(|line: &str| line.to_string())
                         .collect();
 
                 if drunk > 0 {
@@ -544,21 +544,19 @@ fn main() {
 
                     if drunk == 2 {
                         for text_string in system_translated_text.iter_mut() {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
                         }
                     }
                 }
 
-                let system_text_hashmap: HashMap<&str, &str> = system_original_text
+                let system_translation_map: HashMap<&str, &str> = system_original_text
                     .par_iter()
                     .zip(system_translated_text.par_iter())
                     .fold(
                         HashMap::new,
-                        |mut hashmap: HashMap<&str, &str>, (key, value): (&String, &String)| {
-                            hashmap.insert(key.as_str(), value.as_str());
-                            hashmap
+                        |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+                            map.insert(key.as_str(), value.as_str());
+                            map
                         },
                     )
                     .reduce(
@@ -570,16 +568,16 @@ fn main() {
                     );
 
                 write_system(
-                    system_json,
+                    system_obj,
                     &dir_paths.output,
-                    system_text_hashmap,
+                    system_translation_map,
                     write_options.4,
                     localization.write_log,
                 );
             }
 
             if write_options.3 {
-                let plugins_json: Vec<Value> = from_str(
+                let plugins_obj_arr: Vec<Value> = from_str(
                     &read_to_string(format!("{}/plugins.json", dir_paths.plugins)).unwrap(),
                 )
                 .unwrap();
@@ -588,14 +586,14 @@ fn main() {
                     read_to_string(format!("{}/plugins.txt", dir_paths.plugins))
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.to_string())
+                        .map(|line: &str| line.to_string())
                         .collect();
 
                 let mut plugins_translated_text_vec: Vec<String> =
                     read_to_string(format!("{}/plugins_trans.txt", dir_paths.plugins))
                         .unwrap()
                         .par_split('\n')
-                        .map(|x: &str| x.to_string())
+                        .map(|line: &str| line.to_string())
                         .collect();
 
                 if drunk > 0 {
@@ -605,15 +603,13 @@ fn main() {
 
                     if drunk == 2 {
                         for text_string in plugins_translated_text_vec.iter_mut() {
-                            let mut text_string_split: Vec<&str> = text_string.split(' ').collect();
-                            text_string_split.shuffle(&mut rng);
-                            *text_string = text_string_split.join(" ");
+                            *text_string = shuffle_words(text_string);
                         }
                     }
                 }
 
                 write_plugins(
-                    plugins_json,
+                    plugins_obj_arr,
                     &dir_paths.plugins_output,
                     plugins_original_text_vec,
                     plugins_translated_text_vec,
@@ -642,7 +638,7 @@ fn main() {
                 if let Some(output_dir) = matches.get_one::<String>("output_dir") {
                     output_dir
                 } else {
-                    "./parsed"
+                    "./translation"
                 }
                 .replace('\\', "/");
 
@@ -651,12 +647,16 @@ fn main() {
                 return;
             }
 
-            create_dir_all(&output_dir).unwrap();
+            let maps_output: String = format!("{output_dir}/maps");
+            let other_output: String = format!("{output_dir}/other");
+
+            create_dir_all(&maps_output).unwrap();
+            create_dir_all(&other_output).unwrap();
 
             if write_options.0 {
                 read_map(
                     &input_dir,
-                    &output_dir,
+                    &maps_output,
                     write_options.4,
                     localization.read_log,
                 );
@@ -665,7 +665,7 @@ fn main() {
             if write_options.1 {
                 read_other(
                     &input_dir,
-                    &output_dir,
+                    &other_output,
                     write_options.4,
                     localization.read_log,
                 );
@@ -674,7 +674,7 @@ fn main() {
             if write_options.2 {
                 read_system(
                     &input_dir,
-                    &output_dir,
+                    &other_output,
                     write_options.4,
                     localization.read_log,
                 );

@@ -10,71 +10,78 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
-        .filter(|f: &DirEntry| f.file_name().into_string().unwrap().starts_with("Map"))
+        .filter(|entry: &DirEntry| entry.file_name().into_string().unwrap().starts_with("Map"))
         .collect();
 
-    let json_data: HashMap<String, Value> = files
+    let obj_map: HashMap<String, Value> = files
         .iter()
-        .map(|f: &DirEntry| {
+        .map(|entry: &DirEntry| {
             (
-                f.file_name().into_string().unwrap(),
-                from_str(&read_to_string(f.path()).unwrap()).unwrap(),
+                entry.file_name().into_string().unwrap(),
+                from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
             )
         })
         .collect();
 
     let mut lines: IndexSet<String> = IndexSet::new();
+    let mut names_lines: IndexSet<String> = IndexSet::new();
 
-    for (filename, json) in json_data {
-        for event in json["events"].as_array().unwrap().iter().skip(1) {
+    for (filename, obj) in obj_map {
+        if let Some(display_name) = obj["displayName"].as_str() {
+            if !display_name.is_empty() {
+                names_lines.insert(display_name.to_string());
+            }
+        }
+
+        for event in obj["events"].as_array().unwrap().iter().skip(1) {
             if !event["pages"].is_array() {
                 continue;
             }
 
             for page in event["pages"].as_array().unwrap().iter() {
-                let mut in_401_seq: bool = false;
+                let mut in_seq: bool = false;
                 let mut line: Vec<String> = Vec::new();
 
                 for list in page["list"].as_array().unwrap() {
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
-                    for parameter in list["parameters"].as_array().unwrap() {
+                    for parameter_value in list["parameters"].as_array().unwrap() {
                         if code == 401 {
-                            in_401_seq = true;
+                            in_seq = true;
 
-                            if parameter.is_string() {
-                                let parameter_str: &str = parameter.as_str().unwrap();
-                                line.push(parameter_str.to_string());
+                            if parameter_value.is_string() {
+                                let parameter: &str = parameter_value.as_str().unwrap();
+                                line.push(parameter.to_string());
                             }
                         } else {
-                            if in_401_seq {
-                                let line_joined: String = line.join("\\n");
+                            if in_seq {
+                                let line_joined: String = line.join(r"\#");
                                 lines.insert(line_joined);
                                 line.clear();
-                                in_401_seq = false;
+                                in_seq = false;
                             }
 
                             match code {
                                 102 => {
-                                    if parameter.is_array() {
-                                        for param in parameter.as_array().unwrap() {
-                                            if param.is_string() {
-                                                let param_str: &str = param.as_str().unwrap();
-                                                lines.insert(param_str.to_string());
+                                    if parameter_value.is_array() {
+                                        for param_value in parameter_value.as_array().unwrap() {
+                                            if param_value.is_string() {
+                                                let param: &str = param_value.as_str().unwrap();
+                                                lines.insert(param.to_string());
                                             }
                                         }
                                     }
                                 }
 
                                 356 => {
-                                    if parameter.is_string() {
-                                        let parameter_str: &str = parameter.as_str().unwrap();
+                                    if parameter_value.is_string() {
+                                        let parameter: &str = parameter_value.as_str().unwrap();
 
-                                        if parameter_str.starts_with("GabText")
-                                            && (parameter_str.starts_with("choice_text")
-                                                && !parameter_str.ends_with("????"))
+                                        if parameter.starts_with("GabText")
+                                            && (parameter.starts_with("choice_text")
+                                                && !parameter.ends_with("????"))
                                         {
-                                            lines.insert(parameter_str.to_string());
+                                            lines.insert(parameter.to_string());
                                         }
                                     }
                                 }
@@ -93,8 +100,30 @@ pub fn read_map(input_dir: &str, output_dir: &str, logging: bool, log_string: &s
     }
 
     write(
-        format!("{}/maps.txt", output_dir),
+        format!("{output_dir}/maps.txt"),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
+    )
+    .unwrap();
+
+    write(
+        format!("{output_dir}/names.txt"),
+        names_lines
+            .iter()
+            .cloned()
+            .collect::<Vec<String>>()
+            .join("\n"),
+    )
+    .unwrap();
+
+    write(
+        format!("{output_dir}/maps_trans.txt"),
+        "\n".repeat(lines.len() - 1),
+    )
+    .unwrap();
+
+    write(
+        format!("{output_dir}/names_trans.txt"),
+        "\n".repeat(names_lines.len() - 1),
     )
     .unwrap();
 }
@@ -103,10 +132,15 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
-        .filter(|f: &DirEntry| {
+        .filter(|entry: &DirEntry| {
             const FILENAMES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
             for filename in FILENAMES {
-                if f.file_name().into_string().unwrap().starts_with(filename) {
+                if entry
+                    .file_name()
+                    .into_string()
+                    .unwrap()
+                    .starts_with(filename)
+                {
                     return false;
                 }
             }
@@ -115,21 +149,21 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
         })
         .collect();
 
-    let json_data: HashMap<String, Value> = files
+    let obj_arr_map: HashMap<String, Vec<Value>> = files
         .par_iter()
-        .map(|f: &DirEntry| {
+        .map(|entry: &DirEntry| {
             (
-                f.file_name().into_string().unwrap(),
-                from_str(&read_to_string(f.path()).unwrap()).unwrap(),
+                entry.file_name().into_string().unwrap(),
+                from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
             )
         })
         .collect();
 
-    for (filename, json) in json_data {
+    for (filename, obj_arr) in obj_arr_map {
         let mut lines: IndexSet<String> = IndexSet::new();
 
-        if filename != "CommonEvents.json" && filename != "Troops.json" {
-            for obj in json.as_array().unwrap() {
+        if !filename.starts_with("Common") && !filename.starts_with("Troops") {
+            for obj in obj_arr {
                 if obj["name"].is_string() {
                     let name: &str = obj["name"].as_str().unwrap();
 
@@ -142,7 +176,7 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let description: &str = obj["description"].as_str().unwrap();
 
                     if !description.is_empty() {
-                        lines.insert(description.replace('\n', "\\n"));
+                        lines.insert(description.replace('\n', r"\#"));
                     }
                 }
 
@@ -150,95 +184,93 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
                     let note: &str = obj["note"].as_str().unwrap();
 
                     if !note.is_empty() {
-                        lines.insert(note.replace('\n', "\\n"));
+                        lines.insert(note.replace('\n', r"\#"));
                     }
                 }
             }
 
             write(
                 format!(
-                    "{}/{}",
-                    output_dir,
-                    filename.replace(".json", ".txt").to_lowercase()
+                    "{output_dir}/{}.txt",
+                    filename[0..filename.rfind('.').unwrap()].to_lowercase()
                 ),
                 lines.iter().cloned().collect::<Vec<String>>().join("\n"),
             )
             .unwrap();
-
+            write(
+                format!(
+                    "{output_dir}/{}_trans.txt",
+                    filename[0..filename.rfind('.').unwrap()].to_lowercase()
+                ),
+                "\n".repeat(lines.len() - 1),
+            )
+            .unwrap();
             continue;
         }
 
-        for obj in json.as_array().unwrap().iter().skip(1) {
-            let pages_length: usize = if obj["pages"].is_array() {
+        for obj in obj_arr.iter().skip(1) {
+            let pages_length: usize = if filename.starts_with("Troops") {
                 obj["pages"].as_array().unwrap().len()
             } else {
                 1
             };
 
             for i in 0..pages_length {
-                let iterable_object: &Value = if pages_length != 1 {
+                let list: &Value = if pages_length != 1 {
                     &obj["pages"][i]["list"]
                 } else {
                     &obj["list"]
                 };
 
-                if !iterable_object.is_array() {
+                if !list.is_array() {
                     continue;
                 }
 
-                let mut in_401_seq: bool = false;
+                let mut in_seq: bool = false;
                 let mut line: Vec<String> = Vec::new();
 
-                for list in iterable_object.as_array().unwrap() {
+                for list in list.as_array().unwrap() {
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
-                    for parameter in list["parameters"].as_array().unwrap() {
-                        if code == 401 {
-                            in_401_seq = true;
+                    for parameter_value in list["parameters"].as_array().unwrap() {
+                        if code == 401 || code == 405 {
+                            in_seq = true;
 
-                            if parameter.is_string() {
-                                let parameter_str: &str = parameter.as_str().unwrap();
-                                line.push(parameter_str.to_string());
+                            if parameter_value.is_string() {
+                                let parameter: &str = parameter_value.as_str().unwrap();
+                                line.push(parameter.to_string());
                             }
                         } else {
-                            if in_401_seq {
-                                let line_joined: String = line.join("\\n");
+                            if in_seq {
+                                let line_joined: String = line.join(r"\#");
                                 lines.insert(line_joined);
 
                                 line.clear();
-                                in_401_seq = false;
+                                in_seq = false;
                             }
 
                             match code {
                                 102 => {
-                                    if parameter.is_array() {
-                                        for param in parameter.as_array().unwrap() {
-                                            if param.is_string() {
-                                                let param_str: &str = param.as_str().unwrap();
-                                                lines.insert(param_str.to_string());
+                                    if parameter_value.is_array() {
+                                        for param_value in parameter_value.as_array().unwrap() {
+                                            if param_value.is_string() {
+                                                let param: &str = param_value.as_str().unwrap();
+                                                lines.insert(param.to_string());
                                             }
                                         }
                                     }
                                 }
 
                                 356 => {
-                                    if parameter.is_string() {
-                                        let parameter_str: &str = parameter.as_str().unwrap();
+                                    if parameter_value.is_string() {
+                                        let parameter: &str = parameter_value.as_str().unwrap();
 
-                                        if parameter_str.starts_with("GabText")
-                                            && (parameter_str.starts_with("choice_text")
-                                                && !parameter_str.ends_with("????"))
+                                        if parameter.starts_with("GabText")
+                                            && (parameter.starts_with("choice_text")
+                                                && !parameter.ends_with("????"))
                                         {
-                                            lines.insert(parameter_str.to_string());
+                                            lines.insert(parameter.to_string());
                                         }
-                                    }
-                                }
-
-                                405 => {
-                                    if parameter.is_string() {
-                                        let parameter_str: &str = parameter.as_str().unwrap();
-
-                                        lines.insert(parameter_str.to_string());
                                     }
                                 }
 
@@ -252,11 +284,18 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
 
         write(
             format!(
-                "{}/{}",
-                output_dir,
-                filename.replace(".json", ".txt").to_lowercase()
+                "{output_dir}/{}.txt",
+                filename[0..filename.rfind('.').unwrap()].to_lowercase()
             ),
             lines.iter().cloned().collect::<Vec<String>>().join("\n"),
+        )
+        .unwrap();
+        write(
+            format!(
+                "{output_dir}/{}_trans.txt",
+                filename[0..filename.rfind('.').unwrap()].to_lowercase()
+            ),
+            "\n".repeat(lines.len() - 1),
         )
         .unwrap();
 
@@ -267,15 +306,15 @@ pub fn read_other(input_dir: &str, output_dir: &str, logging: bool, log_string: 
 }
 
 pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string: &str) {
-    let system_file: String = format!("{}/System.json", input_dir);
+    let system_file: String = format!("{input_dir}/System.json");
 
-    let json: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
+    let obj: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
 
     let mut lines: IndexSet<String> = IndexSet::new();
 
-    for element in json["equipTypes"].as_array().unwrap() {
-        if element.is_string() {
-            let element_str: &str = element.as_str().unwrap();
+    for string in obj["equipTypes"].as_array().unwrap() {
+        if string.is_string() {
+            let element_str: &str = string.as_str().unwrap();
 
             if !element_str.is_empty() {
                 lines.insert(element_str.to_string());
@@ -283,17 +322,17 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string:
         }
     }
 
-    for element in json["skillTypes"].as_array().unwrap() {
-        if element.is_string() {
-            let element_str: &str = element.as_str().unwrap();
+    for string in obj["skillTypes"].as_array().unwrap() {
+        if string.is_string() {
+            let element_str: &str = string.as_str().unwrap();
 
             if !element_str.is_empty() {
-                lines.insert(element.as_str().unwrap().to_string());
+                lines.insert(string.as_str().unwrap().to_string());
             }
         }
     }
 
-    for (key, value) in json["terms"].as_object().unwrap() {
+    for (key, value) in obj["terms"].as_object().unwrap() {
         if key != "messages" {
             for string in value.as_array().unwrap() {
                 if string.is_string() {
@@ -322,8 +361,13 @@ pub fn read_system(input_dir: &str, output_dir: &str, logging: bool, log_string:
     }
 
     write(
-        format!("{}/system.txt", output_dir),
+        format!("{output_dir}/system.txt"),
         lines.iter().cloned().collect::<Vec<String>>().join("\n"),
+    )
+    .unwrap();
+    write(
+        format!("{output_dir}/system_trans.txt"),
+        "\n".repeat(lines.len() - 1),
     )
     .unwrap();
 

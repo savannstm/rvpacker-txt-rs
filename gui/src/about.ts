@@ -1,5 +1,3 @@
-import { Theme } from "./themes";
-
 import { open as openLink } from "@tauri-apps/api/shell";
 import { readTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
@@ -17,12 +15,12 @@ window.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const licenseLink: HTMLAnchorElement = document.getElementById("license-link") as HTMLAnchorElement;
     const wtpflLink: HTMLAnchorElement = document.getElementById("wtfpl-link") as HTMLAnchorElement;
 
-    function setTheme(theme: Theme): void {
-        for (const [key, value] of Object.entries(theme)) {
-            const elements: NodeListOf<HTMLElement> = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
+    function setTheme(newTheme: Theme): void {
+        for (const [key, value] of Object.entries(newTheme)) {
+            const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
 
             for (const element of elements) {
-                element.classList.add(value);
+                element.style.setProperty(`--${key}`, value);
             }
         }
     }
@@ -36,7 +34,10 @@ window.addEventListener("DOMContentLoaded", async (): Promise<void> => {
             ? JSON.parse(await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })).about
             : JSON.parse(await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })).about;
 
-    const theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
+    const themes = JSON.parse(
+        await readTextFile(await join("../res", "themes.json"), { dir: BaseDirectory.Resource })
+    ) as ThemeObject;
+    const theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
     setTheme(theme);
 
     version.innerHTML = aboutLanguage.version;

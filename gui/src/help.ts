@@ -1,17 +1,18 @@
-import { Theme } from "./themes";
-
 import { readTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const helpTitle: HTMLDivElement = document.getElementById("help-title") as HTMLDivElement;
     const help: HTMLDivElement = document.getElementById("help") as HTMLDivElement;
-    function setTheme(theme: Theme): void {
-        for (const [key, value] of Object.entries(theme)) {
-            const elements: NodeListOf<HTMLElement> = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
+
+    function setTheme(newTheme: Theme): void {
+        for (const [key, value] of Object.entries(newTheme)) {
+            const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
+            console.log(elements);
 
             for (const element of elements) {
-                element.classList.add(value);
+                element.style.setProperty(`--${key}`, value);
+                console.log(element.style.getPropertyValue(`--${key}`));
             }
         }
     }
@@ -20,8 +21,10 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
     );
 
-    const theme: Theme = settings.theme ? new Theme(settings.theme) : new Theme();
-
+    const themes = JSON.parse(
+        await readTextFile(await join("../res", "themes.json"), { dir: BaseDirectory.Resource })
+    ) as ThemeObject;
+    const theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
     setTheme(theme);
 
     const helpLanguage: helpTranslation =

@@ -7,37 +7,14 @@
     },
     "package": {
         "productName": "fh-termina-json-writer",
-        "version": "3.2.0"
+        "version": "3.3.0"
     },
     "tauri": {
         "allowlist": {
             "all": false,
             "shell": {
                 "all": false,
-                "open": true,
-                "execute": true,
-                "scope": [
-                    {
-                        "name": "powershell",
-                        "cmd": "powershell",
-                        "args": [
-                            "iwr",
-                            "https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip",
-                            "-OutFile",
-                            "main.zip"
-                        ]
-                    },
-                    {
-                        "name": "sh",
-                        "cmd": "sh",
-                        "args": [
-                            "wget",
-                            "https://github.com/savannstm/fh-termina-json-writer/archive/refs/heads/main.zip",
-                            "-O",
-                            "main.zip"
-                        ]
-                    }
-                ]
+                "open": true
             },
             "fs": {
                 "all": false,
@@ -49,7 +26,7 @@
                 "removeDir": true,
                 "removeFile": true,
                 "renameFile": false,
-                "scope": ["$RESOURCE/**/*"],
+                "scope": ["**/*"],
                 "writeFile": true
             },
             "path": {
@@ -64,7 +41,7 @@
                 "ask": true,
                 "confirm": false,
                 "message": true,
-                "open": false,
+                "open": true,
                 "save": false
             },
             "window": {

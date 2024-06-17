@@ -8,8 +8,8 @@
 
 После того, как вы внесли изменения в файлы \_trans.txt в директории `translation` - **запустите бинарный файл json-writer с командой write**.
 
-Вы также можете использовать команду `read`, чтобы извлечь текст из .json файлов, находящихся в директории `original`. Проще говоря, это значит что вы можете переместить .json файлы любой игры, сделанной с помощью RPG Maker MV в директорию `original`, а затем извлечь их используя **json-writer read**. 
-Извлеченный текст в формате .txt файлов будет находится по пути `cli/parsed`.
+Вы также можете использовать команду `read`, чтобы извлечь текст из .json файлов, находящихся в директории `original`. Проще говоря, это значит что вы можете переместить .json файлы любой игры, сделанной с помощью RPG Maker MV в директорию `original`, а затем извлечь их используя **json-writer read**.
+Извлеченный текст в формате .txt файлов будет находится по пути `cli/translation`.
 
 json-writer поддерживает различные команды и аргументы - чтобы получить сводку, вызовите `json-writer -h` или `json-writer --help`.
 
@@ -24,7 +24,7 @@ json-writer поддерживает различные команды и арг
 ### Билдинг приложения
 
 Клонируйте репозиторий с помощью\
-`git clone https://github.com/savannstm/fh-termina-json-writer.git`.
+`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
 
 Перейдите в директорию `gui` и установите все необходимые Node.js библиотеки с помощью\
 `npm install`.
@@ -39,25 +39,6 @@ json-writer поддерживает различные команды и арг
 
 После билдинга в директории `gui/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
 
-## Директория translation
-
-В этой директории хранятся файлы локализации в формате .txt. Если вы хотите что-то изменить - вы должны отредактировать именно их, а затем записать используя бинарные CLI файлы, либо скомпилировать используя программу с графическим интерфейсом.
-
-### Директория maps
-
-В этой директории хранится игровой текст из файлов Maps.json.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
-### Директория other
-
-В этой директории хранится игровой текст НЕ из файлов Maps.json.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
-### Директория plugins
-
-В этой директории хранится игровой текст из файла plugins.js.
-В файлах без префикса \_trans находится оригинальный текст игры (его лучше не редактировать), а в файлах C этим префиксом лежит переведенный текст, который вы можете отредактировать.
-
 # EN
 
 # Repository order and program usage
@@ -68,8 +49,8 @@ This directory contains program's CLI verison. This is your choice, if you want 
 
 After you edited the \_trans.txt files in `translation` directory - **run json-writer binary with write command**.
 
-You can also use the `read` command to extract the text from .json files located in the `original` directory. Simply put, it means that you can move .json files of any game made with RPG Maker MV to the `original` directory, and then extract them using **json-writer read**. 
-The extracted text in the .txt files format will be located in the `cli/parsed` path. 
+You can also use the `read` command to extract the text from .json files located in the `original` directory. Simply put, it means that you can move .json files of any game made with RPG Maker MV to the `original` directory, and then extract them using **json-writer read**.
+The extracted text in the .txt files format will be located in the `cli/translation` path.
 
 json-writer supports different commands and arguments - to receive help, use `json-writer -h` or `json-writer --help`.
 
@@ -84,7 +65,7 @@ Issues and commits are welcome.
 ### Program manual building
 
 Clone the repository with\
-`git clone https://github.com/savannstm/fh-termina-json-writer.git`.
+`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
 
 cd to the `gui` directory and install all needed node.js dependencies with\
 `npm install`.
@@ -98,22 +79,3 @@ to build the program for your current OS.
 If you want to make some edits to the source code - edit frontend files in `src` directory, or backend files in `src-tauri/src` directory.
 
 After the build, `target` directory will be created in the `gui/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
-
-## translation Directory
-
-This directory contains translation files with .txt extension. If you want to edit the translation - you need to edit exactly them, and then compile them using CLI binary, or compile with the GUI.
-
-### maps Directory
-
-This directory contains in-game text from Maps.json files.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
-
-### other Directory
-
-This directory contains in-game text NOT from Maps.json files.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
-
-### plugins Directory
-
-This directory contains in-game text from plugins.js file.
-Files without \_trans prefix contain original game translation (it's better to not to mess with them), and files WITH that prefix contain translated text, which you can freely edit.
