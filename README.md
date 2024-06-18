@@ -4,22 +4,24 @@
 
 ## Директория cli
 
-В данной директории хранится версия с командным интерфейсом программы. Это - ваш выбор, если вы хотите отредактировать .txt файлы и быстро записать их используя .exe (или бинарный файл без расширения на Linux).
+В данной директории хранится бинарный файл `json-writer`, позволяющий парсить текст игр на движках RPG Maker MV/MZ,
+а затем записывать его обратно в рабочие игровые .json файлы.
 
-После того, как вы внесли изменения в файлы \_trans.txt в директории `translation` - **запустите бинарный файл json-writer с командой write**.
+Получить справку по его использованию можно с помощью `json-writer -h`.
 
-Вы также можете использовать команду `read`, чтобы извлечь текст из .json файлов, находящихся в директории `original`. Проще говоря, это значит что вы можете переместить .json файлы любой игры, сделанной с помощью RPG Maker MV в директорию `original`, а затем извлечь их используя **json-writer read**.
-Извлеченный текст в формате .txt файлов будет находится по пути `cli/translation`.
+В директории `ruby-writer` хранятся TypeScript файлы утилиты `ruby-writer`, позволяющей парсить текст игр на движках RPG Maker XP/VX/VX Ace, а затем записывать его обратно в рабочие игровые .rxdata, .rvdata или .rvdata2 файлы.
 
-json-writer поддерживает различные команды и аргументы - чтобы получить сводку, вызовите `json-writer -h` или `json-writer --help`.
+Тип движка игры, текст которой парсится и записывается, утилита определяет автоматически.
 
-**Через несколько секунд, он создаст конечные файлы в директориях `data` и `js`, которые вы можете скопировать в директорию `www`, находящуюся в корне игры `(C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www)` с заменой.**
+Для использования, вам необходим [Bun](https://bun.sh/). После его установки, вам необходимо выполнить команду `bun i` для установки зависимостей утилиты, а затем вы можете получить справку по ней, используя `bun run ruby-writer.ts -h`.
 
 ## Директория gui
 
 В этой директории хранится исходный код новой версии программы, написанной на Tauri.
 
 Сообщения об ошибках и коммиты приветствуются.
+
+**Скачать последнюю версию можно из вкладки Releases.**
 
 ### Билдинг приложения
 
@@ -45,16 +47,16 @@ json-writer поддерживает различные команды и арг
 
 ## cli Directory
 
-This directory contains program's CLI verison. This is your choice, if you want to quickly edit .txt files and quickly compile them using .exe (or binary without extension on linux).
+This directory contains a binary file `json-writer`, which allows you to parse the text of games on the RPG Maker MV/MZ engine,
+and then write it back to the working game.json files.
 
-After you edited the \_trans.txt files in `translation` directory - **run json-writer binary with write command**.
+You can get help using it using `json-writer -h'.
 
-You can also use the `read` command to extract the text from .json files located in the `original` directory. Simply put, it means that you can move .json files of any game made with RPG Maker MV to the `original` directory, and then extract them using **json-writer read**.
-The extracted text in the .txt files format will be located in the `cli/translation` path.
+The `ruby-writer` directory stores TypeScript files of the `ruby-writer` utility, which allows you to parse the text of games on RPG Maker XP/VX/VX Ace engines, and then write it back to working game .rxdata, .rvdata or .rvdata2 files.
 
-json-writer supports different commands and arguments - to receive help, use `json-writer -h` or `json-writer --help`.
+The utility automatically determines the type of the game engine, the text of which is parsed and written.
 
-**After a few seconds, it'll create compiled files in `data` and `js` directories, which you can copy and replace to the `www` directory which in the game's root directory (C:\Program Files (x86)\Steam\steamapps\common\Fear & Hunger 2 Termina\www).**
+To use it, you need [Bun](https://bun.sh/). After installing it, you need to run the `bun i` command to install the utility's dependencies, and then you can get help on it using `bun run ruby-writer.ts -h`.
 
 ## gui Directory
 

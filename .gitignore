@@ -6,12 +6,11 @@
 /cli/translation
 /cli/output
 /cli/.cargo
-/cli/src/ruby-parser/output
-/cli/src/ruby-parser/original
-/cli/src/ruby-parser/translation
-/cli/src/ruby-parser/node_modules
-/cli/src/ruby-parser/bun.lockb
-/gui-old
+/cli/ruby-writer/output
+/cli/ruby-writer/original
+/cli/ruby-writer/translation
+/cli/ruby-writer/node_modules
+/cli/ruby-writer/bun.lockb
 /gui/node_modules
 /gui/bun.lockb
 /gui/input.css
