@@ -15,7 +15,16 @@ import { locale as getLocale } from "@tauri-apps/api/os";
 import XRegExp from "xregexp";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
-    const sheet = document.styleSheets[1];
+    let sheet: CSSStyleSheet;
+
+    for (const styleSheet of document.styleSheets) {
+        for (const rule of styleSheet.cssRules) {
+            if (rule.selectorText === ".backgroundDark") {
+                sheet = styleSheet as CSSStyleSheet;
+                break;
+            }
+        }
+    }
 
     let projDir: string = "";
     let RPGMVer: string = "";
