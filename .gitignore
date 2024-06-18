@@ -6,6 +6,7 @@
 /cli/translation
 /cli/output
 /cli/.cargo
+/cli/ruby-writer/backups
 /cli/ruby-writer/output
 /cli/ruby-writer/original
 /cli/ruby-writer/translation

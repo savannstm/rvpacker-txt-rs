@@ -1262,7 +1262,14 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 outputArray.push(node.value.replaceAll("\n", "\\#"));
             }
 
-            const dirPath: string = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
+            let dirPath: string;
+
+            if (RPGMVer === "new") {
+                dirPath = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
+            } else {
+                dirPath = i < 2 ? mapsDir : otherDir;
+            }
+
             const filePath: string = `${dirPath}/${contentElement.id}_trans.txt`;
 
             await writeTextFile(await join(dirName, filePath), outputArray.join("\n"));
