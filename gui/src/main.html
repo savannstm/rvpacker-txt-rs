@@ -13,32 +13,32 @@
         <div>
             <div id="menu-bar" class="flex sticky top-0 z-40 items-center mr-2 w-full h-6 text-sm backgroundPrimary">
                 <div class="menu-bar-button backgroundSecondHovered">
-                    <button id="file" class="px-2"></button>
+                    <button id="file" class="px-2 fileMenu"></button>
                 </div>
                 <div class="menu-bar-button backgroundSecondHovered">
-                    <button id="help" class="px-2"></button>
+                    <button id="help" class="px-2 helpMenu"></button>
                 </div>
                 <div class="menu-bar-button backgroundSecondHovered">
-                    <button id="language" class="px-2"></button>
+                    <button id="language" class="px-2 languageMenu"></button>
                 </div>
                 <div id="file-menu" class="hidden dropdown-menu backgroundSecond">
                     <button
                         id="reload-button"
-                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered"
+                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered reloadButton"
                     ></button>
                 </div>
                 <div id="help-menu" class="hidden dropdown-menu backgroundSecond">
                     <button
                         id="help-button-sub"
-                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered"
+                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered helpButton"
                     ></button>
                     <button
                         id="about-button"
-                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered"
+                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered aboutButton"
                     ></button>
                     <button
                         id="hotkeys-button"
-                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered"
+                        class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered hotkeysButton"
                     ></button>
                 </div>
                 <div id="language-menu" class="hidden dropdown-menu backgroundSecond">
@@ -52,26 +52,36 @@
             </div>
             <div id="top-panel" class="flex sticky top-6 z-30 items-center w-full h-16 backgroundPrimary">
                 <div id="top-panel-buttons" class="flex items-center w-full h-16">
-                    <button id="menu-button" class="button backgroundPrimaryHovered textThird backgroundPrimary">
+                    <button
+                        id="menu-button"
+                        class="button backgroundPrimaryHovered textThird backgroundPrimary menuButtonTitle"
+                    >
                         <div>menu</div>
                     </button>
-                    <button id="save-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="save-button" class="button backgroundPrimaryHovered textThird saveButtonTitle">
                         <div>save</div>
                     </button>
-                    <button id="compile-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="compile-button" class="button backgroundPrimaryHovered textThird compileButtonTitle">
                         <div>upload</div>
                     </button>
-                    <button id="open-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="open-button" class="button backgroundPrimaryHovered textThird openButtonTitle">
                         <div>folder_open</div>
                     </button>
-                    <button id="options-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="options-button" class="button backgroundPrimaryHovered textThird optionsButtonTitle">
                         <div>settings</div>
                     </button>
-                    <button id="theme-button" class="mr-16 button backgroundPrimaryHovered textThird">
+                    <button id="theme-button" class="mr-16 button backgroundPrimaryHovered textThird themeButtonTitle">
                         <div>palette</div>
                     </button>
-                    <div id="theme-menu" class="hidden w-16 dropdown-menu backgroundSecond"></div>
-                    <button id="search-button" class="button backgroundPrimaryHovered textThird">search</button>
+                    <div id="theme-menu" class="hidden w-16 dropdown-menu backgroundSecond">
+                        <button
+                            id="create-theme-menu-button"
+                            class="dropdown-menu-button backgroundPrimary backgroundPrimaryHovered createTheme"
+                        ></button>
+                    </div>
+                    <button id="search-button" class="button backgroundPrimaryHovered textThird searchButtonTitle">
+                        search
+                    </button>
                     <div id="search-field" class="flex flex-row items-center p-4">
                         <textarea
                             id="search-input"
@@ -80,7 +90,7 @@
                             class="w-64 input min-h-8 textSecond backgroundSecond"
                         ></textarea>
                     </div>
-                    <button id="replace-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="replace-button" class="button backgroundPrimaryHovered textThird replaceButtonTitle">
                         arrow_right_alt
                     </button>
                     <div id="replace-field" class="flex flex-row items-center p-4">
@@ -91,13 +101,24 @@
                             class="w-64 input min-h-8 textSecond backgroundSecond"
                         ></textarea>
                     </div>
-                    <button id="case-button" class="button backgroundPrimaryHovered textThird">match_case</button>
-                    <button id="whole-button" class="button backgroundPrimaryHovered textThird">match_word</button>
-                    <button id="regex-button" class="button backgroundPrimaryHovered textThird">
+                    <button id="case-button" class="button backgroundPrimaryHovered textThird caseButtonTitle">
+                        match_case
+                    </button>
+                    <button id="whole-button" class="button backgroundPrimaryHovered textThird wholeButtonTitle">
+                        match_word
+                    </button>
+                    <button id="regex-button" class="button backgroundPrimaryHovered textThird regexButtonTitle">
                         regular_expression
                     </button>
-                    <button id="translation-button" class="button backgroundPrimaryHovered textThird">translate</button>
-                    <button id="location-button" class="button backgroundPrimaryHovered textThird">location_on</button>
+                    <button
+                        id="translation-button"
+                        class="button backgroundPrimaryHovered textThird translationButtonTitle"
+                    >
+                        translate
+                    </button>
+                    <button id="location-button" class="button backgroundPrimaryHovered textThird locationButtonTitle">
+                        location_on
+                    </button>
                     <div id="current-state" class="flex justify-center items-center p-4"></div>
                 </div>
             </div>
@@ -149,8 +170,8 @@
                     </button>
                     <div class="flex justify-evenly items-center w-full h-12">
                         <button id="previous-page-button" class="font-material">chevron_left</button>
-                        <span id="search-current-page"></span>
-                        <span id="search-separator"></span>
+                        <span id="search-current-page" class="currentPage"></span>
+                        <span id="search-separator" class="separator"></span>
                         <span id="search-total-pages"></span>
                         <button id="next-page-button" class="font-material">chevron_right</button>
                     </div>
@@ -222,14 +243,14 @@
             </div>
             <div class="flex flex-col justify-center items-center pb-4">
                 <div class="flex flex-row gap-2">
-                    <label for="theme-name"></label>
-                    <input type="text" name="" id="theme-name" class="h-8 input textSecond backgroundSecond" />
+                    <label for="theme-name-input" class="themeName"></label>
+                    <input type="text" name="" id="theme-name-input" class="h-8 input textSecond backgroundSecond" />
                 </div>
 
-                <div></div>
+                <label for="create-theme" class="allowedThemeNameCharacters"></label>
                 <button
                     id="create-theme"
-                    class="w-32 h-8 rounded-lg backgroundSecond backgroundPrimaryHovered"
+                    class="w-32 h-8 rounded-lg backgroundSecond backgroundPrimaryHovered createTheme"
                 ></button>
             </div>
         </div>

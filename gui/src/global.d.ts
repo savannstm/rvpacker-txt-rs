@@ -27,6 +27,7 @@ interface Settings {
 }
 
 interface mainTranslation {
+    [key: string]: string;
     cannotGetSettings: string;
     askCreateSettings: string;
     createdSettings: string;
@@ -83,6 +84,9 @@ interface mainTranslation {
     allowedThemeNameCharacters: string;
     invalidThemeName: string;
     themeName: string;
+    compileSuccess: string;
+    themeButtonTitle: string;
+    openButtonTitle: string;
 }
 
 interface optionsTranslation {
@@ -126,6 +130,7 @@ interface ThemeObject {
 }
 
 interface Theme {
+    [key: string]: string;
     name: string;
     backgroundDark: string;
     backgroundPrimary: string;
@@ -162,3 +167,8 @@ type State =
     | "troops"
     | "weapons"
     | "plugins";
+
+interface CSSRule {
+    style: CSSStyleDeclaration;
+    selectorText: string;
+}
