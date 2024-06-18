@@ -55,7 +55,10 @@
         "createTheme": "Создать тему",
         "allowedThemeNameCharacters": "Разрешенные символы: a-z, A-Z, 0-9, -, _.",
         "invalidThemeName": "Название темы недопустимо.",
-        "themeName": "Название темы:"
+        "themeName": "Название темы:",
+        "compileSuccess": "Все файлы записаны успешно.\nПотрачено (в секундах):",
+        "themeButtonTitle": "Меню тем",
+        "openButtonTitle": "Открыть папку"
     },
     "options": {
         "backupPeriodLabel": "Создавать резервные копии каждые:",

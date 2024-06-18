@@ -1,6 +1,8 @@
 import "./string-extensions";
 import "./htmlelement-extensions";
 
+import { writeMap, writeOther, writeSystem, writeScripts } from "./ruby-writer/write";
+
 import { FileEntry, exists, readDir, readTextFile, removeFile, writeTextFile, createDir } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
 import { ask, message, open as openPath } from "@tauri-apps/api/dialog";
@@ -9,12 +11,14 @@ import { exit } from "@tauri-apps/api/process";
 import { appWindow, CloseRequestedEvent, WebviewWindow } from "@tauri-apps/api/window";
 import { writeText as writeToClipboard, readText as readFromClipboard } from "@tauri-apps/api/clipboard";
 import { locale as getLocale } from "@tauri-apps/api/os";
-import { Event, UnlistenFn } from "@tauri-apps/api/event";
 
 import XRegExp from "xregexp";
 
 document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
+    const sheet = document.styleSheets[1];
+
     let projDir: string = "";
+    let RPGMVer: string = "";
 
     const resDir = "res";
     const translationDir: string = "translation";
@@ -31,12 +35,455 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     const enTranslation: string = "en.json";
     const themesFile: string = "themes.json";
 
+    const contentContainer = document.getElementById("content-container") as HTMLDivElement;
+    const searchInput = document.getElementById("search-input") as HTMLTextAreaElement;
+    const replaceInput = document.getElementById("replace-input") as HTMLTextAreaElement;
+    const leftPanel = document.getElementById("left-panel") as HTMLDivElement;
+    const searchPanel = document.getElementById("search-results") as HTMLDivElement;
+    const searchPanelFound = document.getElementById("search-content") as HTMLDivElement;
+    const searchPanelReplaced = document.getElementById("replace-content") as HTMLDivElement;
+    const searchCurrentPage = document.getElementById("search-current-page") as HTMLSpanElement;
+    const searchTotalPages = document.getElementById("search-total-pages") as HTMLSpanElement;
+    const topPanel = document.getElementById("top-panel") as HTMLDivElement;
+    const topPanelButtons = document.getElementById("top-panel-buttons") as HTMLDivElement;
+    const saveButton = document.getElementById("save-button") as HTMLButtonElement;
+    const compileButton = document.getElementById("compile-button") as HTMLButtonElement;
+    const themeButton = document.getElementById("theme-button") as HTMLButtonElement;
+    const themeMenu = document.getElementById("theme-menu") as HTMLDivElement;
+    const searchCaseButton = document.getElementById("case-button") as HTMLButtonElement;
+    const searchWholeButton = document.getElementById("whole-button") as HTMLButtonElement;
+    const searchRegexButton = document.getElementById("regex-button") as HTMLButtonElement;
+    const searchTranslationButton = document.getElementById("translation-button") as HTMLButtonElement;
+    const searchLocationButton = document.getElementById("location-button") as HTMLButtonElement;
+    const goToRowInput = document.getElementById("goto-row-input") as HTMLInputElement;
+    const menuBar = document.getElementById("menu-bar") as HTMLDivElement;
+    const fileMenuButton = document.getElementById("file") as HTMLButtonElement;
+    const helpMenuButton = document.getElementById("help") as HTMLButtonElement;
+    const languageMenuButton = document.getElementById("language") as HTMLButtonElement;
+    const fileMenu = document.getElementById("file-menu") as HTMLDivElement;
+    const helpMenu = document.getElementById("help-menu") as HTMLDivElement;
+    const languageMenu = document.getElementById("language-menu") as HTMLDivElement;
+    const currentState = document.getElementById("current-state") as HTMLDivElement;
+    const themeWindow = document.getElementById("theme-window") as HTMLDivElement;
+    const createThemeMenuButton = document.getElementById("create-theme-menu-button") as HTMLButtonElement;
+
+    const replaced: Map<string, { [key: string]: string }> = new Map();
+    const activeGhostLines: HTMLDivElement[] = [];
+
+    let settings: Settings | null = (await exists(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
+        ? JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
+        : null;
+
+    let locale: string | null = await getLocale();
+
+    let language: Language = (
+        locale
+            ? settings
+                ? settings.lang
+                : ["ru", "uk", "be"].some((loc: string): boolean => locale!.startsWith(loc))
+                ? "ru"
+                : "en"
+            : "en"
+    ) as Language;
+
+    locale = null;
+
+    let mainLanguage: mainTranslation =
+        language === "ru"
+            ? JSON.parse(await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })).main
+            : JSON.parse(await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })).main;
+
+    if (!settings) {
+        settings = (await createSettings()) as Settings;
+    }
+
+    const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
+
+    let themes = JSON.parse(
+        await readTextFile(await join(resDir, themesFile), { dir: BaseDirectory.Resource })
+    ) as ThemeObject;
+
+    let theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
+
+    let currentTheme: null | string = null;
+
+    await setTheme(theme);
+    await initializeFirstLaunch(settings.firstLaunch);
+    await initializeProject(settings.project);
+
+    settings = null;
+
+    setLanguage();
+    initializeThemes();
+
+    let searchRegex: boolean = false;
+    let searchWhole: boolean = false;
+    let searchCase: boolean = false;
+    let searchTranslation: boolean = false;
+    let searchLocation: boolean = false;
+
+    let state: State = null;
+    let statePrevious: string | null = null;
+
+    let saved: boolean = true;
+    let saving: boolean = false;
+    let currentFocusedElement: [string, string] | [] = [];
+
+    let shiftPressed: boolean = false;
+
+    let selectedMultiple: boolean = false;
+    const selectedTextareas: Map<string, string> = new Map();
+    const replacedTextareas: Map<string, string> = new Map();
+
+    leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
+
+    let nextBackupNumber: number;
+
+    await createContent();
+
+    const observerMain: IntersectionObserver = new IntersectionObserver(
+        (entries: IntersectionObserverEntry[]): void => {
+            for (const entry of entries) {
+                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        {
+            root: document,
+            rootMargin: "384px",
+            threshold: 0,
+        }
+    );
+
+    const observerFound: IntersectionObserver = new IntersectionObserver(
+        (entries: IntersectionObserverEntry[]): void => {
+            for (const entry of entries) {
+                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        { root: searchPanelFound, threshold: 0.1 }
+    );
+
+    const observerReplaced: IntersectionObserver = new IntersectionObserver(
+        (entries: IntersectionObserverEntry[]): void => {
+            for (const entry of entries) {
+                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
+            }
+        },
+        { root: searchPanelReplaced, threshold: 0.1 }
+    );
+
+    leftPanel.addEventListener("click", (event: MouseEvent): void => {
+        const newState: State = leftPanel.secondHighestParent(event.target as HTMLElement).textContent! as State;
+        changeState(newState, true);
+    });
+
+    topPanelButtons.addEventListener("click", async (event: MouseEvent): Promise<void> => {
+        if (!event.target || event.target === topPanelButtons) {
+            return;
+        }
+
+        const target: HTMLElement = topPanelButtons.secondHighestParent(event.target as HTMLElement);
+
+        switch (target.id) {
+            case "menu-button":
+                if (!projDir) {
+                    return;
+                }
+
+                leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
+                break;
+            case "save-button":
+                await save();
+                break;
+            case "compile-button":
+                await compile();
+                break;
+            case "open-button":
+                await openFolder();
+                break;
+            case "options-button":
+                createOptionsWindow();
+                break;
+            case "theme-button":
+                themeMenu.toggleMultiple("hidden", "flex");
+
+                requestAnimationFrame((): void => {
+                    themeMenu.style.left = `${themeButton.offsetLeft}px`;
+                    themeMenu.style.top = `${themeButton.offsetTop + themeButton.clientHeight + 16}px`;
+
+                    themeMenu.addEventListener("click", async (event: MouseEvent): Promise<void> => {
+                        const target: HTMLButtonElement = event.target as HTMLButtonElement;
+
+                        if (!themeMenu.contains(target)) {
+                            return;
+                        }
+
+                        if (target.id === "create-theme-menu-button") {
+                            showThemeWindow();
+                            return;
+                        }
+
+                        await setTheme(themes[target.id]);
+                    });
+                });
+
+                break;
+            case "search-button":
+                if (!projDir) {
+                    return;
+                }
+
+                if (searchInput.value) {
+                    searchPanelFound.innerHTML = "";
+                    await displaySearchResults(searchInput.value, false);
+                } else if (document.activeElement === document.body) {
+                    searchInput.focus();
+                }
+                break;
+            case "replace-button":
+                if (!projDir) {
+                    return;
+                }
+
+                if (searchInput.value && replaceInput.value) {
+                    await replaceText(searchInput.value, true);
+                }
+                break;
+            case "case-button":
+                switchCase();
+                break;
+            case "whole-button":
+                switchWhole();
+                break;
+            case "regex-button":
+                switchRegExp();
+                break;
+            case "translation-button":
+                switchTranslation();
+                break;
+            case "location-button":
+                switchLocation();
+                break;
+        }
+    });
+
+    searchPanel.addEventListener("click", async (event: MouseEvent): Promise<void> => {
+        const target: HTMLElement = event.target as HTMLElement;
+        let page: number | null = null;
+
+        switch (target.id) {
+            case "switch-search-content":
+                searchPanelFound.toggleMultiple("hidden", "flex");
+                searchPanelReplaced.toggleMultiple("hidden", "flex");
+
+                const searchSwitch: HTMLElement = target;
+
+                if (searchSwitch.innerHTML.trim() === "search") {
+                    searchSwitch.innerHTML = "menu_book";
+
+                    const replacementLogContent: { [key: string]: { original: string; translation: string } } =
+                        JSON.parse(await readTextFile(await join(projDir, logFile)));
+
+                    for (const [key, value] of Object.entries(replacementLogContent)) {
+                        const replacedContainer: HTMLDivElement = document.createElement("div");
+
+                        const replacedElement: HTMLDivElement = document.createElement("div");
+                        replacedElement.classList.add(
+                            "replaced-element",
+                            "textSecond",
+                            "borderPrimary",
+                            "backgroundSecond"
+                        );
+
+                        replacedElement.innerHTML = `<div class="text-base textThird">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
+
+                        replacedContainer.appendChild(replacedElement);
+                        searchPanelReplaced.appendChild(replacedContainer);
+                    }
+
+                    observerFound.disconnect();
+                    searchPanelReplaced.style.height = `${searchPanelReplaced.scrollHeight}px`;
+
+                    const searchPanelReplacedChildren: HTMLCollectionOf<HTMLElement> =
+                        searchPanelReplaced.children as HTMLCollectionOf<HTMLElement>;
+
+                    for (const container of searchPanelReplacedChildren) {
+                        container.style.width = `${container.clientWidth}px`;
+                        container.style.height = `${container.clientHeight}px`;
+
+                        observerReplaced.observe(container);
+                        container.firstElementChild?.classList.add("hidden");
+                    }
+
+                    searchPanelReplaced.addEventListener(
+                        "mousedown",
+                        async (event: MouseEvent): Promise<void> => await handleReplacedClick(event)
+                    );
+                } else {
+                    searchSwitch.innerHTML = "search";
+                    searchPanelReplaced.innerHTML = "";
+
+                    searchPanelReplaced.removeEventListener(
+                        "mousedown",
+                        async (event: MouseEvent): Promise<void> => await handleReplacedClick(event)
+                    );
+                }
+                break;
+            case "previous-page-button":
+                page = Number.parseInt(searchCurrentPage.textContent!);
+
+                if (page > 1) {
+                    searchCurrentPage.textContent = (page - 1).toString();
+
+                    searchPanelFound.innerHTML = "";
+
+                    for (const [id, result] of Object.entries(
+                        JSON.parse(
+                            await readTextFile(
+                                await join(
+                                    projDir,
+                                    `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
+                                )
+                            )
+                        )
+                    )) {
+                        appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
+                    }
+                }
+                break;
+            case "next-page-button":
+                page = Number.parseInt(searchCurrentPage.textContent!);
+
+                if (page < Number.parseInt(searchTotalPages.textContent!)) {
+                    searchCurrentPage.textContent = (page + 1).toString();
+                    searchPanelFound.innerHTML = "";
+
+                    for (const [id, result] of Object.entries(
+                        JSON.parse(
+                            await readTextFile(
+                                await join(
+                                    projDir,
+                                    `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
+                                )
+                            )
+                        )
+                    )) {
+                        appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
+                    }
+                }
+                break;
+        }
+    });
+
+    searchInput.addEventListener("blur", (): string => (searchInput.value = searchInput.value.trim()));
+    replaceInput.addEventListener("blur", (): string => (replaceInput.value = replaceInput.value.trim()));
+
+    searchInput.addEventListener(
+        "keydown",
+        async (event: KeyboardEvent): Promise<void> => await handleKeypressSearch(event)
+    );
+    menuBar.addEventListener("click", (event: MouseEvent): void => menuBarClick(event.target as HTMLElement));
+
+    document.addEventListener("keydown", async (event: KeyboardEvent): Promise<void> => await handleKeypress(event));
+    document.addEventListener("keyup", (event: KeyboardEvent): void => {
+        if (event.key === "Shift") {
+            shiftPressed = false;
+        }
+    });
+
+    document.addEventListener("focus", handleFocus, true);
+    document.addEventListener("blur", handleBlur, true);
+
+    goToRowInput.addEventListener("keydown", (event: KeyboardEvent): void => {
+        if (event.code === "Enter") {
+            const rowNumber: string = goToRowInput.value;
+            const targetRow: HTMLTextAreaElement = document.getElementById(
+                `${state}-${rowNumber}`
+            ) as HTMLTextAreaElement;
+
+            if (targetRow) {
+                targetRow.scrollIntoView({
+                    block: "center",
+                    inline: "center",
+                });
+            }
+
+            goToRowInput.value = "";
+            goToRowInput.classList.add("hidden");
+        }
+
+        if (event.code === "Escape") {
+            goToRowInput.value = "";
+            goToRowInput.classList.add("hidden");
+        }
+    });
+
+    document.addEventListener("mousedown", (event: MouseEvent): void => handleMousedown(event));
+
+    await appWindow.onCloseRequested(async (event: CloseRequestedEvent): Promise<void> => {
+        await awaitSaving();
+        (await exitProgram()) ? await exit(0) : event.preventDefault();
+    });
+
+    function handleMousedown(event: MouseEvent): void {
+        if (event.button === 0) {
+            if (shiftPressed) {
+                if (
+                    contentContainer.contains(document.activeElement) &&
+                    document.activeElement?.tagName === "TEXTAREA"
+                ) {
+                    event.preventDefault();
+                    selectedTextareas.clear();
+
+                    selectedMultiple = true;
+                    const target: HTMLTextAreaElement = event.target as HTMLTextAreaElement;
+
+                    const targetId: string[] = target.id.split("-");
+                    const targetRow: number = Number.parseInt(targetId.pop() as string);
+
+                    const focusedElementId: string[] = document.activeElement.id.split("-");
+                    const focusedElementRow: number = Number.parseInt(focusedElementId.pop() as string);
+
+                    const rowsRange: number = targetRow - focusedElementRow;
+                    const rowsToSelect: number = Math.abs(rowsRange);
+
+                    for (let i = 1; i < rowsToSelect + 1; i++) {
+                        if (rowsRange > 0) {
+                            const nextElement: HTMLTextAreaElement = document.getElementById(
+                                `${targetId.join("-")}-${focusedElementRow + i}`
+                            ) as HTMLTextAreaElement;
+
+                            selectedTextareas.set(nextElement.id, nextElement.value);
+                        } else if (rowsRange < 0) {
+                            const nextElement: HTMLTextAreaElement = document.getElementById(
+                                `${targetId.join("-")}-${focusedElementRow - i}`
+                            ) as HTMLTextAreaElement;
+
+                            selectedTextareas.set(nextElement.id, nextElement.value);
+                        }
+                    }
+                }
+            } else {
+                selectedMultiple = false;
+            }
+        }
+    }
+
     function showThemeWindow(): void {
         themeWindow.classList.remove("hidden");
 
-        function setStyleProperties(inputElement: HTMLInputElement): void {
-            for (const element of document.querySelectorAll(`.${inputElement.id}`) as NodeListOf<HTMLElement>) {
-                element.style.setProperty(`--${inputElement.id}`, inputElement.value);
+        function changeStyle(inputElement: HTMLInputElement) {
+            const id = inputElement.id;
+            const value = inputElement.value;
+
+            for (const rule of sheet.cssRules) {
+                if (id.endsWith("Focused") && rule.selectorText === `.${id}:focus`) {
+                    rule.style.setProperty(rule.style[0], value);
+                } else if (id.endsWith("Hovered") && rule.selectorText === `.${id}:hover`) {
+                    rule.style.setProperty(rule.style[0], value);
+                } else if (rule.selectorText === `.${id}`) {
+                    rule.style.setProperty(rule.style[0], value);
+                }
             }
         }
 
@@ -54,7 +501,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 }
             }
 
-            if (!/^[a-zA-Z0-9_-]+$/.test(themeName)) {
+            if (!/\\#[a-zA-Z0-9_-]+$/.test(themeName)) {
                 await message(mainLanguage.invalidThemeName + mainLanguage.allowedThemeNameCharacters);
                 return;
             }
@@ -81,7 +528,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     const inputElement = subdiv.firstElementChild as HTMLInputElement;
 
                     inputElement.value = themeColors[i];
-                    inputElement.addEventListener("input", (): void => setStyleProperties(inputElement));
+                    inputElement.addEventListener("input", (): void => changeStyle(inputElement));
                     i++;
                 }
             }
@@ -94,7 +541,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                 for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
                     for (const subdiv of div.children) {
                         const inputElement = subdiv.firstElementChild as HTMLInputElement;
-                        inputElement.removeEventListener("input", (): void => setStyleProperties(inputElement));
+                        inputElement.removeEventListener("input", (): void => changeStyle(inputElement));
                     }
                 }
 
@@ -108,7 +555,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         const dirs = [mapsDir, otherDir, pluginsDir];
         const translationPath = await join(folder, translationDir);
         const originalPath = await join(folder, originalDir);
-        let RPGMVer: string = "";
 
         if (!(await exists(translationPath))) {
             await message(mainLanguage.missingTranslationDir);
@@ -123,7 +569,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         for (const dir of dirs) {
             const subDirPath = await join(translationPath, dir);
 
-            if (dir === pluginsDir && RPGMVer === "old") {
+            if (dir === pluginsDir && RPGMVer !== "new") {
                 continue;
             }
 
@@ -139,7 +585,13 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     const name = file.name as string;
 
                     if (name.startsWith("scripts")) {
-                        RPGMVer = "old";
+                        if (name.endsWith(".rxdata")) {
+                            RPGMVer = "xp";
+                        } else if (name.endsWith(".rvdata")) {
+                            RPGMVer = "vx";
+                        } else {
+                            RPGMVer = "vxace";
+                        }
                         break;
                     } else {
                         RPGMVer = "new";
@@ -161,7 +613,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             projDir = folder as string;
 
-            document.getElementById("no-project-selected")!.remove();
+            contentContainer.innerHTML = "";
+
+            if (document.getElementById("no-project-selected")) {
+                document.getElementById("no-project-selected")!.remove();
+            }
 
             const settings: Settings = JSON.parse(
                 await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
@@ -207,20 +663,23 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
     }
 
-    async function changeLanguage(language: Language): Promise<void> {
-        await awaitSaving();
+    async function changeLanguage(lang: Language): Promise<void> {
+        language = lang;
 
-        if (await exitProgram()) {
-            const settings: Settings = JSON.parse(
-                await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource })
-            );
-
-            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, lang: language }), {
-                dir: BaseDirectory.Resource,
-            });
-
-            location.reload();
+        switch (lang) {
+            case "ru":
+                mainLanguage = JSON.parse(
+                    await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })
+                ).main;
+                break;
+            case "en":
+                mainLanguage = JSON.parse(
+                    await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })
+                ).main;
+                break;
         }
+
+        setLanguage();
     }
 
     function arrangeElements(): void {
@@ -377,7 +836,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
         for (const file of await readDir(projDir)) {
             if (file.name?.startsWith("matches")) {
-                await removeFile(await join(projDir, file.name));
+                await removeFile(file.path);
             }
         }
 
@@ -791,7 +1250,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
             for (const child of contentElement.children) {
                 const node: HTMLTextAreaElement = child.firstElementChild?.children[2] as HTMLTextAreaElement;
-                outputArray.push(node.value.replaceAll("\n", "^"));
+                outputArray.push(node.value.replaceAll("\n", "\\#"));
             }
 
             const dirPath: string = i < 2 ? mapsDir : i < 12 ? otherDir : pluginsDir;
@@ -824,7 +1283,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function updateState(newState: string, slide: boolean = true): void {
         currentState.innerHTML = newState;
-
         const contentParent: HTMLDivElement = document.getElementById(newState) as HTMLDivElement;
         contentParent.classList.replace("hidden", "flex");
 
@@ -1195,11 +1653,7 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         }
 
         if (contentNames.includes("scripts")) {
-            for (const element of leftPanel.children) {
-                if (element.innerHTML === "plugins") {
-                    element.innerHTML = "scripts";
-                }
-            }
+            leftPanel.lastElementChild!.innerHTML = "scripts";
         }
 
         for (let i = 0; i < contentNames.length - 1; i += 2) {
@@ -1221,11 +1675,11 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
                 const originalTextElement: HTMLDivElement = document.createElement("div");
                 originalTextElement.id = `${contentName}-original-${j + 1}`;
-                originalTextElement.textContent = originalText.replaceAll("^", "\n");
+                originalTextElement.textContent = originalText.replaceAll("\\#", "\n");
                 originalTextElement.classList.add("original-text-div", "backgroundPrimary", "outlinePrimary");
 
                 const translationTextElement: HTMLTextAreaElement = document.createElement("textarea");
-                const translationTextSplit: string[] = translationText.split("^");
+                const translationTextSplit: string[] = translationText.split("\\#");
                 translationTextElement.id = `${contentName}-translation-${j + 1}`;
                 translationTextElement.rows = translationTextSplit.length;
                 translationTextElement.value = translationTextSplit.join("\n");
@@ -1235,7 +1689,6 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
                     "backgroundPrimary",
                     "outlineFocused"
                 );
-
                 const rowElement: HTMLDivElement = document.createElement("div");
                 rowElement.id = `${contentName}-row-${j + 1}`;
                 rowElement.textContent = (j + 1).toString();
@@ -1257,16 +1710,46 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     async function compile(): Promise<void> {
         compileButton.firstElementChild?.classList.add("animate-spin");
 
-        const unlistenCompile: UnlistenFn = await appWindow.listen(
-            "compile-finished",
-            (message: Event<string>): void => {
+        if (RPGMVer === "new") {
+            await appWindow.listen("compile-finished", (): void => {
                 compileButton.firstElementChild?.classList.remove("animate-spin");
-                alert(message.payload);
-                unlistenCompile();
-            }
-        );
+                alert(`${mainLanguage.compileSuccess} ${(performance.now() - startTime) / 1000}`);
+            });
 
-        await appWindow.emit("compile");
+            const startTime = performance.now();
+            await appWindow.emit("compile", projDir);
+        } else {
+            const startTime = performance.now();
+
+            await createDir(await join(projDir, "output", "data"), { recursive: true });
+
+            const original = await join(projDir, originalDir);
+            const output = await join(projDir, "output", "data");
+            const other = await join(projDir, translationDir, otherDir);
+
+            await writeMap(original, await join(projDir, translationDir, mapsDir), output);
+            await writeOther(original, other, output);
+
+            let ext;
+
+            switch (RPGMVer) {
+                case "xp":
+                    ext = "rxdata";
+                    break;
+                case "vx":
+                    ext = "rvdata";
+                    break;
+                case "vxace":
+                    ext = "rvdata2";
+                    break;
+            }
+
+            await writeSystem(await join(original, `System.${ext}`), other, output);
+            await writeScripts(await join(original, `Scripts.${ext}`), other, output);
+
+            compileButton.firstElementChild?.classList.remove("animate-spin");
+            alert(`${mainLanguage.compileSuccess} ${(performance.now() - startTime) / 1000}`);
+        }
     }
 
     function getNewLinePositions(textarea: HTMLTextAreaElement): { left: number; top: number }[] {
@@ -1377,22 +1860,22 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
 
     function switchWhole(): void {
         searchWhole = !searchWhole;
-        searchCaseButton.classList.toggle("backgroundThird");
+        searchWholeButton.classList.toggle("backgroundThird");
     }
 
     function switchRegExp(): void {
         searchRegex = !searchRegex;
-        searchCaseButton.classList.toggle("backgroundThird");
+        searchRegexButton.classList.toggle("backgroundThird");
     }
 
     function switchTranslation(): void {
         searchTranslation = !searchTranslation;
-        searchCaseButton.classList.toggle("backgroundThird");
+        searchTranslationButton.classList.toggle("backgroundThird");
     }
 
     function switchLocation(): void {
         searchLocation = !searchLocation;
-        searchCaseButton.classList.toggle("backgroundThird");
+        searchLocationButton.classList.toggle("backgroundThird");
     }
 
     function createOptionsWindow(): void {
@@ -1486,20 +1969,12 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         switch (target.id) {
             case "ru-button":
                 if (language !== "ru") {
-                    await awaitSaving();
-
-                    if (await exitProgram()) {
-                        await changeLanguage("ru");
-                    }
+                    await changeLanguage("ru");
                 }
                 break;
             case "en-button":
                 if (language !== "en") {
-                    await awaitSaving();
-
-                    if (await exitProgram()) {
-                        await changeLanguage("en");
-                    }
+                    await changeLanguage("en");
                 }
                 break;
         }
@@ -1578,28 +2053,21 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     }
 
     async function setTheme(newTheme: Theme): Promise<void> {
-        if (!currentTheme) {
-            currentTheme = newTheme.name;
+        if (newTheme.name === currentTheme) {
+            return;
+        }
 
-            for (const [key, value] of Object.entries(newTheme)) {
-                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
+        currentTheme = newTheme.name;
+        theme = newTheme;
 
-                for (const element of elements) {
-                    element.style.setProperty(`--${key}`, value);
-                }
-            }
-        } else {
-            if (newTheme.name === currentTheme) {
-                return;
-            }
-
-            theme = newTheme;
-
-            for (const [key, value] of Object.entries(newTheme)) {
-                const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
-
-                for (const element of elements) {
-                    element.style.setProperty(`--${key}`, value);
+        for (const [key, value] of Object.entries(newTheme)) {
+            for (const rule of sheet.cssRules) {
+                if (key.endsWith("Focused") && rule.selectorText === `.${key}:focus`) {
+                    rule.style.setProperty(rule.style[0], value);
+                } else if (key.endsWith("Hovered") && rule.selectorText === `.${key}:hover`) {
+                    rule.style.setProperty(rule.style[0], value);
+                } else if (rule.selectorText === `.${key}`) {
+                    rule.style.setProperty(rule.style[0], value);
                 }
             }
         }
@@ -1615,535 +2083,81 @@ document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
         });
     }
 
-    const contentContainer = document.getElementById("content-container") as HTMLDivElement;
-    const searchInput = document.getElementById("search-input") as HTMLTextAreaElement;
-    const replaceInput = document.getElementById("replace-input") as HTMLTextAreaElement;
-    const menuButton = document.getElementById("menu-button") as HTMLButtonElement;
-    const leftPanel = document.getElementById("left-panel") as HTMLDivElement;
-    const searchPanel = document.getElementById("search-results") as HTMLDivElement;
-    const searchPanelFound = document.getElementById("search-content") as HTMLDivElement;
-    const searchPanelReplaced = document.getElementById("replace-content") as HTMLDivElement;
-    const searchCurrentPage = document.getElementById("search-current-page") as HTMLSpanElement;
-    const searchSeparator = document.getElementById("search-separator") as HTMLSpanElement;
-    const searchTotalPages = document.getElementById("search-total-pages") as HTMLSpanElement;
-    const topPanel = document.getElementById("top-panel") as HTMLDivElement;
-    const topPanelButtons = document.getElementById("top-panel-buttons") as HTMLDivElement;
-    const saveButton = document.getElementById("save-button") as HTMLButtonElement;
-    const compileButton = document.getElementById("compile-button") as HTMLButtonElement;
-    const optionsButton = document.getElementById("options-button") as HTMLButtonElement;
-    const themeButton = document.getElementById("theme-button") as HTMLButtonElement;
-    const themeMenu = document.getElementById("theme-menu") as HTMLDivElement;
-    const searchCaseButton = document.getElementById("case-button") as HTMLButtonElement;
-    const searchWholeButton = document.getElementById("whole-button") as HTMLButtonElement;
-    const searchRegexButton = document.getElementById("regex-button") as HTMLButtonElement;
-    const searchTranslationButton = document.getElementById("translation-button") as HTMLButtonElement;
-    const searchLocationButton = document.getElementById("location-button") as HTMLButtonElement;
-    const goToRowInput = document.getElementById("goto-row-input") as HTMLInputElement;
-    const menuBar = document.getElementById("menu-bar") as HTMLDivElement;
-    const fileMenuButton = document.getElementById("file") as HTMLButtonElement;
-    const helpMenuButton = document.getElementById("help") as HTMLButtonElement;
-    const languageMenuButton = document.getElementById("language") as HTMLButtonElement;
-    const fileMenu = document.getElementById("file-menu") as HTMLDivElement;
-    const reloadButton = document.getElementById("reload-button") as HTMLButtonElement;
-    const helpMenu = document.getElementById("help-menu") as HTMLDivElement;
-    const helpButtonSub = document.getElementById("help-button-sub") as HTMLButtonElement;
-    const aboutButton = document.getElementById("about-button") as HTMLButtonElement;
-    const hotkeysButton = document.getElementById("hotkeys-button") as HTMLButtonElement;
-    const languageMenu = document.getElementById("language-menu") as HTMLDivElement;
-    const currentState = document.getElementById("current-state") as HTMLDivElement;
-    const themeWindow = document.getElementById("theme-window") as HTMLDivElement;
+    function setLanguage(): void {
+        for (const [key, value] of Object.entries(mainLanguage)) {
+            if (key in theme) {
+                continue;
+            }
 
-    const replaced: Map<string, { [key: string]: string }> = new Map();
-    const activeGhostLines: HTMLDivElement[] = [];
+            const element = document.querySelector(`.${key}`) as HTMLElement | null;
+            if (!element) {
+                continue;
+            }
 
-    let settings: Settings | null = (await exists(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
-        ? JSON.parse(await readTextFile(await join(resDir, settingsFile), { dir: BaseDirectory.Resource }))
-        : null;
+            if (key.endsWith("Title")) {
+                element.title = value;
+            } else {
+                element.innerHTML = value;
+            }
+        }
 
-    let locale: string | null = await getLocale();
-
-    const language: Language = (
-        locale
-            ? settings
-                ? settings.lang
-                : ["ru", "uk", "be"].some((loc: string): boolean => locale!.startsWith(loc))
-                ? "ru"
-                : "en"
-            : "en"
-    ) as Language;
-
-    locale = null;
-
-    const mainLanguage: mainTranslation =
-        language === "ru"
-            ? JSON.parse(await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })).main
-            : JSON.parse(await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })).main;
-
-    if (!settings) {
-        settings = (await createSettings()) as Settings;
+        for (const div of themeWindow.children[1].children) {
+            for (const subdiv of div.children) {
+                const label = subdiv.lastElementChild as HTMLLabelElement;
+                label.innerHTML = mainLanguage[subdiv.firstElementChild?.id!];
+            }
+        }
     }
 
-    const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
-
-    let themes = JSON.parse(
-        await readTextFile(await join(resDir, themesFile), { dir: BaseDirectory.Resource })
-    ) as ThemeObject;
-
-    let theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
-
-    let currentTheme: null | string = null;
-
-    await setTheme(theme);
-
-    if (settings.firstLaunch) {
-        new WebviewWindow("help", {
-            url: "./help.html",
-            title: mainLanguage.helpButton,
-            width: 640,
-            height: 480,
-            center: true,
-            alwaysOnTop: true,
-        });
-
-        await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, firstLaunch: false }), {
-            dir: BaseDirectory.Resource,
-        });
-    }
-
-    if (settings.project) {
-        if (!(await ensureProjectIsValid(settings.project))) {
-            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: null }), {
-                dir: BaseDirectory.Resource,
+    async function initializeFirstLaunch(firstLaunch: boolean): Promise<void> {
+        if (firstLaunch) {
+            new WebviewWindow("help", {
+                url: "./help.html",
+                title: mainLanguage.helpButton,
+                width: 640,
+                height: 480,
+                center: true,
+                alwaysOnTop: true,
             });
 
+            await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, firstLaunch: false }), {
+                dir: BaseDirectory.Resource,
+            });
+        }
+    }
+
+    async function initializeProject(project: string | null): Promise<void> {
+        if (project) {
+            if (!(await ensureProjectIsValid(project))) {
+                await writeTextFile(await join(resDir, settingsFile), JSON.stringify({ ...settings, project: null }), {
+                    dir: BaseDirectory.Resource,
+                });
+
+                const noProjectSelected = document.createElement("div");
+                noProjectSelected.classList.add("flex", "items-center", "justify-center");
+                noProjectSelected.id = "no-project-selected";
+                noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
+                contentContainer.appendChild(noProjectSelected);
+            }
+
+            projDir = project;
+        } else {
             const noProjectSelected = document.createElement("div");
             noProjectSelected.classList.add("flex", "items-center", "justify-center");
             noProjectSelected.id = "no-project-selected";
             noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
             contentContainer.appendChild(noProjectSelected);
         }
-
-        projDir = settings.project;
-    } else {
-        const noProjectSelected = document.createElement("div");
-        noProjectSelected.classList.add("flex", "items-center", "justify-center");
-        noProjectSelected.id = "no-project-selected";
-        noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
-        contentContainer.appendChild(noProjectSelected);
     }
 
-    settings = null;
+    function initializeThemes(): void {
+        for (const themeName of Object.keys(themes)) {
+            const themeButton = document.createElement("button");
+            themeButton.id = themeName;
+            themeButton.innerHTML = themeName;
+            themeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
 
-    menuButton.title = mainLanguage.menuButtonTitle;
-    saveButton.title = mainLanguage.saveButtonTitle;
-    compileButton.title = mainLanguage.compileButtonTitle;
-    optionsButton.title = mainLanguage.optionsButtonTitle;
-
-    searchCaseButton.title = mainLanguage.caseButtonTitle;
-    searchWholeButton.title = mainLanguage.wholeButtonTitle;
-    searchRegexButton.title = mainLanguage.regexButtonTitle;
-    searchTranslationButton.title = mainLanguage.translationButtonTitle;
-    searchLocationButton.title = mainLanguage.locationButtonTitle;
-
-    fileMenuButton.innerHTML = mainLanguage.fileMenu;
-    helpMenuButton.innerHTML = mainLanguage.helpMenu;
-    languageMenuButton.innerHTML = mainLanguage.languageMenu;
-
-    reloadButton.innerHTML = mainLanguage.reloadButton;
-
-    helpButtonSub.innerHTML = mainLanguage.helpButton;
-    aboutButton.innerHTML = mainLanguage.aboutButton;
-    hotkeysButton.innerHTML = mainLanguage.hotkeysButton;
-
-    searchCurrentPage.innerHTML = mainLanguage.currentPage;
-    searchSeparator.innerHTML = mainLanguage.separator;
-
-    for (const themeName of Object.keys(themes)) {
-        const themeButton = document.createElement("button");
-        themeButton.id = themeName;
-        themeButton.innerHTML = themeName;
-        themeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
-
-        themeMenu.appendChild(themeButton);
-    }
-
-    {
-        const createThemeButton = document.createElement("button");
-        createThemeButton.id = "create-theme";
-        createThemeButton.innerHTML = mainLanguage.createTheme;
-        createThemeButton.classList.add("dropdown-menu-button", "backgroundPrimary", "backgroundPrimaryHovered");
-
-        themeMenu.appendChild(createThemeButton);
-    }
-
-    for (const div of themeWindow.children[1].children) {
-        for (const subdiv of div.children) {
-            const label = subdiv.lastElementChild as HTMLLabelElement;
-            label.innerHTML = mainLanguage[subdiv.firstElementChild?.id!];
+            themeMenu.insertBefore(themeButton, createThemeMenuButton);
         }
     }
-
-    {
-        const allowedThemeNameCharactersDiv = themeWindow.lastElementChild?.children[1]!;
-        allowedThemeNameCharactersDiv.innerHTML = mainLanguage.allowedThemeNameCharacters;
-
-        const createThemeButton = themeWindow.lastElementChild?.lastElementChild!;
-        createThemeButton.innerHTML = mainLanguage.createTheme;
-
-        const themeNameLabel = themeWindow.lastElementChild?.firstElementChild?.firstElementChild!;
-        themeNameLabel.innerHTML = mainLanguage.themeName;
-    }
-
-    let searchRegex: boolean = false;
-    let searchWhole: boolean = false;
-    let searchCase: boolean = false;
-    let searchTranslation: boolean = false;
-    let searchLocation: boolean = false;
-
-    let state: State = null;
-    let statePrevious: string | null = null;
-
-    let saved: boolean = true;
-    let saving: boolean = false;
-    let currentFocusedElement: [string, string] | [] = [];
-
-    let shiftPressed: boolean = false;
-
-    let selectedMultiple: boolean = false;
-    const selectedTextareas: Map<string, string> = new Map();
-    const replacedTextareas: Map<string, string> = new Map();
-
-    leftPanel.style.height = `${window.innerHeight - topPanel.clientHeight - menuBar.clientHeight}px`;
-
-    let nextBackupNumber: number;
-
-    await createContent();
-
-    const observerMain: IntersectionObserver = new IntersectionObserver(
-        (entries: IntersectionObserverEntry[]): void => {
-            for (const entry of entries) {
-                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
-            }
-        },
-        {
-            root: document,
-            rootMargin: "384px",
-            threshold: 0,
-        }
-    );
-
-    const observerFound: IntersectionObserver = new IntersectionObserver(
-        (entries: IntersectionObserverEntry[]): void => {
-            for (const entry of entries) {
-                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
-            }
-        },
-        { root: searchPanelFound, threshold: 0.1 }
-    );
-
-    const observerReplaced: IntersectionObserver = new IntersectionObserver(
-        (entries: IntersectionObserverEntry[]): void => {
-            for (const entry of entries) {
-                entry.target.firstElementChild?.classList.toggle("hidden", !entry.isIntersecting);
-            }
-        },
-        { root: searchPanelReplaced, threshold: 0.1 }
-    );
-
-    leftPanel.addEventListener("click", (event: MouseEvent): void => {
-        const newState: State = leftPanel.secondHighestParent(event.target as HTMLElement).textContent! as State;
-        changeState(newState, true);
-    });
-
-    topPanelButtons.addEventListener("click", async (event: MouseEvent): Promise<void> => {
-        if (!event.target || event.target === topPanelButtons) {
-            return;
-        }
-
-        const target: HTMLElement = topPanelButtons.secondHighestParent(event.target as HTMLElement);
-
-        switch (target.id) {
-            case "menu-button":
-                if (!projDir) {
-                    return;
-                }
-
-                leftPanel.toggleMultiple("translate-x-0", "-translate-x-full");
-                break;
-            case "save-button":
-                await save();
-                break;
-            case "compile-button":
-                await compile();
-                break;
-            case "open-button":
-                await openFolder();
-                break;
-            case "options-button":
-                createOptionsWindow();
-                break;
-            case "theme-button":
-                themeMenu.toggleMultiple("hidden", "flex");
-
-                requestAnimationFrame((): void => {
-                    themeMenu.style.left = `${themeButton.offsetLeft}px`;
-                    themeMenu.style.top = `${themeButton.offsetTop + themeButton.clientHeight + 16}px`;
-
-                    themeMenu.addEventListener("click", async (event: MouseEvent): Promise<void> => {
-                        const target: HTMLButtonElement = event.target as HTMLButtonElement;
-
-                        if (!themeMenu.contains(target)) {
-                            return;
-                        }
-
-                        if (target.id === "create-theme") {
-                            showThemeWindow();
-                            return;
-                        }
-
-                        await setTheme(themes[target.id]);
-                    });
-                });
-
-                break;
-            case "search-button":
-                if (!projDir) {
-                    return;
-                }
-
-                if (searchInput.value) {
-                    searchPanelFound.innerHTML = "";
-                    await displaySearchResults(searchInput.value, false);
-                } else if (document.activeElement === document.body) {
-                    searchInput.focus();
-                }
-                break;
-            case "replace-button":
-                if (!projDir) {
-                    return;
-                }
-
-                if (searchInput.value && replaceInput.value) {
-                    await replaceText(searchInput.value, true);
-                }
-                break;
-            case "case-button":
-                switchCase();
-                break;
-            case "whole-button":
-                switchWhole();
-                break;
-            case "regex-button":
-                switchRegExp();
-                break;
-            case "translation-button":
-                switchTranslation();
-                break;
-            case "location-button":
-                switchLocation();
-                break;
-        }
-    });
-
-    searchPanel.addEventListener("click", async (event: MouseEvent): Promise<void> => {
-        const target: HTMLElement = event.target as HTMLElement;
-        let page: number | null = null;
-
-        switch (target.id) {
-            case "switch-search-content":
-                searchPanelFound.toggleMultiple("hidden", "flex");
-                searchPanelReplaced.toggleMultiple("hidden", "flex");
-
-                const searchSwitch: HTMLElement = target;
-
-                if (searchSwitch.innerHTML.trim() === "search") {
-                    searchSwitch.innerHTML = "menu_book";
-
-                    const replacementLogContent: { [key: string]: { original: string; translation: string } } =
-                        JSON.parse(await readTextFile(await join(projDir, logFile)));
-
-                    for (const [key, value] of Object.entries(replacementLogContent)) {
-                        const replacedContainer: HTMLDivElement = document.createElement("div");
-
-                        const replacedElement: HTMLDivElement = document.createElement("div");
-                        replacedElement.classList.add(
-                            "replaced-element",
-                            "textSecond",
-                            "borderPrimary",
-                            "backgroundSecond"
-                        );
-
-                        replacedElement.innerHTML = `<div class="text-base textThird">${key}</div><div class=text-base>${value.original}</div><div class="flex justify-center items-center text-xl textPrimary font-material">arrow_downward</div><div class="text-base">${value.translation}</div>`;
-
-                        replacedContainer.appendChild(replacedElement);
-                        searchPanelReplaced.appendChild(replacedContainer);
-                    }
-
-                    observerFound.disconnect();
-                    searchPanelReplaced.style.height = `${searchPanelReplaced.scrollHeight}px`;
-
-                    const searchPanelReplacedChildren: HTMLCollectionOf<HTMLElement> =
-                        searchPanelReplaced.children as HTMLCollectionOf<HTMLElement>;
-
-                    for (const container of searchPanelReplacedChildren) {
-                        container.style.width = `${container.clientWidth}px`;
-                        container.style.height = `${container.clientHeight}px`;
-
-                        observerReplaced.observe(container);
-                        container.firstElementChild?.classList.add("hidden");
-                    }
-
-                    searchPanelReplaced.addEventListener(
-                        "mousedown",
-                        async (event: MouseEvent): Promise<void> => await handleReplacedClick(event)
-                    );
-                } else {
-                    searchSwitch.innerHTML = "search";
-                    searchPanelReplaced.innerHTML = "";
-
-                    searchPanelReplaced.removeEventListener(
-                        "mousedown",
-                        async (event: MouseEvent): Promise<void> => await handleReplacedClick(event)
-                    );
-                }
-                break;
-            case "previous-page-button":
-                page = Number.parseInt(searchCurrentPage.textContent!);
-
-                if (page > 1) {
-                    searchCurrentPage.textContent = (page - 1).toString();
-
-                    searchPanelFound.innerHTML = "";
-
-                    for (const [id, result] of Object.entries(
-                        JSON.parse(
-                            await readTextFile(
-                                await join(
-                                    projDir,
-                                    `matches-${Number.parseInt(searchCurrentPage.textContent) - 1}.json`
-                                )
-                            )
-                        )
-                    )) {
-                        appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
-                    }
-                }
-                break;
-            case "next-page-button":
-                page = Number.parseInt(searchCurrentPage.textContent!);
-
-                if (page < Number.parseInt(searchTotalPages.textContent!)) {
-                    searchCurrentPage.textContent = (page + 1).toString();
-                    searchPanelFound.innerHTML = "";
-
-                    for (const [id, result] of Object.entries(
-                        JSON.parse(
-                            await readTextFile(
-                                await join(
-                                    projDir,
-                                    `matches-${Number.parseInt(searchCurrentPage.textContent) + 1}.json`
-                                )
-                            )
-                        )
-                    )) {
-                        appendMatch(document.getElementById(id) as HTMLDivElement, result as string);
-                    }
-                }
-                break;
-        }
-    });
-
-    searchInput.addEventListener("blur", (): string => (searchInput.value = searchInput.value.trim()));
-    replaceInput.addEventListener("blur", (): string => (replaceInput.value = replaceInput.value.trim()));
-
-    searchInput.addEventListener(
-        "keydown",
-        async (event: KeyboardEvent): Promise<void> => await handleKeypressSearch(event)
-    );
-    menuBar.addEventListener("click", (event: MouseEvent): void => menuBarClick(event.target as HTMLElement));
-
-    document.addEventListener("keydown", async (event: KeyboardEvent): Promise<void> => await handleKeypress(event));
-    document.addEventListener("keyup", (event: KeyboardEvent): void => {
-        if (event.key === "Shift") {
-            shiftPressed = false;
-        }
-    });
-
-    document.addEventListener("focus", handleFocus, true);
-    document.addEventListener("blur", handleBlur, true);
-
-    function handleMousedown(event: MouseEvent): void {
-        if (event.button === 0) {
-            if (shiftPressed) {
-                if (
-                    contentContainer.contains(document.activeElement) &&
-                    document.activeElement?.tagName === "TEXTAREA"
-                ) {
-                    event.preventDefault();
-                    selectedTextareas.clear();
-
-                    selectedMultiple = true;
-                    const target: HTMLTextAreaElement = event.target as HTMLTextAreaElement;
-
-                    const targetId: string[] = target.id.split("-");
-                    const targetRow: number = Number.parseInt(targetId.pop() as string);
-
-                    const focusedElementId: string[] = document.activeElement.id.split("-");
-                    const focusedElementRow: number = Number.parseInt(focusedElementId.pop() as string);
-
-                    const rowsRange: number = targetRow - focusedElementRow;
-                    const rowsToSelect: number = Math.abs(rowsRange);
-
-                    for (let i = 1; i < rowsToSelect + 1; i++) {
-                        if (rowsRange > 0) {
-                            const nextElement: HTMLTextAreaElement = document.getElementById(
-                                `${targetId.join("-")}-${focusedElementRow + i}`
-                            ) as HTMLTextAreaElement;
-
-                            selectedTextareas.set(nextElement.id, nextElement.value);
-                        } else if (rowsRange < 0) {
-                            const nextElement: HTMLTextAreaElement = document.getElementById(
-                                `${targetId.join("-")}-${focusedElementRow - i}`
-                            ) as HTMLTextAreaElement;
-
-                            selectedTextareas.set(nextElement.id, nextElement.value);
-                        }
-                    }
-                }
-            } else {
-                selectedMultiple = false;
-            }
-        }
-    }
-
-    goToRowInput.addEventListener("keydown", (event: KeyboardEvent): void => {
-        if (event.code === "Enter") {
-            const rowNumber: string = goToRowInput.value;
-            const targetRow: HTMLTextAreaElement = document.getElementById(
-                `${state}-${rowNumber}`
-            ) as HTMLTextAreaElement;
-
-            if (targetRow) {
-                targetRow.scrollIntoView({
-                    block: "center",
-                    inline: "center",
-                });
-            }
-
-            goToRowInput.value = "";
-            goToRowInput.classList.add("hidden");
-        }
-
-        if (event.code === "Escape") {
-            goToRowInput.value = "";
-            goToRowInput.classList.add("hidden");
-        }
-    });
-
-    document.addEventListener("mousedown", (event: MouseEvent): void => handleMousedown(event));
-
-    await appWindow.onCloseRequested(async (event: CloseRequestedEvent): Promise<void> => {
-        await awaitSaving();
-        (await exitProgram()) ? await exit(0) : event.preventDefault();
-    });
 });

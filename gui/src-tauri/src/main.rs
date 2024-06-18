@@ -1,11 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use regex::escape;
-use std::fs::remove_file;
-use std::io::Cursor;
-use std::path::Path;
-use tauri::{generate_context, App, Builder, Event, Manager};
-use zip_extract::extract;
+use std::path::PathBuf;
+use tauri::{api::os::locale, generate_context, App, Builder, Event, Manager};
 mod writer;
 
 #[tauri::command]
@@ -13,26 +10,11 @@ fn escape_text(text: String) -> String {
     escape(&text)
 }
 
-#[tauri::command]
-fn unzip(path: &str, dest: &str) {
-    let bytes: Vec<u8> = std::fs::read(path).unwrap();
-    extract(Cursor::new(bytes), Path::new(dest), false).unwrap();
-    remove_file(path).unwrap();
-}
-
 fn main() {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![escape_text, unzip])
+        .invoke_handler(tauri::generate_handler![escape_text])
         .setup(|app: &mut App| {
             let main_window: tauri::Window = app.get_window("main").unwrap();
-            let resource_path: String = app
-                .path_resolver()
-                .resource_dir()
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .replace('\\', "/");
-
             #[cfg(debug_assertions)]
             {
                 main_window.open_devtools();
@@ -40,10 +22,13 @@ fn main() {
 
             app.get_window("main")
                 .unwrap()
-                .listen("compile", move |_event: Event| {
-                    let result: String =
-                        writer::main(&resource_path, tauri::api::os::locale().unwrap().as_str());
-                    main_window.emit("compile-finished", result).unwrap();
+                .listen("compile", move |event: Event| {
+                    writer::main(
+                        PathBuf::from(event.payload().unwrap().replace('"', "")),
+                        locale().unwrap().as_str(),
+                    );
+
+                    main_window.emit("compile-finished", "").unwrap();
                 });
 
             Ok(())

@@ -55,7 +55,10 @@
         "createTheme": "Create theme",
         "allowedThemeNameCharacters": "Allowed characters: a-z, A-Z, 0-9, -, _.",
         "invalidThemeName": "Theme name is invalid.",
-        "themeName": "Theme name:"
+        "themeName": "Theme name:",
+        "compileSuccess": "All files were written successfully.\nTime spent (in seconds):",
+        "themeButtonTitle": "Themes menu",
+        "openButtonTitle": "Open folder"
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",
