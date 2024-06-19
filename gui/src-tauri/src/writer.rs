@@ -4,7 +4,6 @@ use std::{
     collections::{HashMap, HashSet},
     fs::{create_dir_all, read_dir, read_to_string, write, DirEntry},
     path::{Path, PathBuf},
-    time::Instant,
 };
 
 struct Paths {
@@ -654,9 +653,7 @@ pub fn write_plugins(plugins_path: &Path, output_path: &Path) {
     .unwrap();
 }
 
-pub fn main(resource_path: PathBuf, language: &str) -> String {
-    let start_time: Instant = Instant::now();
-
+pub fn main(resource_path: PathBuf) {
     let dir_paths: Paths = Paths {
         original: resource_path.join("original"),
         maps: resource_path.join("translation/maps"),
@@ -674,19 +671,4 @@ pub fn main(resource_path: PathBuf, language: &str) -> String {
     write_other(&dir_paths.original, &dir_paths.output, &dir_paths.other);
     write_system(&dir_paths.original, &dir_paths.other, &dir_paths.output);
     write_plugins(&dir_paths.plugins, &dir_paths.plugins_output);
-
-    if ["ru", "uk", "be"]
-        .iter()
-        .any(|x: &&str| language.starts_with(x))
-    {
-        format!(
-            "Все файлы записаны успешно.\nПотрачено {} секунд.",
-            start_time.elapsed().as_secs_f64()
-        )
-    } else {
-        format!(
-            "All files have been written successfully.\nTime spent: {} seconds.",
-            start_time.elapsed().as_secs_f64()
-        )
-    }
 }

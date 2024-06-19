@@ -80,11 +80,6 @@
                 "unmaximize": false,
                 "unminimize": false
             },
-            "clipboard": {
-                "all": true,
-                "readText": true,
-                "writeText": true
-            },
             "os": {
                 "all": true
             }

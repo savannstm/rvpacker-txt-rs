@@ -2,7 +2,7 @@
 
 use regex::escape;
 use std::path::PathBuf;
-use tauri::{api::os::locale, generate_context, App, Builder, Event, Manager};
+use tauri::{generate_context, App, Builder, Event, Manager};
 mod writer;
 
 #[tauri::command]
@@ -23,11 +23,7 @@ fn main() {
             app.get_window("main")
                 .unwrap()
                 .listen("compile", move |event: Event| {
-                    writer::main(
-                        PathBuf::from(event.payload().unwrap().replace('"', "")),
-                        locale().unwrap().as_str(),
-                    );
-
+                    writer::main(PathBuf::from(event.payload().unwrap().replace('"', "")));
                     main_window.emit("compile-finished", "").unwrap();
                 });
 

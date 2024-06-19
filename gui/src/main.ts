@@ -9,7 +9,6 @@ import { ask, message, open as openPath } from "@tauri-apps/api/dialog";
 import { invoke } from "@tauri-apps/api/tauri";
 import { exit } from "@tauri-apps/api/process";
 import { appWindow, WebviewWindow } from "@tauri-apps/api/window";
-import { writeText as writeToClipboard, readText as readFromClipboard } from "@tauri-apps/api/clipboard";
 import { locale as getLocale } from "@tauri-apps/api/os";
 
 import XRegExp from "xregexp";
@@ -457,24 +456,36 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const rowsRange: number = targetRow - focusedElementRow;
                     const rowsToSelect: number = Math.abs(rowsRange);
 
-                    for (let i = 1; i < rowsToSelect + 1; i++) {
-                        if (rowsRange > 0) {
+                    if (rowsRange > 0) {
+                        for (let i = 0; i < rowsToSelect + 1; i++) {
+                            const line = focusedElementRow + i;
+
                             const nextElement: HTMLTextAreaElement = document.getElementById(
-                                `${targetId.join("-")}-${focusedElementRow + i}`
+                                `${targetId.join("-")}-${line}`
                             ) as HTMLTextAreaElement;
 
+                            nextElement.style.outlineColor = theme.outlineFocused;
                             selectedTextareas.set(nextElement.id, nextElement.value);
-                        } else if (rowsRange < 0) {
+                        }
+                    } else {
+                        for (let i = rowsToSelect; i >= 0; i--) {
+                            const line = focusedElementRow - i;
+
                             const nextElement: HTMLTextAreaElement = document.getElementById(
-                                `${targetId.join("-")}-${focusedElementRow - i}`
+                                `${targetId.join("-")}-${line}`
                             ) as HTMLTextAreaElement;
 
+                            nextElement.style.outlineColor = theme.outlineFocused;
                             selectedTextareas.set(nextElement.id, nextElement.value);
                         }
                     }
                 }
             } else {
                 selectedMultiple = false;
+
+                for (const id of selectedTextareas.keys()) {
+                    document.getElementById(id)!.style.outlineColor = "";
+                }
             }
         }
     }
@@ -965,11 +976,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function showSearchPanel(hide: boolean = true): void {
         if (searchPanel.getAttribute("moving") === "false") {
-            if (hide) {
-                searchPanel.toggleMultiple("translate-x-0", "translate-x-full");
-            } else {
-                searchPanel.classList.replace("translate-x-full", "translate-x-0");
-            }
+            hide
+                ? searchPanel.toggleMultiple("translate-x-0", "translate-x-full")
+                : searchPanel.classList.replace("translate-x-full", "translate-x-0");
+
             searchPanel.setAttribute("moving", "true");
         }
 
@@ -1285,6 +1295,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function updateState(newState: string, slide: boolean = true): void {
         currentState.innerHTML = newState;
+
         const contentParent = document.getElementById(newState) as HTMLDivElement;
         contentParent.classList.replace("hidden", "flex");
 
@@ -1486,93 +1497,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         jumpToRow("alt");
                     } else if (event.ctrlKey) {
                         jumpToRow("ctrl");
-                    }
-                    break;
-                case "KeyC":
-                    if (event.ctrlKey) {
-                        if (
-                            contentContainer.contains(document.activeElement) &&
-                            document.activeElement?.tagName === "TEXTAREA"
-                        ) {
-                            if (!selectedMultiple) {
-                                return;
-                            }
-
-                            event.preventDefault();
-
-                            selectedTextareas.set(
-                                document.activeElement.id,
-                                (document.activeElement as HTMLTextAreaElement).value
-                            );
-                            await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
-                        }
-                    }
-                    break;
-                case "KeyX":
-                    if (event.ctrlKey) {
-                        if (
-                            contentContainer.contains(document.activeElement) &&
-                            document.activeElement?.tagName === "TEXTAREA"
-                        ) {
-                            if (!selectedMultiple) {
-                                return;
-                            }
-
-                            event.preventDefault();
-
-                            selectedTextareas.set(
-                                document.activeElement.id,
-                                (document.activeElement as HTMLTextAreaElement).value
-                            );
-                            await writeToClipboard(Array.from(selectedTextareas.values()).join("#"));
-
-                            for (const key of selectedTextareas.keys()) {
-                                const textarea = document.getElementById(key) as HTMLTextAreaElement;
-                                textarea.value = "";
-                            }
-
-                            saved = false;
-                        }
-                    }
-                    break;
-                case "KeyV":
-                    if (event.ctrlKey) {
-                        if (
-                            contentContainer.contains(document.activeElement) &&
-                            document.activeElement?.tagName === "TEXTAREA"
-                        ) {
-                            const clipboardText: string | null = await readFromClipboard();
-
-                            if (!clipboardText || !clipboardText.includes("#")) {
-                                return;
-                            }
-
-                            const clipboardTextSplit = clipboardText.split("#");
-                            const textRows = clipboardTextSplit.length;
-
-                            if (textRows <= 0) {
-                                return;
-                            } else {
-                                const focusedElement = document.activeElement as HTMLElement;
-                                const focusedElementId = focusedElement.id.split("-");
-                                const focusedElementNumber = Number.parseInt(focusedElementId.pop() as string);
-
-                                for (let i = 0; i < textRows; i++) {
-                                    const elementToReplace = document.getElementById(
-                                        `${focusedElementId.join("-")}-${focusedElementNumber + i}`
-                                    ) as HTMLTextAreaElement;
-
-                                    replacedTextareas.set(
-                                        elementToReplace.id,
-                                        elementToReplace.value.replaceAll(clipboardText, "")
-                                    );
-                                    elementToReplace.value = clipboardTextSplit[i];
-                                    elementToReplace.calculateHeight();
-                                }
-
-                                saved = false;
-                            }
-                        }
                     }
                     break;
             }
@@ -2127,4 +2051,82 @@ document.addEventListener("DOMContentLoaded", async () => {
             themeMenu.insertBefore(themeButton, createThemeMenuButton);
         }
     }
+
+    document.addEventListener(
+        "paste",
+        (event) => {
+            const text = event.clipboardData?.getData("text");
+
+            if (
+                contentContainer.contains(document.activeElement) &&
+                document.activeElement?.tagName === "TEXTAREA" &&
+                text?.includes("/#")
+            ) {
+                event.preventDefault();
+                const clipboardTextSplit = text.split("/#");
+                const textRows = clipboardTextSplit.length;
+
+                if (textRows < 1) {
+                    return;
+                } else {
+                    const focusedElement = document.activeElement as HTMLElement;
+                    const focusedElementId = focusedElement.id.split("-");
+                    const focusedElementNumber = Number.parseInt(focusedElementId.pop() as string);
+
+                    for (let i = 0; i < textRows; i++) {
+                        const elementToReplace = document.getElementById(
+                            `${focusedElementId.join("-")}-${focusedElementNumber + i}`
+                        ) as HTMLTextAreaElement;
+
+                        replacedTextareas.set(elementToReplace.id, elementToReplace.value.replaceAll(text, ""));
+                        elementToReplace.value = clipboardTextSplit[i];
+                        elementToReplace.calculateHeight();
+                    }
+
+                    saved = false;
+                }
+            }
+        },
+        true
+    );
+
+    document.addEventListener(
+        "copy",
+        (event) => {
+            if (contentContainer.contains(document.activeElement) && document.activeElement?.tagName === "TEXTAREA") {
+                if (!selectedMultiple) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                selectedTextareas.set(document.activeElement.id, (document.activeElement as HTMLTextAreaElement).value);
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("/#"));
+            }
+        },
+        true
+    );
+
+    document.addEventListener(
+        "cut",
+        (event) => {
+            if (contentContainer.contains(document.activeElement) && document.activeElement?.tagName === "TEXTAREA") {
+                if (!selectedMultiple) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("/#"));
+
+                for (const key of selectedTextareas.keys()) {
+                    const textarea = document.getElementById(key) as HTMLTextAreaElement;
+                    textarea.value = "";
+                }
+
+                saved = false;
+            }
+        },
+        true
+    );
 });
