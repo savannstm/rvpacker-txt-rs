@@ -1,3 +1,4 @@
+use fancy_regex::Regex;
 use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng};
 use rayon::prelude::*;
 use serde_json::{from_str, to_string, to_value, Value};
@@ -89,8 +90,8 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
 }
 
 pub fn write_maps(
-    original_path: &Path,
     maps_path: &Path,
+    original_path: &Path,
     output_path: &Path,
     drunk: u8,
     logging: bool,
@@ -103,9 +104,10 @@ pub fn write_maps(
         .fold(
             HashMap::new,
             |mut map: HashMap<String, Value>, entry: DirEntry| {
+                let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
                 let filename: String = entry.file_name().into_string().unwrap();
 
-                if filename.starts_with("Map") {
+                if re.is_match(&filename).unwrap() {
                     map.insert(
                         filename,
                         merge_map(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
@@ -284,15 +286,14 @@ pub fn write_maps(
 }
 
 pub fn write_other(
+    other_path: &Path,
     original_path: &Path,
     output_path: &Path,
-    other_path: &Path,
     drunk: u8,
     logging: bool,
     log_string: &str,
 ) {
-    const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
-
+    let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
     let mut other_obj_arr_map: HashMap<String, Vec<Value>> = read_dir(original_path)
         .unwrap()
         .par_bridge()
@@ -302,10 +303,7 @@ pub fn write_other(
             |mut map: HashMap<String, Vec<Value>>, entry: DirEntry| {
                 let filename: String = entry.file_name().into_string().unwrap();
 
-                if !PREFIXES
-                    .par_iter()
-                    .any(|prefix: &&str| filename.starts_with(prefix))
-                {
+                if re.is_match(&filename).unwrap() {
                     map.insert(
                         filename,
                         merge_other(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
@@ -500,8 +498,8 @@ pub fn write_other(
 }
 
 pub fn write_system(
-    original_path: &Path,
     other_path: &Path,
+    original_path: &Path,
     output_path: &Path,
     drunk: u8,
     logging: bool,

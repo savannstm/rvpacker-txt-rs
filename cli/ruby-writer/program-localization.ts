@@ -2,14 +2,14 @@ import chalk from "chalk";
 
 export class ProgramLocalization {
     programDesc: string;
-    languageDesc: string;
-    inputDirType: string;
-    outputDirType: string;
+    languageArgDesc: string;
+    inputDirArgType: string;
+    outputDirArgType: string;
     readInputDirDesc: string;
     readOutputDirDesc: string;
     writeInputDirDesc: string;
     writeOutputDirDesc: string;
-    helpOptionDesc: string;
+    helpArgDesc: string;
     helpCommandDesc: string;
     helpCommandType: string;
     usage: string;
@@ -19,34 +19,35 @@ export class ProgramLocalization {
     error: string;
     optionsType: string;
     commandType: string;
-    readDesc: string;
-    writeDesc: string;
+    readCommandDesc: string;
+    writeCommandDesc: string;
     default: string;
     choices: string;
     false: string;
     true: string;
-    logOptionDesc: string;
+    logArgDesc: string;
     languageType: string;
-    drunkType: string;
-    drunkDesc: string;
+    drunkArgType: string;
+    drunkArgDesc: string;
     readLogString: string;
     writeLogString: string;
     timeElapsed: string;
-    noSystemFile: string;
-    noScriptsFile: string;
-    noOptionDesc: string;
+    systemFileMissing: string;
+    scriptsFileMissing: string;
+    noArgDesc: string;
     noType: string;
-    noOriginalPath: string;
-    noTranslationFiles: string;
+    originalDirMissing: string;
+    translationDirsMissing: string;
 
     constructor(language: string) {
         switch (language) {
             default:
             case "en":
-                this.programDesc = "A tool, that parses .rxdata/.rvdata/.rvdata2 files into text and writes them back.";
-                this.languageDesc = "Sets tool language to specified.";
-                this.inputDirType = "INPUT_PATH";
-                this.outputDirType = "OUTPUT_PATH";
+                this.programDesc =
+                    "A tool, that parses .rxdata/.rvdata/.rvdata2 files of RPG Maker XP/VX/VXAce games into .txt files and vice versa.";
+                this.languageArgDesc = "Sets tool language to specified.";
+                this.inputDirArgType = "INPUT_PATH";
+                this.outputDirArgType = "OUTPUT_PATH";
                 this.readInputDirDesc =
                     'Path to the input directory, containing an "original" or "data" folder with game files.';
                 this.readOutputDirDesc =
@@ -55,7 +56,7 @@ export class ProgramLocalization {
                     'Path to the input directory, containing directories "original" or "data" with original game files, and "translation/maps" with "translation/other" directories containing .txt game files.';
                 this.writeOutputDirDesc =
                     'Path to the output directory, where the "output" folder with files will be created out of .txt translation files.';
-                this.helpOptionDesc = "Prints this help message.";
+                this.helpArgDesc = "Prints this help message.";
                 this.helpCommandDesc = "Prints a help message for specified command.";
                 this.helpCommandType = "COMMAND_NAME";
                 this.usage = "Usage:";
@@ -65,37 +66,37 @@ export class ProgramLocalization {
                 this.error = "error:";
                 this.optionsType = "OPTIONS";
                 this.commandType = "COMMAND";
-                this.readDesc =
+                this.readCommandDesc =
                     'Parses files from the "original" or "data" folder of input directory to the "translation" folder of output directory.';
-                this.writeDesc =
+                this.writeCommandDesc =
                     'Writes translated files using original files from the "original" or "data" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
                 this.default = "default:";
                 this.choices = "choices:";
                 this.false = "false";
                 this.true = "true";
-                this.logOptionDesc = "Enables logging.";
+                this.logArgDesc = "Enables logging.";
                 this.languageType = "LANGUAGE";
-                this.drunkType = "NUMBER";
-                this.drunkDesc =
+                this.drunkArgType = "NUMBER";
+                this.drunkArgDesc =
                     "At value 1: shuffles all translation lines. At value 2: shuffles all words in translation lines.";
                 this.readLogString = "Parsed file";
                 this.writeLogString = "Written file";
                 this.timeElapsed = "Time elapsed (in seconds):";
-                this.noSystemFile = "The system file does not exist.";
-                this.noScriptsFile = "The scripts file does not exist.";
-                this.noOptionDesc =
+                this.systemFileMissing = "The system file does not exist.";
+                this.scriptsFileMissing = "The scripts file does not exist.";
+                this.noArgDesc =
                     "Disables parsing/writing specified files.\nPossible values: maps, other, system, scripts.\nExample: --no=maps,other,system,scripts";
                 this.noType = "FILES";
-                this.noOriginalPath = "The path to 'original' or 'data' directories does not exist.";
-                this.noTranslationFiles =
+                this.originalDirMissing = "The path to 'original' or 'data' directories does not exist.";
+                this.translationDirsMissing =
                     "The path to 'translation/maps' or/and 'translation/other' directories does not exist.";
                 break;
             case "ru":
                 this.programDesc =
-                    "Инструмент, который парсит .rxdata/.rvdata/rvdata2 файлы в текст и записывает их обратно.";
-                this.languageDesc = "Устанавливает язык инструмента на введённый.";
-                this.inputDirType = "ВХОДНОЙ_ПУТЬ";
-                this.outputDirType = "ВЫХОДНОЙ_ПУТЬ";
+                    "Инструмент, позволяющий парсить .rxdata/.rvdata/rvdata2 файлы RPG Maker XP/VX/VXAce игр в .txt файлы, а затем записывать их обратно.";
+                this.languageArgDesc = "Устанавливает язык инструмента на введённый.";
+                this.inputDirArgType = "ВХОДНОЙ_ПУТЬ";
+                this.outputDirArgType = "ВЫХОДНОЙ_ПУТЬ";
                 this.readInputDirDesc = 'Путь к директории входа, содержащей папку "original" с файлами игры.';
                 this.readOutputDirDesc =
                     'Путь к директории выхода, в которой будет создана папка "translation" с .txt файлами из распарсенных файлов.';
@@ -103,7 +104,7 @@ export class ProgramLocalization {
                     'Путь к директории входа, содержащей папки "original" или "data" с оригинальными файлами игры, и папки "translation/maps" и "translation/other" с .txt файлами игры.';
                 this.writeOutputDirDesc =
                     'Путь к директории выхода, в которой будет создана папка "output" с файлами, созданными из .txt файлов с переводом.';
-                this.helpOptionDesc = "Выводит эту справку.";
+                this.helpArgDesc = "Выводит эту справку.";
                 this.helpCommandDesc = "Выводит справку для указанной команды.";
                 this.helpCommandType = "ИМЯ_КОМАНДЫ";
                 this.usage = "Использование:";
@@ -113,30 +114,30 @@ export class ProgramLocalization {
                 this.error = "ошибка:";
                 this.optionsType = "ОПЦИИ";
                 this.commandType = "КОМАНДА";
-                this.readDesc =
+                this.readCommandDesc =
                     'Парсит файлы из папки "original" или "data" входной директории в папку "translation" выходной директории.';
-                this.writeDesc = "";
+                this.writeCommandDesc = "";
                 this.default = "по умолчанию:";
                 this.choices = "варианты:";
                 this.false = "нет";
                 this.true = "да";
-                this.logOptionDesc = "Включает логирование.";
+                this.logArgDesc = "Включает логирование.";
                 this.languageType = "ЯЗЫК";
-                this.drunkType = "ЧИСЛО";
-                this.writeDesc =
+                this.drunkArgType = "ЧИСЛО";
+                this.writeCommandDesc =
                     'Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
-                this.drunkDesc =
+                this.drunkArgDesc =
                     "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
                 this.readLogString = "Распарсен файл";
                 this.writeLogString = "Записан файл";
                 this.timeElapsed = "Время выполнения (в секундах):";
-                this.noSystemFile = "Файл System не существует.";
-                this.noScriptsFile = "Файл Scripts не существует.";
-                this.noOptionDesc =
+                this.systemFileMissing = "Файл System не существует.";
+                this.scriptsFileMissing = "Файл Scripts не существует.";
+                this.noArgDesc =
                     "Отключает обработку указанных файлов.\nВозможные значения: maps, other, system, scripts.\nПример: --no=maps,other,system,scripts";
                 this.noType = "ФАЙЛЫ";
-                this.noOriginalPath = 'Путь к директориям "original" или "data" не существует.';
-                this.noTranslationFiles =
+                this.originalDirMissing = 'Путь к директориям "original" или "data" не существует.';
+                this.translationDirsMissing =
                     'Путь к директориям "translation/maps" и/или "translation/other" не существует.';
                 break;
         }

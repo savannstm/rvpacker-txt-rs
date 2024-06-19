@@ -1,3 +1,4 @@
+use fancy_regex::Regex;
 use indexmap::IndexSet;
 use rayon::prelude::*;
 use serde_json::{from_str, Value};
@@ -11,7 +12,11 @@ pub fn read_map(input_dir: &Path, output_dir: &Path, logging: bool, log_string: 
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
-        .filter(|entry: &DirEntry| entry.file_name().into_string().unwrap().starts_with("Map"))
+        .filter(|entry: &DirEntry| {
+            let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
+            let filename: String = entry.file_name().into_string().unwrap();
+            re.is_match(&filename).unwrap()
+        })
         .collect();
 
     let maps_obj_map: HashMap<String, Value> = files
@@ -129,23 +134,13 @@ pub fn read_map(input_dir: &Path, output_dir: &Path, logging: bool, log_string: 
 }
 
 pub fn read_other(input_dir: &Path, output_dir: &Path, logging: bool, log_string: &str) {
+    let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
     let files: Vec<DirEntry> = read_dir(input_dir)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| {
-            const FILENAMES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
-            for filename in FILENAMES {
-                if entry
-                    .file_name()
-                    .into_string()
-                    .unwrap()
-                    .starts_with(filename)
-                {
-                    return false;
-                }
-            }
-
-            true
+            re.is_match(&entry.file_name().into_string().unwrap())
+                .unwrap()
         })
         .collect();
 

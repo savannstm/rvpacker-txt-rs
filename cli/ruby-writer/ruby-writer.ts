@@ -62,27 +62,29 @@ program.configureOutput({
 
 program.usage(`[${localization.optionsType}] [${localization.commandType}]`);
 
-program.helpOption("-h, --help", localization.helpOptionDesc);
+program.helpOption("-h, --help", localization.helpArgDesc);
 program.helpCommand(`help [${localization.helpCommandType}]`, localization.helpCommandDesc);
 
 program
-    .option("--log", localization.logOptionDesc, false)
+    .option("--log", localization.logArgDesc, false)
     .addOption(
-        new Option(`-l, --language <${localization.languageType}>`, localization.languageDesc).choices(allowedLanguages)
+        new Option(`-l, --language <${localization.languageType}>`, localization.languageArgDesc).choices(
+            allowedLanguages
+        )
     )
     .addOption(
-        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
+        new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
     );
 
 program
     .command("read")
-    .option(`-i, --inputDir <${localization.inputDirType}>`, localization.readInputDirDesc, "./")
-    .option(`-o, --outputDir <${localization.outputDirType}>`, localization.readOutputDirDesc, "./")
+    .option(`-i, --inputDir <${localization.inputDirArgType}>`, localization.readInputDirDesc, "./")
+    .option(`-o, --outputDir <${localization.outputDirArgType}>`, localization.readOutputDirDesc, "./")
     .addOption(
-        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
+        new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
     )
     .usage(localization.optionsType)
-    .description(localization.readDesc)
+    .description(localization.readCommandDesc)
     .action(async (_name, options: Command) => {
         const { inputDir, outputDir }: { [key: string]: string } = options.opts();
         const { log, no } = program.opts();
@@ -98,7 +100,7 @@ program
 
             const dataFolder = files.find((file) => /^data/i.test(file));
             if (!dataFolder) {
-                throw localization.noOriginalPath;
+                throw localization.originalDirMissing;
             }
 
             paths.original = `${inputDir}/${dataFolder}`;
@@ -159,14 +161,14 @@ program
 
 program
     .command("write")
-    .option(`-i, --inputDir <${localization.inputDirType}>`, localization.writeInputDirDesc, "./")
-    .option(`-o, --outputDir <${localization.outputDirType}>`, localization.writeOutputDirDesc, "./")
-    .option(`-d, --drunk <${localization.drunkType}>`, localization.drunkDesc, "0")
+    .option(`-i, --inputDir <${localization.inputDirArgType}>`, localization.writeInputDirDesc, "./")
+    .option(`-o, --outputDir <${localization.outputDirArgType}>`, localization.writeOutputDirDesc, "./")
+    .option(`-d, --drunk <${localization.drunkArgType}>`, localization.drunkArgDesc, "0")
     .addOption(
-        new Option(`--no <${localization.noType}>`, localization.noOptionDesc).argParser((value) => value.split(","))
+        new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
     )
     .usage(localization.optionsType)
-    .description(localization.writeDesc)
+    .description(localization.writeCommandDesc)
     .action(async (_name, options: Command) => {
         const { inputDir, outputDir, drunk }: { [key: string]: string } = options.opts();
         const { log, no } = program.opts();
@@ -185,7 +187,7 @@ program
 
             const dataFolder = files.find((file) => /^data/i.test(file));
             if (!dataFolder) {
-                throw localization.noOriginalPath;
+                throw localization.originalDirMissing;
             }
 
             paths.original = `${inputDir}/${dataFolder}`;
@@ -196,7 +198,7 @@ program
         }
 
         if (!(await exists(paths.maps)) || !(await exists(paths.other))) {
-            throw localization.noTranslationFiles;
+            throw localization.translationDirsMissing;
         }
 
         await mkdir(paths.output, { recursive: true });

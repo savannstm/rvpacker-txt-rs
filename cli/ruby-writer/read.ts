@@ -8,9 +8,8 @@ import { getValueBySymbolDesc } from "./symbol-utils";
 export async function readMap(inputDir: string, outputDir: string, logging: boolean, logString: string): Promise<void> {
     const decoder = new TextDecoder();
 
-    const files = (await readdir(inputDir)).filter(
-        (filename) => /^Map[0-9]/.test(filename) || /rxdata|rvdata|rvdata2/.test(filename)
-    );
+    const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
+    const files = (await readdir(inputDir)).filter((filename) => re.test(filename));
 
     const filesData: ArrayBuffer[] = await Promise.all(
         files.map((filename) => Bun.file(`${inputDir}/${filename}`).arrayBuffer())
@@ -134,16 +133,8 @@ export async function readOther(
 ): Promise<void> {
     const decoder = new TextDecoder();
 
-    const prefixesToFilter = ["Map", "Tilesets", "Animations", "States", "System", "Plugins", "Scripts", "Areas"];
-    const filenames = (await readdir(inputDir)).filter((filename) => {
-        for (const prefix of prefixesToFilter) {
-            if (filename.startsWith(prefix) || !/rvdata|rxdata|rxdata2$/.test(filename)) {
-                return false;
-            }
-        }
-
-        return true;
-    });
+    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rvdata|rxdata|rxdata2)$/;
+    const filenames = (await readdir(inputDir)).filter((filename) => re.test(filename));
 
     const filesData: ArrayBuffer[] = await Promise.all(
         filenames.map((filename) => Bun.file(`${inputDir}/${filename}`).arrayBuffer())
