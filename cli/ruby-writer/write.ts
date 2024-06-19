@@ -235,7 +235,7 @@ export async function writeOther(
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rvdata|rxdata|rxdata2)$/;
+    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filtered = (await readdir(originalDir)).filter((filename) => re.test(filename));
 
     const filesData = await Promise.all(

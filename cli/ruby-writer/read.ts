@@ -133,7 +133,7 @@ export async function readOther(
 ): Promise<void> {
     const decoder = new TextDecoder();
 
-    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rvdata|rxdata|rxdata2)$/;
+    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filenames = (await readdir(inputDir)).filter((filename) => re.test(filename));
 
     const filesData: ArrayBuffer[] = await Promise.all(
