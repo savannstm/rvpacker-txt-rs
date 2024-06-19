@@ -1,63 +1,63 @@
 .backgroundDark {
-    background-color: var(--backgroundDark);
+    background-color: transparent;
 }
 
 .backgroundPrimary {
-    background-color: var(--backgroundPrimary);
+    background-color: transparent;
 }
 
 .backgroundSecond {
-    background-color: var(--backgroundSecond);
+    background-color: transparent;
 }
 
 .backgroundThird {
-    background-color: var(--backgroundThird);
+    background-color: transparent;
 }
 
 .textPrimary {
-    color: var(--textPrimary);
+    color: transparent;
 }
 
 .textSecond {
-    color: var(--textSecond);
+    color: transparent;
 }
 
 .textThird {
-    color: var(--textThird);
+    color: transparent;
 }
 
 .outlinePrimary {
-    outline-color: var(--outlinePrimary);
+    outline-color: transparent;
 }
 
 .outlineSecond {
-    outline-color: var(--outlineSecond);
+    outline-color: transparent;
 }
 
 .outlineThird {
-    outline-color: var(--outlineThird);
+    outline-color: transparent;
 }
 
 .borderPrimary {
-    border-color: var(--borderPrimary);
+    border-color: transparent;
 }
 
 .borderSecond {
-    border-color: var(--borderSecond);
+    border-color: transparent;
 }
 
 .borderFocused:focus {
-    border-color: var(--borderFocused);
+    border-color: transparent;
 }
 
 .outlineFocused:focus {
-    outline-color: var(--outlineFocused);
+    outline-color: transparent;
 }
 
 .backgroundPrimaryHovered:hover {
-    background-color: var(--backgroundPrimaryHovered);
+    background-color: transparent;
 }
 
 .backgroundSecondHovered:hover {
-    background-color: var(--backgroundSecondHovered);
+    background-color: transparent;
 }

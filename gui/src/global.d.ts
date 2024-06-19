@@ -19,7 +19,7 @@ interface Backup {
 }
 
 interface Settings {
-    lang: Language;
+    language: Language;
     backup: Backup;
     theme: ThemeName;
     firstLaunch: boolean;

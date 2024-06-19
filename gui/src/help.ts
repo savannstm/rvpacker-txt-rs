@@ -1,36 +1,54 @@
 import { readTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
 
-document.addEventListener("DOMContentLoaded", async (): Promise<void> => {
-    const helpTitle: HTMLDivElement = document.getElementById("help-title") as HTMLDivElement;
-    const help: HTMLDivElement = document.getElementById("help") as HTMLDivElement;
+document.addEventListener("DOMContentLoaded", async () => {
+    let sheet: CSSStyleSheet;
 
-    function setTheme(newTheme: Theme): void {
-        for (const [key, value] of Object.entries(newTheme)) {
-            const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
-            console.log(elements);
-
-            for (const element of elements) {
-                element.style.setProperty(`--${key}`, value);
-                console.log(element.style.getPropertyValue(`--${key}`));
+    for (const styleSheet of document.styleSheets) {
+        for (const rule of styleSheet.cssRules) {
+            if (rule.selectorText === ".backgroundDark") {
+                sheet = styleSheet;
+                break;
             }
         }
     }
 
-    const settings: Settings = JSON.parse(
+    const helpTitle = document.getElementById("help-title") as HTMLDivElement;
+    const help = document.getElementById("help") as HTMLDivElement;
+
+    const { theme, language } = JSON.parse(
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
-    );
+    ) as Settings;
 
-    const themes = JSON.parse(
-        await readTextFile(await join("../res", "themes.json"), { dir: BaseDirectory.Resource })
-    ) as ThemeObject;
-    const theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
-    setTheme(theme);
+    let helpLanguage: helpTranslation;
 
-    const helpLanguage: helpTranslation =
-        settings.lang === "ru"
-            ? JSON.parse(await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })).help
-            : JSON.parse(await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })).help;
+    switch (language) {
+        case "ru":
+            helpLanguage = JSON.parse(
+                await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
+            ).help;
+            break;
+        default:
+        case "en":
+            helpLanguage = JSON.parse(
+                await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
+            ).help;
+            break;
+    }
+
+    const themeObj: Theme = JSON.parse(await readTextFile(await join("../res", "themes.json")))[theme];
+
+    for (const [key, value] of Object.entries(themeObj)) {
+        for (const rule of sheet!.cssRules) {
+            if (key.endsWith("Focused") && rule.selectorText === `.${key}:focus`) {
+                rule.style.setProperty(rule.style[0], value);
+            } else if (key.endsWith("Hovered") && rule.selectorText === `.${key}:hover`) {
+                rule.style.setProperty(rule.style[0], value);
+            } else if (rule.selectorText === `.${key}`) {
+                rule.style.setProperty(rule.style[0], value);
+            }
+        }
+    }
 
     helpTitle.innerHTML = helpLanguage.helpTitle;
     help.innerHTML = helpLanguage.help;
