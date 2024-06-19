@@ -104,11 +104,11 @@ program
             }
 
             paths.original = `${inputDir}/${dataFolder}`;
+        }
 
-            if (outputDir === "./") {
-                paths.maps = `${inputDir}/translation/maps`;
-                paths.other = `${inputDir}/translation/other`;
-            }
+        if (outputDir === "./") {
+            paths.maps = `${inputDir}/translation/maps`;
+            paths.other = `${inputDir}/translation/other`;
         }
 
         await mkdir(paths.maps, { recursive: true });
@@ -191,10 +191,10 @@ program
             }
 
             paths.original = `${inputDir}/${dataFolder}`;
+        }
 
-            if (outputDir === "./") {
-                paths.output = `${inputDir}/output/data`;
-            }
+        if (outputDir === "./") {
+            paths.output = `${inputDir}/output/data`;
         }
 
         if (!(await exists(paths.maps)) || !(await exists(paths.other))) {

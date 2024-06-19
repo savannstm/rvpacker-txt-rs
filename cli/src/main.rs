@@ -342,11 +342,11 @@ fn main() {
                 }
 
                 paths.original = data_folder.unwrap().path();
+            }
 
-                if output_dir == PathBuf::from("./") {
-                    paths.maps = input_dir.join("translation/maps");
-                    paths.other = input_dir.join("translation/other");
-                }
+            if output_dir == PathBuf::from("./") {
+                paths.maps = input_dir.join("translation/maps");
+                paths.other = input_dir.join("translation/other");
             }
 
             create_dir_all(&paths.maps).unwrap();
@@ -442,11 +442,11 @@ fn main() {
                 }
 
                 paths.original = data_folder.unwrap().path();
+            }
 
-                if output_dir == PathBuf::from("./") {
-                    paths.output = input_dir.join("output/data");
-                    paths.plugins_output = input_dir.join("output/js");
-                }
+            if output_dir == PathBuf::from("./") {
+                paths.output = input_dir.join("output/data");
+                paths.plugins_output = input_dir.join("output/js");
             }
 
             if !Path::new(&paths.maps).exists() || !Path::new(&paths.other).exists() {
