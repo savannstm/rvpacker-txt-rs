@@ -1,4 +1,4 @@
-import { mkdir, readdir } from "node:fs/promises";
+import { mkdir, readdir, exists } from "node:fs/promises";
 import { Command, Help, Option, program } from "commander";
 import { getUserLocale } from "get-user-locale";
 
@@ -93,15 +93,20 @@ program
             other: `${outputDir}/translation/other`,
         };
 
-        if (!(await Bun.file(paths.original).exists())) {
-            const dataPath = `${inputDir}/data`;
+        if (!(await exists(paths.original))) {
             const files = await readdir(inputDir);
 
-            if (!files.includes("data") || !files.includes("Data")) {
-                throw new Error(localization.noOriginalPath);
+            const dataFolder = files.find((file) => /^data/i.test(file));
+            if (!dataFolder) {
+                throw localization.noOriginalPath;
             }
 
-            paths.original = dataPath;
+            paths.original = `${inputDir}/${dataFolder}`;
+
+            if (outputDir === "./") {
+                paths.maps = `${inputDir}/translation/maps`;
+                paths.other = `${inputDir}/translation/other`;
+            }
         }
 
         await mkdir(paths.maps, { recursive: true });
@@ -175,19 +180,23 @@ program
             output: `${outputDir}/output/data`,
         };
 
-        if (!(await Bun.file(paths.original).exists())) {
-            const dataPath = `${inputDir}/data`;
+        if (!(await exists(paths.original))) {
             const files = await readdir(inputDir);
 
-            if (!files.includes("data") || !files.includes("Data")) {
-                throw new Error(localization.noOriginalPath);
+            const dataFolder = files.find((file) => /^data/i.test(file));
+            if (!dataFolder) {
+                throw localization.noOriginalPath;
             }
 
-            paths.original = dataPath;
+            paths.original = `${inputDir}/${dataFolder}`;
+
+            if (outputDir === "./") {
+                paths.output = `${inputDir}/output/data`;
+            }
         }
 
-        if (!(await Bun.file(paths.maps).exists()) || !(await Bun.file(paths.other).exists())) {
-            throw new Error(localization.noTranslationFiles);
+        if (!(await exists(paths.maps)) || !(await exists(paths.other))) {
+            throw localization.noTranslationFiles;
         }
 
         await mkdir(paths.output, { recursive: true });

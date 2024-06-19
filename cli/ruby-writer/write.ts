@@ -97,7 +97,9 @@ export async function writeMap(
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const filtered = (await readdir(originalPath)).filter((filename) => filename.startsWith("Map"));
+    const filtered = (await readdir(originalPath)).filter(
+        (filename) => /^Map[0-9]/.test(filename) || /rxdata|rvdata|rvdata2/.test(filename)
+    );
 
     const filesData = await Promise.all(
         filtered.map((filename) => Bun.file(`${originalPath}/${filename}`).arrayBuffer())
@@ -236,9 +238,15 @@ export async function writeOther(
 
     const prefixesToFilter = ["Map", "Tilesets", "Animations", "States", "System", "Scripts", "Areas"];
 
-    const filtered = (await readdir(originalDir)).filter(
-        (filename) => !prefixesToFilter.some((prefix) => filename.startsWith(prefix))
-    );
+    const filtered = (await readdir(originalDir)).filter((filename) => {
+        for (const prefix of prefixesToFilter) {
+            if (filename.startsWith(prefix) || !/rvdata|rxdata|rxdata2$/.test(filename)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
 
     const filesData = await Promise.all(
         filtered.map((filename) => Bun.file(`${originalDir}/${filename}`).arrayBuffer())

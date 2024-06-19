@@ -9,7 +9,7 @@ export async function readMap(inputDir: string, outputDir: string, logging: bool
     const decoder = new TextDecoder();
 
     const files = (await readdir(inputDir)).filter(
-        (filename) => filename.startsWith("Map") && !filename.startsWith("MapInfos")
+        (filename) => /^Map[0-9]/.test(filename) || /rxdata|rvdata|rvdata2/.test(filename)
     );
 
     const filesData: ArrayBuffer[] = await Promise.all(
@@ -134,9 +134,15 @@ export async function readOther(
 ): Promise<void> {
     const decoder = new TextDecoder();
 
-    const filesToFilter = ["Map", "Tilesets", "Animations", "States", "System", "Plugins", "Scripts", "Areas"];
+    const prefixesToFilter = ["Map", "Tilesets", "Animations", "States", "System", "Plugins", "Scripts", "Areas"];
     const filenames = (await readdir(inputDir)).filter((filename) => {
-        return filesToFilter.some((file) => filename.startsWith(file)) ? false : true;
+        for (const prefix of prefixesToFilter) {
+            if (filename.startsWith(prefix) || !/rvdata|rxdata|rxdata2$/.test(filename)) {
+                return false;
+            }
+        }
+
+        return true;
     });
 
     const filesData: ArrayBuffer[] = await Promise.all(
