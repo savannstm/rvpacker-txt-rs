@@ -36,6 +36,8 @@ export class ProgramLocalization {
     noScriptsFile: string;
     noOptionDesc: string;
     noType: string;
+    noOriginalPath: string;
+    noTranslationFiles: string;
 
     constructor(language: string) {
         switch (language) {
@@ -45,11 +47,12 @@ export class ProgramLocalization {
                 this.languageDesc = "Sets tool language to specified.";
                 this.inputDirType = "INPUT_PATH";
                 this.outputDirType = "OUTPUT_PATH";
-                this.readInputDirDesc = 'Path to the input directory, containing a "original" folder with files.';
+                this.readInputDirDesc =
+                    'Path to the input directory, containing an "original" or "data" folder with game files.';
                 this.readOutputDirDesc =
                     'Path to the output directory, where the "translation" folder with .txt files with text from the parsed files will be created.';
                 this.writeInputDirDesc =
-                    'Path to the input directory, containing folders "original" with original game files, and "translation" with "maps" and "other" folders with .txt game files.';
+                    'Path to the input directory, containing directories "original" or "data" with original game files, and "translation/maps" with "translation/other" directories containing .txt game files.';
                 this.writeOutputDirDesc =
                     'Path to the output directory, where the "output" folder with files will be created out of .txt translation files.';
                 this.helpOptionDesc = "Prints this help message.";
@@ -63,9 +66,9 @@ export class ProgramLocalization {
                 this.optionsType = "OPTIONS";
                 this.commandType = "COMMAND";
                 this.readDesc =
-                    'Parses files from the "original" folder of input directory to the "translation" folder of output directory.';
+                    'Parses files from the "original" or "data" folder of input directory to the "translation" folder of output directory.';
                 this.writeDesc =
-                    'Writes translated files using original files from the "original" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
+                    'Writes translated files using original files from the "original" or "data" folder of input directory, replacing their text with the files from "translation" folder and outputting results to the "output" folder.';
                 this.default = "default:";
                 this.choices = "choices:";
                 this.false = "false";
@@ -83,6 +86,9 @@ export class ProgramLocalization {
                 this.noOptionDesc =
                     "Disables parsing/writing specified files.\nPossible values: maps, other, system, scripts.\nExample: --no=maps,other,system,scripts";
                 this.noType = "FILES";
+                this.noOriginalPath = "The path to 'original' or 'data' directories does not exist.";
+                this.noTranslationFiles =
+                    "The path to 'translation/maps' or/and 'translation/other' directories does not exist.";
                 break;
             case "ru":
                 this.programDesc =
@@ -94,7 +100,7 @@ export class ProgramLocalization {
                 this.readOutputDirDesc =
                     'Путь к директории выхода, в которой будет создана папка "translation" с .txt файлами из распарсенных файлов.';
                 this.writeInputDirDesc =
-                    'Путь к директории входа, содержащей папки "original" с оригинальными файлами игры, и "translation" с папками "maps" и "other" с .txt файлами игры.';
+                    'Путь к директории входа, содержащей папки "original" или "data" с оригинальными файлами игры, и папки "translation/maps" и "translation/other" с .txt файлами игры.';
                 this.writeOutputDirDesc =
                     'Путь к директории выхода, в которой будет создана папка "output" с файлами, созданными из .txt файлов с переводом.';
                 this.helpOptionDesc = "Выводит эту справку.";
@@ -108,7 +114,7 @@ export class ProgramLocalization {
                 this.optionsType = "ОПЦИИ";
                 this.commandType = "КОМАНДА";
                 this.readDesc =
-                    'Парсит файлы из папки "original" входной директории в папку "translation" выходной директории.';
+                    'Парсит файлы из папки "original" или "data" входной директории в папку "translation" выходной директории.';
                 this.writeDesc = "";
                 this.default = "по умолчанию:";
                 this.choices = "варианты:";
@@ -118,7 +124,7 @@ export class ProgramLocalization {
                 this.languageType = "ЯЗЫК";
                 this.drunkType = "ЧИСЛО";
                 this.writeDesc =
-                    'Записывает переведенные файлы, используя исходные файлы из папки "original" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
+                    'Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
                 this.drunkDesc =
                     "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
                 this.readLogString = "Распарсен файл";
@@ -129,6 +135,9 @@ export class ProgramLocalization {
                 this.noOptionDesc =
                     "Отключает обработку указанных файлов.\nВозможные значения: maps, other, system, scripts.\nПример: --no=maps,other,system,scripts";
                 this.noType = "ФАЙЛЫ";
+                this.noOriginalPath = 'Путь к директориям "original" или "data" не существует.';
+                this.noTranslationFiles =
+                    'Путь к директориям "translation/maps" и/или "translation/other" не существует.';
                 break;
         }
 

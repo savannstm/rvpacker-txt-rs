@@ -2,7 +2,7 @@ interface Array<T> {
     shuffle(): T[];
 }
 
-Array.prototype.shuffle = function (): any[] {
+Array.prototype.shuffle = function () {
     const self = this;
 
     for (let i = self.length - 1; i > 0; i--) {

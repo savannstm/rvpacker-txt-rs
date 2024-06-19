@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { OrderedSet } from "immutable";
 import { load } from "@hyrious/marshal";
-import { inflateSync } from "node:zlib";
+import { inflate } from "pako";
 
 import { getValueBySymbolDesc } from "./symbol-utils";
 
@@ -302,11 +302,16 @@ export async function readOther(
     }
 }
 
-export async function readSystem(path: string, outputDir: string, logging: boolean, logString: string): Promise<void> {
+export async function readSystem(
+    inputFile: string,
+    outputDir: string,
+    logging: boolean,
+    logString: string
+): Promise<void> {
     const decoder = new TextDecoder();
 
-    const obj = load(await Bun.file(path).arrayBuffer()) as RubyObject;
-    const type = path.slice(path.lastIndexOf(".") + 1);
+    const obj = load(await Bun.file(inputFile).arrayBuffer()) as RubyObject;
+    const type = inputFile.slice(inputFile.lastIndexOf(".") + 1);
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
     if (type === "rvdata2") {
@@ -381,12 +386,18 @@ export async function readSystem(path: string, outputDir: string, logging: boole
     await Bun.write(`${outputDir}/system_trans.txt`, "\n".repeat(lines.size ? lines.size - 1 : 0));
 }
 
-export async function readScripts(path: string, outputDir: string, logging: boolean, logString: string): Promise<void> {
-    const uintarrArr = load(await Bun.file(path).arrayBuffer(), { string: "binary" }) as Uint8Array[][];
+export async function readScripts(
+    inputFile: string,
+    outputDir: string,
+    logging: boolean,
+    logString: string
+): Promise<void> {
+    const decoder = new TextDecoder();
+    const uintarrArr = load(await Bun.file(inputFile).arrayBuffer(), { string: "binary" }) as Uint8Array[][];
 
     const fullCode = [];
     for (let i = 0; i < uintarrArr.length; i++) {
-        const codeString = inflateSync(uintarrArr[i][2]).toString("utf8").replaceAll(/\r?\n/g, "\\#");
+        const codeString = decoder.decode(inflate(uintarrArr[i][2])).replaceAll(/\r?\n/g, "\\#");
         fullCode.push(codeString);
     }
 

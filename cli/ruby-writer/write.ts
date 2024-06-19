@@ -1,6 +1,6 @@
 import { readdir } from "node:fs/promises";
 import { dump, load } from "@hyrious/marshal";
-import { deflateSync } from "node:zlib";
+import { deflate } from "pako";
 
 import "./shuffle";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
@@ -87,8 +87,8 @@ export function mergeOther(objArr: RubyObject[]): RubyObject[] {
 }
 
 export async function writeMap(
-    originalPath: string,
     mapsPath: string,
+    originalPath: string,
     outputDir: string,
     drunk: number,
     logging: boolean,
@@ -117,7 +117,7 @@ export async function writeMap(
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
-    let namesTranslatedText = (await Bun.file(`${mapsPath}/names_trans.txt}`).text())
+    let namesTranslatedText = (await Bun.file(`${mapsPath}/names_trans.txt`).text())
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
@@ -153,7 +153,7 @@ export async function writeMap(
         for (const event of Object.values(events || {})) {
             const pages: RubyObject[] = getValueBySymbolDesc(event, "@pages");
             if (!pages) {
-                return;
+                continue;
             }
 
             for (const page of pages) {
@@ -224,9 +224,9 @@ export async function writeMap(
 }
 
 export async function writeOther(
+    otherDir: string,
     originalDir: string,
     outputDir: string,
-    otherDir: string,
     drunk: number,
     logging: boolean,
     logString: string
@@ -399,7 +399,7 @@ export async function writeOther(
 }
 
 export async function writeSystem(
-    path: string,
+    inputFile: string,
     otherDir: string,
     outputDir: string,
     drunk: number,
@@ -409,8 +409,8 @@ export async function writeSystem(
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const obj = load(await Bun.file(path).arrayBuffer()) as RubyObject;
-    const ext = path.split(".").pop()!;
+    const obj = load(await Bun.file(inputFile).arrayBuffer()) as RubyObject;
+    const ext = inputFile.split(".").pop()!;
 
     const systemOriginalText = (await Bun.file(`${otherDir}/system.txt`).text()).split("\n");
     let systemTranslatedText = (await Bun.file(`${otherDir}/system_trans.txt`).text()).split("\n");
@@ -484,7 +484,7 @@ export async function writeSystem(
 }
 
 export async function writeScripts(
-    path: string,
+    inputFile: string,
     otherDir: string,
     outputDir: string,
     logging: boolean,
@@ -492,10 +492,10 @@ export async function writeScripts(
 ): Promise<void> {
     const decoder = new TextDecoder();
 
-    const scriptsArr = load(await Bun.file(path).arrayBuffer(), {
+    const scriptsArr = load(await Bun.file(inputFile).arrayBuffer(), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = path.split(".").pop()!;
+    const ext = inputFile.split(".").pop()!;
 
     const translationArr = (await Bun.file(`${otherDir}/scripts_trans.txt`).text()).split("\n");
 
@@ -511,7 +511,7 @@ export async function writeScripts(
             scriptsArr[i][1] = decoder.decode(title);
         }
 
-        scriptsArr[i][2] = deflateSync(translationArr[i].replaceAll("\\#", "\r\n"));
+        scriptsArr[i][2] = deflate(translationArr[i].replaceAll("\\#", "\r\n"));
     }
 
     if (logging) {
