@@ -1,7 +1,7 @@
 {
-    "name": "fh-termina-json-writer",
+    "name": "rpgm-translation-gui",
     "private": true,
-    "version": "3.4.1",
+    "version": "3.5.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -14,8 +14,7 @@
     },
     "dependencies": {
         "@hyrious/marshal": "^0.3.3",
-        "@tauri-apps/api": "^1",
-        "@types/pako": "^2.0.3",
+        "@tauri-apps/api": "^1.5.6",
         "immutable": "^4.3.6",
         "pako": "^2.1.0",
         "xregexp": "^5.1.1"
