@@ -87,6 +87,8 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
 }
 
 pub fn write_maps(maps_path: &Path, original_path: &Path, output_path: &Path) {
+    let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
+
     let mut maps_obj_map: FnvHashMap<String, Value> = read_dir(original_path)
         .unwrap()
         .par_bridge()
@@ -94,7 +96,6 @@ pub fn write_maps(maps_path: &Path, original_path: &Path, output_path: &Path) {
         .fold(
             FnvHashMap::default,
             |mut map: FnvHashMap<String, Value>, entry: DirEntry| {
-                let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
                 let filename: String = entry.file_name().into_string().unwrap();
 
                 if re.is_match(&filename).unwrap() {
@@ -254,6 +255,7 @@ pub fn write_maps(maps_path: &Path, original_path: &Path, output_path: &Path) {
 
 pub fn write_other(other_path: &Path, original_path: &Path, output_path: &Path) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
+
     let mut other_obj_arr_map: FnvHashMap<String, Vec<Value>> = read_dir(original_path)
         .unwrap()
         .par_bridge()
