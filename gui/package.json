@@ -22,10 +22,9 @@
     "devDependencies": {
         "@tauri-apps/cli": "^1.5.14",
         "@types/pako": "^2.0.3",
-        "html-minifier-terser": "^7.2.0",
         "tailwindcss": "^3.4.4",
-        "terser": "^5.31.1",
         "typescript": "^5.4.5",
-        "vite": "^5.3.1"
+        "vite": "^5.3.1",
+        "vite-plugin-minify": "^1.5.2"
     }
 }
