@@ -30,17 +30,17 @@ window.addEventListener("DOMContentLoaded", async () => {
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
     ) as Settings;
 
-    let aboutLanguage: aboutTranslation;
+    let aboutLocalization: aboutLocalization;
 
     switch (language) {
         case "ru":
-            aboutLanguage = JSON.parse(
+            aboutLocalization = JSON.parse(
                 await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
             ).about;
             break;
         default:
         case "en":
-            aboutLanguage = JSON.parse(
+            aboutLocalization = JSON.parse(
                 await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
             ).about;
             break;
@@ -60,14 +60,14 @@ window.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    version.innerHTML = aboutLanguage.version;
+    version.innerHTML = aboutLocalization.version;
     versionNumber.innerHTML = await getVersion();
-    about.innerHTML = aboutLanguage.about;
-    socials.innerHTML = aboutLanguage.socials;
-    vkLink.innerHTML = aboutLanguage.vkLink;
-    tgLink.innerHTML = aboutLanguage.tgLink;
-    githubLink.innerHTML = aboutLanguage.githubLink;
-    license.innerHTML = aboutLanguage.license;
+    about.innerHTML = aboutLocalization.about;
+    socials.innerHTML = aboutLocalization.socials;
+    vkLink.innerHTML = aboutLocalization.vkLink;
+    tgLink.innerHTML = aboutLocalization.tgLink;
+    githubLink.innerHTML = aboutLocalization.githubLink;
+    license.innerHTML = aboutLocalization.license;
 
     const links = new Map([
         [vkLink, "https://vk.com/stivhuis228"],

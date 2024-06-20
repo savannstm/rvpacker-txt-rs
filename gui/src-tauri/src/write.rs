@@ -1,19 +1,11 @@
+use fancy_regex::Regex;
+use fnv::{FnvHashMap, FnvHashSet};
 use rayon::prelude::*;
 use serde_json::{from_str, to_string, to_value, Value};
 use std::{
-    collections::{HashMap, HashSet},
-    fs::{create_dir_all, read_dir, read_to_string, write, DirEntry},
-    path::{Path, PathBuf},
+    fs::{read_dir, read_to_string, write, DirEntry},
+    path::Path,
 };
-
-struct Paths {
-    original: PathBuf,
-    output: PathBuf,
-    maps: PathBuf,
-    other: PathBuf,
-    plugins: PathBuf,
-    plugins_output: PathBuf,
-}
 
 fn merge_401(json: &mut Value) {
     let mut first: Option<usize> = None;
@@ -94,17 +86,18 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
     obj_arr
 }
 
-pub fn write_maps(original_path: &Path, maps_path: &Path, output_path: &Path) {
-    let mut maps_obj_map: HashMap<String, Value> = read_dir(original_path)
+pub fn write_maps(maps_path: &Path, original_path: &Path, output_path: &Path) {
+    let mut maps_obj_map: FnvHashMap<String, Value> = read_dir(original_path)
         .unwrap()
         .par_bridge()
         .flatten()
         .fold(
-            HashMap::new,
-            |mut map: HashMap<String, Value>, entry: DirEntry| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<String, Value>, entry: DirEntry| {
+                let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
                 let filename: String = entry.file_name().into_string().unwrap();
 
-                if filename.starts_with("Map") {
+                if re.is_match(&filename).unwrap() {
                     map.insert(
                         filename,
                         merge_map(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
@@ -114,8 +107,8 @@ pub fn write_maps(original_path: &Path, maps_path: &Path, output_path: &Path) {
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<String, Value>, b: HashMap<String, Value>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<String, Value>, b: FnvHashMap<String, Value>| {
                 a.extend(b);
                 a
             },
@@ -145,37 +138,37 @@ pub fn write_maps(original_path: &Path, maps_path: &Path, output_path: &Path) {
         .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
         .collect();
 
-    let maps_translation_map: HashMap<&str, &str> = maps_original_text_vec
+    let maps_translation_map: FnvHashMap<&str, &str> = maps_original_text_vec
         .par_iter()
         .zip(maps_translated_text_vec.par_iter())
         .fold(
-            HashMap::new,
-            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
         );
 
-    let names_translation_map: HashMap<&str, &str> = names_original_text_vec
+    let names_translation_map: FnvHashMap<&str, &str> = names_original_text_vec
         .par_iter()
         .zip(names_translated_text_vec.par_iter())
         .fold(
-            HashMap::new,
-            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
@@ -259,22 +252,18 @@ pub fn write_maps(original_path: &Path, maps_path: &Path, output_path: &Path) {
         });
 }
 
-pub fn write_other(original_path: &Path, output_path: &Path, other_path: &Path) {
-    const PREFIXES: [&str; 5] = ["Map", "Tilesets", "Animations", "States", "System"];
-
-    let mut other_obj_arr_map: HashMap<String, Vec<Value>> = read_dir(original_path)
+pub fn write_other(other_path: &Path, original_path: &Path, output_path: &Path) {
+    let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
+    let mut other_obj_arr_map: FnvHashMap<String, Vec<Value>> = read_dir(original_path)
         .unwrap()
         .par_bridge()
         .flatten()
         .fold(
-            HashMap::new,
-            |mut map: HashMap<String, Vec<Value>>, entry: DirEntry| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<String, Vec<Value>>, entry: DirEntry| {
                 let filename: String = entry.file_name().into_string().unwrap();
 
-                if !PREFIXES
-                    .par_iter()
-                    .any(|prefix: &&str| filename.starts_with(prefix))
-                {
+                if re.is_match(&filename).unwrap() {
                     map.insert(
                         filename,
                         merge_other(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
@@ -284,8 +273,8 @@ pub fn write_other(original_path: &Path, output_path: &Path, other_path: &Path) 
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<String, Vec<Value>>, b: HashMap<String, Vec<Value>>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<String, Vec<Value>>, b: FnvHashMap<String, Vec<Value>>| {
                 a.extend(b);
                 a
             },
@@ -309,19 +298,19 @@ pub fn write_other(original_path: &Path, output_path: &Path, other_path: &Path) 
             .map(|line: &str| line.to_string().replace(r"\#", "\n"))
             .collect();
 
-            let other_translation_map: HashMap<&str, &str> = other_original_text
+            let other_translation_map: FnvHashMap<&str, &str> = other_original_text
                 .par_iter()
                 .zip(other_translated_text.par_iter())
                 .fold(
-                    HashMap::new,
-                    |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+                    FnvHashMap::default,
+                    |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
                         map.insert(key.as_str(), value.as_str());
                         map
                     },
                 )
                 .reduce(
-                    HashMap::new,
-                    |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
+                    FnvHashMap::default,
+                    |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
                         a.extend(b);
                         a
                     },
@@ -452,7 +441,7 @@ pub fn write_other(original_path: &Path, output_path: &Path, other_path: &Path) 
         });
 }
 
-pub fn write_system(original_path: &Path, other_path: &Path, output_path: &Path) {
+pub fn write_system(other_path: &Path, original_path: &Path, output_path: &Path) {
     let mut obj: Value =
         from_str(&read_to_string(original_path.join("System.json")).unwrap()).unwrap();
 
@@ -468,19 +457,19 @@ pub fn write_system(original_path: &Path, other_path: &Path, output_path: &Path)
         .map(|line: &str| line.to_string())
         .collect();
 
-    let system_translation_map: HashMap<&str, &str> = system_original_text
+    let system_translation_map: FnvHashMap<&str, &str> = system_original_text
         .par_iter()
         .zip(system_translated_text.par_iter())
         .fold(
-            HashMap::new,
-            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
@@ -567,26 +556,26 @@ pub fn write_plugins(plugins_path: &Path, output_path: &Path) {
             .map(|line: &str| line.to_string())
             .collect();
 
-    let plugins_translation_map: HashMap<&str, &str> = plugins_original_text_vec
+    let plugins_translation_map: FnvHashMap<&str, &str> = plugins_original_text_vec
         .par_iter()
         .zip(plugins_translated_text_vec.par_iter())
         .fold(
-            HashMap::new,
-            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
+            FnvHashMap::default,
+            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            HashMap::new,
-            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
+            FnvHashMap::default,
+            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
         );
 
     obj_arr.par_iter_mut().for_each(|obj: &mut Value| {
-        let plugin_names: HashSet<&str> = HashSet::from([
+        let plugin_names: FnvHashSet<&str> = FnvHashSet::from_iter([
             "YEP_BattleEngineCore",
             "YEP_OptionsCore",
             "SRD_NameInputUpgrade",
@@ -651,24 +640,4 @@ pub fn write_plugins(plugins_path: &Path, output_path: &Path) {
         format!("var $plugins =\n{}", to_string(&obj_arr).unwrap()),
     )
     .unwrap();
-}
-
-pub fn main(resource_path: PathBuf) {
-    let dir_paths: Paths = Paths {
-        original: resource_path.join("original"),
-        maps: resource_path.join("translation/maps"),
-        other: resource_path.join("translation/other"),
-        plugins: resource_path.join("translation/plugins"),
-        output: resource_path.join("output/data"),
-        plugins_output: resource_path.join("output/js"),
-    };
-
-    println!("{}", &dir_paths.output.display());
-    create_dir_all(&dir_paths.output).unwrap();
-    create_dir_all(&dir_paths.plugins_output).unwrap();
-
-    write_maps(&dir_paths.original, &dir_paths.maps, &dir_paths.output);
-    write_other(&dir_paths.original, &dir_paths.output, &dir_paths.other);
-    write_system(&dir_paths.original, &dir_paths.other, &dir_paths.output);
-    write_plugins(&dir_paths.plugins, &dir_paths.plugins_output);
 }

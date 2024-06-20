@@ -12,7 +12,7 @@ interface HTMLTextAreaElement {
     calculateHeight(): void;
 }
 
-interface Backup {
+interface BackupSetting {
     enabled: boolean;
     period: number;
     max: number;
@@ -20,13 +20,13 @@ interface Backup {
 
 interface Settings {
     language: Language;
-    backup: Backup;
+    backup: BackupSetting;
     theme: ThemeName;
     firstLaunch: boolean;
     project: string | null;
 }
 
-interface mainTranslation {
+interface mainLocalization {
     [key: string]: string;
     cannotGetSettings: string;
     askCreateSettings: string;
@@ -87,9 +87,10 @@ interface mainTranslation {
     compileSuccess: string;
     themeButtonTitle: string;
     openButtonTitle: string;
+    loadingProject: string;
 }
 
-interface optionsTranslation {
+interface optionsLocalization {
     backupPeriodLabel: string;
     backupPeriodNote: string;
     backupMaxLabel: string;
@@ -97,7 +98,7 @@ interface optionsTranslation {
     backup: string;
 }
 
-interface aboutTranslation {
+interface aboutLocalization {
     version: string;
     about: string;
     socials: string;
@@ -107,22 +108,22 @@ interface aboutTranslation {
     license: string;
 }
 
-interface hotkeysTranslation {
+interface hotkeysLocalization {
     hotkeysTitle: string;
     hotkeys: string;
 }
 
-interface helpTranslation {
+interface helpLocalization {
     helpTitle: string;
     help: string;
 }
 
-interface Translation {
-    main: mainTranslation;
-    options: optionsTranslation;
-    about: aboutTranslation;
-    hotkeys: hotkeysTranslation;
-    help: helpTranslation;
+interface Localization {
+    main: mainLocalization;
+    options: optionsLocalization;
+    about: aboutLocalization;
+    hotkeys: hotkeysLocalization;
+    help: helpLocalization;
 }
 
 interface ThemeObject {

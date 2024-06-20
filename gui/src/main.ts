@@ -2,6 +2,7 @@ import "./string-extensions";
 import "./htmlelement-extensions";
 
 import { writeMap, writeOther, writeSystem, writeScripts } from "./ruby-writer/write";
+import { readMap, readOther, readSystem, readScripts } from "./ruby-writer/read";
 
 import { exists, readDir, readTextFile, removeFile, writeTextFile, createDir } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
@@ -30,7 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const resDir = "res";
     const translationDir = "translation";
-    const originalDir = "original";
     const backupDir = "backups";
 
     const mapsDir = "maps";
@@ -98,17 +98,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     locale = null;
 
-    let mainLanguage: mainTranslation;
+    let mainLocalization: mainLocalization;
 
     switch (language) {
         case "ru":
-            mainLanguage = JSON.parse(
+            mainLocalization = JSON.parse(
                 await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })
             ).main;
             break;
         default:
         case "en":
-            mainLanguage = JSON.parse(
+            mainLocalization = JSON.parse(
                 await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })
             ).main;
             break;
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         settings = (await createSettings()) as Settings;
     }
 
-    const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: Backup = settings.backup;
+    const { enabled: backupEnabled, period: backupPeriod, max: backupMax }: BackupSetting = settings.backup;
 
     let themes = JSON.parse(
         await readTextFile(await join(resDir, themesFile), { dir: BaseDirectory.Resource })
@@ -158,8 +158,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let nextBackupNumber: number;
 
-    await createContent();
-
     const observerMain = new IntersectionObserver(
         (entries) => {
             for (const entry of entries) {
@@ -196,7 +194,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         changeState(newState, true);
     });
 
-    topPanelButtons.addEventListener("click", async (event): Promise<void> => {
+    topPanelButtons.addEventListener("click", async (event) => {
         if (event.target === topPanelButtons) {
             return;
         }
@@ -286,8 +284,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    searchPanel.addEventListener("click", async (event): Promise<void> => {
-        const target: HTMLElement = event.target as HTMLElement;
+    searchPanel.addEventListener("click", async (event) => {
+        const target = event.target as HTMLElement;
         let page: number | null = null;
 
         switch (target.id) {
@@ -523,7 +521,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             if (!/\\#[a-zA-Z0-9_-]+$/.test(themeName)) {
-                await message(mainLanguage.invalidThemeName + mainLanguage.allowedThemeNameCharacters);
+                await message(mainLocalization.invalidThemeName + mainLocalization.allowedThemeNameCharacters);
                 return;
             }
 
@@ -538,7 +536,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             themeMenu.insertBefore(themeMenu.lastElementChild!, newThemeButton);
         }
 
-        requestAnimationFrame((): void => {
+        requestAnimationFrame(() => {
             themeWindow.style.left = `${(document.body.clientWidth - themeWindow.clientWidth) / 2}px`;
 
             let i = 1;
@@ -549,96 +547,179 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const inputElement = subdiv.firstElementChild as HTMLInputElement;
 
                     inputElement.value = themeColors[i];
-                    inputElement.addEventListener("input", (): void => changeStyle(inputElement));
+                    inputElement.addEventListener("input", () => changeStyle(inputElement));
                     i++;
                 }
             }
 
             const closeButton = themeWindow.firstElementChild!.firstElementChild as HTMLButtonElement;
             const createThemeButton = themeWindow.lastElementChild!.lastElementChild as HTMLButtonElement;
-            createThemeButton.addEventListener("click", async (): Promise<void> => await createTheme());
+            createThemeButton.addEventListener("click", async () => await createTheme());
 
-            closeButton.addEventListener("click", (): void => {
+            closeButton.addEventListener("click", () => {
                 for (const div of themeWindow.children[1].children as HTMLCollectionOf<HTMLDivElement>) {
                     for (const subdiv of div.children) {
                         const inputElement = subdiv.firstElementChild as HTMLInputElement;
-                        inputElement.removeEventListener("input", (): void => changeStyle(inputElement));
+                        inputElement.removeEventListener("input", () => changeStyle(inputElement));
                     }
                 }
 
-                createThemeButton.removeEventListener("click", async (): Promise<void> => await createTheme());
+                createThemeButton.removeEventListener("click", async () => await createTheme());
                 themeWindow.classList.add("hidden");
             });
         });
     }
 
-    async function ensureProjectIsValid(folder: string): Promise<boolean> {
+    async function ensureProjectIsValid(folder: string): Promise<boolean | undefined> {
+        const noProjectSelected = document.getElementById("no-project-selected") as HTMLDivElement;
+        noProjectSelected.innerHTML = mainLocalization.loadingProject;
+
         const dirs = [mapsDir, otherDir, pluginsDir];
         const translationPath = await join(folder, translationDir);
-        const originalPath = await join(folder, originalDir);
+        const folderDirs = await readDir(folder);
 
+        let parsed = true;
         if (!(await exists(translationPath))) {
-            await message(mainLanguage.missingTranslationDir);
-            return false;
+            parsed = false;
         }
 
-        if (!(await exists(originalPath))) {
-            await message(mainLanguage.missingOriginalDir);
+        const re = /^data|Data/;
+
+        const originalFolder = folderDirs.find((dir) => re.test(dir.name!))?.path;
+
+        if (!originalFolder) {
+            await message(mainLocalization.missingOriginalDir);
             return false;
-        }
+        } else if (!parsed) {
+            if (await exists(await join(originalFolder, "Map001.json"))) {
+                await appWindow.emit("read", [folder, originalFolder]);
+                await appWindow.listen("read-finished", async () => {
+                    for (const dir of dirs) {
+                        const subDirPath = await join(translationPath, dir);
 
-        for (const dir of dirs) {
-            const subDirPath = await join(translationPath, dir);
-
-            if (dir === pluginsDir && RPGMVer !== "new") {
-                continue;
-            }
-
-            if (!(await exists(subDirPath))) {
-                await message(mainLanguage.missingTranslationSubdirs);
-                return false;
-            }
-
-            if (dir === otherDir) {
-                const files = await readDir(subDirPath);
-
-                for (const file of files) {
-                    const name = file.name as string;
-
-                    if (name.startsWith("scripts")) {
-                        if (name.endsWith(".rxdata")) {
-                            RPGMVer = "xp";
-                        } else if (name.endsWith(".rvdata")) {
-                            RPGMVer = "vx";
-                        } else {
-                            RPGMVer = "vxace";
+                        if (dir === pluginsDir && RPGMVer !== "new") {
+                            continue;
                         }
+
+                        if (!(await exists(subDirPath))) {
+                            await message(mainLocalization.missingTranslationSubdirs);
+                            return false;
+                        }
+
+                        if (dir === otherDir) {
+                            const files = await readDir(subDirPath);
+
+                            for (const file of files) {
+                                const name = file.name as string;
+
+                                if (name.startsWith("scripts")) {
+                                    if (name.endsWith(".rxdata")) {
+                                        RPGMVer = "xp";
+                                    } else if (name.endsWith(".rvdata")) {
+                                        RPGMVer = "vx";
+                                    } else {
+                                        RPGMVer = "vxace";
+                                    }
+                                    break;
+                                } else {
+                                    RPGMVer = "new";
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                const mapsPath = await join(translationPath, mapsDir);
+                const otherPath = await join(translationPath, otherDir);
+
+                await createDir(mapsPath, { recursive: true });
+                await createDir(otherPath, { recursive: true });
+
+                await readMap(originalFolder, mapsPath);
+
+                await readOther(originalFolder, otherPath);
+
+                const systemPaths = [
+                    `${originalFolder}/System.rvdata2`,
+                    `${originalFolder}/System.rvdata`,
+                    `${originalFolder}/System.rxdata`,
+                ];
+
+                for (const systemPath of systemPaths) {
+                    if (await exists(systemPath)) {
+                        await readSystem(systemPath, otherPath);
                         break;
-                    } else {
-                        RPGMVer = "new";
+                    }
+                }
+
+                const scriptsPaths = [
+                    `${originalFolder}/Scripts.rvdata2`,
+                    `${originalFolder}/Scripts.rvdata`,
+                    `${originalFolder}/Scripts.rxdata`,
+                ];
+
+                for (const scriptsPath of scriptsPaths) {
+                    if (await exists(scriptsPath)) {
+                        await readScripts(scriptsPath, otherPath);
+                        break;
                     }
                 }
             }
-        }
 
-        return true;
+            return true;
+        } else {
+            for (const dir of dirs) {
+                const subDirPath = await join(translationPath, dir);
+
+                if (dir === pluginsDir && RPGMVer !== "new") {
+                    continue;
+                }
+
+                if (!(await exists(subDirPath))) {
+                    await message(mainLocalization.missingTranslationSubdirs);
+                    return false;
+                }
+
+                if (dir === otherDir) {
+                    const files = await readDir(subDirPath);
+
+                    for (const file of files) {
+                        const name = file.name as string;
+
+                        if (name.startsWith("scripts")) {
+                            if (name.endsWith(".rxdata")) {
+                                RPGMVer = "xp";
+                            } else if (name.endsWith(".rvdata")) {
+                                RPGMVer = "vx";
+                            } else {
+                                RPGMVer = "vxace";
+                            }
+                            break;
+                        } else {
+                            RPGMVer = "new";
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
     }
 
     async function openFolder(): Promise<void> {
         const folder = await openPath({ directory: true, multiple: false });
 
         if (folder) {
-            if (!(await ensureProjectIsValid(folder as string))) {
+            const projectIsValid = await ensureProjectIsValid(folder as string);
+            if (projectIsValid === false) {
+                const noProjectSelected = document.getElementById("no-project-selected") as HTMLDivElement;
+                noProjectSelected.innerHTML = mainLocalization.noProjectSelected;
                 return;
             }
 
             projDir = folder as string;
 
             contentContainer.innerHTML = "";
-
-            if (document.getElementById("no-project-selected")) {
-                document.getElementById("no-project-selected")!.remove();
-            }
 
             settings!.project = projDir;
             await writeTextFile(settingsPath, JSON.stringify({ ...settings, project: projDir }), {
@@ -651,14 +732,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 backup(backupPeriod);
             }
 
-            createLogFile();
-            createContent();
+            await createLogFile();
+            await createContent();
         }
     }
 
     async function createSettings(): Promise<Settings | void> {
-        await message(mainLanguage.cannotGetSettings);
-        const askCreateSettings: boolean = await ask(mainLanguage.askCreateSettings);
+        await message(mainLocalization.cannotGetSettings);
+        const askCreateSettings: boolean = await ask(mainLocalization.askCreateSettings);
 
         if (askCreateSettings) {
             await writeTextFile(
@@ -675,7 +756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             );
 
-            alert(mainLanguage.createdSettings);
+            alert(mainLocalization.createdSettings);
             return JSON.parse(await readTextFile(settingsPath, { dir: BaseDirectory.Resource }));
         } else {
             await exit();
@@ -687,13 +768,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         switch (lang) {
             case "ru":
-                mainLanguage = JSON.parse(
+                mainLocalization = JSON.parse(
                     await readTextFile(await join(resDir, ruTranslation), { dir: BaseDirectory.Resource })
                 ).main;
                 break;
             default:
             case "en":
-                mainLanguage = JSON.parse(
+                mainLocalization = JSON.parse(
                     await readTextFile(await join(resDir, enTranslation), { dir: BaseDirectory.Resource })
                 ).main;
                 break;
@@ -732,6 +813,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             document.body.firstElementChild!.classList.remove("invisible");
         }
+
+        const noProjectSelected = document.getElementById("no-project-selected") as HTMLDivElement;
+        if (noProjectSelected) {
+            noProjectSelected.innerHTML = "";
+        }
     }
 
     async function determineLastBackupNumber(): Promise<string> {
@@ -764,7 +850,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             return XRegExp(regexp, attr);
         } catch (err) {
-            await message(`${mainLanguage.invalidRegexp} (${text}), ${err}`);
+            await message(`${mainLocalization.invalidRegexp} (${text}), ${err}`);
             return;
         }
     }
@@ -960,7 +1046,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             clicked.value = element.children[1].textContent!;
 
             element.innerHTML = `<span class="text-base"><code>${element.firstElementChild!.textContent}</code>\n${
-                mainLanguage.textReverted
+                mainLocalization.textReverted
             }\n<code>${element.children[1].textContent}</code></span>`;
             element.setAttribute("reverted", "");
 
@@ -1028,10 +1114,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function findCounterpart(id: string): [HTMLElement, number] {
-        if (id.includes(originalDir)) {
-            return [document.getElementById(id.replace(originalDir, translationDir)) as HTMLElement, 1];
+        if (id.includes("original")) {
+            return [document.getElementById(id.replace("original", "translation")) as HTMLElement, 1];
         } else {
-            return [document.getElementById(id.replace(translationDir, originalDir)) as HTMLElement, 0];
+            return [document.getElementById(id.replace("translation", "original")) as HTMLElement, 0];
         }
     }
 
@@ -1057,8 +1143,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 inline: "center",
             });
         } else if (button === 2) {
-            if (element.id.includes(originalDir)) {
-                alert(mainLanguage.originalTextIrreplacable);
+            if (element.id.includes("original")) {
+                alert(mainLocalization.originalTextIrreplacable);
                 return;
             } else {
                 if (replaceInput.value.trim()) {
@@ -1114,7 +1200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const noMatches: null | undefined | Map<HTMLTextAreaElement, string> = await searchText(text, false);
 
         if (noMatches) {
-            searchPanelFound.innerHTML = `<div id="no-results" class="flex justify-center items-center h-full">${mainLanguage.noMatches}</div>`;
+            searchPanelFound.innerHTML = `<div id="no-results" class="flex justify-center items-center h-full">${mainLocalization.noMatches}</div>`;
             showSearchPanel(false);
             return;
         }
@@ -1193,7 +1279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         for (const textarea of results.keys()) {
-            if (!textarea.id.includes(originalDir)) {
+            if (!textarea.id.includes("original")) {
                 const newValue = textarea.value.replace(regexp, replaceInput.value);
 
                 replaced.set(textarea.id, {
@@ -1345,7 +1431,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const element = document.getElementById(state as string) as HTMLDivElement;
         const lastRow = element.lastElementChild!.id.split("-").at(-1) as string;
 
-        goToRowInput.placeholder = `${mainLanguage.goToRow} ${lastRow}`;
+        goToRowInput.placeholder = `${mainLocalization.goToRow} ${lastRow}`;
     }
 
     function jumpToRow(key: string): void {
@@ -1635,7 +1721,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (RPGMVer === "new") {
             await appWindow.listen("compile-finished", () => {
                 compileButton.firstElementChild!.classList.remove("animate-spin");
-                alert(`${mainLanguage.compileSuccess} ${(performance.now() - startTime) / 1000}`);
+                alert(`${mainLocalization.compileSuccess} ${(performance.now() - startTime) / 1000}`);
             });
 
             const startTime = performance.now();
@@ -1645,7 +1731,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             await createDir(await join(projDir, "output", "data"), { recursive: true });
 
-            const original = await join(projDir, originalDir);
+            const re = /^data|Data/;
+            const original = (await readDir(projDir)).find((f) => re.test(f.name!))!.path;
             const output = await join(projDir, "output", "data");
             const other = await join(projDir, translationDir, otherDir);
 
@@ -1670,7 +1757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             await writeScripts(await join(original, `Scripts.${ext}`), other, output);
 
             compileButton.firstElementChild!.classList.remove("animate-spin");
-            alert(`${mainLanguage.compileSuccess} ${(performance.now() - startTime) / 1000}`);
+            alert(`${mainLocalization.compileSuccess} ${(performance.now() - startTime) / 1000}`);
         }
     }
 
@@ -1793,7 +1880,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function createOptionsWindow() {
         new WebviewWindow("options", {
             url: "./options.html",
-            title: mainLanguage.optionsButtonTitle,
+            title: mainLocalization.optionsButtonTitle,
             width: 800,
             height: 600,
             center: true,
@@ -1806,12 +1893,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (saved) {
             askExitUnsaved = true;
         } else {
-            askExitUnsaved = await ask(mainLanguage.unsavedChanges);
+            askExitUnsaved = await ask(mainLocalization.unsavedChanges);
         }
 
         let askExit: boolean;
         if (!askExitUnsaved) {
-            askExit = await ask(mainLanguage.exit);
+            askExit = await ask(mainLocalization.exit);
         } else {
             if (!saved) {
                 await save();
@@ -1847,7 +1934,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             case "help-button-sub":
                 new WebviewWindow("help", {
                     url: "./help.html",
-                    title: mainLanguage.helpButton,
+                    title: mainLocalization.helpButton,
                     width: 640,
                     height: 480,
                     center: true,
@@ -1856,7 +1943,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             case "about-button":
                 new WebviewWindow("about", {
                     url: "./about.html",
-                    title: mainLanguage.aboutButton,
+                    title: mainLocalization.aboutButton,
                     width: 640,
                     height: 480,
                     center: true,
@@ -1866,7 +1953,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             case "hotkeys-button":
                 new WebviewWindow("hotkeys", {
                     url: "./hotkeys.html",
-                    title: mainLanguage.hotkeysButton,
+                    title: mainLocalization.hotkeysButton,
                     width: 640,
                     height: 480,
                     center: true,
@@ -1982,7 +2069,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function setLanguage(): void {
-        for (const [key, value] of Object.entries(mainLanguage)) {
+        for (const [key, value] of Object.entries(mainLocalization)) {
             if (key in theme) {
                 continue;
             }
@@ -2002,7 +2089,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         for (const div of themeWindow.children[1].children) {
             for (const subdiv of div.children) {
                 const label = subdiv.lastElementChild as HTMLLabelElement;
-                label.innerHTML = mainLanguage[subdiv.firstElementChild!.id];
+                label.innerHTML = mainLocalization[subdiv.firstElementChild!.id];
             }
         }
     }
@@ -2011,7 +2098,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (firstLaunch) {
             new WebviewWindow("help", {
                 url: "./help.html",
-                title: mainLanguage.helpButton,
+                title: mainLocalization.helpButton,
                 width: 640,
                 height: 480,
                 center: true,
@@ -2025,19 +2112,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function initializeProject(project: string | null): Promise<void> {
-        if (!project || !(await ensureProjectIsValid(project))) {
+        if (!project || (await ensureProjectIsValid(project)) === false) {
             settings!.project = null;
             await writeTextFile(settingsPath, JSON.stringify({ ...settings, project: null }), {
                 dir: BaseDirectory.Resource,
             });
 
-            const noProjectSelected: HTMLDivElement = document.createElement("div");
-            noProjectSelected.classList.add("flex", "items-center", "justify-center");
-            noProjectSelected.id = "no-project-selected";
-            noProjectSelected.innerHTML = mainLanguage.noProjectSelected;
-            contentContainer.appendChild(noProjectSelected);
+            const noProjectSelected = document.getElementById("no-project-selected") as HTMLDivElement;
+            noProjectSelected.innerHTML = mainLocalization.noProjectSelected;
         } else {
             projDir = project;
+            await createContent();
         }
     }
 

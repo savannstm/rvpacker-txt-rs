@@ -20,17 +20,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
     ) as Settings;
 
-    let hotkeysLanguage: hotkeysTranslation;
+    let hotkeysLocalization: hotkeysLocalization;
 
     switch (language) {
         case "ru":
-            hotkeysLanguage = JSON.parse(
+            hotkeysLocalization = JSON.parse(
                 await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
             ).hotkeys;
             break;
         default:
         case "en":
-            hotkeysLanguage = JSON.parse(
+            hotkeysLocalization = JSON.parse(
                 await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
             ).hotkeys;
             break;
@@ -50,6 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    hotkeysTitle.innerHTML = hotkeysLanguage.hotkeysTitle;
-    hotkeys.innerHTML = hotkeysLanguage.hotkeys;
+    hotkeysTitle.innerHTML = hotkeysLocalization.hotkeysTitle;
+    hotkeys.innerHTML = hotkeysLocalization.hotkeys;
 });

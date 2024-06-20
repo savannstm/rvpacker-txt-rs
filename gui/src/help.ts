@@ -20,17 +20,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
     ) as Settings;
 
-    let helpLanguage: helpTranslation;
+    let helpLocalization: helpLocalization;
 
     switch (language) {
         case "ru":
-            helpLanguage = JSON.parse(
+            helpLocalization = JSON.parse(
                 await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
             ).help;
             break;
         default:
         case "en":
-            helpLanguage = JSON.parse(
+            helpLocalization = JSON.parse(
                 await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
             ).help;
             break;
@@ -50,6 +50,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    helpTitle.innerHTML = helpLanguage.helpTitle;
-    help.innerHTML = helpLanguage.help;
+    helpTitle.innerHTML = helpLocalization.helpTitle;
+    help.innerHTML = helpLocalization.help;
 });

@@ -31,17 +31,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     const language = settings.language;
     const theme = settings.theme;
 
-    let optionsLanguage: optionsTranslation;
+    let optionsLocalization: optionsLocalization;
 
     switch (language) {
         case "ru":
-            optionsLanguage = JSON.parse(
+            optionsLocalization = JSON.parse(
                 await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
             ).options;
             break;
         default:
         case "en":
-            optionsLanguage = JSON.parse(
+            optionsLocalization = JSON.parse(
                 await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
             ).options;
             break;
@@ -61,11 +61,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    backupPeriodLabel.innerHTML = optionsLanguage.backupPeriodLabel;
-    backupPeriodNote.innerHTML = optionsLanguage.backupPeriodNote;
-    backupMaxLabel.innerHTML = optionsLanguage.backupMaxLabel;
-    backupMaxNote.innerHTML = optionsLanguage.backupMaxNote;
-    backup.innerHTML = optionsLanguage.backup;
+    backupPeriodLabel.innerHTML = optionsLocalization.backupPeriodLabel;
+    backupPeriodNote.innerHTML = optionsLocalization.backupPeriodNote;
+    backupMaxLabel.innerHTML = optionsLocalization.backupMaxLabel;
+    backupMaxNote.innerHTML = optionsLocalization.backupMaxNote;
+    backup.innerHTML = optionsLocalization.backup;
 
     backupMaxInput.value = settings.backup.max.toString();
     backupPeriodInput.value = settings.backup.period.toString();
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         backupSettings.classList.add("translate-y-0");
     }
 
-    backupCheck.addEventListener("click", (): void => {
+    backupCheck.addEventListener("click", () => {
         if (!backupCheck.textContent) {
             backupSettings.classList.replace("hidden", "flex");
             requestAnimationFrame(() => backupSettings.classList.replace("-translate-y-full", "translate-y-0"));
@@ -92,14 +92,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         backupCheck.innerHTML = !backupCheck.textContent ? "check" : "";
     });
 
-    backupMaxInput.addEventListener("input", (): void => {
+    backupMaxInput.addEventListener("input", () => {
         backupMaxInput.value = backupMaxInput.value.replaceAll(/[^0-9]/g, "");
         const backupMaxValue = Number.parseInt(backupMaxInput.value);
 
         backupMaxInput.value = (backupMaxValue < 1 ? 1 : backupMaxValue > 99 ? 99 : backupMaxValue).toString();
     });
 
-    backupPeriodInput.addEventListener("input", (): void => {
+    backupPeriodInput.addEventListener("input", () => {
         backupPeriodInput.value = backupPeriodInput.value.replaceAll(/[^0-9]/g, "");
         const backupPeriodValue = Number.parseInt(backupPeriodInput.value);
 

@@ -1,7 +1,7 @@
 {
-    "name": "fh-termina-json-writer",
+    "name": "rpgm-translation-gui",
     "private": true,
-    "version": "3.4.1",
+    "version": "3.5.0",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -14,20 +14,19 @@
     },
     "dependencies": {
         "@hyrious/marshal": "^0.3.3",
-        "@tauri-apps/api": "^1",
-        "@types/pako": "^2.0.3",
+        "@tauri-apps/api": "^1.5.6",
         "immutable": "^4.3.6",
         "pako": "^2.1.0",
         "xregexp": "^5.1.1"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "^1",
-        "@types/node": "^20.14.0",
+        "@tauri-apps/cli": "^1.5.14",
         "html-minifier-terser": "^7.2.0",
-        "tailwindcss": "^3.4.3",
-        "terser": "^5.30.4",
-        "typescript": "^5.0.2",
-        "vite": "^5.0.0",
-        "vite-plugin-minify": "^1.5.2"
+        "tailwindcss": "^3.4.4",
+        "terser": "^5.31.1",
+        "typescript": "^5.4.5",
+        "vite": "^5.3.1",
+        "vite-plugin-minify": "^1.5.2",
+        "@types/pako": "^2.0.3"
     }
 }

@@ -33,9 +33,9 @@
         "separator": "of",
         "goToRow": "Go to row... from 1 to",
         "missingTranslationDir": "'translation' directory is missing. Project won't be initialized.",
-        "missingOriginalDir": "'original' directory is missing. Project won't be initialized.",
-        "missingTranslationSubdirs": "'translation' directory's subdirectories 'maps', 'other' and 'plugins' are missing. Project won't be initialized.",
-        "noProjectSelected": "No project selected. Select the project directory, using 'open folder' button in the left-top corner. Directory must contain directories 'original' and 'translation' (with 'maps', 'other' and 'plugins' subdirectories, if it's RPG Maker MV or MZ, or 'maps' and 'other', if it's RPG Maker XP, VX, VX Ace).",
+        "missingOriginalDir": "'original' or 'data' directory is missing. Project won't be initialized.",
+        "missingTranslationSubdirs": "'translation' directory's subdirectories 'maps', 'other' and/or 'plugins' are missing. Project won't be initialized.",
+        "noProjectSelected": "No project selected. Select the project directory, using 'open folder' button in the left-top corner. Directory must contain directories 'original' or 'data' and 'translation' (with 'maps', 'other' and 'plugins' subdirectories, if it's RPG Maker MV/MZ, or 'maps' and 'other', if it's RPG Maker XP/VX/VXAce).",
         "backgroundDark": "Dark background color",
         "backgroundPrimary": "Primary background color",
         "backgroundSecond": "Second background color",
@@ -58,7 +58,8 @@
         "themeName": "Theme name:",
         "compileSuccess": "All files were written successfully.\nTime spent (in seconds):",
         "themeButtonTitle": "Themes menu",
-        "openButtonTitle": "Open folder"
+        "openButtonTitle": "Open folder",
+        "loadingProject": "Loading project..."
     },
     "options": {
         "backupPeriodLabel": "Create backup every:",
