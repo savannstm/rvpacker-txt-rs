@@ -85,15 +85,16 @@ export function mergeOther(objArr: RubyObject[]): RubyObject[] {
     return objArr;
 }
 
-export async function writeMap(originalPath: string, mapsPath: string, outputDir: string): Promise<void> {
+export async function writeMap(originalPath: string, mapsPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const filtered = (await readDir(originalPath)).filter((filename) => filename.name!.startsWith("Map"));
+    const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
+    const files = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
 
-    const filesData = await Promise.all(filtered.map((filename) => readBinaryFile(filename.path)));
+    const filesData = await Promise.all(files.map((filename) => readBinaryFile(filename.path)));
 
-    const objMap = new Map(filtered.map((filename, i) => [filename, mergeMap(load(filesData[i]) as RubyObject)]));
+    const objMap = new Map(files.map((filename, i) => [filename.name!, mergeMap(load(filesData[i]) as RubyObject)]));
 
     const mapsOriginalText = (await readTextFile(`${mapsPath}/maps.txt`))
         .split("\n")
@@ -114,8 +115,7 @@ export async function writeMap(originalPath: string, mapsPath: string, outputDir
     const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
     const namesTranslationMap = new Map(namesOriginalText.map((string, i) => [string, namesTranslatedText[i]]));
 
-    for (const [entry, obj] of objMap) {
-        const filename = entry.name as string;
+    for (const [filename, obj] of objMap) {
         const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
 
         if (typeof displayName === "string" && namesTranslationMap.has(displayName)) {
@@ -195,35 +195,31 @@ export async function writeMap(originalPath: string, mapsPath: string, outputDir
             }
         }
 
-        await writeBinaryFile(`${outputDir}/${filename}`, dump(obj));
+        await writeBinaryFile(`${outputPath}/${filename}`, dump(obj));
     }
 }
 
-export async function writeOther(originalDir: string, otherDir: string, outputDir: string): Promise<void> {
+export async function writeOther(originalPath: string, otherPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const prefixesToFilter = ["Map", "Tilesets", "Animations", "States", "System", "Scripts", "Areas"];
+    const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
+    const filenames = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
 
-    const filtered = (await readDir(originalDir)).filter(
-        (filename) => !prefixesToFilter.some((prefix) => filename.name!.startsWith(prefix))
+    const filesData = await Promise.all(filenames.map((filename) => readBinaryFile(filename.path)));
+
+    const objMap = new Map(
+        filenames.map((filename, i) => [filename.name!, mergeOther(load(filesData[i]) as RubyObject[])])
     );
 
-    const filesData = await Promise.all(filtered.map((filename) => readBinaryFile(filename.path)));
+    for (const [filename, objArr] of objMap) {
+        const processed_filename = filename.slice(0, filename.lastIndexOf(".")).toLowerCase();
 
-    const objMap = new Map(filtered.map((filename, i) => [filename, mergeOther(load(filesData[i]) as RubyObject[])]));
-
-    for (const [entry, objArr] of objMap) {
-        const filename = entry.name as string;
-        const otherOriginalText = (
-            await readTextFile(`${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}.txt`)
-        )
+        const otherOriginalText = (await readTextFile(`${otherPath}/${processed_filename}.txt`))
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
-        let otherTranslatedText = (
-            await readTextFile(`${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`)
-        )
+        let otherTranslatedText = (await readTextFile(`${otherPath}/${processed_filename}_trans.txt`))
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
@@ -348,19 +344,19 @@ export async function writeOther(originalDir: string, otherDir: string, outputDi
             }
         }
 
-        await writeBinaryFile(`${outputDir}/${filename}`, dump(objArr));
+        await writeBinaryFile(`${outputPath}/${filename}`, dump(objArr));
     }
 }
 
-export async function writeSystem(path: string, otherDir: string, outputDir: string): Promise<void> {
+export async function writeSystem(systemPath: string, otherPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const obj = load(await readBinaryFile(path)) as RubyObject;
-    const ext = path.split(".").pop()!;
+    const obj = load(await readBinaryFile(systemPath)) as RubyObject;
+    const ext = systemPath.split(".").pop()!;
 
-    const systemOriginalText = (await readTextFile(`${otherDir}/system.txt`)).split("\n");
-    let systemTranslatedText = (await readTextFile(`${otherDir}/system_trans.txt`)).split("\n");
+    const systemOriginalText = (await readTextFile(`${otherPath}/system.txt`)).split("\n");
+    let systemTranslatedText = (await readTextFile(`${otherPath}/system_trans.txt`)).split("\n");
 
     const translationMap = new Map(systemOriginalText.map((string, i) => [string, systemTranslatedText[i]]));
 
@@ -413,18 +409,18 @@ export async function writeSystem(path: string, otherDir: string, outputDir: str
         }
     }
 
-    await writeBinaryFile(`${outputDir}/System.${ext}`, dump(obj));
+    await writeBinaryFile(`${outputPath}/System.${ext}`, dump(obj));
 }
 
-export async function writeScripts(path: string, otherDir: string, outputDir: string): Promise<void> {
+export async function writeScripts(scriptsPath: string, otherPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
 
-    const scriptsArr = load(await readBinaryFile(path), {
+    const scriptsArr = load(await readBinaryFile(scriptsPath), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = path.split(".").pop()!;
+    const ext = scriptsPath.split(".").pop()!;
 
-    const translationArr = (await readTextFile(`${otherDir}/scripts_trans.txt`)).split("\n");
+    const translationArr = (await readTextFile(`${otherPath}/scripts_trans.txt`)).split("\n");
 
     for (let i = 0; i < scriptsArr.length; i++) {
         const magic = scriptsArr[i][0];
@@ -441,5 +437,5 @@ export async function writeScripts(path: string, otherDir: string, outputDir: st
         scriptsArr[i][2] = deflate(translationArr[i].replaceAll("\\#", "\r\n"));
     }
 
-    await writeBinaryFile(`${outputDir}/Scripts.${ext}`, dump(scriptsArr));
+    await writeBinaryFile(`${outputPath}/Scripts.${ext}`, dump(scriptsArr));
 }

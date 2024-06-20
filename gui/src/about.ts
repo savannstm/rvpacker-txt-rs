@@ -3,53 +3,73 @@ import { readTextFile } from "@tauri-apps/api/fs";
 import { BaseDirectory, join } from "@tauri-apps/api/path";
 import { getVersion } from "@tauri-apps/api/app";
 
-window.addEventListener("DOMContentLoaded", async (): Promise<void> => {
-    const version: HTMLSpanElement = document.getElementById("version") as HTMLSpanElement;
-    const versionNumber: HTMLSpanElement = document.getElementById("version-number") as HTMLSpanElement;
-    const about: HTMLDivElement = document.getElementById("about") as HTMLDivElement;
-    const socials: HTMLDivElement = document.getElementById("socials") as HTMLDivElement;
-    const vkLink: HTMLAnchorElement = document.getElementById("vk-link") as HTMLAnchorElement;
-    const tgLink: HTMLAnchorElement = document.getElementById("tg-link") as HTMLAnchorElement;
-    const githubLink: HTMLAnchorElement = document.getElementById("github-link") as HTMLAnchorElement;
-    const license: HTMLSpanElement = document.getElementById("license") as HTMLSpanElement;
-    const licenseLink: HTMLAnchorElement = document.getElementById("license-link") as HTMLAnchorElement;
-    const wtpflLink: HTMLAnchorElement = document.getElementById("wtfpl-link") as HTMLAnchorElement;
+window.addEventListener("DOMContentLoaded", async () => {
+    let sheet: CSSStyleSheet;
 
-    function setTheme(newTheme: Theme): void {
-        for (const [key, value] of Object.entries(newTheme)) {
-            const elements = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement>;
-
-            for (const element of elements) {
-                element.style.setProperty(`--${key}`, value);
+    for (const styleSheet of document.styleSheets) {
+        for (const rule of styleSheet.cssRules) {
+            if (rule.selectorText === ".backgroundDark") {
+                sheet = styleSheet;
+                break;
             }
         }
     }
 
-    const settings: Settings = JSON.parse(
+    const version = document.getElementById("version") as HTMLSpanElement;
+    const versionNumber = document.getElementById("version-number") as HTMLSpanElement;
+    const about = document.getElementById("about") as HTMLDivElement;
+    const socials = document.getElementById("socials") as HTMLDivElement;
+    const vkLink = document.getElementById("vk-link") as HTMLAnchorElement;
+    const tgLink = document.getElementById("tg-link") as HTMLAnchorElement;
+    const githubLink = document.getElementById("github-link") as HTMLAnchorElement;
+    const license = document.getElementById("license") as HTMLSpanElement;
+    const licenseLink = document.getElementById("license-link") as HTMLAnchorElement;
+    const wtpflLink = document.getElementById("wtfpl-link") as HTMLAnchorElement;
+
+    const { theme, language } = JSON.parse(
         await readTextFile(await join("../res", "settings.json"), { dir: BaseDirectory.Resource })
-    );
+    ) as Settings;
 
-    const aboutLanguage: aboutTranslation =
-        settings.lang === "ru"
-            ? JSON.parse(await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })).about
-            : JSON.parse(await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })).about;
+    let aboutLocalization: aboutLocalization;
 
-    const themes = JSON.parse(
-        await readTextFile(await join("../res", "themes.json"), { dir: BaseDirectory.Resource })
-    ) as ThemeObject;
-    const theme: Theme = settings.theme ? themes[settings.theme] : themes["cool-zinc"];
-    setTheme(theme);
+    switch (language) {
+        case "ru":
+            aboutLocalization = JSON.parse(
+                await readTextFile(await join("../res", "ru.json"), { dir: BaseDirectory.Resource })
+            ).about;
+            break;
+        default:
+        case "en":
+            aboutLocalization = JSON.parse(
+                await readTextFile(await join("../res", "en.json"), { dir: BaseDirectory.Resource })
+            ).about;
+            break;
+    }
 
-    version.innerHTML = aboutLanguage.version;
+    const themeObj: Theme = JSON.parse(await readTextFile(await join("../res", "themes.json")))[theme];
+
+    for (const [key, value] of Object.entries(themeObj)) {
+        for (const rule of sheet!.cssRules) {
+            if (key.endsWith("Focused") && rule.selectorText === `.${key}:focus`) {
+                rule.style.setProperty(rule.style[0], value);
+            } else if (key.endsWith("Hovered") && rule.selectorText === `.${key}:hover`) {
+                rule.style.setProperty(rule.style[0], value);
+            } else if (rule.selectorText === `.${key}`) {
+                rule.style.setProperty(rule.style[0], value);
+            }
+        }
+    }
+
+    version.innerHTML = aboutLocalization.version;
     versionNumber.innerHTML = await getVersion();
-    about.innerHTML = aboutLanguage.about;
-    socials.innerHTML = aboutLanguage.socials;
-    vkLink.innerHTML = aboutLanguage.vkLink;
-    tgLink.innerHTML = aboutLanguage.tgLink;
-    githubLink.innerHTML = aboutLanguage.githubLink;
-    license.innerHTML = aboutLanguage.license;
+    about.innerHTML = aboutLocalization.about;
+    socials.innerHTML = aboutLocalization.socials;
+    vkLink.innerHTML = aboutLocalization.vkLink;
+    tgLink.innerHTML = aboutLocalization.tgLink;
+    githubLink.innerHTML = aboutLocalization.githubLink;
+    license.innerHTML = aboutLocalization.license;
 
-    const links: Map<HTMLAnchorElement, string> = new Map([
+    const links = new Map([
         [vkLink, "https://vk.com/stivhuis228"],
         [tgLink, "https://t.me/Arsen1337Curduke"],
         [githubLink, "https://github.com/savannstm/fh-termina-json-writer"],
@@ -58,6 +78,6 @@ window.addEventListener("DOMContentLoaded", async (): Promise<void> => {
     ]);
 
     for (const [id, url] of links) {
-        id.addEventListener("click", async (): Promise<void> => await openLink(url));
+        id.addEventListener("click", async () => await openLink(url));
     }
 });
