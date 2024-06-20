@@ -21,13 +21,12 @@
         "xregexp": "^5.1.1"
     },
     "devDependencies": {
-        "@tauri-apps/cli": "^1",
-        "@types/node": "^20.14.0",
+        "@tauri-apps/cli": "^1.5.14",
+        "@types/pako": "^2.0.3",
         "html-minifier-terser": "^7.2.0",
-        "tailwindcss": "^3.4.3",
-        "terser": "^5.30.4",
-        "typescript": "^5.0.2",
-        "vite": "^5.0.0",
-        "vite-plugin-minify": "^1.5.2"
+        "tailwindcss": "^3.4.4",
+        "terser": "^5.31.1",
+        "typescript": "^5.4.5",
+        "vite": "^5.3.1"
     }
 }
