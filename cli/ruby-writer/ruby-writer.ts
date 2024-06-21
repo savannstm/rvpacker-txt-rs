@@ -78,8 +78,8 @@ program
 
 program
     .command("read")
-    .option(`-i, --inputDir <${localization.inputDirArgType}>`, localization.readInputDirDesc, "./")
-    .option(`-o, --outputDir <${localization.outputDirArgType}>`, localization.readOutputDirDesc, "./")
+    .option(`-i, --input-dir <${localization.inputDirArgType}>`, localization.readInputDirDesc, "./")
+    .option(`-o, --output-dir <${localization.outputDirArgType}>`, localization.readOutputDirDesc, "./")
     .addOption(
         new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
     )
@@ -161,8 +161,8 @@ program
 
 program
     .command("write")
-    .option(`-i, --inputDir <${localization.inputDirArgType}>`, localization.writeInputDirDesc, "./")
-    .option(`-o, --outputDir <${localization.outputDirArgType}>`, localization.writeOutputDirDesc, "./")
+    .option(`-i, --input-dir <${localization.inputDirArgType}>`, localization.writeInputDirDesc, "./")
+    .option(`-o, --output-dir <${localization.outputDirArgType}>`, localization.writeOutputDirDesc, "./")
     .option(`-d, --drunk <${localization.drunkArgType}>`, localization.drunkArgDesc, "0")
     .addOption(
         new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
@@ -203,15 +203,15 @@ program
 
         await mkdir(paths.output, { recursive: true });
 
-        if (!no) {
+        if (!no || !no.includes("maps")) {
             await writeMap(paths.maps, paths.original, paths.output, drunkInt, log, localization.writeLogString);
         }
 
-        if (!no) {
+        if (!no || !no.includes("other")) {
             await writeOther(paths.other, paths.original, paths.output, drunkInt, log, localization.writeLogString);
         }
 
-        if (!no) {
+        if (!no || !no.includes("system")) {
             const systemPaths = [
                 `${paths.original}/System.rvdata2`,
                 `${paths.original}/System.rvdata`,
@@ -235,7 +235,7 @@ program
             }
         }
 
-        if (!no) {
+        if (!no || !no.includes("scripts")) {
             const scriptsPaths = [
                 `${paths.original}/Scripts.rvdata2`,
                 `${paths.original}/Scripts.rvdata`,

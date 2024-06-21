@@ -5,6 +5,12 @@ import { deflate } from "pako";
 import "./shuffle";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 
+/**
+ * Merges sequences of objects with codes 401 and 405 inside list objects.
+ * Merging is perfectly valid, and it's much faster and easier than replacing text in each object in a loop.
+ * @param {RubyObject[]} objArr - list object, which objects with codes 401 and 405 should be merged
+ * @returns {RubyObject[]}
+ */
 function mergeSeq(objArr: RubyObject[]): RubyObject[] {
     let first: null | number = null;
     let number: number = -1;
@@ -15,7 +21,7 @@ function mergeSeq(objArr: RubyObject[]): RubyObject[] {
         const obj = objArr[i];
         const code: number = getValueBySymbolDesc(obj, "@code");
 
-        if (code === 401) {
+        if (code === 401 || code === 405) {
             if (first === null) {
                 first = i;
             }
@@ -43,6 +49,11 @@ function mergeSeq(objArr: RubyObject[]): RubyObject[] {
     return objArr;
 }
 
+/**
+ * Merges lists's objects with codes 401 and 405 in Map files
+ * @param {RubyObject} obj - object, which lists's objects with codes 401 and 405 should be merged
+ * @returns {RubyObject}
+ */
 export function mergeMap(obj: RubyObject): RubyObject {
     const events: RubyObject = getValueBySymbolDesc(obj, "@events");
 
@@ -61,6 +72,11 @@ export function mergeMap(obj: RubyObject): RubyObject {
     return obj;
 }
 
+/**
+ * Merges lists's objects with codes 401 and 405 in Other files
+ * @param {RubyObject} objArr - array of objects, which lists's objects with codes 401 and 405 should be merged
+ * @returns {RubyObject}
+ */
 export function mergeOther(objArr: RubyObject[]): RubyObject[] {
     for (const obj of objArr) {
         if (!obj) {
@@ -86,10 +102,20 @@ export function mergeOther(objArr: RubyObject[]): RubyObject[] {
     return objArr;
 }
 
+/**
+ * Writes .txt files from maps folder back to their initial form
+ * @param {string} mapsPath - path to the maps directory
+ * @param {string} originalPath - path to the original directory
+ * @param {string} outputPath - path to the output directory
+ * @param {number} drunk - drunkness level
+ * @param {boolean} logging - whether to log or not
+ * @param {string} logString - string to log
+ * @returns {Promise<void>}
+ */
 export async function writeMap(
     mapsPath: string,
     originalPath: string,
-    outputDir: string,
+    outputPath: string,
     drunk: number,
     logging: boolean,
     logString: string
@@ -136,6 +162,11 @@ export async function writeMap(
     const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
     const namesTranslationMap = new Map(namesOriginalText.map((string, i) => [string, namesTranslatedText[i]]));
 
+    //401 - dialogue lines
+    //102, 402 - dialogue choices
+    //356 - system lines (special texts)
+    const ALLOWED_CODES: Uint16Array = new Uint16Array([401, 402, 356, 102]);
+
     for (const [filename, obj] of objMap) {
         const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
 
@@ -162,16 +193,16 @@ export async function writeMap(
 
                 for (const item of list || []) {
                     const code: number = getValueBySymbolDesc(item, "@code");
+
+                    if (!ALLOWED_CODES.includes(code)) {
+                        continue;
+                    }
+
                     const parameters: (string | Uint8Array)[] = getValueBySymbolDesc(item, "@parameters");
 
                     for (const [i, parameter] of parameters.entries()) {
                         if (typeof parameter === "string") {
-                            if (
-                                [401, 402, 324].includes(code) ||
-                                (code === 356 &&
-                                    (parameter.startsWith("GabText") ||
-                                        (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
-                            ) {
+                            if (code === 401 || code === 402 || code === 356) {
                                 if (mapsTranslationMap.has(parameter)) {
                                     parameters[i] = mapsTranslationMap.get(parameter)!;
                                     setValueBySymbolDesc(item, "@parameters", parameters);
@@ -180,12 +211,7 @@ export async function writeMap(
                         } else if (parameter instanceof Uint8Array) {
                             const decoded = decoder.decode(parameter);
 
-                            if (
-                                [401, 402, 324].includes(code) ||
-                                (code === 356 &&
-                                    (decoded.startsWith("GabText") ||
-                                        (decoded.startsWith("choice_text") && !decoded.endsWith("????"))))
-                            ) {
+                            if (code === 401 || code === 402 || code === 356) {
                                 if (mapsTranslationMap.has(decoded)) {
                                     parameters[i] = encoder.encode(mapsTranslationMap.get(decoded)!);
                                     setValueBySymbolDesc(item, "@parameters", parameters);
@@ -220,14 +246,24 @@ export async function writeMap(
             }
         }
 
-        await Bun.write(`${outputDir}/${filename}`, dump(obj));
+        await Bun.write(`${outputPath}/${filename}`, dump(obj));
     }
 }
 
+/**
+ * Writes .txt files from other folder back to their initial form.
+ * @param {string} otherPath - path to the other folder
+ * @param {string} originalPath - path to the original folder
+ * @param {string} outputPath - path to the output folder
+ * @param {number} drunk - drunkness level
+ * @param {boolean} logging - whether to log or not
+ * @param {string} logString - string to log
+ * @returns {Promise<void>}
+ */
 export async function writeOther(
-    otherDir: string,
-    originalDir: string,
-    outputDir: string,
+    otherPath: string,
+    originalPath: string,
+    outputPath: string,
     drunk: number,
     logging: boolean,
     logString: string
@@ -236,24 +272,34 @@ export async function writeOther(
     const encoder = new TextEncoder();
 
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
-    const filtered = (await readdir(originalDir)).filter((filename) => re.test(filename));
+    const filtered = (await readdir(originalPath)).filter((filename) => re.test(filename));
 
     const filesData = await Promise.all(
-        filtered.map((filename) => Bun.file(`${originalDir}/${filename}`).arrayBuffer())
+        filtered.map((filename) => Bun.file(`${originalPath}/${filename}`).arrayBuffer())
     );
 
-    const objMap = new Map(filtered.map((filename, i) => [filename, mergeOther(load(filesData[i]) as RubyObject[])]));
+    const objMap = new Map(
+        //Slicing off the first element in array as it is null
+        filtered.map((filename, i) => [
+            filename,
+            mergeOther(load(filesData[i]) as RubyObject[]).slice(1) as RubyObject[],
+        ])
+    );
+
+    //401 - dialogue lines
+    //102, 402 - dialogue choices
+    //356 - system lines (special texts)
+    //405 - credits lines
+    const ALLOWED_CODES = new Uint16Array([401, 402, 405, 356, 102]);
 
     for (const [filename, objArr] of objMap) {
-        const otherOriginalText = (
-            await Bun.file(`${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}.txt`).text()
-        )
+        const processedFilename = filename.slice(0, filename.lastIndexOf(".")).toLowerCase();
+
+        const otherOriginalText = (await Bun.file(`${otherPath}/${processedFilename}.txt`).text())
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
-        let otherTranslatedText = (
-            await Bun.file(`${otherDir}/${filename.slice(0, filename.lastIndexOf("."))}_trans.txt`).text()
-        )
+        let otherTranslatedText = (await Bun.file(`${otherPath}/${processedFilename}_trans.txt`).text())
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
@@ -269,6 +315,8 @@ export async function writeOther(
 
         const translationMap = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
 
+        // Other files except CommonEvents.json and Troops.json have the structure that consists
+        // of name, nickname, description and note
         if (!filename.startsWith("Common") && !filename.startsWith("Troops")) {
             for (const obj of objArr) {
                 if (!obj) {
@@ -285,7 +333,7 @@ export async function writeOther(
                 } else if (name instanceof Uint8Array) {
                     const decoded = decoder.decode(name);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@name", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -295,7 +343,7 @@ export async function writeOther(
                 } else if (nickname instanceof Uint8Array) {
                     const decoded = decoder.decode(nickname);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@nickname", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -305,7 +353,7 @@ export async function writeOther(
                 } else if (description instanceof Uint8Array) {
                     const decoded = decoder.decode(description);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@description", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -315,21 +363,23 @@ export async function writeOther(
                 } else if (note instanceof Uint8Array) {
                     const decoded = decoder.decode(note);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@note", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
             }
         } else {
             for (const obj of objArr.slice(1)) {
+                //CommonEvents doesn't have pages, so we can just check if it's Troops
                 const pages: RubyObject[] = getValueBySymbolDesc(obj, "@pages");
-                const pagesLength = filename == "Troops.rvdata2" ? pages.length : 1;
+                const pagesLength = filename.startsWith("Troops") ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
-                    const list: RubyObject[] =
-                        filename == "Troops.rvdata2"
-                            ? getValueBySymbolDesc(pages[i], "@list")
-                            : getValueBySymbolDesc(obj, "@list");
+                    //If element has pages, then we'll iterate over them
+                    //Otherwise we'll just iterate over the list
+                    const list: RubyObject[] = filename.startsWith("Troops")
+                        ? getValueBySymbolDesc(pages[i], "@list")
+                        : getValueBySymbolDesc(obj, "@list");
 
                     if (!Array.isArray(list)) {
                         continue;
@@ -337,6 +387,11 @@ export async function writeOther(
 
                     for (const item of list) {
                         const code: number = getValueBySymbolDesc(item, "@code");
+
+                        if (!ALLOWED_CODES.includes(code)) {
+                            continue;
+                        }
+
                         const parameters: (string | Uint8Array)[] | (string | Uint8Array)[][] = getValueBySymbolDesc(
                             item,
                             "@parameters"
@@ -344,20 +399,18 @@ export async function writeOther(
 
                         for (const [i, parameter] of parameters.entries()) {
                             if (typeof parameter === "string") {
-                                if ([401, 402, 324, 356].includes(code)) {
+                                if ([401, 402, 405, 356].includes(code)) {
                                     if (translationMap.has(parameter)) {
                                         parameters[i] = translationMap.get(parameter)!;
-
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
                                 }
                             } else if (parameter instanceof Uint8Array) {
                                 const decoded = decoder.decode(parameter);
 
-                                if ([401, 402, 324, 356].includes(code)) {
+                                if ([401, 402, 405, 356].includes(code)) {
                                     if (translationMap.has(decoded)) {
                                         parameters[i] = encoder.encode(translationMap.get(decoded)!);
-
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
                                 }
@@ -366,7 +419,6 @@ export async function writeOther(
                                     if (typeof param === "string") {
                                         if (translationMap.has(param)) {
                                             (parameters[i][j] as string) = translationMap.get(param)!;
-
                                             setValueBySymbolDesc(item, "@parameters", parameters);
                                         }
                                     } else if (param instanceof Uint8Array) {
@@ -376,7 +428,6 @@ export async function writeOther(
                                             (parameters[i][j] as Uint8Array) = encoder.encode(
                                                 translationMap.get(decoded)!
                                             );
-
                                             setValueBySymbolDesc(item, "@parameters", parameters);
                                         }
                                     }
@@ -392,14 +443,26 @@ export async function writeOther(
             console.log(`${logString} ${filename}`);
         }
 
-        await Bun.write(`${outputDir}/${filename}`, dump(objArr));
+        await Bun.write(`${outputPath}/${filename}`, dump(objArr));
     }
 }
 
+/**
+ * Writes system.txt file back to its initial form.
+ *
+ * For inner code documentation, check readSystem function.
+ * @param {string} inputFilePath - path to System.rx/rv/rvdata2 file
+ * @param {string} otherPath - path to other directory
+ * @param {string} outputPath - path to output directory
+ * @param {number} drunk - drunkness level
+ * @param {boolean} logging - whether to log or not
+ * @param {string} logString - string to log
+ * @returns {Promise<void>}
+ */
 export async function writeSystem(
-    inputFile: string,
-    otherDir: string,
-    outputDir: string,
+    inputFilePath: string,
+    otherPath: string,
+    outputPath: string,
     drunk: number,
     logging: boolean,
     logString: string
@@ -407,11 +470,11 @@ export async function writeSystem(
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const obj = load(await Bun.file(inputFile).arrayBuffer()) as RubyObject;
-    const ext = inputFile.split(".").pop()!;
+    const obj = load(await Bun.file(inputFilePath).arrayBuffer()) as RubyObject;
+    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
 
-    const systemOriginalText = (await Bun.file(`${otherDir}/system.txt`).text()).split("\n");
-    let systemTranslatedText = (await Bun.file(`${otherDir}/system_trans.txt`).text()).split("\n");
+    const systemOriginalText = (await Bun.file(`${otherPath}/system.txt`).text()).split("\n");
+    let systemTranslatedText = (await Bun.file(`${otherPath}/system_trans.txt`).text()).split("\n");
 
     if (drunk > 0) {
         systemTranslatedText = systemTranslatedText.shuffle();
@@ -426,12 +489,12 @@ export async function writeSystem(
     const translationMap = new Map(systemOriginalText.map((string, i) => [string, systemTranslatedText[i]]));
 
     if (ext === "rvdata2") {
-        const symbolDescs = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
-        const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDescs.map((desc) =>
+        const symbolDescs = ["@elements", "@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
+        const [elements, skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDescs.map((desc) =>
             getValueBySymbolDesc(obj, desc)
-        ) as [string[], string[], string[], string, RubyObject];
+        ) as [string[], string[], string[], string[], string, RubyObject];
 
-        for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
+        for (const [i, arr] of [elements, skillTypes, weaponTypes, armorTypes].entries()) {
             for (const [j, string] of arr.entries()) {
                 if (string && translationMap.has(string)) {
                     arr[j] = translationMap.get(string)!;
@@ -474,41 +537,68 @@ export async function writeSystem(
         }
     }
 
+    const gameTitle = getValueBySymbolDesc(obj, "@game_title") as Uint8Array | string;
+    if (typeof gameTitle === "string") {
+        if (translationMap.has(gameTitle)) {
+            setValueBySymbolDesc(obj, "@game_title", translationMap.get(gameTitle)!);
+        }
+    } else {
+        const decoded = decoder.decode(gameTitle);
+
+        if (translationMap.has(decoded)) {
+            setValueBySymbolDesc(obj, "@game_title", encoder.encode(translationMap.get(decoded)!));
+        }
+    }
+
     if (logging) {
         console.log(`${logString} System.${ext}`);
     }
 
-    await Bun.write(`${outputDir}/System.${ext}`, dump(obj));
+    await Bun.write(`${outputPath}/System.${ext}`, dump(obj));
 }
 
+/**
+ * Writes system.txt file back to its initial form.
+ *
+ * Does not support drunk, because shuffling the data will produce invalid data.
+ * @param {string} inputFilePath - path to Scripts.rx/rv/rvdata2 file
+ * @param {string} otherPath - path to other directory
+ * @param {string} outputPath - path to output directory
+ * @param {boolean} logging - whether to log or not
+ * @param {string} logString - string to log
+ * @returns {Promise<void>}
+ */
 export async function writeScripts(
-    inputFile: string,
-    otherDir: string,
-    outputDir: string,
+    inputFilePath: string,
+    otherPath: string,
+    outputPath: string,
     logging: boolean,
     logString: string
 ): Promise<void> {
     const decoder = new TextDecoder();
 
-    const scriptsArr = load(await Bun.file(inputFile).arrayBuffer(), {
+    const scriptsArr = load(await Bun.file(inputFilePath).arrayBuffer(), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = inputFile.split(".").pop()!;
+    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
 
-    const translationArr = (await Bun.file(`${otherDir}/scripts_trans.txt`).text()).split("\n");
+    const translationArr = (await Bun.file(`${otherPath}/scripts_trans.txt`).text()).split("\n");
 
     for (let i = 0; i < scriptsArr.length; i++) {
         const magic = scriptsArr[i][0];
         const title = scriptsArr[i][1];
 
+        // Magic number should be encoded as string
         if (magic instanceof Uint8Array) {
             scriptsArr[i][0] = decoder.decode(magic);
         }
 
+        // And title too
         if (title instanceof Uint8Array) {
             scriptsArr[i][1] = decoder.decode(title);
         }
 
+        // Ruby code should be a deflated string
         scriptsArr[i][2] = deflate(translationArr[i].replaceAll("\\#", "\r\n"));
     }
 
@@ -516,5 +606,5 @@ export async function writeScripts(
         console.log(`${logString} Scripts.${ext}`);
     }
 
-    await Bun.write(`${outputDir}/Scripts.${ext}`, dump(scriptsArr));
+    await Bun.write(`${outputPath}/Scripts.${ext}`, dump(scriptsArr));
 }

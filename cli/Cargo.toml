@@ -13,3 +13,4 @@ clap = { version = "4.5.7", features = ["wrap_help"] }
 rand = "0.8.5"
 color-print = "0.3.6"
 fancy-regex = "0.13.0"
+fnv = "1.0.7"

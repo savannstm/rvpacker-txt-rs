@@ -480,8 +480,8 @@ fn main() {
 
             if write_options.2 {
                 write_system(
+                    &paths.original.join("System.json"),
                     &paths.other,
-                    &paths.original,
                     &paths.output,
                     drunk,
                     write_options.4,
