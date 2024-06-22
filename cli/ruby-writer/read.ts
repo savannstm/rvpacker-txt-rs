@@ -230,7 +230,6 @@ export async function readOther(
         }
         //Other files have the structure somewhat similar to Maps.json files
         else {
-            //Skipping first element in array as it is null
             for (const obj of objArr) {
                 //CommonEvents doesn't have pages, so we can just check if it's Troops
                 const pages: RubyObject[] = getValueBySymbolDesc(obj, "@pages");
@@ -347,64 +346,46 @@ export async function readSystem(
 
     const file = Bun.file(inputFilePath);
     const obj = load(await file.arrayBuffer()) as RubyObject;
-    const type = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
+    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
-    // rvdata2 contains elements, skill_types, weapon_types and armor_types arrays, that should be parsed
-    // Along with currency unit string and terms object, that contains game terms and vocabulary
-    if (type === "rvdata2") {
-        const symbolDescs = ["@elements", "@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
 
-        const [elements, skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDescs.map((desc) =>
-            getValueBySymbolDesc(obj, desc)
-        ) as [string[], string[], string[], string[], string, RubyObject];
+    const termsDesc = ext !== "rxdata" ? "@terms" : "@words";
+    const symbolDescs = [
+        "@elements",
+        "@skill_types",
+        "@weapon_types",
+        "@armor_types",
+        "@currency_unit",
+        termsDesc,
+        "@game_title",
+    ];
 
-        for (const arr of [elements, skillTypes, weaponTypes, armorTypes]) {
-            for (const string of arr) {
-                if (string.length > 0) {
-                    lines.add(string);
-                }
-            }
+    // Game damage elements names
+    const elements = getValueBySymbolDesc(obj, symbolDescs[0]) as (string | Uint8Array)[] | undefined;
+    // Game skill types names
+    const skillTypes = getValueBySymbolDesc(obj, symbolDescs[1]) as (string | Uint8Array)[] | undefined;
+    // Game weapon types names
+    const weaponTypes = getValueBySymbolDesc(obj, symbolDescs[2]) as (string | Uint8Array)[] | undefined;
+    // Game armor types names
+    const armorTypes = getValueBySymbolDesc(obj, symbolDescs[3]) as (string | Uint8Array)[] | undefined;
+    // Game currency unit name
+    const currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
+    // Game terms (vocabulary), called "words" in RPG Maker XP
+    const terms = getValueBySymbolDesc(obj, symbolDescs[5]) as RubyObject;
+    // Game title
+    const gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
+
+    for (const arr of [elements, skillTypes, weaponTypes, armorTypes]) {
+        if (!arr) {
+            continue;
         }
 
-        if (currencyUnit.length > 0) {
-            lines.add(currencyUnit);
-        }
-
-        const termsSymbols = Object.getOwnPropertySymbols(terms);
-
-        for (let i = 0; i < termsSymbols.length; i++) {
-            for (const string of terms[termsSymbols[i]] as string[]) {
-                if (string.length > 0) {
-                    lines.add(string);
-                }
-            }
-        }
-    }
-    // Older version contain only terms (words in XP) object
-    else {
-        const symbolsDesc = type === "rvdata" ? "@terms" : "@words";
-
-        const termsObj = getValueBySymbolDesc(obj, symbolsDesc) as RubyObject;
-        const termsSymbols = Object.getOwnPropertySymbols(termsObj);
-
-        for (let i = 0; i < termsSymbols.length; i++) {
-            const value = termsObj[termsSymbols[i]];
-
-            if (value instanceof Uint8Array) {
-                const decoded = decoder.decode(value);
-
-                if (decoded.length > 0) {
-                    lines.add(decoded);
-                }
-            }
-        }
-
-        const elements = getValueBySymbolDesc(obj, "@elements") as Uint8Array[];
-
-        for (const element of elements) {
-            if (element instanceof Uint8Array) {
-                const decoded = decoder.decode(element);
+        for (const string of arr) {
+            if (typeof string === "string" && string.length > 0) {
+                lines.add(string);
+            } else if (string instanceof Uint8Array) {
+                const decoded = decoder.decode(string);
 
                 if (decoded.length > 0) {
                     lines.add(decoded);
@@ -413,13 +394,40 @@ export async function readSystem(
         }
     }
 
-    // Every engine has game title string, that should be parsed
-    const gameTitle = getValueBySymbolDesc(obj, "@game_title") as Uint8Array | string;
-    if (typeof gameTitle === "string") {
-        if (gameTitle.length > 0) {
-            lines.add(gameTitle);
+    if (typeof currencyUnit === "string" && currencyUnit.length > 0) {
+        lines.add(currencyUnit);
+    } else if (currencyUnit instanceof Uint8Array) {
+        const decoded = decoder.decode(currencyUnit);
+
+        if (decoded.length > 0) {
+            lines.add(decoded);
         }
-    } else {
+    }
+
+    const termsSymbols = Object.getOwnPropertySymbols(terms);
+
+    for (let i = 0; i < termsSymbols.length; i++) {
+        const value = terms[termsSymbols[i]] as Uint8Array | string[];
+
+        if (value instanceof Uint8Array) {
+            const decoded = decoder.decode(value);
+
+            if (decoded.length > 0) {
+                lines.add(decoded);
+            }
+            continue;
+        }
+
+        for (const string of value) {
+            if (string.length > 0) {
+                lines.add(string as string);
+            }
+        }
+    }
+
+    if (typeof gameTitle === "string" && gameTitle.length > 0) {
+        lines.add(gameTitle);
+    } else if (gameTitle instanceof Uint8Array) {
         const decoded = decoder.decode(gameTitle);
 
         if (decoded.length > 0) {

@@ -390,9 +390,9 @@ pub fn write_other(
                     .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
-            let mut rng: ThreadRng = thread_rng();
-
             if drunk > 0 {
+                let mut rng: ThreadRng = thread_rng();
+
                 other_translated_text.shuffle(&mut rng);
 
                 if drunk == 2 {
@@ -719,20 +719,21 @@ pub fn write_system(
 
 /// Writes plugins.txt file back to its initial form.
 /// # Parameters
-/// * `plugins_path` - path to the original plugins file
+/// * `plugins_file_path` - path to the original plugins file
+/// * `plugins_path` - path to the plugins directory
 /// * `output_path` - path to the output directory
 /// * `drunk` - drunkness level
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
 pub fn write_plugins(
+    pluigns_file_path: &Path,
     plugins_path: &Path,
     output_path: &Path,
     drunk: u8,
     logging: bool,
     log_string: &str,
 ) {
-    let mut obj_arr: Vec<Value> =
-        from_str(&read_to_string(plugins_path.join("plugins.json")).unwrap()).unwrap();
+    let mut obj_arr: Vec<Value> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
     let plugins_original_text_vec: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))
         .unwrap()

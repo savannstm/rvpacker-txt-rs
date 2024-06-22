@@ -1,9 +1,16 @@
 import { dump, load } from "@hyrious/marshal";
 import { deflate } from "pako";
-import { readTextFile, readBinaryFile, writeBinaryFile, readDir } from "@tauri-apps/api/fs";
 
+import "./shuffle";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
+import { readBinaryFile, readDir, readTextFile, writeBinaryFile } from "@tauri-apps/api/fs";
 
+/**
+ * Merges sequences of objects with codes 401 and 405 inside list objects.
+ * Merging is perfectly valid, and it's much faster and easier than replacing text in each object in a loop.
+ * @param {RubyObject[]} objArr - list object, which objects with codes 401 and 405 should be merged
+ * @returns {RubyObject[]}
+ */
 function mergeSeq(objArr: RubyObject[]): RubyObject[] {
     let first: null | number = null;
     let number: number = -1;
@@ -14,7 +21,7 @@ function mergeSeq(objArr: RubyObject[]): RubyObject[] {
         const obj = objArr[i];
         const code: number = getValueBySymbolDesc(obj, "@code");
 
-        if (code === 401) {
+        if (code === 401 || code === 405) {
             if (first === null) {
                 first = i;
             }
@@ -42,6 +49,11 @@ function mergeSeq(objArr: RubyObject[]): RubyObject[] {
     return objArr;
 }
 
+/**
+ * Merges lists's objects with codes 401 and 405 in Map files
+ * @param {RubyObject} obj - object, which lists's objects with codes 401 and 405 should be merged
+ * @returns {RubyObject}
+ */
 export function mergeMap(obj: RubyObject): RubyObject {
     const events: RubyObject = getValueBySymbolDesc(obj, "@events");
 
@@ -60,6 +72,11 @@ export function mergeMap(obj: RubyObject): RubyObject {
     return obj;
 }
 
+/**
+ * Merges lists's objects with codes 401 and 405 in Other files
+ * @param {RubyObject} objArr - array of objects, which lists's objects with codes 401 and 405 should be merged
+ * @returns {RubyObject}
+ */
 export function mergeOther(objArr: RubyObject[]): RubyObject[] {
     for (const obj of objArr) {
         if (!obj) {
@@ -85,16 +102,23 @@ export function mergeOther(objArr: RubyObject[]): RubyObject[] {
     return objArr;
 }
 
-export async function writeMap(originalPath: string, mapsPath: string, outputPath: string): Promise<void> {
+/**
+ * Writes .txt files from maps folder back to their initial form
+ * @param {string} mapsPath - path to the maps directory
+ * @param {string} originalPath - path to the original directory
+ * @param {string} outputPath - path to the output directory
+ * @returns {Promise<void>}
+ */
+export async function writeMap(mapsPath: string, originalPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
-    const files = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
+    const filtered = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
 
-    const filesData = await Promise.all(files.map((filename) => readBinaryFile(filename.path)));
+    const filesData = await Promise.all(filtered.map((filename) => readBinaryFile(filename.path)));
 
-    const objMap = new Map(files.map((filename, i) => [filename.name!, mergeMap(load(filesData[i]) as RubyObject)]));
+    const objMap = new Map(filtered.map((filename, i) => [filename.name!, mergeMap(load(filesData[i]) as RubyObject)]));
 
     const mapsOriginalText = (await readTextFile(`${mapsPath}/maps.txt`))
         .split("\n")
@@ -115,6 +139,11 @@ export async function writeMap(originalPath: string, mapsPath: string, outputPat
     const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
     const namesTranslationMap = new Map(namesOriginalText.map((string, i) => [string, namesTranslatedText[i]]));
 
+    //401 - dialogue lines
+    //102, 402 - dialogue choices
+    //356 - system lines (special texts)
+    const allowedCodes: Uint16Array = new Uint16Array([401, 402, 356, 102]);
+
     for (const [filename, obj] of objMap) {
         const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
 
@@ -133,7 +162,7 @@ export async function writeMap(originalPath: string, mapsPath: string, outputPat
         for (const event of Object.values(events || {})) {
             const pages: RubyObject[] = getValueBySymbolDesc(event, "@pages");
             if (!pages) {
-                return;
+                continue;
             }
 
             for (const page of pages) {
@@ -141,36 +170,29 @@ export async function writeMap(originalPath: string, mapsPath: string, outputPat
 
                 for (const item of list || []) {
                     const code: number = getValueBySymbolDesc(item, "@code");
+
+                    if (!allowedCodes.includes(code)) {
+                        continue;
+                    }
+
                     const parameters: (string | Uint8Array)[] = getValueBySymbolDesc(item, "@parameters");
 
                     for (const [i, parameter] of parameters.entries()) {
-                        if (typeof parameter === "string") {
-                            if (
-                                [401, 402, 324].includes(code) ||
-                                (code === 356 &&
-                                    (parameter.startsWith("GabText") ||
-                                        (parameter.startsWith("choice_text") && !parameter.endsWith("????"))))
-                            ) {
+                        if ([401, 402, 356].includes(code)) {
+                            if (typeof parameter === "string") {
                                 if (mapsTranslationMap.has(parameter)) {
                                     parameters[i] = mapsTranslationMap.get(parameter)!;
                                     setValueBySymbolDesc(item, "@parameters", parameters);
                                 }
-                            }
-                        } else if (parameter instanceof Uint8Array) {
-                            const decoded = decoder.decode(parameter);
+                            } else if (parameter instanceof Uint8Array) {
+                                const decoded = decoder.decode(parameter);
 
-                            if (
-                                [401, 402, 324].includes(code) ||
-                                (code === 356 &&
-                                    (decoded.startsWith("GabText") ||
-                                        (decoded.startsWith("choice_text") && !decoded.endsWith("????"))))
-                            ) {
                                 if (mapsTranslationMap.has(decoded)) {
                                     parameters[i] = encoder.encode(mapsTranslationMap.get(decoded)!);
                                     setValueBySymbolDesc(item, "@parameters", parameters);
                                 }
                             }
-                        } else if (code == 102 && Array.isArray(parameter)) {
+                        } else if (code === 102 && Array.isArray(parameter)) {
                             for (const [j, param] of (parameter as (string | Uint8Array)[]).entries()) {
                                 if (typeof param === "string") {
                                     if (mapsTranslationMap.has(param)) {
@@ -199,32 +221,48 @@ export async function writeMap(originalPath: string, mapsPath: string, outputPat
     }
 }
 
-export async function writeOther(originalPath: string, otherPath: string, outputPath: string): Promise<void> {
+/**
+ * Writes .txt files from other folder back to their initial form.
+ * @param {string} otherPath - path to the other folder
+ * @param {string} originalPath - path to the original folder
+ * @param {string} outputPath - path to the output folder
+ * @returns {Promise<void>}
+ */
+export async function writeOther(otherPath: string, originalPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
-    const filenames = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
+    const filtered = (await readDir(originalPath)).filter((filename) => re.test(filename.name!));
 
-    const filesData = await Promise.all(filenames.map((filename) => readBinaryFile(filename.path)));
+    const filesData = await Promise.all(filtered.map((filename) => readBinaryFile(filename.path)));
 
     const objMap = new Map(
-        filenames.map((filename, i) => [filename.name!, mergeOther(load(filesData[i]) as RubyObject[])])
+        //Slicing off the first element in array as it is null
+        filtered.map((filename, i) => [filename.name!, mergeOther(load(filesData[i]) as RubyObject[]).slice(1)])
     );
 
-    for (const [filename, objArr] of objMap) {
-        const processed_filename = filename.slice(0, filename.lastIndexOf(".")).toLowerCase();
+    //401 - dialogue lines
+    //102, 402 - dialogue choices
+    //356 - system lines (special texts)
+    //405 - credits lines
+    const allowedCodes = new Uint16Array([401, 402, 405, 356, 102]);
 
-        const otherOriginalText = (await readTextFile(`${otherPath}/${processed_filename}.txt`))
+    for (const [filename, objArr] of objMap) {
+        const processedFilename = filename.slice(0, filename.lastIndexOf(".")).toLowerCase();
+
+        const otherOriginalText = (await readTextFile(`${otherPath}/${processedFilename}.txt`))
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
-        let otherTranslatedText = (await readTextFile(`${otherPath}/${processed_filename}_trans.txt`))
+        let otherTranslatedText = (await readTextFile(`${otherPath}/${processedFilename}_trans.txt`))
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
         const translationMap = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
 
+        // Other files except CommonEvents.json and Troops.json have the structure that consists
+        // of name, nickname, description and note
         if (!filename.startsWith("Common") && !filename.startsWith("Troops")) {
             for (const obj of objArr) {
                 if (!obj) {
@@ -241,7 +279,7 @@ export async function writeOther(originalPath: string, otherPath: string, output
                 } else if (name instanceof Uint8Array) {
                     const decoded = decoder.decode(name);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@name", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -251,7 +289,7 @@ export async function writeOther(originalPath: string, otherPath: string, output
                 } else if (nickname instanceof Uint8Array) {
                     const decoded = decoder.decode(nickname);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@nickname", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -261,7 +299,7 @@ export async function writeOther(originalPath: string, otherPath: string, output
                 } else if (description instanceof Uint8Array) {
                     const decoded = decoder.decode(description);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@description", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
@@ -271,21 +309,23 @@ export async function writeOther(originalPath: string, otherPath: string, output
                 } else if (note instanceof Uint8Array) {
                     const decoded = decoder.decode(note);
 
-                    if (decoded && translationMap.has(decoded)) {
+                    if (translationMap.has(decoded)) {
                         setValueBySymbolDesc(obj, "@note", encoder.encode(translationMap.get(decoded)!));
                     }
                 }
             }
         } else {
-            for (const obj of objArr.slice(1)) {
+            for (const obj of objArr) {
+                //CommonEvents doesn't have pages, so we can just check if it's Troops
                 const pages: RubyObject[] = getValueBySymbolDesc(obj, "@pages");
-                const pagesLength = filename == "Troops.rvdata2" ? pages.length : 1;
+                const pagesLength = filename.startsWith("Troops") ? pages.length : 1;
 
                 for (let i = 0; i < pagesLength; i++) {
-                    const list: RubyObject[] =
-                        filename == "Troops.rvdata2"
-                            ? getValueBySymbolDesc(pages[i], "@list")
-                            : getValueBySymbolDesc(obj, "@list");
+                    //If it's Troops, we'll iterate over the pages
+                    //Otherwise we'll just iterate over the list
+                    const list: RubyObject[] = filename.startsWith("Troops")
+                        ? getValueBySymbolDesc(pages[i], "@list")
+                        : getValueBySymbolDesc(obj, "@list");
 
                     if (!Array.isArray(list)) {
                         continue;
@@ -293,27 +333,28 @@ export async function writeOther(originalPath: string, otherPath: string, output
 
                     for (const item of list) {
                         const code: number = getValueBySymbolDesc(item, "@code");
+
+                        if (!allowedCodes.includes(code)) {
+                            continue;
+                        }
+
                         const parameters: (string | Uint8Array)[] | (string | Uint8Array)[][] = getValueBySymbolDesc(
                             item,
                             "@parameters"
                         );
 
                         for (const [i, parameter] of parameters.entries()) {
-                            if (typeof parameter === "string") {
-                                if ([401, 402, 324, 356].includes(code)) {
+                            if ([401, 402, 405, 356].includes(code)) {
+                                if (typeof parameter === "string") {
                                     if (translationMap.has(parameter)) {
                                         parameters[i] = translationMap.get(parameter)!;
-
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
-                                }
-                            } else if (parameter instanceof Uint8Array) {
-                                const decoded = decoder.decode(parameter);
+                                } else if (parameter instanceof Uint8Array) {
+                                    const decoded = decoder.decode(parameter);
 
-                                if ([401, 402, 324, 356].includes(code)) {
                                     if (translationMap.has(decoded)) {
                                         parameters[i] = encoder.encode(translationMap.get(decoded)!);
-
                                         setValueBySymbolDesc(item, "@parameters", parameters);
                                     }
                                 }
@@ -322,7 +363,6 @@ export async function writeOther(originalPath: string, otherPath: string, output
                                     if (typeof param === "string") {
                                         if (translationMap.has(param)) {
                                             (parameters[i][j] as string) = translationMap.get(param)!;
-
                                             setValueBySymbolDesc(item, "@parameters", parameters);
                                         }
                                     } else if (param instanceof Uint8Array) {
@@ -332,7 +372,6 @@ export async function writeOther(originalPath: string, otherPath: string, output
                                             (parameters[i][j] as Uint8Array) = encoder.encode(
                                                 translationMap.get(decoded)!
                                             );
-
                                             setValueBySymbolDesc(item, "@parameters", parameters);
                                         }
                                     }
@@ -348,77 +387,131 @@ export async function writeOther(originalPath: string, otherPath: string, output
     }
 }
 
-export async function writeSystem(systemPath: string, otherPath: string, outputPath: string): Promise<void> {
+/**
+ * Writes system.txt file back to its initial form.
+ *
+ * For inner code documentation, check readSystem function.
+ * @param {string} inputFilePath - path to System.rx/rv/rvdata2 file
+ * @param {string} otherPath - path to other directory
+ * @param {string} outputPath - path to output directory
+ * @returns {Promise<void>}
+ */
+export async function writeSystem(inputFilePath: string, otherPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
 
-    const obj = load(await readBinaryFile(systemPath)) as RubyObject;
-    const ext = systemPath.split(".").pop()!;
+    const obj = load(await readBinaryFile(inputFilePath)) as RubyObject;
+    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
 
     const systemOriginalText = (await readTextFile(`${otherPath}/system.txt`)).split("\n");
     let systemTranslatedText = (await readTextFile(`${otherPath}/system_trans.txt`)).split("\n");
 
     const translationMap = new Map(systemOriginalText.map((string, i) => [string, systemTranslatedText[i]]));
 
-    if (ext === "rvdata2") {
-        const symbolDescs = ["@skill_types", "@weapon_types", "@armor_types", "@currency_unit", "@terms"];
-        const [skillTypes, weaponTypes, armorTypes, currencyUnit, terms] = symbolDescs.map((desc) =>
-            getValueBySymbolDesc(obj, desc)
-        ) as [string[], string[], string[], string, RubyObject];
+    const termsDesc = ext !== "rxdata" ? "@terms" : "@words";
+    const symbolDescs = [
+        "@elements",
+        "@skill_types",
+        "@weapon_types",
+        "@armor_types",
+        "@currency_unit",
+        termsDesc,
+        "@game_title",
+    ];
 
-        for (const [i, arr] of [skillTypes, weaponTypes, armorTypes].entries()) {
-            for (const [j, string] of arr.entries()) {
-                if (string && translationMap.has(string)) {
-                    arr[j] = translationMap.get(string)!;
+    const elements = getValueBySymbolDesc(obj, symbolDescs[0]) as (string | Uint8Array)[] | undefined;
+    const skillTypes = getValueBySymbolDesc(obj, symbolDescs[1]) as (string | Uint8Array)[] | undefined;
+    const weaponTypes = getValueBySymbolDesc(obj, symbolDescs[2]) as (string | Uint8Array)[] | undefined;
+    const armorTypes = getValueBySymbolDesc(obj, symbolDescs[3]) as (string | Uint8Array)[] | undefined;
+    const currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
+    const terms = getValueBySymbolDesc(obj, symbolDescs[5]) as RubyObject;
+    const gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
 
+    for (const [i, arr] of [elements, skillTypes, weaponTypes, armorTypes].entries()) {
+        if (!arr) {
+            continue;
+        }
+
+        for (const [j, string] of arr.entries()) {
+            if (typeof string === "string" && translationMap.has(string)) {
+                arr[j] = translationMap.get(string)!;
+                setValueBySymbolDesc(obj, symbolDescs[i], arr);
+            } else if (string instanceof Uint8Array) {
+                const decoded = decoder.decode(string);
+
+                if (translationMap.has(decoded)) {
+                    arr[j] = encoder.encode(translationMap.get(decoded)!);
                     setValueBySymbolDesc(obj, symbolDescs[i], arr);
                 }
             }
         }
+    }
 
-        setValueBySymbolDesc(obj, currencyUnit, translationMap.get(currencyUnit));
+    if (typeof currencyUnit === "string" && translationMap.has(currencyUnit)) {
+        setValueBySymbolDesc(obj, symbolDescs[4], translationMap.get(currencyUnit));
+    } else if (currencyUnit instanceof Uint8Array) {
+        const decoded = decoder.decode(currencyUnit);
 
-        const termsSymbols = Object.getOwnPropertySymbols(terms);
-        const termsValues: string[][] = termsSymbols.map((symbol) => terms[symbol]);
-
-        for (let i = 0; i < termsSymbols.length; i++) {
-            for (const [j, termValue] of termsValues.entries()) {
-                if (translationMap.has(termValue[j])) {
-                    termValue[j] = translationMap.get(termValue[j])!;
-                }
-
-                setValueBySymbolDesc(terms, termsSymbols[i].description!, termValue);
-            }
+        if (translationMap.has(decoded)) {
+            setValueBySymbolDesc(obj, symbolDescs[4], encoder.encode(translationMap.get(decoded)));
         }
-    } else {
-        const symbolsDesc = ext === "rvdata" ? "@terms" : "@words";
+    }
 
-        const termsObj = getValueBySymbolDesc(obj, symbolsDesc) as RubyObject;
-        const termsSymbols = Object.getOwnPropertySymbols(termsObj);
+    const termsSymbols = Object.getOwnPropertySymbols(terms);
+    const termsValues: string[][] = termsSymbols.map((symbol) => terms[symbol]);
 
-        for (let i = 0; i < termsSymbols.length; i++) {
-            const value = termsObj[termsSymbols[i]] as Uint8Array;
+    for (let i = 0; i < termsSymbols.length; i++) {
+        const value = terms[termsSymbols[i]] as Uint8Array | string[];
 
-            if (value instanceof Uint8Array) {
-                const decoded = decoder.decode(value);
+        if (value instanceof Uint8Array) {
+            const decoded = decoder.decode(value);
 
-                if (translationMap.has(decoded)) {
-                    termsObj[termsSymbols[i]] = encoder.encode(translationMap.get(decoded)!);
-                }
+            if (translationMap.has(decoded)) {
+                terms[termsSymbols[i]] = encoder.encode(translationMap.get(decoded)!);
             }
+            continue;
+        }
+
+        for (const [j, termValue] of termsValues.entries()) {
+            if (translationMap.has(termValue[j])) {
+                termValue[j] = translationMap.get(termValue[j])!;
+            }
+
+            setValueBySymbolDesc(terms, termsSymbols[i].description!, termValue);
+        }
+    }
+
+    if (typeof gameTitle === "string") {
+        if (translationMap.has(gameTitle)) {
+            setValueBySymbolDesc(obj, "@game_title", translationMap.get(gameTitle)!);
+        }
+    } else if (gameTitle instanceof Uint8Array) {
+        const decoded = decoder.decode(gameTitle);
+
+        if (translationMap.has(decoded)) {
+            setValueBySymbolDesc(obj, "@game_title", encoder.encode(translationMap.get(decoded)!));
         }
     }
 
     await writeBinaryFile(`${outputPath}/System.${ext}`, dump(obj));
 }
 
-export async function writeScripts(scriptsPath: string, otherPath: string, outputPath: string): Promise<void> {
+/**
+ * Writes system.txt file back to its initial form.
+ *
+ * Does not support drunk, because shuffling the data will produce invalid data.
+ * @param {string} inputFilePath - path to Scripts.rx/rv/rvdata2 file
+ * @param {string} otherPath - path to other directory
+ * @param {string} outputPath - path to output directory
+ * @returns {Promise<void>}
+ */
+export async function writeScripts(inputFilePath: string, otherPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
 
-    const scriptsArr = load(await readBinaryFile(scriptsPath), {
+    const scriptsArr = load(await readBinaryFile(inputFilePath), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = scriptsPath.split(".").pop()!;
+    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
 
     const translationArr = (await readTextFile(`${otherPath}/scripts_trans.txt`)).split("\n");
 
@@ -426,14 +519,17 @@ export async function writeScripts(scriptsPath: string, otherPath: string, outpu
         const magic = scriptsArr[i][0];
         const title = scriptsArr[i][1];
 
+        // Magic number should be encoded as string
         if (magic instanceof Uint8Array) {
             scriptsArr[i][0] = decoder.decode(magic);
         }
 
+        // And title too
         if (title instanceof Uint8Array) {
             scriptsArr[i][1] = decoder.decode(title);
         }
 
+        // Ruby code should be a deflated string
         scriptsArr[i][2] = deflate(translationArr[i].replaceAll("\\#", "\r\n"));
     }
 

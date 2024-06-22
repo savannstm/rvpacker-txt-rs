@@ -491,6 +491,7 @@ fn main() {
 
             if write_options.3 {
                 write_plugins(
+                    &paths.plugins.join("plugins.json"),
                     &paths.plugins,
                     &paths.plugins_output,
                     drunk,

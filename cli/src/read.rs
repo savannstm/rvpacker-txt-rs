@@ -402,7 +402,7 @@ pub fn read_system(input_path: &Path, output_path: &Path, logging: bool, log_str
     // Weapon types names
     // Normally it's system strings, but might be needed for some purposes
     for string in obj["weaponTypes"].as_array().unwrap() {
-        let slice_ref = string.as_str().unwrap();
+        let slice_ref: &str = string.as_str().unwrap();
 
         if !slice_ref.is_empty() {
             lines.insert(slice_ref.to_string());

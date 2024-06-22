@@ -55,8 +55,16 @@ fn main() {
 
                     write_maps(&paths.maps, &paths.original, &paths.output);
                     write_other(&paths.other, &paths.original, &paths.output);
-                    write_system(&paths.other, &paths.original, &paths.output);
-                    write_plugins(&paths.plugins, &paths.plugins_output);
+                    write_system(
+                        &paths.other.join("System.json"),
+                        &paths.other,
+                        &paths.output,
+                    );
+                    write_plugins(
+                        &paths.plugins.join("Plugins.json"),
+                        &paths.plugins,
+                        &paths.plugins_output,
+                    );
 
                     main_window.emit("compile-finished", "").unwrap();
                 });

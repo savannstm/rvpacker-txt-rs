@@ -8,10 +8,14 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub fn read_map(original_path: &Path, output_path: &Path) {
-    let re: Regex = Regex::new(r"^Map[0-9].*.json$").unwrap();
+/// Reads all Map .json files of input_path and parses them into .txt files in output_path.
+/// # Parameters
+/// * `input_path` - path to directory than contains .json files
+/// * `output_path` - path to output directory
+pub fn read_map(input_path: &Path, output_path: &Path) {
+    let re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
-    let files: Vec<DirEntry> = read_dir(original_path)
+    let files: Vec<DirEntry> = read_dir(input_path)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| {
@@ -20,7 +24,7 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
         })
         .collect();
 
-    let maps_obj_map: Vec<Value> = files
+    let maps_arr: Vec<Value> = files
         .iter()
         .map(|entry: &DirEntry| from_str(&read_to_string(entry.path()).unwrap()).unwrap())
         .collect();
@@ -28,13 +32,14 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
     let mut lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
     let mut names_lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
 
-    for obj in maps_obj_map {
+    for obj in maps_arr {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
                 names_lines.insert(display_name.to_string());
             }
         }
 
+        //Skipping first element in array as it is null
         for event in obj["events"].as_array().unwrap().iter().skip(1) {
             if !event["pages"].is_array() {
                 continue;
@@ -45,6 +50,9 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
                 let mut line: Vec<String> = Vec::new();
 
                 for list in page["list"].as_array().unwrap() {
+                    //401 - dialogue lines
+                    //102 - dialogue choices
+                    //356 - system lines (special texts)
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                     for parameter_value in list["parameters"].as_array().unwrap() {
@@ -53,7 +61,10 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
 
                             if parameter_value.is_string() {
                                 let parameter: &str = parameter_value.as_str().unwrap();
-                                line.push(parameter.to_string());
+
+                                if !parameter.is_empty() {
+                                    line.push(parameter.to_string());
+                                }
                             }
                         } else {
                             if in_seq {
@@ -68,7 +79,10 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
                                         for param_value in parameter_value.as_array().unwrap() {
                                             if param_value.is_string() {
                                                 let param: &str = param_value.as_str().unwrap();
-                                                lines.insert(param.to_string());
+
+                                                if !param.is_empty() {
+                                                    lines.insert(param.to_string());
+                                                }
                                             }
                                         }
                                     }
@@ -78,10 +92,7 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
                                     if parameter_value.is_string() {
                                         let parameter: &str = parameter_value.as_str().unwrap();
 
-                                        if parameter.starts_with("GabText")
-                                            && (parameter.starts_with("choice_text")
-                                                && !parameter.ends_with("????"))
-                                        {
+                                        if !parameter.is_empty() {
                                             lines.insert(parameter.to_string());
                                         }
                                     }
@@ -125,10 +136,14 @@ pub fn read_map(original_path: &Path, output_path: &Path) {
     .unwrap();
 }
 
-pub fn read_other(original_path: &Path, output_path: &Path) {
+/// Reads all Other .json files of input_path and parses them into .txt files in output_path.
+/// # Parameters
+/// * `input_path` - path to directory than contains .json files
+/// * `output_path` - path to output directory
+pub fn read_other(input_path: &Path, output_path: &Path) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
 
-    let files: Vec<DirEntry> = read_dir(original_path)
+    let files: Vec<DirEntry> = read_dir(input_path)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| {
@@ -151,6 +166,8 @@ pub fn read_other(original_path: &Path, output_path: &Path) {
         let processed_filename: String = filename[0..filename.rfind('.').unwrap()].to_lowercase();
         let mut lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
 
+        // Other files except CommonEvents.json and Troops.json have the structure that consists
+        // of name, nickname, description and note
         if !filename.starts_with("Common") && !filename.starts_with("Troops") {
             for obj in obj_arr {
                 if obj["name"].is_string() {
@@ -169,6 +186,14 @@ pub fn read_other(original_path: &Path, output_path: &Path) {
                     }
                 }
 
+                if obj["nickname"].is_string() {
+                    let nickname: &str = obj["nickname"].as_str().unwrap();
+
+                    if !nickname.is_empty() {
+                        lines.insert(nickname.to_string());
+                    }
+                }
+
                 if obj["note"].is_string() {
                     let note: &str = obj["note"].as_str().unwrap();
 
@@ -177,85 +202,84 @@ pub fn read_other(original_path: &Path, output_path: &Path) {
                     }
                 }
             }
-
-            write(
-                output_path.join(format!("{processed_filename}.txt",)),
-                lines.iter().cloned().collect::<Vec<String>>().join("\n"),
-            )
-            .unwrap();
-            write(
-                output_path.join(format!("{processed_filename}_trans.txt",)),
-                "\n".repeat(lines.len() - 1),
-            )
-            .unwrap();
-            continue;
         }
-
-        for obj in obj_arr.iter().skip(1) {
-            let pages_length: usize = if filename.starts_with("Troops") {
-                obj["pages"].as_array().unwrap().len()
-            } else {
-                1
-            };
-
-            for i in 0..pages_length {
-                let list: &Value = if pages_length != 1 {
-                    &obj["pages"][i]["list"]
+        //Other files have the structure somewhat similar to Maps.json files
+        else {
+            //Skipping first element in array as it is null
+            for obj in obj_arr.iter().skip(1) {
+                //CommonEvents doesn't have pages, so we can just check if it's Troops
+                let pages_length: usize = if filename.starts_with("Troops") {
+                    obj["pages"].as_array().unwrap().len()
                 } else {
-                    &obj["list"]
+                    1
                 };
 
-                if !list.is_array() {
-                    continue;
-                }
+                for i in 0..pages_length {
+                    let list: &Value = if pages_length != 1 {
+                        &obj["pages"][i]["list"]
+                    } else {
+                        &obj["list"]
+                    };
 
-                let mut in_seq: bool = false;
-                let mut line: Vec<String> = Vec::new();
+                    if !list.is_array() {
+                        continue;
+                    }
 
-                for list in list.as_array().unwrap() {
-                    let code: u16 = list["code"].as_u64().unwrap() as u16;
+                    let mut in_seq: bool = false;
+                    let mut line: Vec<String> = Vec::with_capacity(256);
 
-                    for parameter_value in list["parameters"].as_array().unwrap() {
-                        if code == 401 || code == 405 {
-                            in_seq = true;
+                    for list in list.as_array().unwrap() {
+                        //401 - dialogue lines
+                        //102 - dialogue choices
+                        //356 - system lines (special texts)
+                        //405 - credits lines
+                        let code: u16 = list["code"].as_u64().unwrap() as u16;
 
-                            if parameter_value.is_string() {
-                                let parameter: &str = parameter_value.as_str().unwrap();
-                                line.push(parameter.to_string());
-                            }
-                        } else {
-                            if in_seq {
-                                lines.insert(line.join(r"\#"));
-                                line.clear();
-                                in_seq = false;
-                            }
+                        for parameter_value in list["parameters"].as_array().unwrap() {
+                            if code == 401 || code == 405 {
+                                in_seq = true;
 
-                            match code {
-                                102 => {
-                                    if parameter_value.is_array() {
-                                        for param_value in parameter_value.as_array().unwrap() {
-                                            if param_value.is_string() {
-                                                let param: &str = param_value.as_str().unwrap();
-                                                lines.insert(param.to_string());
+                                if parameter_value.is_string() {
+                                    let parameter: &str = parameter_value.as_str().unwrap();
+
+                                    if !parameter.is_empty() {
+                                        line.push(parameter.to_string());
+                                    }
+                                }
+                            } else {
+                                if in_seq {
+                                    lines.insert(line.join(r"\#"));
+                                    line.clear();
+                                    in_seq = false;
+                                }
+
+                                match code {
+                                    102 => {
+                                        if parameter_value.is_array() {
+                                            for param_value in parameter_value.as_array().unwrap() {
+                                                if param_value.is_string() {
+                                                    let param: &str = param_value.as_str().unwrap();
+
+                                                    if !param.is_empty() {
+                                                        lines.insert(param.to_string());
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                356 => {
-                                    if parameter_value.is_string() {
-                                        let parameter: &str = parameter_value.as_str().unwrap();
+                                    356 => {
+                                        if parameter_value.is_string() {
+                                            let parameter: &str = parameter_value.as_str().unwrap();
 
-                                        if parameter.starts_with("GabText")
-                                            && (parameter.starts_with("choice_text")
-                                                && !parameter.ends_with("????"))
-                                        {
-                                            lines.insert(parameter.to_string());
+                                            if !parameter.is_empty() {
+                                                lines.insert(parameter.to_string());
+                                            }
                                         }
                                     }
-                                }
 
-                                _ => {}
+                                    _ => {}
+                                }
                             }
                         }
                     }
@@ -268,7 +292,6 @@ pub fn read_other(original_path: &Path, output_path: &Path) {
             lines.iter().cloned().collect::<Vec<String>>().join("\n"),
         )
         .unwrap();
-
         write(
             output_path.join(format!("{processed_filename}_trans.txt")),
             "\n".repeat(lines.len() - 1),
@@ -277,58 +300,93 @@ pub fn read_other(original_path: &Path, output_path: &Path) {
     }
 }
 
-pub fn read_system(original_path: &Path, output_path: &Path) {
-    let system_file: PathBuf = original_path.join("System.json");
+/// Reads System .json file of input_path and parses it into .txt file in output_path.
+/// # Parameters
+/// * `input_path` - path to directory than contains .json files
+/// * `output_path` - path to output directory
+pub fn read_system(input_path: &Path, output_path: &Path) {
+    let system_file: PathBuf = input_path.join("System.json");
 
     let obj: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
 
     let mut lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
 
+    // Armor types names
+    // Normally it's system strings, but might be needed for some purposes
+    for string in obj["armorTypes"].as_array().unwrap() {
+        let slice_ref: &str = string.as_str().unwrap();
+
+        if !slice_ref.is_empty() {
+            lines.insert(slice_ref.to_string());
+        }
+    }
+
+    // Element types names
+    // Normally it's system strings, but might be needed for some purposes
+    for string in obj["elements"].as_array().unwrap() {
+        let slice_ref: &str = string.as_str().unwrap();
+
+        if !slice_ref.is_empty() {
+            lines.insert(slice_ref.to_string());
+        }
+    }
+
+    // Names of equipment slots
     for string in obj["equipTypes"].as_array().unwrap() {
-        if string.is_string() {
-            let element_str: &str = string.as_str().unwrap();
+        let slice_ref: &str = string.as_str().unwrap();
 
-            if !element_str.is_empty() {
-                lines.insert(element_str.to_string());
-            }
+        if !slice_ref.is_empty() {
+            lines.insert(slice_ref.to_string());
         }
     }
 
+    // Game title, parsed just for fun
+    // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
+    lines.insert(obj["gameTitle"].as_str().unwrap().to_string());
+
+    // Names of battle options
     for string in obj["skillTypes"].as_array().unwrap() {
-        if string.is_string() {
-            let element_str: &str = string.as_str().unwrap();
+        let slice_ref: &str = string.as_str().unwrap();
 
-            if !element_str.is_empty() {
-                lines.insert(string.as_str().unwrap().to_string());
-            }
+        if !slice_ref.is_empty() {
+            lines.insert(string.to_string());
         }
     }
 
+    // Game terms vocabulary
     for (key, value) in obj["terms"].as_object().unwrap() {
         if key != "messages" {
             for string in value.as_array().unwrap() {
                 if string.is_string() {
-                    let string_str: &str = string.as_str().unwrap();
+                    let slice_ref: &str = string.as_str().unwrap();
 
-                    if !string_str.is_empty() {
-                        lines.insert(string_str.to_string());
+                    if !slice_ref.is_empty() {
+                        lines.insert(slice_ref.to_string());
                     }
                 }
             }
         } else {
             if !value.is_object() {
-                return;
+                continue;
             }
 
-            for message_value in value.as_object().unwrap().values() {
-                if message_value.is_string() {
-                    let message_str: &str = message_value.as_str().unwrap();
+            for message_string in value.as_object().unwrap().values() {
+                let slice_ref: &str = message_string.as_str().unwrap();
 
-                    if !message_str.is_empty() {
-                        lines.insert(message_str.to_string());
-                    }
+                if !slice_ref.is_empty() {
+                    lines.insert(slice_ref.to_string());
                 }
             }
+        }
+    }
+
+    // Weapon types names
+    // Normally it's system strings, but might be needed for some purposes
+    for string in obj["weaponTypes"].as_array().unwrap() {
+        let slice_ref: &str = string.as_str().unwrap();
+
+        if !slice_ref.is_empty() {
+            lines.insert(slice_ref.to_string());
         }
     }
 
@@ -343,3 +401,6 @@ pub fn read_system(original_path: &Path, output_path: &Path) {
     )
     .unwrap();
 }
+
+// read_plugins is not implemented and will NEVER be, as plugins can differ from each other incredibly.
+// Change plugins.js with your own hands.

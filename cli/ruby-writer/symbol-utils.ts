@@ -1,4 +1,8 @@
 export function getValueBySymbolDesc(collection: { [key: symbol]: any }, description: string): any {
+    if (typeof collection !== "object") {
+        return;
+    }
+
     const symbols = Object.getOwnPropertySymbols(collection);
 
     const symbol = symbols.find((symbol) => symbol.description === description);
