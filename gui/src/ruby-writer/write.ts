@@ -1,7 +1,6 @@
 import { dump, load } from "@hyrious/marshal";
 import { deflate } from "pako";
 
-import "./shuffle";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 import { readBinaryFile, readDir, readTextFile, writeBinaryFile } from "@tauri-apps/api/fs";
 

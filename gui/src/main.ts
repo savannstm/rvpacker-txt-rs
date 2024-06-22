@@ -791,15 +791,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             let i = 0;
 
             for (const node of child.children as HTMLCollectionOf<HTMLDivElement>) {
-                heights.set([node.firstElementChild!.children[1].clientHeight as number], i);
+                heights.set([(node.firstElementChild!.children[1].innerHTML.count("\n") + 1) * 28], i);
                 i++;
             }
 
             i = 0;
             for (const node of child.children as HTMLCollectionOf<HTMLDivElement>) {
-                node.style.minHeight = `${heights[i] + 8}px`;
-                (node.firstElementChild as HTMLDivElement).style.minHeight = `${heights[i]}px`;
-
                 for (const child of node.firstElementChild!.children as HTMLCollectionOf<HTMLDivElement>) {
                     child.style.minHeight = `${heights[i]}px`;
                 }

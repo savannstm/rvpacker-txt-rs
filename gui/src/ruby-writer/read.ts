@@ -12,8 +12,6 @@ import { getValueBySymbolDesc } from "./symbol-utils";
  * This function handles both cases.
  * @param {string} inputPath - path to directory than contains .rx/rv/rvdata2 files
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
 export async function readMap(inputPath: string, outputPath: string): Promise<void> {
@@ -139,16 +137,9 @@ export async function readMap(inputPath: string, outputPath: string): Promise<vo
  * This function handles both cases.
  * @param {string} inputPath - path to directory than contains .rx/rv/rvdata2 files
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
-export async function readOther(
-    inputPath: string,
-    outputPath: string,
-    logging: boolean,
-    logString: string
-): Promise<void> {
+export async function readOther(inputPath: string, outputPath: string): Promise<void> {
     const decoder = new TextDecoder();
 
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
@@ -303,10 +294,6 @@ export async function readOther(
             }
         }
 
-        if (logging) {
-            console.log(`${logString} ${filename}`);
-        }
-
         await writeTextFile(`${outputPath}/${processedFilename}.txt`, lines.join("\n"));
         await writeTextFile(
             `${outputPath}/${processedFilename}_trans.txt`,
@@ -322,8 +309,6 @@ export async function readOther(
  * This function handles both cases.
  * @param {string} inputFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
 export async function readSystem(inputFilePath: string, outputPath: string): Promise<void> {
@@ -428,8 +413,6 @@ export async function readSystem(inputFilePath: string, outputPath: string): Pro
  * Reads Scripts .rx/rv/rvdata2 file from inputFilePath and parses it into .txt file in outputPath.
  * @param {string} inputFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
 export async function readScripts(inputFilePath: string, outputPath: string): Promise<void> {
