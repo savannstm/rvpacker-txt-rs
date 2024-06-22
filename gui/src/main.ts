@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             let i = 0;
 
             for (const node of child.children as HTMLCollectionOf<HTMLDivElement>) {
-                heights.set([(node.firstElementChild!.children[1].innerHTML.count("\n") + 1) * 28], i);
+                heights.set([(node.firstElementChild!.children[1].innerHTML.count("\n") + 1) * 28 + 8], i);
                 i++;
             }
 
