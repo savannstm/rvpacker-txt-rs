@@ -1,6 +1,6 @@
 [package]
 name = "rpgm-translation-gui"
-version = "3.5.0"
+version = "3.5.1"
 description = "Репозиторий с инструментами, позволяющими редактировать текст RPG Maker VX/MV/VXAce и компилировать его в обратно в оригинальные файлы"
 authors = ["savannstm"]
 edition = "2021"

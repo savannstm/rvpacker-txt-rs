@@ -1,7 +1,7 @@
 {
     "name": "rpgm-translation-gui",
     "private": true,
-    "version": "3.5.0",
+    "version": "3.5.1",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -23,7 +23,7 @@
         "@tauri-apps/cli": "^1.5.14",
         "@types/pako": "^2.0.3",
         "tailwindcss": "^3.4.4",
-        "typescript": "^5.4.5",
+        "typescript": "^5.5.2",
         "vite": "^5.3.1",
         "vite-plugin-minify": "^1.5.2"
     }
