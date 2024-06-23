@@ -520,7 +520,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
 
-            if (!/\\#[a-zA-Z0-9_-]+$/.test(themeName)) {
+            if (!/^[a-zA-Z0-9_-]+$/.test(themeName)) {
                 await message(mainLocalization.invalidThemeName + mainLocalization.allowedThemeNameCharacters);
                 return;
             }
@@ -797,6 +797,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             i = 0;
             for (const node of child.children as HTMLCollectionOf<HTMLDivElement>) {
+                node.style.minHeight = `${heights[i] + 8}px`;
+
                 for (const child of node.firstElementChild!.children as HTMLCollectionOf<HTMLDivElement>) {
                     child.style.minHeight = `${heights[i]}px`;
                 }
@@ -1639,12 +1641,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         const contentNames: string[] = [];
         const content: string[][] = [];
 
-        for (const folder of await readDir(await join(projDir, translationDir), {
+        for (const entry of await readDir(await join(projDir, translationDir), {
             recursive: true,
         })) {
-            const f = folder.name as string;
+            const folder = entry.name as string;
 
-            for (const file of folder.children!) {
+            for (const file of entry.children!) {
                 const name = file.name as string;
 
                 if (!name.endsWith(".txt")) {
@@ -1652,7 +1654,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
 
                 contentNames.push(name.slice(0, -4));
-                content.push((await readTextFile(await join(projDir, translationDir, f, name))).split("\n"));
+                content.push((await readTextFile(await join(projDir, translationDir, folder, name))).split("\n"));
             }
         }
 
@@ -1725,36 +1727,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             await appWindow.emit("compile", projDir);
         } else {
             const startTime = performance.now();
-
-            await createDir(await join(projDir, "output", "data"), { recursive: true });
+            const outputPath = await join(projDir, "output", "data");
+            await createDir(outputPath, { recursive: true });
 
             const re = /^data|Data/;
-            const original = (await readDir(projDir)).find((f) => re.test(f.name!))!.path;
-            const output = await join(projDir, "output", "data");
-            const other = await join(projDir, translationDir, otherDir);
 
-            await writeMap(original, await join(projDir, translationDir, mapsDir), output);
-            await writeOther(original, other, output);
+            const originalPath = (await readDir(projDir)).find((f) => re.test(f.name!))!.path;
+            const otherPath = await join(projDir, translationDir, otherDir);
+            const ext = RPGMVer === "xp" ? "rxdata" : RPGMVer === "vx" ? "rvdata" : "rvdata2";
 
-            let ext;
+            await writeMap(originalPath, await join(projDir, translationDir, mapsDir), outputPath);
+            await writeOther(originalPath, otherPath, outputPath);
+            await writeSystem(await join(originalPath, `System.${ext}`), otherPath, outputPath);
+            await writeScripts(await join(originalPath, `Scripts.${ext}`), otherPath, outputPath);
 
-            switch (RPGMVer) {
-                case "xp":
-                    ext = "rxdata";
-                    break;
-                case "vx":
-                    ext = "rvdata";
-                    break;
-                case "vxace":
-                    ext = "rvdata2";
-                    break;
-            }
-
-            await writeSystem(await join(original, `System.${ext}`), other, output);
-            await writeScripts(await join(original, `Scripts.${ext}`), other, output);
-
-            compileButton.firstElementChild!.classList.remove("animate-spin");
             alert(`${mainLocalization.compileSuccess} ${(performance.now() - startTime) / 1000}`);
+            compileButton.firstElementChild!.classList.remove("animate-spin");
         }
     }
 
@@ -1790,12 +1778,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const result: { left: number; top: number }[] = getNewLinePositions(focusedElement);
-        if (result.length === 0) {
-            return;
-        }
 
-        for (const object of result) {
-            const { left, top } = object;
+        for (const { left, top } of result) {
             const ghostNewLine: HTMLDivElement = document.createElement("div");
             ghostNewLine.classList.add("ghost-new-line", "textThird");
             ghostNewLine.innerHTML = "\\n";
@@ -2071,15 +2055,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 continue;
             }
 
-            const element = document.querySelector(`.${key}`) as HTMLElement | null;
+            const element = document.querySelectorAll(`.${key}`) as NodeListOf<HTMLElement> | null;
             if (!element) {
                 continue;
             }
 
             if (key.endsWith("Title")) {
-                element.title = value;
+                for (const elem of element) {
+                    elem.title = value;
+                }
             } else {
-                element.innerHTML = value;
+                for (const elem of element) {
+                    elem.innerHTML = value;
+                }
             }
         }
 
@@ -2142,10 +2130,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (
                 contentContainer.contains(document.activeElement) &&
                 document.activeElement?.tagName === "TEXTAREA" &&
-                text?.includes("/#")
+                text?.includes("\\#")
             ) {
                 event.preventDefault();
-                const clipboardTextSplit = text.split("/#");
+                const clipboardTextSplit = text.split("\\#");
                 const textRows = clipboardTextSplit.length;
 
                 if (textRows < 1) {
@@ -2183,7 +2171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 event.preventDefault();
 
                 selectedTextareas.set(document.activeElement.id, (document.activeElement as HTMLTextAreaElement).value);
-                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("/#"));
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\#"));
             }
         },
         true
@@ -2199,7 +2187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 event.preventDefault();
 
-                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("/#"));
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\#"));
 
                 for (const key of selectedTextareas.keys()) {
                     const textarea = document.getElementById(key) as HTMLTextAreaElement;
