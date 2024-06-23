@@ -1736,8 +1736,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             const otherPath = await join(projDir, translationDir, otherDir);
             const ext = RPGMVer === "xp" ? "rxdata" : RPGMVer === "vx" ? "rvdata" : "rvdata2";
 
-            await writeMap(originalPath, await join(projDir, translationDir, mapsDir), outputPath);
-            await writeOther(originalPath, otherPath, outputPath);
+            await writeMap(await join(projDir, translationDir, mapsDir), originalPath, outputPath);
+            await writeOther(otherPath, originalPath, outputPath);
             await writeSystem(await join(originalPath, `System.${ext}`), otherPath, outputPath);
             await writeScripts(await join(originalPath, `Scripts.${ext}`), otherPath, outputPath);
 
