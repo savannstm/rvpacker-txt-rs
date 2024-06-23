@@ -2130,10 +2130,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (
                 contentContainer.contains(document.activeElement) &&
                 document.activeElement?.tagName === "TEXTAREA" &&
-                text?.includes("\\#")
+                text?.includes("\\/#")
             ) {
                 event.preventDefault();
-                const clipboardTextSplit = text.split("\\#");
+                const clipboardTextSplit = text.split("\\/#");
                 const textRows = clipboardTextSplit.length;
 
                 if (textRows < 1) {
@@ -2163,15 +2163,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener(
         "copy",
         (event) => {
-            if (contentContainer.contains(document.activeElement) && document.activeElement?.tagName === "TEXTAREA") {
-                if (!selectedMultiple) {
-                    return;
-                }
-
+            if (
+                selectedMultiple &&
+                contentContainer.contains(document.activeElement) &&
+                document.activeElement?.tagName === "TEXTAREA"
+            ) {
                 event.preventDefault();
-
                 selectedTextareas.set(document.activeElement.id, (document.activeElement as HTMLTextAreaElement).value);
-                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\#"));
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\/#"));
             }
         },
         true
@@ -2180,14 +2179,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.addEventListener(
         "cut",
         (event) => {
-            if (contentContainer.contains(document.activeElement) && document.activeElement?.tagName === "TEXTAREA") {
-                if (!selectedMultiple) {
-                    return;
-                }
-
+            if (
+                selectedMultiple &&
+                contentContainer.contains(document.activeElement) &&
+                document.activeElement?.tagName === "TEXTAREA"
+            ) {
                 event.preventDefault();
-
-                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\#"));
+                event.clipboardData?.setData("text", Array.from(selectedTextareas.values()).join("\\/#"));
 
                 for (const key of selectedTextareas.keys()) {
                     const textarea = document.getElementById(key) as HTMLTextAreaElement;
