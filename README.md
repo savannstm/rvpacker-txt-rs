@@ -41,6 +41,11 @@
 
 После билдинга в директории `gui/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
 
+## Лицензия
+
+Репозиторий лицензирован под [WTFPL](http://www.wtfpl.net/).
+Это означает, что вы можете безнаказанно использовать и модифицировать программу в каком угодно виде. Вы можете делать всё, что захотите.
+
 # EN
 
 # Repository order and program usage
@@ -81,3 +86,8 @@ to build the program for your current OS.
 If you want to make some edits to the source code - edit frontend files in `src` directory, or backend files in `src-tauri/src` directory.
 
 After the build, `target` directory will be created in the `gui/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
+
+## License
+
+The repository is licensed under [WTFPL](http://www.wtfpl.net/).
+This means that you can use and modify the program in any way. You can do what the fuck you want to.
