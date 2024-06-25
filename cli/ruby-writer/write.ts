@@ -3,7 +3,106 @@ import { dump, load } from "@hyrious/marshal";
 import { deflate } from "pako";
 
 import "./shuffle";
+import { readGameTitle } from "./read";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+const encode = (string: string): Uint8Array => encoder.encode(string);
+const decode = (buffer: Uint8Array): string => decoder.decode(buffer);
+
+let parsingMethod: string;
+const parsingRegExps = {} as { [key: string]: RegExp };
+
+export async function setWriteParsingMethod(systemFilePath: string) {
+    const gameTitle = await readGameTitle(systemFilePath);
+    const lowercased = gameTitle!.toLowerCase();
+
+    if (lowercased.includes("lisa")) {
+        parsingMethod = "lisa";
+        parsingRegExps.lisaMaps = /^\\et\[[0-9]+\]/;
+        parsingRegExps.lisaTroops = /^\\nbt/;
+        parsingRegExps.lisaOtheVariable = /^<.*>\.?$/;
+    }
+}
+
+function getVariable(variable: string | Uint8Array): void | string | Uint8Array {
+    let type = "string";
+
+    if (variable instanceof Uint8Array) {
+        type = "Uint8Array";
+        variable = decode(variable);
+    }
+
+    if (typeof variable === "string" && variable.length > 0) {
+        if (translationMap!.has(variable)) {
+            const gotten = translationMap!.get(variable);
+
+            if (gotten) {
+                return type === "string" ? gotten : encode(gotten);
+            }
+        }
+    }
+}
+
+let translationMap: null | Map<string, string>;
+
+function getCode(code: number, parameter: string | string[] | Uint8Array): undefined | string | string[] | Uint8Array {
+    switch (code) {
+        case 401 || 402 || 356 || 405:
+            {
+                let type = "string";
+
+                if (parameter instanceof Uint8Array) {
+                    type = "Uint8Array";
+                    parameter = decode(parameter);
+                }
+
+                if (typeof parameter === "string" && parameter.length > 0) {
+                    switch (parsingMethod) {
+                        case "lisa":
+                            const match =
+                                parameter.match(parsingRegExps.lisaMaps) ?? parameter.match(parsingRegExps.lisaTroops);
+
+                            if (match) {
+                                parameter = parameter.slice(match[0].length);
+                            }
+                            break;
+                    }
+
+                    if (translationMap!.has(parameter)) {
+                        const gotten = translationMap!.get(parameter);
+
+                        if (gotten) {
+                            return type === "string" ? gotten : encode(gotten);
+                        }
+                    }
+                }
+            }
+            break;
+        case 102:
+            {
+                let type = "string";
+
+                if (parameter instanceof Uint8Array) {
+                    type = "Uint8Array";
+                    parameter = decode(parameter);
+                }
+
+                if (typeof parameter === "string" && parameter.length > 0) {
+                    if (translationMap!.has(parameter)) {
+                        const gotten = translationMap!.get(parameter);
+
+                        if (gotten) {
+                            return type === "string" ? gotten : encode(gotten);
+                        }
+                    }
+                }
+            }
+            break;
+    }
+}
 
 /**
  * Merges sequences of objects with codes 401 and 405 inside list objects.
@@ -54,7 +153,7 @@ function mergeSeq(objArr: RubyObject[]): RubyObject[] {
  * @param {RubyObject} obj - object, which lists's objects with codes 401 and 405 should be merged
  * @returns {RubyObject}
  */
-export function mergeMap(obj: RubyObject): RubyObject {
+function mergeMap(obj: RubyObject): RubyObject {
     const events: RubyObject = getValueBySymbolDesc(obj, "@events");
 
     for (const event of Object.values(events || {})) {
@@ -77,7 +176,7 @@ export function mergeMap(obj: RubyObject): RubyObject {
  * @param {RubyObject} objArr - array of objects, which lists's objects with codes 401 and 405 should be merged
  * @returns {RubyObject}
  */
-export function mergeOther(objArr: RubyObject[]): RubyObject[] {
+function mergeOther(objArr: RubyObject[]): RubyObject[] {
     for (const obj of objArr) {
         if (!obj) {
             continue;
@@ -120,9 +219,6 @@ export async function writeMap(
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
     const filtered = (await readdir(originalPath)).filter((filename) => re.test(filename));
 
@@ -159,7 +255,7 @@ export async function writeMap(
         }
     }
 
-    const mapsTranslationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
+    translationMap = new Map(mapsOriginalText.map((string, i) => [string, mapsTranslatedText[i]]));
     const namesTranslationMap = new Map(namesOriginalText.map((string, i) => [string, namesTranslatedText[i]]));
 
     //401 - dialogue lines
@@ -173,7 +269,7 @@ export async function writeMap(
         if (typeof displayName === "string" && namesTranslationMap.has(displayName)) {
             setValueBySymbolDesc(obj, "@display_name", namesTranslationMap.get(displayName)!);
         } else if (displayName instanceof Uint8Array) {
-            const decoded = decoder.decode(displayName);
+            const decoded = decode(displayName);
 
             if (namesTranslationMap.has(decoded)) {
                 setValueBySymbolDesc(obj, "@display_name", namesTranslationMap.get(decoded)!);
@@ -202,37 +298,23 @@ export async function writeMap(
 
                     for (const [i, parameter] of parameters.entries()) {
                         if ([401, 402, 356].includes(code)) {
-                            if (typeof parameter === "string") {
-                                if (mapsTranslationMap.has(parameter)) {
-                                    parameters[i] = mapsTranslationMap.get(parameter)!;
-                                    setValueBySymbolDesc(item, "@parameters", parameters);
-                                }
-                            } else if (parameter instanceof Uint8Array) {
-                                const decoded = decoder.decode(parameter);
+                            const gotten = getCode(code, parameter);
 
-                                if (mapsTranslationMap.has(decoded)) {
-                                    parameters[i] = encoder.encode(mapsTranslationMap.get(decoded)!);
-                                    setValueBySymbolDesc(item, "@parameters", parameters);
-                                }
+                            if (gotten) {
+                                parameters[i] = gotten as string | Uint8Array;
+                                setValueBySymbolDesc(item, "@parameters", parameters);
                             }
-                        } else if (code === 102 && Array.isArray(parameter)) {
-                            for (const [j, param] of (parameter as (string | Uint8Array)[]).entries()) {
-                                if (typeof param === "string") {
-                                    if (mapsTranslationMap.has(param)) {
-                                        (parameters[i][j] as string) = mapsTranslationMap.get(param)!;
+                        } else if (code === 102) {
+                            if (Array.isArray(parameter)) {
+                                for (const [j, param] of parameter.entries()) {
+                                    const gotten = getCode(code, param) as string | Uint8Array;
 
-                                        setValueBySymbolDesc(item, "@parameters", parameters);
-                                    }
-                                } else if (param instanceof Uint8Array) {
-                                    const decoded = decoder.decode(param);
-                                    if (mapsTranslationMap.has(decoded)) {
-                                        (parameters[i][j] as unknown as Uint8Array) = encoder.encode(
-                                            mapsTranslationMap.get(decoded)!
-                                        );
-
-                                        setValueBySymbolDesc(item, "@parameters", parameters);
+                                    if (gotten) {
+                                        (parameters[i][j] as string | Uint8Array) = gotten;
                                     }
                                 }
+
+                                setValueBySymbolDesc(item, "@parameters", parameters);
                             }
                         }
                     }
@@ -266,9 +348,6 @@ export async function writeOther(
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filtered = (await readdir(originalPath)).filter((filename) => re.test(filename));
 
@@ -308,7 +387,7 @@ export async function writeOther(
             }
         }
 
-        const translationMap = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
+        translationMap = new Map(otherOriginalText.map((string, i) => [string, otherTranslatedText[i]]));
 
         // Other files except CommonEvents.json and Troops.json have the structure that consists
         // of name, nickname, description and note
@@ -318,48 +397,28 @@ export async function writeOther(
                     continue;
                 }
 
-                const name: string | Uint8Array = getValueBySymbolDesc(obj, "@name");
-                const nickname: string | Uint8Array = getValueBySymbolDesc(obj, "@nickname");
-                const description: string | Uint8Array = getValueBySymbolDesc(obj, "@description");
-                const note: string | Uint8Array = getValueBySymbolDesc(obj, "@note");
+                const nameSymbolDesc = "@name";
+                const name: string | Uint8Array = getValueBySymbolDesc(obj, nameSymbolDesc);
 
-                if (typeof name === "string" && translationMap.has(name)) {
-                    setValueBySymbolDesc(obj, "@name", translationMap.get(name));
-                } else if (name instanceof Uint8Array) {
-                    const decoded = decoder.decode(name);
+                const nicknameSymbolDesc = "@nickname";
+                const nickname: string | Uint8Array = getValueBySymbolDesc(obj, nicknameSymbolDesc);
 
-                    if (translationMap.has(decoded)) {
-                        setValueBySymbolDesc(obj, "@name", encoder.encode(translationMap.get(decoded)!));
-                    }
-                }
+                const descriptionSymbolDesc = "@description";
+                const description: string | Uint8Array = getValueBySymbolDesc(obj, descriptionSymbolDesc);
 
-                if (typeof nickname === "string" && translationMap.has(nickname)) {
-                    setValueBySymbolDesc(obj, "@nickname", translationMap.get(nickname));
-                } else if (nickname instanceof Uint8Array) {
-                    const decoded = decoder.decode(nickname);
+                const noteSymbolDesc = "@note";
+                const note: string | Uint8Array = getValueBySymbolDesc(obj, noteSymbolDesc);
 
-                    if (translationMap.has(decoded)) {
-                        setValueBySymbolDesc(obj, "@nickname", encoder.encode(translationMap.get(decoded)!));
-                    }
-                }
+                for (const [symbol, variable] of [
+                    [nameSymbolDesc, name],
+                    [nicknameSymbolDesc, nickname],
+                    [descriptionSymbolDesc, description],
+                    [noteSymbolDesc, note],
+                ]) {
+                    const gotten = getVariable(variable);
 
-                if (typeof description === "string" && translationMap.has(description)) {
-                    setValueBySymbolDesc(obj, "@description", translationMap.get(description));
-                } else if (description instanceof Uint8Array) {
-                    const decoded = decoder.decode(description);
-
-                    if (translationMap.has(decoded)) {
-                        setValueBySymbolDesc(obj, "@description", encoder.encode(translationMap.get(decoded)!));
-                    }
-                }
-
-                if (typeof note === "string" && translationMap.has(note)) {
-                    setValueBySymbolDesc(obj, "@note", translationMap.get(note));
-                } else if (note instanceof Uint8Array) {
-                    const decoded = decoder.decode(note);
-
-                    if (translationMap.has(decoded)) {
-                        setValueBySymbolDesc(obj, "@note", encoder.encode(translationMap.get(decoded)!));
+                    if (gotten) {
+                        setValueBySymbolDesc(obj, symbol as string, gotten);
                     }
                 }
             }
@@ -387,43 +446,27 @@ export async function writeOther(
                             continue;
                         }
 
-                        const parameters: (string | Uint8Array)[] | (string | Uint8Array)[][] = getValueBySymbolDesc(
-                            item,
-                            "@parameters"
-                        );
+                        const parameters: (string | Uint8Array)[] = getValueBySymbolDesc(item, "@parameters");
 
                         for (const [i, parameter] of parameters.entries()) {
-                            if ([401, 402, 405, 356].includes(code)) {
-                                if (typeof parameter === "string") {
-                                    if (translationMap.has(parameter)) {
-                                        parameters[i] = translationMap.get(parameter)!;
-                                        setValueBySymbolDesc(item, "@parameters", parameters);
-                                    }
-                                } else if (parameter instanceof Uint8Array) {
-                                    const decoded = decoder.decode(parameter);
+                            if ([401, 402, 356, 405].includes(code)) {
+                                const gotten = getCode(code, parameter);
 
-                                    if (translationMap.has(decoded)) {
-                                        parameters[i] = encoder.encode(translationMap.get(decoded)!);
-                                        setValueBySymbolDesc(item, "@parameters", parameters);
-                                    }
+                                if (gotten) {
+                                    parameters[i] = gotten as string | Uint8Array;
+                                    setValueBySymbolDesc(item, "@parameters", parameters);
                                 }
-                            } else if (code === 102 && Array.isArray(parameter)) {
-                                for (const [j, param] of (parameter as (string | Uint8Array)[]).entries()) {
-                                    if (typeof param === "string") {
-                                        if (translationMap.has(param)) {
-                                            (parameters[i][j] as string) = translationMap.get(param)!;
-                                            setValueBySymbolDesc(item, "@parameters", parameters);
-                                        }
-                                    } else if (param instanceof Uint8Array) {
-                                        const decoded = decoder.decode(param);
+                            } else if (code === 102) {
+                                if (Array.isArray(parameter)) {
+                                    for (const [j, param] of parameter.entries()) {
+                                        const gotten = getCode(code, param) as string | Uint8Array;
 
-                                        if (translationMap.has(decoded)) {
-                                            (parameters[i][j] as Uint8Array) = encoder.encode(
-                                                translationMap.get(decoded)!
-                                            );
-                                            setValueBySymbolDesc(item, "@parameters", parameters);
+                                        if (gotten) {
+                                            (parameters[i][j] as string | Uint8Array) = gotten;
                                         }
                                     }
+
+                                    setValueBySymbolDesc(item, "@parameters", parameters);
                                 }
                             }
                         }
@@ -440,11 +483,13 @@ export async function writeOther(
     }
 }
 
+translationMap = null;
+
 /**
  * Writes system.txt file back to its initial form.
  *
  * For inner code documentation, check readSystem function.
- * @param {string} inputFilePath - path to System.rx/rv/rvdata2 file
+ * @param {string} systemFilePath - path to System.rx/rv/rvdata2 file
  * @param {string} otherPath - path to other directory
  * @param {string} outputPath - path to output directory
  * @param {number} drunk - drunkness level
@@ -453,18 +498,15 @@ export async function writeOther(
  * @returns {Promise<void>}
  */
 export async function writeSystem(
-    inputFilePath: string,
+    systemFilePath: string,
     otherPath: string,
     outputPath: string,
     drunk: number,
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-
-    const obj = load(await Bun.file(inputFilePath).arrayBuffer()) as RubyObject;
-    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
+    const obj = load(await Bun.file(systemFilePath).arrayBuffer()) as RubyObject;
+    const ext = systemFilePath.slice(systemFilePath.lastIndexOf(".") + 1, systemFilePath.length);
 
     const systemOriginalText = (await Bun.file(`${otherPath}/system.txt`).text()).split("\n");
     let systemTranslatedText = (await Bun.file(`${otherPath}/system_trans.txt`).text()).split("\n");
@@ -496,37 +538,42 @@ export async function writeSystem(
     const skillTypes = getValueBySymbolDesc(obj, symbolDescs[1]) as (string | Uint8Array)[] | undefined;
     const weaponTypes = getValueBySymbolDesc(obj, symbolDescs[2]) as (string | Uint8Array)[] | undefined;
     const armorTypes = getValueBySymbolDesc(obj, symbolDescs[3]) as (string | Uint8Array)[] | undefined;
-    const currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
+    let currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
     const terms = getValueBySymbolDesc(obj, symbolDescs[5]) as RubyObject;
-    const gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
+    let gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
 
     for (const [i, arr] of [elements, skillTypes, weaponTypes, armorTypes].entries()) {
         if (!arr) {
             continue;
         }
 
-        for (const [j, string] of arr.entries()) {
-            if (typeof string === "string" && translationMap.has(string)) {
-                arr[j] = translationMap.get(string)!;
-                setValueBySymbolDesc(obj, symbolDescs[i], arr);
-            } else if (string instanceof Uint8Array) {
-                const decoded = decoder.decode(string);
+        for (let [j, string] of arr.entries()) {
+            let type = "string";
 
-                if (translationMap.has(decoded)) {
-                    arr[j] = encoder.encode(translationMap.get(decoded)!);
-                    setValueBySymbolDesc(obj, symbolDescs[i], arr);
-                }
+            if (string instanceof Uint8Array) {
+                type = "Uint8Array";
+                string = decode(string);
+            }
+
+            if (typeof string === "string" && translationMap.has(string)) {
+                const gotten = translationMap.get(string)!;
+                arr[j] = type === "string" ? gotten : encode(gotten);
+                setValueBySymbolDesc(obj, symbolDescs[i], arr);
             }
         }
     }
 
-    if (typeof currencyUnit === "string" && translationMap.has(currencyUnit)) {
-        setValueBySymbolDesc(obj, symbolDescs[4], translationMap.get(currencyUnit));
-    } else if (currencyUnit instanceof Uint8Array) {
-        const decoded = decoder.decode(currencyUnit);
+    {
+        let type = "string";
 
-        if (translationMap.has(decoded)) {
-            setValueBySymbolDesc(obj, symbolDescs[4], encoder.encode(translationMap.get(decoded)));
+        if (currencyUnit instanceof Uint8Array) {
+            type = "Uint8Array";
+            currencyUnit = decode(currencyUnit);
+        }
+
+        if (typeof currencyUnit === "string" && translationMap.has(currencyUnit)) {
+            const gotten = translationMap.get(currencyUnit)!;
+            setValueBySymbolDesc(obj, symbolDescs[4], type === "string" ? gotten : encode(gotten));
         }
     }
 
@@ -537,10 +584,10 @@ export async function writeSystem(
         const value = terms[termsSymbols[i]] as Uint8Array | string[];
 
         if (value instanceof Uint8Array) {
-            const decoded = decoder.decode(value);
+            const decoded = decode(value);
 
             if (translationMap.has(decoded)) {
-                terms[termsSymbols[i]] = encoder.encode(translationMap.get(decoded)!);
+                terms[termsSymbols[i]] = encode(translationMap.get(decoded)!);
             }
             continue;
         }
@@ -554,15 +601,19 @@ export async function writeSystem(
         }
     }
 
-    if (typeof gameTitle === "string") {
-        if (translationMap.has(gameTitle)) {
-            setValueBySymbolDesc(obj, "@game_title", translationMap.get(gameTitle)!);
-        }
-    } else if (gameTitle instanceof Uint8Array) {
-        const decoded = decoder.decode(gameTitle);
+    {
+        let type = "string";
 
-        if (translationMap.has(decoded)) {
-            setValueBySymbolDesc(obj, "@game_title", encoder.encode(translationMap.get(decoded)!));
+        if (gameTitle instanceof Uint8Array) {
+            type = "Uint8Array";
+            gameTitle = decode(gameTitle);
+        }
+
+        if (typeof gameTitle === "string") {
+            if (translationMap.has(gameTitle)) {
+                const gotten = translationMap.get(gameTitle)!;
+                setValueBySymbolDesc(obj, "@game_title", type === "string" ? gotten : encode(gotten));
+            }
         }
     }
 
@@ -577,7 +628,7 @@ export async function writeSystem(
  * Writes system.txt file back to its initial form.
  *
  * Does not support drunk, because shuffling the data will produce invalid data.
- * @param {string} inputFilePath - path to Scripts.rx/rv/rvdata2 file
+ * @param {string} scriptsFilePath - path to Scripts.rx/rv/rvdata2 file
  * @param {string} otherPath - path to other directory
  * @param {string} outputPath - path to output directory
  * @param {boolean} logging - whether to log or not
@@ -585,18 +636,16 @@ export async function writeSystem(
  * @returns {Promise<void>}
  */
 export async function writeScripts(
-    inputFilePath: string,
+    scriptsFilePath: string,
     otherPath: string,
     outputPath: string,
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-
-    const scriptsArr = load(await Bun.file(inputFilePath).arrayBuffer(), {
+    const scriptsArr = load(await Bun.file(scriptsFilePath).arrayBuffer(), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
+    const ext = scriptsFilePath.slice(scriptsFilePath.lastIndexOf(".") + 1, scriptsFilePath.length);
 
     const translationArr = (await Bun.file(`${otherPath}/scripts_trans.txt`).text()).split("\n");
 
@@ -606,12 +655,12 @@ export async function writeScripts(
 
         // Magic number should be encoded as string
         if (magic instanceof Uint8Array) {
-            scriptsArr[i][0] = decoder.decode(magic);
+            scriptsArr[i][0] = decode(magic);
         }
 
         // And title too
         if (title instanceof Uint8Array) {
-            scriptsArr[i][1] = decoder.decode(title);
+            scriptsArr[i][1] = decode(title);
         }
 
         // Ruby code should be a deflated string

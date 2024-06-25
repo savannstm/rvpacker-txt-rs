@@ -38,6 +38,7 @@ export class ProgramLocalization {
     noType: string;
     originalDirMissing: string;
     translationDirsMissing: string;
+    disableCustomParsingDesc: string;
 
     constructor(language: string) {
         switch (language) {
@@ -90,6 +91,8 @@ export class ProgramLocalization {
                 this.originalDirMissing = "The path to 'original' or 'data' directories does not exist.";
                 this.translationDirsMissing =
                     "The path to 'translation/maps' or/and 'translation/other' directories does not exist.";
+                this.disableCustomParsingDesc =
+                    "Disables custom parsing of specific game, where it's implemented, and parses whole raw game text.";
                 break;
             case "ru":
                 this.programDesc =
@@ -139,6 +142,8 @@ export class ProgramLocalization {
                 this.originalDirMissing = 'Путь к директориям "original" или "data" не существует.';
                 this.translationDirsMissing =
                     'Путь к директориям "translation/maps" и/или "translation/other" не существует.';
+                this.disableCustomParsingDesc =
+                    "Отключает использование индивидуальных способов парсинга файлов игр, для которых это имплементировано, парся игровой текст целиком и сырым.";
                 break;
         }
 

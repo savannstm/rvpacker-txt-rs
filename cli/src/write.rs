@@ -10,6 +10,85 @@ use std::{
 
 use crate::shuffle_words;
 
+#[allow(clippy::single_match, unused_mut)]
+fn get_code(
+    code: u16,
+    mut parameter: &str,
+    hashmap: &FnvHashMap<&str, &str>,
+    game_type: &str,
+) -> Option<String> {
+    match code {
+        401 | 402 | 405 => match game_type {
+            "termina" => {}
+            // Implement custom parsing for other games
+            _ => {}
+        },
+        102 => match game_type {
+            "termina" => {}
+            // Implement custom parsing for other games
+            _ => {}
+        },
+        356 => match game_type {
+            "termina" => {
+                if !parameter.starts_with("GabText")
+                    && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
+                {
+                    return None;
+                }
+            }
+            // Implement custom parsing for other games
+            _ => return None,
+        },
+        _ => return None,
+    }
+
+    hashmap.get(parameter).map(|text: &&str| text.to_string())
+}
+
+#[allow(clippy::single_match, unused_mut)]
+fn get_variable(
+    mut variable: &str,
+    name: &str,
+    filename: &str,
+    hashmap: &FnvHashMap<&str, &str>,
+    game_type: &str,
+) -> Option<String> {
+    match name {
+        "name" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "nickname" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "description" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "note" => match game_type {
+            "termina" => {
+                if filename.starts_with("Items") {
+                    for string in [
+                        "<Menu Category: Items>",
+                        "<Menu Category: Food>",
+                        "<Menu Category: Healing>",
+                        "<Menu Category: Body bag>",
+                    ] {
+                        if variable.contains(string) {
+                            return Some(variable.replace(string, hashmap[string]));
+                        }
+                    }
+                }
+            }
+            _ => {}
+        },
+        _ => return None,
+    }
+
+    hashmap.get(variable).map(|text: &&str| text.to_string())
+}
+
 /// Merges sequences of objects with codes 401 and 405 inside list objects.
 /// Merging is perfectly valid in RPG Maker MV/MZ, and it's much faster and easier than replacing text in each object in a loop.
 /// # Parameters
@@ -111,6 +190,7 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
 /// * `drunk` - drunkness level
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
+/// * `game_type` - game type for custom parsing
 pub fn write_maps(
     maps_path: &Path,
     original_path: &Path,
@@ -118,6 +198,7 @@ pub fn write_maps(
     drunk: u8,
     logging: bool,
     log_string: &str,
+    game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
@@ -276,9 +357,14 @@ pub fn write_maps(
                                                     parameter_value.as_str().unwrap();
 
                                                 if code == 401 || code == 402 || code == 356 {
-                                                    if let Some(text) =
-                                                        maps_translation_map.get(parameter)
-                                                    {
+                                                    let gotten: Option<String> = get_code(
+                                                        code,
+                                                        parameter,
+                                                        &maps_translation_map,
+                                                        game_type,
+                                                    );
+
+                                                    if let Some(text) = gotten {
                                                         *parameter_value = to_value(text).unwrap();
                                                     }
                                                 }
@@ -287,12 +373,19 @@ pub fn write_maps(
                                                     .as_array_mut()
                                                     .unwrap()
                                                     .par_iter_mut()
-                                                    .for_each(|param: &mut Value| {
-                                                        if param.is_string() {
-                                                            if let Some(text) = maps_translation_map
-                                                                .get(param.as_str().unwrap())
-                                                            {
-                                                                *param = to_value(text).unwrap();
+                                                    .for_each(|param_value: &mut Value| {
+                                                        let param = param_value.as_str().unwrap();
+                                                        if param_value.is_string() {
+                                                            let gotten: Option<String> = get_code(
+                                                                code,
+                                                                param,
+                                                                &maps_translation_map,
+                                                                game_type,
+                                                            );
+
+                                                            if let Some(text) = gotten {
+                                                                *param_value =
+                                                                    to_value(text).unwrap();
                                                             }
                                                         }
                                                     });
@@ -317,6 +410,7 @@ pub fn write_maps(
 /// * `drunk` - drunkness level
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
+/// * `game_type` - game type for custom parsing
 pub fn write_other(
     other_path: &Path,
     original_path: &Path,
@@ -324,6 +418,7 @@ pub fn write_other(
     drunk: u8,
     logging: bool,
     log_string: &str,
+    game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
 
@@ -356,14 +451,6 @@ pub fn write_other(
                 a
             },
         );
-
-    // Strings inside notes that must be replaced to translated in Termina
-    const TO_REPLACE: [&str; 4] = [
-        "<Menu Category: Items>",
-        "<Menu Category: Food>",
-        "<Menu Category: Healing>",
-        "<Menu Category: Body bag>",
-    ];
 
     //401 - dialogue lines
     //102, 402 - dialogue choices
@@ -427,48 +514,30 @@ pub fn write_other(
                     .par_iter_mut()
                     .skip(1) //Skipping first element in array as it is null
                     .for_each(|obj: &mut Value| {
-                        if let Some(text) = other_translation_map.get(obj["name"].as_str().unwrap())
-                        {
-                            obj["name"] = to_value(text).unwrap();
-                        }
-
-                        if filename.starts_with("Actors") {
-                            if let Some(text) =
-                                other_translation_map.get(obj["nickname"].as_str().unwrap())
-                            {
-                                obj["nickname"] = to_value(text).unwrap();
+                        for (variable, name) in [
+                            (obj["name"].take(), "name"),
+                            (obj["nickname"].take(), "nickname"),
+                            (obj["description"].take(), "description"),
+                            (obj["note"].take(), "note"),
+                        ] {
+                            if !variable.is_string() {
+                                continue;
                             }
-                        }
 
-                        if obj["description"].is_string() {
-                            if let Some(text) =
-                                other_translation_map.get(obj["description"].as_str().unwrap())
-                            {
-                                obj["description"] = to_value(text).unwrap();
-                            }
-                        }
+                            let variable: &str = variable.as_str().unwrap();
 
-                        if obj["note"].is_string() {
-                            let note: &str = obj["note"].as_str().unwrap();
+                            if !variable.is_empty() {
+                                let gotten: Option<String> = get_variable(
+                                    variable,
+                                    name,
+                                    filename,
+                                    &other_translation_map,
+                                    game_type,
+                                );
 
-                            if filename.starts_with("Items") {
-                                for string in TO_REPLACE {
-                                    if note.contains(string) {
-                                        // In F&H2 Termina, note contains Menu Category that should be replaced with translated text
-                                        if let Some(text) = other_translation_map.get(string) {
-                                            obj["note"] =
-                                                to_value(note.replace(string, text)).unwrap();
-                                            break;
-                                        }
-                                    }
+                                if let Some(text) = gotten {
+                                    obj[name] = to_value(text).unwrap();
                                 }
-                            }
-
-                            // For other games, note probably should be replaced entirely
-                            if let Some(text) =
-                                other_translation_map.get(obj["note"].as_str().unwrap())
-                            {
-                                obj["note"] = to_value(text).unwrap();
                             }
                         }
                     });
@@ -520,9 +589,14 @@ pub fn write_other(
                                                     || code == 405
                                                     || code == 356
                                                 {
-                                                    if let Some(text) =
-                                                        other_translation_map.get(parameter)
-                                                    {
+                                                    let gotten: Option<String> = get_code(
+                                                        code,
+                                                        parameter,
+                                                        &other_translation_map,
+                                                        game_type,
+                                                    );
+
+                                                    if let Some(text) = gotten {
                                                         *parameter_value = to_value(text).unwrap();
                                                     }
                                                 }
@@ -531,13 +605,21 @@ pub fn write_other(
                                                     .as_array_mut()
                                                     .unwrap()
                                                     .par_iter_mut()
-                                                    .for_each(|param: &mut Value| {
-                                                        if param.is_string() {
-                                                            if let Some(text) =
-                                                                other_translation_map
-                                                                    .get(param.as_str().unwrap())
-                                                            {
-                                                                *param = to_value(text).unwrap();
+                                                    .for_each(|param_value: &mut Value| {
+                                                        let param: &str =
+                                                            param_value.as_str().unwrap();
+
+                                                        if param_value.is_string() {
+                                                            let gotten: Option<String> = get_code(
+                                                                code,
+                                                                param,
+                                                                &other_translation_map,
+                                                                game_type,
+                                                            );
+
+                                                            if let Some(text) = gotten {
+                                                                *param_value =
+                                                                    to_value(text).unwrap();
                                                             }
                                                         }
                                                     });

@@ -1,9 +1,10 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
 use fancy_regex::Regex;
+use serde_json::{from_str, Value};
 use std::{
     env::args,
-    fs::{create_dir_all, read_dir, DirEntry},
+    fs::{create_dir_all, read_dir, read_to_string, DirEntry},
     path::{Path, PathBuf},
     process::exit,
     time::Instant,
@@ -47,6 +48,7 @@ struct ProgramLocalization<'a> {
     read_log: &'a str,
     write_success: &'a str,
     read_success: &'a str,
+    disable_custom_parsing_desc: &'a str,
 }
 
 impl<'a> ProgramLocalization<'a> {
@@ -80,6 +82,7 @@ impl<'a> ProgramLocalization<'a> {
                 write_success: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
                 read_success: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
                 read_log: "Распарсен файл",
+                disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов игр, для которых это имплементировано, парся игровой текст целиком и сырым.",
             },
             "en" => ProgramLocalization {
                 program_desc: cstr!("<bold>A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.</bold>"),
@@ -109,10 +112,22 @@ impl<'a> ProgramLocalization<'a> {
                 write_success: "All files were written successfully.\nTime spent (in seconds):",
                 read_success: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
                 read_log: "Parsed file",
+                disable_custom_parsing_desc: "Disables custom parsing of specific game, where it's implemented, and parses whole raw game text.",
             },
             _ => unreachable!(),
         }
     }
+}
+
+fn get_game_type(system_file_path: &Path) -> &str {
+    let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
+    let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
+
+    if game_title.contains("termina") {
+        return "termina";
+    }
+
+    ""
 }
 
 fn main() {
@@ -253,6 +268,12 @@ fn main() {
         .global(true)
         .help(localization.log_arg_desc);
 
+    let disable_custom_parsing_arg: Arg = Arg::new("disable-custom-parsing")
+        .long("disable-custom-parsing")
+        .action(ArgAction::SetTrue)
+        .global(true)
+        .help(localization.disable_custom_parsing_desc);
+
     let cli: Command = Command::new("fh-termina-json-writer")
         .disable_version_flag(true)
         .disable_help_subcommand(true)
@@ -265,6 +286,7 @@ fn main() {
         .arg(output_dir_arg)
         .arg(language_arg)
         .arg(log_arg)
+        .arg(disable_custom_parsing_arg)
         .arg(help_arg);
 
     let matches: ArgMatches = cli.get_matches();
@@ -275,7 +297,7 @@ fn main() {
         exit(1);
     };
 
-    let mut write_options = (true, true, true, true, false);
+    let mut write_options = (true, true, true, true, false, false);
 
     if let Some(no_values) = matches
         .subcommand_matches(mode)
@@ -295,6 +317,10 @@ fn main() {
 
     if matches.get_flag("log") {
         write_options.4 = true;
+    }
+
+    if matches.get_flag("disable-custom-parsing") {
+        write_options.5 = true;
     }
 
     match mode {
@@ -352,12 +378,20 @@ fn main() {
             create_dir_all(&paths.maps).unwrap();
             create_dir_all(&paths.other).unwrap();
 
+            let system_file_path: PathBuf = if !write_options.5 {
+                paths.original.join("System.json")
+            } else {
+                PathBuf::from("")
+            };
+            let game_type: &str = get_game_type(&system_file_path);
+
             if write_options.0 {
                 read_map(
                     &paths.original,
                     &paths.maps,
                     write_options.4,
                     localization.read_log,
+                    game_type,
                 );
             }
 
@@ -367,12 +401,13 @@ fn main() {
                     &paths.other,
                     write_options.4,
                     localization.read_log,
+                    game_type,
                 );
             }
 
             if write_options.2 {
                 read_system(
-                    &paths.original,
+                    &system_file_path,
                     &paths.other,
                     write_options.4,
                     localization.read_log,
@@ -456,6 +491,13 @@ fn main() {
             create_dir_all(&paths.output).unwrap();
             create_dir_all(&paths.plugins_output).unwrap();
 
+            let system_file_path: PathBuf = if !write_options.5 {
+                paths.original.join("System.json")
+            } else {
+                PathBuf::from("")
+            };
+            let game_type: &str = get_game_type(&system_file_path);
+
             if write_options.0 {
                 write_maps(
                     &paths.maps,
@@ -464,6 +506,7 @@ fn main() {
                     drunk,
                     write_options.4,
                     localization.write_log,
+                    game_type,
                 );
             }
 
@@ -475,12 +518,13 @@ fn main() {
                     drunk,
                     write_options.4,
                     localization.write_log,
+                    game_type,
                 );
             }
 
             if write_options.2 {
                 write_system(
-                    &paths.original.join("System.json"),
+                    &system_file_path,
                     &paths.other,
                     &paths.output,
                     drunk,

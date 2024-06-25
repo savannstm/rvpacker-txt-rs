@@ -5,6 +5,114 @@ import { inflate } from "pako";
 
 import { getValueBySymbolDesc } from "./symbol-utils";
 
+let parsingMethod: string;
+const parsingRegExps = {} as { [key: string]: RegExp };
+const decoder = new TextDecoder();
+
+function decode(buffer: Uint8Array): string {
+    return decoder.decode(buffer);
+}
+
+export async function setReadParsingMethod(systemFilePath: string) {
+    const gameTitle = await readGameTitle(systemFilePath);
+    const lowercased = gameTitle!.toLowerCase();
+
+    if (lowercased.includes("lisa")) {
+        parsingMethod = "lisa";
+        parsingRegExps.lisaMaps = /^\\et\[[0-9]+\]/;
+        parsingRegExps.lisaTroops = /^\\nbt/;
+        parsingRegExps.lisaOtherVariable = /^<.*>\.?$/;
+    }
+}
+
+function parseCode(code: number, parameter: (string | Uint8Array) | string[]): string | void {
+    switch (code) {
+        case 401 || 405:
+            if (parameter instanceof Uint8Array) {
+                parameter = decode(parameter);
+            }
+
+            if (typeof parameter === "string" && parameter.length > 0) {
+                switch (parsingMethod) {
+                    case "lisa":
+                        const match =
+                            (parameter as string).match(parsingRegExps.lisaMaps) ??
+                            (parameter as string).match(parsingRegExps.lisaTroops);
+
+                        if (match) {
+                            parameter = parameter.slice(match[0].length);
+                        }
+                        break;
+                }
+
+                return parameter as string;
+            }
+        case 102 || 402:
+            if (parameter instanceof Uint8Array) {
+                parameter = decode(parameter);
+            }
+
+            if (typeof parameter === "string" && parameter.length > 0) {
+                return parameter;
+            }
+            break;
+        case 356:
+            if (parameter instanceof Uint8Array) {
+                parameter = decode(parameter);
+            }
+
+            if (typeof parameter === "string" && parameter.length > 0) {
+                return parameter as string;
+            }
+            break;
+    }
+}
+
+function parseOtherVariable(variable: string | Uint8Array): string | void {
+    if (variable instanceof Uint8Array) {
+        variable = decode(variable);
+    }
+
+    if (typeof variable === "string" && variable.length > 0) {
+        const linesCount = variable.match(/\r?\n/g)?.length ?? 0;
+
+        if (linesCount >= 1) {
+            const replaced = variable.replaceAll(/\r?\n/g, "\\#");
+
+            if (
+                !replaced.split("\\#").every((line) => parsingRegExps.lisaOtherVariable.test(line) || line.length === 0)
+            ) {
+                return replaced;
+            }
+        }
+
+        if (!parsingRegExps.lisaOtherVariable.test(variable)) {
+            return variable;
+        }
+    }
+}
+
+export async function readGameTitle(systemFilePath: string): Promise<string | undefined> {
+    const file = Bun.file(systemFilePath);
+    const obj = load(await file.arrayBuffer()) as RubyObject;
+
+    const gameTitle = getValueBySymbolDesc(obj, "@game_title");
+
+    let titleString;
+
+    if (typeof gameTitle === "string" && gameTitle.length > 0) {
+        titleString = gameTitle;
+    } else if (gameTitle instanceof Uint8Array) {
+        const decoded = decode(gameTitle);
+
+        if (decoded.length > 0) {
+            titleString = decoded;
+        }
+    }
+
+    return titleString;
+}
+
 /**
  * Reads all Map .rx/rv/rvdata2 files of inputPath and parses them into .txt files in outputPath.
  *
@@ -22,8 +130,6 @@ export async function readMap(
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
     const files = (await readdir(inputPath)).filter((filename) => re.test(filename));
 
@@ -37,16 +143,14 @@ export async function readMap(
     const namesLines = OrderedSet().asMutable() as OrderedSet<string>;
 
     for (const [filename, obj] of objMap) {
-        const displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
+        let displayName: string | Uint8Array = getValueBySymbolDesc(obj, "@display_name");
+
+        if (displayName instanceof Uint8Array) {
+            displayName = decode(displayName);
+        }
 
         if (typeof displayName === "string" && displayName.length > 0) {
             namesLines.add(displayName);
-        } else if (displayName instanceof Uint8Array) {
-            const decoded = decoder.decode(displayName);
-
-            if (decoded.length > 0) {
-                namesLines.add(decoded);
-            }
         }
 
         const events: object = getValueBySymbolDesc(obj, "@events");
@@ -81,14 +185,10 @@ export async function readMap(
                         if (code === 401) {
                             inSeq = true;
 
-                            if (typeof parameter === "string" && parameter.length > 0) {
-                                line.push(parameter);
-                            } else if (parameter instanceof Uint8Array) {
-                                const decoded = decoder.decode(parameter);
+                            const parsed = parseCode(code, parameter);
 
-                                if (decoded.length > 0) {
-                                    line.push(decoded);
-                                }
+                            if (parsed) {
+                                line.push(parsed);
                             }
                         } else {
                             if (inSeq) {
@@ -97,34 +197,22 @@ export async function readMap(
                                 inSeq = false;
                             }
 
-                            switch (code) {
-                                case 102:
-                                    if (Array.isArray(parameter)) {
-                                        for (const param of parameter as (string | Uint8Array)[]) {
-                                            if (typeof param === "string" && param.length > 0) {
-                                                lines.add(param);
-                                            } else if (param instanceof Uint8Array) {
-                                                const decoded = decoder.decode(param);
+                            if (code === 102) {
+                                if (Array.isArray(parameter)) {
+                                    for (const param of parameter) {
+                                        const parsed = parseCode(code, param);
 
-                                                if (decoded.length > 0) {
-                                                    lines.add(decoded);
-                                                }
-                                            }
+                                        if (parsed) {
+                                            lines.add(parsed);
                                         }
                                     }
-                                    break;
+                                }
+                            } else if (code === 356) {
+                                const parsed = parseCode(code, parameter);
 
-                                case 356:
-                                    if (typeof parameter === "string" && parameter.length > 0) {
-                                        lines.add(parameter);
-                                    } else if (parameter instanceof Uint8Array) {
-                                        const decoded = decoder.decode(parameter);
-
-                                        if (decoded.length > 0) {
-                                            lines.add(decoded);
-                                        }
-                                    }
-                                    break;
+                                if (parsed) {
+                                    lines.add(parsed);
+                                }
                             }
                         }
                     }
@@ -160,8 +248,6 @@ export async function readOther(
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filenames = (await readdir(inputPath)).filter((filename) => re.test(filename));
 
@@ -187,43 +273,11 @@ export async function readOther(
                 const description: string | Uint8Array = getValueBySymbolDesc(obj, "@description");
                 const note: string | Uint8Array = getValueBySymbolDesc(obj, "@note");
 
-                if (typeof name === "string" && name.length > 0) {
-                    lines.add(name);
-                } else if (name instanceof Uint8Array) {
-                    const decoded = decoder.decode(name);
+                for (const variable of [name, nickname, description, note]) {
+                    const parsed = parseOtherVariable(variable);
 
-                    if (decoded.length > 0) {
-                        lines.add(decoded);
-                    }
-                }
-
-                if (typeof nickname === "string" && nickname.length > 0) {
-                    lines.add(nickname);
-                } else if (nickname instanceof Uint8Array) {
-                    const decoded = decoder.decode(nickname);
-
-                    if (decoded.length > 0) {
-                        lines.add(decoded);
-                    }
-                }
-
-                if (typeof description === "string" && description.length > 0) {
-                    lines.add(description.replaceAll(/\r\n|\n/g, "\\#"));
-                } else if (description instanceof Uint8Array) {
-                    const decoded = decoder.decode(description);
-
-                    if (decoded.length > 0) {
-                        lines.add(decoded.replaceAll(/\r\n|\n/g, "\\#"));
-                    }
-                }
-
-                if (typeof note === "string" && note.length > 0) {
-                    lines.add(note.replaceAll(/\r\n|\n/g, "\\#"));
-                } else if (note instanceof Uint8Array) {
-                    const decoded = decoder.decode(note);
-
-                    if (decoded.length > 0) {
-                        lines.add(decoded.replaceAll(/\r\n|\n/g, "\\#"));
+                    if (parsed) {
+                        lines.add(parsed);
                     }
                 }
             }
@@ -264,14 +318,10 @@ export async function readOther(
                             if (code === 401 || code === 405) {
                                 inSeq = true;
 
-                                if (typeof parameter === "string" && parameter.length > 0) {
-                                    line.push(parameter);
-                                } else if (parameter instanceof Uint8Array) {
-                                    const decoded = decoder.decode(parameter);
+                                const parsed = parseCode(code, parameter);
 
-                                    if (decoded.length > 0) {
-                                        line.push(decoded);
-                                    }
+                                if (parsed) {
+                                    line.push(parsed);
                                 }
                             } else {
                                 if (inSeq) {
@@ -280,34 +330,22 @@ export async function readOther(
                                     inSeq = false;
                                 }
 
-                                switch (code) {
-                                    case 102:
-                                        if (Array.isArray(parameter)) {
-                                            for (const param of parameter as (string | Uint8Array)[]) {
-                                                if (typeof param === "string" && param.length > 0) {
-                                                    lines.add(param);
-                                                } else if (param instanceof Uint8Array) {
-                                                    const decoded = decoder.decode(param);
+                                if (code === 102) {
+                                    if (Array.isArray(parameter)) {
+                                        for (const param of parameter) {
+                                            const parsed = parseCode(code, param);
 
-                                                    if (decoded.length > 0) {
-                                                        lines.add(decoded);
-                                                    }
-                                                }
+                                            if (parsed) {
+                                                lines.add(parsed);
                                             }
                                         }
-                                        break;
+                                    }
+                                } else if (code === 356) {
+                                    const parsed = parseCode(code, parameter);
 
-                                    case 356:
-                                        if (typeof parameter === "string" && parameter.length > 0) {
-                                            lines.add(parameter);
-                                        } else if (parameter instanceof Uint8Array) {
-                                            const decoded = decoder.decode(parameter);
-
-                                            if (decoded.length > 0) {
-                                                lines.add(decoded);
-                                            }
-                                        }
-                                        break;
+                                    if (parsed) {
+                                        lines.add(parsed);
+                                    }
                                 }
                             }
                         }
@@ -330,23 +368,21 @@ export async function readOther(
  *
  * Based on the engine type, strings can be either UTF-8 encoded or binary.
  * This function handles both cases.
- * @param {string} inputFilePath - path to .rx/rv/rvdata2 file
+ * @param {string} systemFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
  * @param {boolean} logging - whether to log or not
  * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
 export async function readSystem(
-    inputFilePath: string,
+    systemFilePath: string,
     outputPath: string,
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-
-    const file = Bun.file(inputFilePath);
+    const file = Bun.file(systemFilePath);
     const obj = load(await file.arrayBuffer()) as RubyObject;
-    const ext = inputFilePath.slice(inputFilePath.lastIndexOf(".") + 1, inputFilePath.length);
+    const ext = systemFilePath.slice(systemFilePath.lastIndexOf(".") + 1, systemFilePath.length);
 
     const lines = OrderedSet().asMutable() as OrderedSet<string>;
 
@@ -370,38 +406,34 @@ export async function readSystem(
     // Game armor types names
     const armorTypes = getValueBySymbolDesc(obj, symbolDescs[3]) as (string | Uint8Array)[] | undefined;
     // Game currency unit name
-    const currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
+    let currencyUnit = getValueBySymbolDesc(obj, symbolDescs[4]) as string | Uint8Array | undefined;
     // Game terms (vocabulary), called "words" in RPG Maker XP
     const terms = getValueBySymbolDesc(obj, symbolDescs[5]) as RubyObject;
     // Game title
-    const gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
+    let gameTitle = getValueBySymbolDesc(obj, symbolDescs[6]) as Uint8Array | string;
 
     for (const arr of [elements, skillTypes, weaponTypes, armorTypes]) {
         if (!arr) {
             continue;
         }
 
-        for (const string of arr) {
+        for (let string of arr) {
+            if (string instanceof Uint8Array) {
+                string = decode(string);
+            }
+
             if (typeof string === "string" && string.length > 0) {
                 lines.add(string);
-            } else if (string instanceof Uint8Array) {
-                const decoded = decoder.decode(string);
-
-                if (decoded.length > 0) {
-                    lines.add(decoded);
-                }
             }
         }
     }
 
+    if (currencyUnit instanceof Uint8Array) {
+        currencyUnit = decode(currencyUnit);
+    }
+
     if (typeof currencyUnit === "string" && currencyUnit.length > 0) {
         lines.add(currencyUnit);
-    } else if (currencyUnit instanceof Uint8Array) {
-        const decoded = decoder.decode(currencyUnit);
-
-        if (decoded.length > 0) {
-            lines.add(decoded);
-        }
     }
 
     const termsSymbols = Object.getOwnPropertySymbols(terms);
@@ -410,7 +442,7 @@ export async function readSystem(
         const value = terms[termsSymbols[i]] as Uint8Array | string[];
 
         if (value instanceof Uint8Array) {
-            const decoded = decoder.decode(value);
+            const decoded = decode(value);
 
             if (decoded.length > 0) {
                 lines.add(decoded);
@@ -425,14 +457,12 @@ export async function readSystem(
         }
     }
 
+    if (gameTitle instanceof Uint8Array) {
+        gameTitle = decode(gameTitle);
+    }
+
     if (typeof gameTitle === "string" && gameTitle.length > 0) {
         lines.add(gameTitle);
-    } else if (gameTitle instanceof Uint8Array) {
-        const decoded = decoder.decode(gameTitle);
-
-        if (decoded.length > 0) {
-            lines.add(decoded);
-        }
     }
 
     if (logging) {
@@ -445,21 +475,19 @@ export async function readSystem(
 
 /**
  * Reads Scripts .rx/rv/rvdata2 file from inputFilePath and parses it into .txt file in outputPath.
- * @param {string} inputFilePath - path to .rx/rv/rvdata2 file
+ * @param {string} scriptsFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
  * @param {boolean} logging - whether to log or not
  * @param {string} logString - string to log
  * @returns {Promise<void>}
  */
 export async function readScripts(
-    inputFilePath: string,
+    scriptsFilePath: string,
     outputPath: string,
     logging: boolean,
     logString: string
 ): Promise<void> {
-    const decoder = new TextDecoder();
-
-    const file = Bun.file(inputFilePath);
+    const file = Bun.file(scriptsFilePath);
     const uintarrArr = load(await file.arrayBuffer(), { string: "binary" }) as Uint8Array[][];
 
     const fullCode = [];
@@ -467,7 +495,7 @@ export async function readScripts(
         // To convert Ruby code to string, it needs to be inflated
         // Then we decode our inflated string to the actual UTF-8 encoded string
         // And then replace \r\ns with \#s, which are out custom newline marks
-        const codeString = decoder.decode(inflate(uintarrArr[i][2])).replaceAll(/\r?\n/g, "\\#");
+        const codeString = decode(inflate(uintarrArr[i][2])).replaceAll(/\r?\n/g, "\\#");
         fullCode.push(codeString);
     }
 

@@ -5,19 +5,111 @@ use rayon::prelude::*;
 use serde_json::{from_str, Value};
 use std::{
     fs::{read_dir, read_to_string, write, DirEntry},
-    path::{Path, PathBuf},
+    path::Path,
 };
 
-/// Reads all Map .json files of input_path and parses them into .txt files in output_path.
+#[allow(clippy::single_match, unused_mut)]
+fn parse_code(code: u16, mut parameter: &str, game_type: &str) -> Option<String> {
+    match code {
+        401 | 405 => match game_type {
+            "termina" => {}
+            // Implement custom parsing for other games
+            _ => {}
+        },
+        102 => match game_type {
+            "termina" => {}
+            // Implement custom parsing for other games
+            _ => {}
+        },
+        356 => match game_type {
+            "termina" => {
+                if !parameter.starts_with("GabText")
+                    && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
+                {
+                    return None;
+                }
+            }
+            // Implement custom parsing for other games
+            _ => return None,
+        },
+        _ => return None,
+    }
+
+    Some(parameter.to_string())
+}
+
+#[allow(clippy::single_match, unused_mut)]
+fn parse_variable(
+    mut variable: &str,
+    name: &str,
+    filename: &str,
+    game_type: &str,
+) -> Option<String> {
+    match name {
+        "name" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "nickname" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "description" => match game_type {
+            "termina" => {}
+            _ => {}
+        },
+        "note" => match game_type {
+            "termina" => {
+                if !filename.starts_with("Common") && !filename.starts_with("Troops") {
+                    if filename.starts_with("Items") {
+                        for string in [
+                            "<Menu Category: Items>",
+                            "<Menu Category: Food>",
+                            "<Menu Category: Healing>",
+                            "<Menu Category: Body bag>",
+                        ] {
+                            if variable.contains(string) {
+                                return Some(string.to_string());
+                            }
+                        }
+                    }
+
+                    if filename.starts_with("Classes") {
+                        return Some(variable.to_string());
+                    }
+
+                    if filename.starts_with("Armors") && !variable.starts_with("///") {
+                        return Some(variable.to_string());
+                    }
+
+                    return None;
+                }
+            }
+            _ => {}
+        },
+        _ => return None,
+    }
+
+    Some(variable.to_string())
+}
+
+/// Reads all Map .json files of map_path and parses them into .txt files in output_path.
 /// # Parameters
-/// * `input_path` - path to directory than contains .json files
+/// * `map_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
-pub fn read_map(input_path: &Path, output_path: &Path, logging: bool, log_string: &str) {
+/// * `game_type` - game type for custom parsing
+pub fn read_map(
+    map_path: &Path,
+    output_path: &Path,
+    logging: bool,
+    log_string: &str,
+    game_type: &str,
+) {
     let re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
-    let files: Vec<DirEntry> = read_dir(input_path)
+    let files: Vec<DirEntry> = read_dir(map_path)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| {
@@ -70,7 +162,12 @@ pub fn read_map(input_path: &Path, output_path: &Path, logging: bool, log_string
                                 let parameter: &str = parameter_value.as_str().unwrap();
 
                                 if !parameter.is_empty() {
-                                    line.push(parameter.to_string());
+                                    let parsed: Option<String> =
+                                        parse_code(code, parameter, game_type);
+
+                                    if let Some(parsed) = parsed {
+                                        line.push(parsed);
+                                    }
                                 }
                             }
                         } else {
@@ -88,7 +185,12 @@ pub fn read_map(input_path: &Path, output_path: &Path, logging: bool, log_string
                                                 let param: &str = param_value.as_str().unwrap();
 
                                                 if !param.is_empty() {
-                                                    lines.insert(param.to_string());
+                                                    let parsed: Option<String> =
+                                                        parse_code(code, param, game_type);
+
+                                                    if let Some(parsed) = parsed {
+                                                        lines.insert(parsed);
+                                                    }
                                                 }
                                             }
                                         }
@@ -100,7 +202,12 @@ pub fn read_map(input_path: &Path, output_path: &Path, logging: bool, log_string
                                         let parameter: &str = parameter_value.as_str().unwrap();
 
                                         if !parameter.is_empty() {
-                                            lines.insert(parameter.to_string());
+                                            let parsed: Option<String> =
+                                                parse_code(code, parameter, game_type);
+
+                                            if let Some(parsed) = parsed {
+                                                lines.insert(parsed);
+                                            }
                                         }
                                     }
                                 }
@@ -147,16 +254,23 @@ pub fn read_map(input_path: &Path, output_path: &Path, logging: bool, log_string
     .unwrap();
 }
 
-/// Reads all Other .json files of input_path and parses them into .txt files in output_path.
+/// Reads all Other .json files of other_path and parses them into .txt files in output_path.
 /// # Parameters
-/// * `input_path` - path to directory than contains .json files
+/// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
-pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_string: &str) {
+/// * `game_type` - game type for custom parsing
+pub fn read_other(
+    other_path: &Path,
+    output_path: &Path,
+    logging: bool,
+    log_string: &str,
+    game_type: &str,
+) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
 
-    let files: Vec<DirEntry> = read_dir(input_path)
+    let files: Vec<DirEntry> = read_dir(other_path)
         .unwrap()
         .flatten()
         .filter(|entry: &DirEntry| {
@@ -183,35 +297,25 @@ pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_stri
         // of name, nickname, description and note
         if !filename.starts_with("Common") && !filename.starts_with("Troops") {
             for obj in obj_arr {
-                if obj["name"].is_string() {
-                    let name: &str = obj["name"].as_str().unwrap();
-
-                    if !name.is_empty() {
-                        lines.insert(name.to_string());
+                for (variable, name) in [
+                    (obj["name"].as_str(), "name"),
+                    (obj["nickname"].as_str(), "nickname"),
+                    (obj["description"].as_str(), "description"),
+                    (obj["note"].as_str(), "note"),
+                ] {
+                    if variable.is_none() {
+                        continue;
                     }
-                }
 
-                if obj["description"].is_string() {
-                    let description: &str = obj["description"].as_str().unwrap();
+                    let variable: &str = variable.unwrap();
 
-                    if !description.is_empty() {
-                        lines.insert(description.replace('\n', r"\#"));
-                    }
-                }
+                    if !variable.is_empty() {
+                        let parsed: Option<String> =
+                            parse_variable(variable, name, &filename, game_type);
 
-                if obj["nickname"].is_string() {
-                    let nickname: &str = obj["nickname"].as_str().unwrap();
-
-                    if !nickname.is_empty() {
-                        lines.insert(nickname.to_string());
-                    }
-                }
-
-                if obj["note"].is_string() {
-                    let note: &str = obj["note"].as_str().unwrap();
-
-                    if !note.is_empty() {
-                        lines.insert(note.replace('\n', r"\#"));
+                        if let Some(parsed) = parsed {
+                            lines.insert(parsed.replace('\n', r"\#"));
+                        }
                     }
                 }
             }
@@ -256,7 +360,12 @@ pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_stri
                                     let parameter: &str = parameter_value.as_str().unwrap();
 
                                     if !parameter.is_empty() {
-                                        line.push(parameter.to_string());
+                                        let parsed: Option<String> =
+                                            parse_code(code, parameter, game_type);
+
+                                        if let Some(parsed) = parsed {
+                                            line.push(parsed);
+                                        }
                                     }
                                 }
                             } else {
@@ -274,7 +383,12 @@ pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_stri
                                                     let param: &str = param_value.as_str().unwrap();
 
                                                     if !param.is_empty() {
-                                                        lines.insert(param.to_string());
+                                                        let parsed: Option<String> =
+                                                            parse_code(code, param, game_type);
+
+                                                        if let Some(parsed) = parsed {
+                                                            lines.insert(parsed);
+                                                        }
                                                     }
                                                 }
                                             }
@@ -286,7 +400,12 @@ pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_stri
                                             let parameter: &str = parameter_value.as_str().unwrap();
 
                                             if !parameter.is_empty() {
-                                                lines.insert(parameter.to_string());
+                                                let parsed: Option<String> =
+                                                    parse_code(code, parameter, game_type);
+
+                                                if let Some(parsed) = parsed {
+                                                    lines.insert(parsed);
+                                                }
                                             }
                                         }
                                     }
@@ -317,16 +436,14 @@ pub fn read_other(input_path: &Path, output_path: &Path, logging: bool, log_stri
     }
 }
 
-/// Reads System .json file of input_path and parses it into .txt file in output_path.
+/// Reads System .json file of other_path and parses it into .txt file in output_path.
 /// # Parameters
-/// * `input_path` - path to directory than contains .json files
+/// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
 /// * `log_string` - string to log
-pub fn read_system(input_path: &Path, output_path: &Path, logging: bool, log_string: &str) {
-    let system_file: PathBuf = input_path.join("System.json");
-
-    let obj: Value = from_str(&read_to_string(system_file).unwrap()).unwrap();
+pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, log_string: &str) {
+    let obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
     let mut lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
 

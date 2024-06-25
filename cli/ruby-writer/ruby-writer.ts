@@ -2,8 +2,8 @@ import { mkdir, readdir, exists } from "node:fs/promises";
 import { Command, Help, Option, program } from "commander";
 import { getUserLocale } from "get-user-locale";
 
-import { readMap, readOther, readSystem, readScripts } from "./read";
-import { writeMap, writeOther, writeSystem, writeScripts } from "./write";
+import { readMap, readOther, readSystem, readScripts, setReadParsingMethod } from "./read";
+import { writeMap, writeOther, writeSystem, writeScripts, setWriteParsingMethod } from "./write";
 import { ProgramLocalization } from "./program-localization";
 import "./shuffle";
 
@@ -74,7 +74,8 @@ program
     )
     .addOption(
         new Option(`--no <${localization.noType}>`, localization.noArgDesc).argParser((value) => value.split(","))
-    );
+    )
+    .option(`--disable-custom-parsing`, localization.disableCustomParsingDesc, false);
 
 program
     .command("read")
@@ -87,7 +88,7 @@ program
     .description(localization.readCommandDesc)
     .action(async (_name, options: Command) => {
         const { inputDir, outputDir }: { [key: string]: string } = options.opts();
-        const { log, no } = program.opts();
+        const { log, no, disableCustomParsing } = program.opts();
 
         const paths: Record<string, string> = {
             original: `${inputDir}/original`,
@@ -114,6 +115,26 @@ program
         await mkdir(paths.maps, { recursive: true });
         await mkdir(paths.other, { recursive: true });
 
+        let systemPath;
+        const systemPaths = [
+            `${paths.original}/System.rvdata2`,
+            `${paths.original}/System.rvdata`,
+            `${paths.original}/System.rxdata`,
+        ];
+
+        for (const _systemPath of systemPaths) {
+            const file = Bun.file(_systemPath);
+
+            if (await file.exists()) {
+                systemPath = _systemPath;
+                break;
+            }
+        }
+
+        if (systemPath && !disableCustomParsing) {
+            await setReadParsingMethod(systemPath);
+        }
+
         if (!no || !no.includes("maps")) {
             await readMap(paths.original, paths.maps, log, localization.readLogString);
         }
@@ -123,19 +144,8 @@ program
         }
 
         if (!no || !no.includes("system")) {
-            const systemPaths = [
-                `${paths.original}/System.rvdata2`,
-                `${paths.original}/System.rvdata`,
-                `${paths.original}/System.rxdata`,
-            ];
-
-            for (const systemPath of systemPaths) {
-                const file = Bun.file(systemPath);
-
-                if (await file.exists()) {
-                    await readSystem(systemPath, paths.other, log, localization.readLogString);
-                    break;
-                }
+            if (systemPath) {
+                await readSystem(systemPath, paths.other, log, localization.readLogString);
             }
         }
 
@@ -171,7 +181,7 @@ program
     .description(localization.writeCommandDesc)
     .action(async (_name, options: Command) => {
         const { inputDir, outputDir, drunk }: { [key: string]: string } = options.opts();
-        const { log, no } = program.opts();
+        const { log, no, disableCustomParsing } = program.opts();
 
         const drunkInt = Number.parseInt(drunk);
 
@@ -203,6 +213,24 @@ program
 
         await mkdir(paths.output, { recursive: true });
 
+        let systemPath;
+        for (const _systemPath of [
+            `${paths.original}/System.rvdata2`,
+            `${paths.original}/System.rvdata`,
+            `${paths.original}/System.rxdata`,
+        ]) {
+            const file = Bun.file(_systemPath);
+
+            if (await file.exists()) {
+                systemPath = _systemPath;
+                break;
+            }
+        }
+
+        if (systemPath && !disableCustomParsing) {
+            await setWriteParsingMethod(systemPath);
+        }
+
         if (!no || !no.includes("maps")) {
             await writeMap(paths.maps, paths.original, paths.output, drunkInt, log, localization.writeLogString);
         }
@@ -212,26 +240,8 @@ program
         }
 
         if (!no || !no.includes("system")) {
-            const systemPaths = [
-                `${paths.original}/System.rvdata2`,
-                `${paths.original}/System.rvdata`,
-                `${paths.original}/System.rxdata`,
-            ];
-
-            for (const systemPath of systemPaths) {
-                const file = Bun.file(systemPath);
-
-                if (await file.exists()) {
-                    await writeSystem(
-                        systemPath,
-                        paths.other,
-                        paths.output,
-                        drunkInt,
-                        log,
-                        localization.writeLogString
-                    );
-                    break;
-                }
+            if (systemPath) {
+                await writeSystem(systemPath, paths.other, paths.output, drunkInt, log, localization.writeLogString);
             }
         }
 
