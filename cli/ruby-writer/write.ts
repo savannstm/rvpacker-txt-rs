@@ -3,7 +3,6 @@ import { dump, load } from "@hyrious/marshal";
 import { deflate } from "pako";
 
 import "./shuffle";
-import { readGameTitle } from "./read";
 import { getValueBySymbolDesc, setValueBySymbolDesc } from "./symbol-utils";
 
 const encoder = new TextEncoder();
@@ -12,20 +11,7 @@ const decoder = new TextDecoder();
 const encode = (string: string): Uint8Array => encoder.encode(string);
 const decode = (buffer: Uint8Array): string => decoder.decode(buffer);
 
-let parsingMethod: string;
-const parsingRegExps = {} as { [key: string]: RegExp };
-
-export async function setWriteParsingMethod(systemFilePath: string) {
-    const gameTitle = await readGameTitle(systemFilePath);
-    const lowercased = gameTitle!.toLowerCase();
-
-    if (lowercased.includes("lisa")) {
-        parsingMethod = "lisa";
-        parsingRegExps.lisaMaps = /^\\et\[[0-9]+\]/;
-        parsingRegExps.lisaTroops = /^\\nbt/;
-        parsingRegExps.lisaOtheVariable = /^<.*>\.?$/;
-    }
-}
+let translationMap: null | Map<string, string>;
 
 function getVariable(variable: string | Uint8Array): void | string | Uint8Array {
     let type = "string";
@@ -46,9 +32,11 @@ function getVariable(variable: string | Uint8Array): void | string | Uint8Array 
     }
 }
 
-let translationMap: null | Map<string, string>;
-
-function getCode(code: number, parameter: string | string[] | Uint8Array): undefined | string | string[] | Uint8Array {
+function getCode(
+    code: number,
+    parameter: string | string[] | Uint8Array,
+    gameType: string
+): undefined | string | string[] | Uint8Array {
     switch (code) {
         case 401 || 402 || 356 || 405:
             {
@@ -60,10 +48,9 @@ function getCode(code: number, parameter: string | string[] | Uint8Array): undef
                 }
 
                 if (typeof parameter === "string" && parameter.length > 0) {
-                    switch (parsingMethod) {
+                    switch (gameType) {
                         case "lisa":
-                            const match =
-                                parameter.match(parsingRegExps.lisaMaps) ?? parameter.match(parsingRegExps.lisaTroops);
+                            const match = parameter.match(/^\\et\[[0-9]+\]/) ?? parameter.match(/^\\nbt/);
 
                             if (match) {
                                 parameter = parameter.slice(match[0].length);
@@ -209,6 +196,7 @@ function mergeOther(objArr: RubyObject[]): RubyObject[] {
  * @param {number} drunk - drunkness level
  * @param {boolean} logging - whether to log or not
  * @param {string} logString - string to log
+ * @param {string} gameType - game type for custom parsing
  * @returns {Promise<void>}
  */
 export async function writeMap(
@@ -217,7 +205,8 @@ export async function writeMap(
     outputPath: string,
     drunk: number,
     logging: boolean,
-    logString: string
+    logString: string,
+    gameType: string
 ): Promise<void> {
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
     const filtered = (await readdir(originalPath)).filter((filename) => re.test(filename));
@@ -298,7 +287,7 @@ export async function writeMap(
 
                     for (const [i, parameter] of parameters.entries()) {
                         if ([401, 402, 356].includes(code)) {
-                            const gotten = getCode(code, parameter);
+                            const gotten = getCode(code, parameter, gameType);
 
                             if (gotten) {
                                 parameters[i] = gotten as string | Uint8Array;
@@ -307,7 +296,7 @@ export async function writeMap(
                         } else if (code === 102) {
                             if (Array.isArray(parameter)) {
                                 for (const [j, param] of parameter.entries()) {
-                                    const gotten = getCode(code, param) as string | Uint8Array;
+                                    const gotten = getCode(code, param, gameType) as string | Uint8Array;
 
                                     if (gotten) {
                                         (parameters[i][j] as string | Uint8Array) = gotten;
@@ -338,6 +327,7 @@ export async function writeMap(
  * @param {number} drunk - drunkness level
  * @param {boolean} logging - whether to log or not
  * @param {string} logString - string to log
+ * @param {string} gameType - game type for custom parsing
  * @returns {Promise<void>}
  */
 export async function writeOther(
@@ -346,7 +336,8 @@ export async function writeOther(
     outputPath: string,
     drunk: number,
     logging: boolean,
-    logString: string
+    logString: string,
+    gameType: string
 ): Promise<void> {
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filtered = (await readdir(originalPath)).filter((filename) => re.test(filename));
@@ -450,7 +441,7 @@ export async function writeOther(
 
                         for (const [i, parameter] of parameters.entries()) {
                             if ([401, 402, 356, 405].includes(code)) {
-                                const gotten = getCode(code, parameter);
+                                const gotten = getCode(code, parameter, gameType);
 
                                 if (gotten) {
                                     parameters[i] = gotten as string | Uint8Array;
@@ -459,7 +450,7 @@ export async function writeOther(
                             } else if (code === 102) {
                                 if (Array.isArray(parameter)) {
                                     for (const [j, param] of parameter.entries()) {
-                                        const gotten = getCode(code, param) as string | Uint8Array;
+                                        const gotten = getCode(code, param, gameType) as string | Uint8Array;
 
                                         if (gotten) {
                                             (parameters[i][j] as string | Uint8Array) = gotten;

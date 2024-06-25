@@ -2,12 +2,35 @@ import { mkdir, readdir, exists } from "node:fs/promises";
 import { Command, Help, Option, program } from "commander";
 import { getUserLocale } from "get-user-locale";
 
-import { readMap, readOther, readSystem, readScripts, setReadParsingMethod } from "./read";
-import { writeMap, writeOther, writeSystem, writeScripts, setWriteParsingMethod } from "./write";
+import { readMap, readOther, readSystem, readScripts } from "./read";
+import { writeMap, writeOther, writeSystem, writeScripts } from "./write";
 import { ProgramLocalization } from "./program-localization";
 import "./shuffle";
+import { load } from "@hyrious/marshal";
+import { getValueBySymbolDesc } from "./symbol-utils";
 
 const startTime = performance.now();
+
+async function getGameType(systemFilePath: string): Promise<string> {
+    const file = Bun.file(systemFilePath);
+    const obj = load(await file.arrayBuffer()) as RubyObject;
+
+    let gameTitle = getValueBySymbolDesc(obj, "@game_title");
+
+    if (gameTitle instanceof Uint8Array) {
+        const decoded = new TextDecoder().decode(gameTitle);
+
+        if (decoded.length > 0) {
+            gameTitle = decoded;
+        }
+    }
+
+    if (typeof gameTitle === "string" && gameTitle.length > 0) {
+        return gameTitle;
+    }
+
+    return "";
+}
 const args = process.argv;
 
 let locale = getUserLocale();
@@ -131,16 +154,24 @@ program
             }
         }
 
-        if (systemPath && !disableCustomParsing) {
-            await setReadParsingMethod(systemPath);
+        let gameType: string;
+
+        if (!disableCustomParsing) {
+            if (systemPath) {
+                gameType = await getGameType(systemPath);
+            } else {
+                throw localization.systemFileMissing;
+            }
+        } else {
+            gameType = "";
         }
 
         if (!no || !no.includes("maps")) {
-            await readMap(paths.original, paths.maps, log, localization.readLogString);
+            await readMap(paths.original, paths.maps, log, localization.readLogString, gameType);
         }
 
         if (!no || !no.includes("other")) {
-            await readOther(paths.original, paths.other, log, localization.readLogString);
+            await readOther(paths.original, paths.other, log, localization.readLogString, gameType);
         }
 
         if (!no || !no.includes("system")) {
@@ -227,16 +258,40 @@ program
             }
         }
 
-        if (systemPath && !disableCustomParsing) {
-            await setWriteParsingMethod(systemPath);
+        let gameType: string;
+
+        if (!disableCustomParsing) {
+            if (systemPath) {
+                gameType = await getGameType(systemPath);
+            } else {
+                throw localization.systemFileMissing;
+            }
+        } else {
+            gameType = "";
         }
 
         if (!no || !no.includes("maps")) {
-            await writeMap(paths.maps, paths.original, paths.output, drunkInt, log, localization.writeLogString);
+            await writeMap(
+                paths.maps,
+                paths.original,
+                paths.output,
+                drunkInt,
+                log,
+                localization.writeLogString,
+                gameType
+            );
         }
 
         if (!no || !no.includes("other")) {
-            await writeOther(paths.other, paths.original, paths.output, drunkInt, log, localization.writeLogString);
+            await writeOther(
+                paths.other,
+                paths.original,
+                paths.output,
+                drunkInt,
+                log,
+                localization.writeLogString,
+                gameType
+            );
         }
 
         if (!no || !no.includes("system")) {

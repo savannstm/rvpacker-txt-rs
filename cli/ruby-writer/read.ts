@@ -5,27 +5,13 @@ import { inflate } from "pako";
 
 import { getValueBySymbolDesc } from "./symbol-utils";
 
-let parsingMethod: string;
-const parsingRegExps = {} as { [key: string]: RegExp };
 const decoder = new TextDecoder();
 
-function decode(buffer: Uint8Array): string {
+const decode = (buffer: Uint8Array): string => {
     return decoder.decode(buffer);
-}
+};
 
-export async function setReadParsingMethod(systemFilePath: string) {
-    const gameTitle = await readGameTitle(systemFilePath);
-    const lowercased = gameTitle!.toLowerCase();
-
-    if (lowercased.includes("lisa")) {
-        parsingMethod = "lisa";
-        parsingRegExps.lisaMaps = /^\\et\[[0-9]+\]/;
-        parsingRegExps.lisaTroops = /^\\nbt/;
-        parsingRegExps.lisaOtherVariable = /^<.*>\.?$/;
-    }
-}
-
-function parseCode(code: number, parameter: (string | Uint8Array) | string[]): string | void {
+function parseCode(code: number, parameter: (string | Uint8Array) | string[], gameType: string): string | void {
     switch (code) {
         case 401 || 405:
             if (parameter instanceof Uint8Array) {
@@ -33,11 +19,9 @@ function parseCode(code: number, parameter: (string | Uint8Array) | string[]): s
             }
 
             if (typeof parameter === "string" && parameter.length > 0) {
-                switch (parsingMethod) {
+                switch (gameType) {
                     case "lisa":
-                        const match =
-                            (parameter as string).match(parsingRegExps.lisaMaps) ??
-                            (parameter as string).match(parsingRegExps.lisaTroops);
+                        const match = parameter.match(/^\\et\[[0-9]+\]/) ?? parameter.match(/^\\et\[[0-9]+\]/);
 
                         if (match) {
                             parameter = parameter.slice(match[0].length);
@@ -45,9 +29,9 @@ function parseCode(code: number, parameter: (string | Uint8Array) | string[]): s
                         break;
                 }
 
-                return parameter as string;
+                return parameter;
             }
-        case 102 || 402:
+        case 102:
             if (parameter instanceof Uint8Array) {
                 parameter = decode(parameter);
             }
@@ -68,7 +52,7 @@ function parseCode(code: number, parameter: (string | Uint8Array) | string[]): s
     }
 }
 
-function parseOtherVariable(variable: string | Uint8Array): string | void {
+function parseVariable(variable: string | Uint8Array, gameType: string): string | undefined {
     if (variable instanceof Uint8Array) {
         variable = decode(variable);
     }
@@ -77,40 +61,21 @@ function parseOtherVariable(variable: string | Uint8Array): string | void {
         const linesCount = variable.match(/\r?\n/g)?.length ?? 0;
 
         if (linesCount >= 1) {
-            const replaced = variable.replaceAll(/\r?\n/g, "\\#");
+            switch (gameType) {
+                case "lisa":
+                    variable = variable.replaceAll(/\r?\n/g, "\\#");
 
-            if (
-                !replaced.split("\\#").every((line) => parsingRegExps.lisaOtherVariable.test(line) || line.length === 0)
-            ) {
-                return replaced;
+                    if (!variable.split("\\#").every((line) => /^<.*>\.?$/.test(line) || line.length === 0)) {
+                        return variable;
+                    } else {
+                        return undefined;
+                    }
+                    break;
             }
         }
-
-        if (!parsingRegExps.lisaOtherVariable.test(variable)) {
-            return variable;
-        }
-    }
-}
-
-export async function readGameTitle(systemFilePath: string): Promise<string | undefined> {
-    const file = Bun.file(systemFilePath);
-    const obj = load(await file.arrayBuffer()) as RubyObject;
-
-    const gameTitle = getValueBySymbolDesc(obj, "@game_title");
-
-    let titleString;
-
-    if (typeof gameTitle === "string" && gameTitle.length > 0) {
-        titleString = gameTitle;
-    } else if (gameTitle instanceof Uint8Array) {
-        const decoded = decode(gameTitle);
-
-        if (decoded.length > 0) {
-            titleString = decoded;
-        }
     }
 
-    return titleString;
+    return variable;
 }
 
 /**
@@ -128,7 +93,8 @@ export async function readMap(
     inputPath: string,
     outputPath: string,
     logging: boolean,
-    logString: string
+    logString: string,
+    gameType: string
 ): Promise<void> {
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
     const files = (await readdir(inputPath)).filter((filename) => re.test(filename));
@@ -185,7 +151,7 @@ export async function readMap(
                         if (code === 401) {
                             inSeq = true;
 
-                            const parsed = parseCode(code, parameter);
+                            const parsed = parseCode(code, parameter, gameType);
 
                             if (parsed) {
                                 line.push(parsed);
@@ -200,7 +166,7 @@ export async function readMap(
                             if (code === 102) {
                                 if (Array.isArray(parameter)) {
                                     for (const param of parameter) {
-                                        const parsed = parseCode(code, param);
+                                        const parsed = parseCode(code, param, gameType);
 
                                         if (parsed) {
                                             lines.add(parsed);
@@ -208,7 +174,7 @@ export async function readMap(
                                     }
                                 }
                             } else if (code === 356) {
-                                const parsed = parseCode(code, parameter);
+                                const parsed = parseCode(code, parameter, gameType);
 
                                 if (parsed) {
                                     lines.add(parsed);
@@ -246,7 +212,8 @@ export async function readOther(
     inputPath: string,
     outputPath: string,
     logging: boolean,
-    logString: string
+    logString: string,
+    gameType: string
 ): Promise<void> {
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
     const filenames = (await readdir(inputPath)).filter((filename) => re.test(filename));
@@ -274,7 +241,7 @@ export async function readOther(
                 const note: string | Uint8Array = getValueBySymbolDesc(obj, "@note");
 
                 for (const variable of [name, nickname, description, note]) {
-                    const parsed = parseOtherVariable(variable);
+                    const parsed = parseVariable(variable, gameType);
 
                     if (parsed) {
                         lines.add(parsed);
@@ -318,7 +285,7 @@ export async function readOther(
                             if (code === 401 || code === 405) {
                                 inSeq = true;
 
-                                const parsed = parseCode(code, parameter);
+                                const parsed = parseCode(code, parameter, gameType);
 
                                 if (parsed) {
                                     line.push(parsed);
@@ -333,7 +300,7 @@ export async function readOther(
                                 if (code === 102) {
                                     if (Array.isArray(parameter)) {
                                         for (const param of parameter) {
-                                            const parsed = parseCode(code, param);
+                                            const parsed = parseCode(code, param, gameType);
 
                                             if (parsed) {
                                                 lines.add(parsed);
@@ -341,7 +308,7 @@ export async function readOther(
                                         }
                                     }
                                 } else if (code === 356) {
-                                    const parsed = parseCode(code, parameter);
+                                    const parsed = parseCode(code, parameter, gameType);
 
                                     if (parsed) {
                                         lines.add(parsed);
