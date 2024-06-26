@@ -38,7 +38,7 @@ function getCode(
     gameType: string
 ): undefined | string | string[] | Uint8Array {
     switch (code) {
-        case 401 || 402 || 356 || 405:
+        case 401 || 356 || 405:
             {
                 let type = "string";
 
@@ -68,7 +68,7 @@ function getCode(
                 }
             }
             break;
-        case 102:
+        case 102 || 402:
             {
                 let type = "string";
 
@@ -193,9 +193,9 @@ function mergeOther(objArr: RubyObject[]): RubyObject[] {
  * @param {string} mapsPath - path to the maps directory
  * @param {string} originalPath - path to the original directory
  * @param {string} outputPath - path to the output directory
- * @param {number} drunk - drunkness level
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {number} shuffleLevel - level of shuffle
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @param {string} gameType - game type for custom parsing
  * @returns {Promise<void>}
  */
@@ -203,9 +203,9 @@ export async function writeMap(
     mapsPath: string,
     originalPath: string,
     outputPath: string,
-    drunk: number,
+    shuffleLevel: number,
     logging: boolean,
-    logString: string,
+    logMsg: string,
     gameType: string
 ): Promise<void> {
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
@@ -233,11 +233,11 @@ export async function writeMap(
         .split("\n")
         .map((line) => line.replaceAll("\\#", "\n").trim());
 
-    if (drunk > 0) {
+    if (shuffleLevel > 0) {
         mapsTranslatedText = mapsTranslatedText.shuffle();
         namesTranslatedText = namesTranslatedText.shuffle();
 
-        if (drunk === 2) {
+        if (shuffleLevel === 2) {
             mapsTranslatedText = mapsTranslatedText.map((string) => {
                 return shuffleWords(string)!;
             });
@@ -311,7 +311,7 @@ export async function writeMap(
             }
 
             if (logging) {
-                console.log(`${logString} ${filename}`);
+                console.log(`${logMsg} ${filename}`);
             }
         }
 
@@ -324,9 +324,9 @@ export async function writeMap(
  * @param {string} otherPath - path to the other folder
  * @param {string} originalPath - path to the original folder
  * @param {string} outputPath - path to the output folder
- * @param {number} drunk - drunkness level
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {number} shuffleLevel - level of shuffle
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @param {string} gameType - game type for custom parsing
  * @returns {Promise<void>}
  */
@@ -334,9 +334,9 @@ export async function writeOther(
     otherPath: string,
     originalPath: string,
     outputPath: string,
-    drunk: number,
+    shuffleLevel: number,
     logging: boolean,
-    logString: string,
+    logMsg: string,
     gameType: string
 ): Promise<void> {
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
@@ -368,10 +368,10 @@ export async function writeOther(
             .split("\n")
             .map((string) => string.replaceAll("\\#", "\n"));
 
-        if (drunk > 0) {
+        if (shuffleLevel > 0) {
             otherTranslatedText = otherTranslatedText.shuffle();
 
-            if (drunk === 2) {
+            if (shuffleLevel === 2) {
                 otherTranslatedText = otherTranslatedText.map((string) => {
                     return shuffleWords(string)!;
                 });
@@ -467,7 +467,7 @@ export async function writeOther(
         }
 
         if (logging) {
-            console.log(`${logString} ${filename}`);
+            console.log(`${logMsg} ${filename}`);
         }
 
         await Bun.write(`${outputPath}/${filename}`, dump(objArr));
@@ -483,29 +483,29 @@ translationMap = null;
  * @param {string} systemFilePath - path to System.rx/rv/rvdata2 file
  * @param {string} otherPath - path to other directory
  * @param {string} outputPath - path to output directory
- * @param {number} drunk - drunkness level
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {number} shuffleLevel - level of shuffle
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function writeSystem(
     systemFilePath: string,
     otherPath: string,
     outputPath: string,
-    drunk: number,
+    shuffleLevel: number,
     logging: boolean,
-    logString: string
+    logMsg: string
 ): Promise<void> {
     const obj = load(await Bun.file(systemFilePath).arrayBuffer()) as RubyObject;
-    const ext = systemFilePath.slice(systemFilePath.lastIndexOf(".") + 1, systemFilePath.length);
+    const ext = systemFilePath.slice(systemFilePath.lastIndexOf(".") + 1);
 
     const systemOriginalText = (await Bun.file(`${otherPath}/system.txt`).text()).split("\n");
     let systemTranslatedText = (await Bun.file(`${otherPath}/system_trans.txt`).text()).split("\n");
 
-    if (drunk > 0) {
+    if (shuffleLevel > 0) {
         systemTranslatedText = systemTranslatedText.shuffle();
 
-        if (drunk === 2) {
+        if (shuffleLevel === 2) {
             systemTranslatedText = systemTranslatedText.map((string) => {
                 return shuffleWords(string)!;
             });
@@ -609,7 +609,7 @@ export async function writeSystem(
     }
 
     if (logging) {
-        console.log(`${logString} System.${ext}`);
+        console.log(`${logMsg} System.${ext}`);
     }
 
     await Bun.write(`${outputPath}/System.${ext}`, dump(obj));
@@ -618,12 +618,12 @@ export async function writeSystem(
 /**
  * Writes system.txt file back to its initial form.
  *
- * Does not support drunk, because shuffling the data will produce invalid data.
+ * Does not support shuffle, because shuffling the data will produce invalid data.
  * @param {string} scriptsFilePath - path to Scripts.rx/rv/rvdata2 file
  * @param {string} otherPath - path to other directory
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function writeScripts(
@@ -631,12 +631,12 @@ export async function writeScripts(
     otherPath: string,
     outputPath: string,
     logging: boolean,
-    logString: string
+    logMsg: string
 ): Promise<void> {
     const scriptsArr = load(await Bun.file(scriptsFilePath).arrayBuffer(), {
         string: "binary",
     }) as (string | Uint8Array)[][];
-    const ext = scriptsFilePath.slice(scriptsFilePath.lastIndexOf(".") + 1, scriptsFilePath.length);
+    const ext = scriptsFilePath.slice(scriptsFilePath.lastIndexOf(".") + 1);
 
     const translationArr = (await Bun.file(`${otherPath}/scripts_trans.txt`).text()).split("\n");
 
@@ -659,7 +659,7 @@ export async function writeScripts(
     }
 
     if (logging) {
-        console.log(`${logString} Scripts.${ext}`);
+        console.log(`${logMsg} Scripts.${ext}`);
     }
 
     await Bun.write(`${outputPath}/Scripts.${ext}`, dump(scriptsArr));

@@ -27,10 +27,10 @@ export class ProgramLocalization {
     true: string;
     logArgDesc: string;
     languageType: string;
-    drunkArgType: string;
-    drunkArgDesc: string;
-    readLogString: string;
-    writeLogString: string;
+    shuffleArgType: string;
+    shuffleArgDesc: string;
+    readLogMessage: string;
+    writeLogMessage: string;
     timeElapsed: string;
     systemFileMissing: string;
     scriptsFileMissing: string;
@@ -77,11 +77,11 @@ export class ProgramLocalization {
                 this.true = "true";
                 this.logArgDesc = "Enables logging.";
                 this.languageType = "LANGUAGE";
-                this.drunkArgType = "NUMBER";
-                this.drunkArgDesc =
+                this.shuffleArgType = "NUMBER";
+                this.shuffleArgDesc =
                     "At value 1: shuffles all translation lines. At value 2: shuffles all words in translation lines.";
-                this.readLogString = "Parsed file";
-                this.writeLogString = "Written file";
+                this.readLogMessage = "Parsed file";
+                this.writeLogMessage = "Written file";
                 this.timeElapsed = "Time elapsed (in seconds):";
                 this.systemFileMissing = "The system file does not exist.";
                 this.scriptsFileMissing = "The scripts file does not exist.";
@@ -126,13 +126,13 @@ export class ProgramLocalization {
                 this.true = "да";
                 this.logArgDesc = "Включает логирование.";
                 this.languageType = "ЯЗЫК";
-                this.drunkArgType = "ЧИСЛО";
+                this.shuffleArgType = "ЧИСЛО";
                 this.writeCommandDesc =
                     'Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".';
-                this.drunkArgDesc =
+                this.shuffleArgDesc =
                     "При значении 1: перемешивает все строки перевода. При значении 2: перемешивает все слова в строках перевода.";
-                this.readLogString = "Распарсен файл";
-                this.writeLogString = "Записан файл";
+                this.readLogMessage = "Распарсен файл";
+                this.writeLogMessage = "Записан файл";
                 this.timeElapsed = "Время выполнения (в секундах):";
                 this.systemFileMissing = "Файл System не существует.";
                 this.scriptsFileMissing = "Файл Scripts не существует.";

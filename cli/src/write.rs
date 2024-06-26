@@ -187,17 +187,17 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
 /// * `maps_path` - path to the maps directory
 /// * `original_path` - path to the original directory
 /// * `output_path` - path to the output directory
-/// * `drunk` - drunkness level
+/// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn write_maps(
     maps_path: &Path,
     original_path: &Path,
     output_path: &Path,
-    drunk: u8,
+    shuffle_level: u8,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
     game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
@@ -254,13 +254,13 @@ pub fn write_maps(
             .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
             .collect();
 
-    if drunk > 0 {
+    if shuffle_level > 0 {
         let mut rng: ThreadRng = thread_rng();
 
         maps_translated_text_vec.shuffle(&mut rng);
         names_translated_text_vec.shuffle(&mut rng);
 
-        if drunk == 2 {
+        if shuffle_level == 2 {
             for (text_string, name_string) in maps_translated_text_vec
                 .iter_mut()
                 .zip(names_translated_text_vec.iter_mut())
@@ -374,7 +374,8 @@ pub fn write_maps(
                                                     .unwrap()
                                                     .par_iter_mut()
                                                     .for_each(|param_value: &mut Value| {
-                                                        let param = param_value.as_str().unwrap();
+                                                        let param: &str =
+                                                            param_value.as_str().unwrap();
                                                         if param_value.is_string() {
                                                             let gotten: Option<String> = get_code(
                                                                 code,
@@ -397,7 +398,7 @@ pub fn write_maps(
             write(output_path.join(filename), obj.to_string()).unwrap();
 
             if logging {
-                println!("{log_string} {filename}");
+                println!("{log_msg} {filename}");
             }
         });
 }
@@ -407,17 +408,17 @@ pub fn write_maps(
 /// * `other_path` - path to the other directory
 /// * `original_path` - path to the original directory
 /// * `output_path` - path to the output directory
-/// * `drunk` - drunkness level
+/// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn write_other(
     other_path: &Path,
     original_path: &Path,
     output_path: &Path,
-    drunk: u8,
+    shuffle_level: u8,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
     game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
@@ -477,12 +478,12 @@ pub fn write_other(
                     .map(|line: &str| line.replace(r"\#", "\n"))
                     .collect();
 
-            if drunk > 0 {
+            if shuffle_level > 0 {
                 let mut rng: ThreadRng = thread_rng();
 
                 other_translated_text.shuffle(&mut rng);
 
-                if drunk == 2 {
+                if shuffle_level == 2 {
                     for text_string in other_translated_text.iter_mut() {
                         *text_string = shuffle_words(text_string);
                     }
@@ -633,7 +634,7 @@ pub fn write_other(
             write(output_path.join(filename), to_string(obj_arr).unwrap()).unwrap();
 
             if logging {
-                println!("{log_string} {filename}");
+                println!("{log_msg} {filename}");
             }
         });
 }
@@ -645,16 +646,16 @@ pub fn write_other(
 /// * `system_file_path` - path to the original system file
 /// * `other_path` - path to the other directory
 /// * `output_path` - path to the output directory
-/// * `drunk` - drunkness level
+/// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
 pub fn write_system(
     system_file_path: &Path,
     other_path: &Path,
     output_path: &Path,
-    drunk: u8,
+    shuffle_level: u8,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
 ) {
     let mut obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
@@ -671,12 +672,12 @@ pub fn write_system(
             .map(|line: &str| line.to_string())
             .collect();
 
-    if drunk > 0 {
+    if shuffle_level > 0 {
         let mut rng: ThreadRng = thread_rng();
 
         system_translated_text.shuffle(&mut rng);
 
-        if drunk == 2 {
+        if shuffle_level == 2 {
             for text_string in system_translated_text.iter_mut() {
                 *text_string = shuffle_words(text_string);
             }
@@ -795,7 +796,7 @@ pub fn write_system(
     write(output_path.join("System.json"), to_string(&obj).unwrap()).unwrap();
 
     if logging {
-        println!("{log_string} System.json");
+        println!("{log_msg} System.json");
     }
 }
 
@@ -804,17 +805,23 @@ pub fn write_system(
 /// * `plugins_file_path` - path to the original plugins file
 /// * `plugins_path` - path to the plugins directory
 /// * `output_path` - path to the output directory
-/// * `drunk` - drunkness level
+/// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
+/// * `game_type` - game type, currently function executes only if it's `termina`
 pub fn write_plugins(
     pluigns_file_path: &Path,
     plugins_path: &Path,
     output_path: &Path,
-    drunk: u8,
+    shuffle_level: u8,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
+    game_type: &str,
 ) {
+    if game_type != "termina" {
+        return;
+    }
+
     let mut obj_arr: Vec<Value> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
     let plugins_original_text_vec: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))
@@ -830,12 +837,12 @@ pub fn write_plugins(
             .map(|line: &str| line.to_string())
             .collect();
 
-    if drunk > 0 {
+    if shuffle_level > 0 {
         let mut rng: ThreadRng = thread_rng();
 
         plugins_translated_text_vec.shuffle(&mut rng);
 
-        if drunk == 2 {
+        if shuffle_level == 2 {
             for text_string in plugins_translated_text_vec.iter_mut() {
                 *text_string = shuffle_words(text_string);
             }
@@ -935,6 +942,6 @@ pub fn write_plugins(
     .unwrap();
 
     if logging {
-        println!("{log_string} plugins.js");
+        println!("{log_msg} plugins.js");
     }
 }

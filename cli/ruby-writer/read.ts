@@ -6,10 +6,7 @@ import { inflate } from "pako";
 import { getValueBySymbolDesc } from "./symbol-utils";
 
 const decoder = new TextDecoder();
-
-const decode = (buffer: Uint8Array): string => {
-    return decoder.decode(buffer);
-};
+const decode = (buffer: Uint8Array): string => decoder.decode(buffer);
 
 function parseCode(code: number, parameter: (string | Uint8Array) | string[], gameType: string): string | void {
     switch (code) {
@@ -21,7 +18,7 @@ function parseCode(code: number, parameter: (string | Uint8Array) | string[], ga
             if (typeof parameter === "string" && parameter.length > 0) {
                 switch (gameType) {
                     case "lisa":
-                        const match = parameter.match(/^\\et\[[0-9]+\]/) ?? parameter.match(/^\\et\[[0-9]+\]/);
+                        const match = parameter.match(/^\\et\[[0-9]+\]/) ?? parameter.match(/\\nbt/);
 
                         if (match) {
                             parameter = parameter.slice(match[0].length);
@@ -85,15 +82,15 @@ function parseVariable(variable: string | Uint8Array, gameType: string): string 
  * This function handles both cases.
  * @param {string} inputPath - path to directory than contains .rx/rv/rvdata2 files
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function readMap(
     inputPath: string,
     outputPath: string,
     logging: boolean,
-    logString: string,
+    logMsg: string,
     gameType: string
 ): Promise<void> {
     const re = /^Map[0-9].*(rxdata|rvdata|rvdata2)$/;
@@ -187,7 +184,7 @@ export async function readMap(
         }
 
         if (logging) {
-            console.log(`${logString} ${filename}`);
+            console.log(`${logMsg} ${filename}`);
         }
     }
 
@@ -204,15 +201,15 @@ export async function readMap(
  * This function handles both cases.
  * @param {string} inputPath - path to directory than contains .rx/rv/rvdata2 files
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function readOther(
     inputPath: string,
     outputPath: string,
     logging: boolean,
-    logString: string,
+    logMsg: string,
     gameType: string
 ): Promise<void> {
     const re = /^(?!Map|Tilesets|Animations|States|System|Scripts|Areas).*(rxdata|rvdata|rvdata2)$/;
@@ -322,7 +319,7 @@ export async function readOther(
         }
 
         if (logging) {
-            console.log(`${logString} ${filename}`);
+            console.log(`${logMsg} ${filename}`);
         }
 
         await Bun.write(`${outputPath}/${processedFilename}.txt`, lines.join("\n"));
@@ -337,15 +334,15 @@ export async function readOther(
  * This function handles both cases.
  * @param {string} systemFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function readSystem(
     systemFilePath: string,
     outputPath: string,
     logging: boolean,
-    logString: string
+    logMsg: string
 ): Promise<void> {
     const file = Bun.file(systemFilePath);
     const obj = load(await file.arrayBuffer()) as RubyObject;
@@ -433,7 +430,7 @@ export async function readSystem(
     }
 
     if (logging) {
-        console.log(`${logString} ${file.name}`);
+        console.log(`${logMsg} ${file.name}`);
     }
 
     await Bun.write(`${outputPath}/system.txt`, lines.join("\n"));
@@ -444,15 +441,15 @@ export async function readSystem(
  * Reads Scripts .rx/rv/rvdata2 file from inputFilePath and parses it into .txt file in outputPath.
  * @param {string} scriptsFilePath - path to .rx/rv/rvdata2 file
  * @param {string} outputPath - path to output directory
- * @param {boolean} logging - whether to log or not
- * @param {string} logString - string to log
+ * @param {boolean} logging - whether to log
+ * @param {string} logMsg - message to log
  * @returns {Promise<void>}
  */
 export async function readScripts(
     scriptsFilePath: string,
     outputPath: string,
     logging: boolean,
-    logString: string
+    logMsg: string
 ): Promise<void> {
     const file = Bun.file(scriptsFilePath);
     const uintarrArr = load(await file.arrayBuffer(), { string: "binary" }) as Uint8Array[][];
@@ -467,7 +464,7 @@ export async function readScripts(
     }
 
     if (logging) {
-        console.log(`${logString} ${file.name}.`);
+        console.log(`${logMsg} ${file.name}.`);
     }
 
     const joinedCode = fullCode.join("\n");

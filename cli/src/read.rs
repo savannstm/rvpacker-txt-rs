@@ -98,13 +98,13 @@ fn parse_variable(
 /// * `map_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn read_map(
     map_path: &Path,
     output_path: &Path,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
     game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
@@ -221,7 +221,7 @@ pub fn read_map(
         }
 
         if logging {
-            println!("{log_string} {filename}.");
+            println!("{log_msg} {filename}.");
         }
     }
 
@@ -259,13 +259,13 @@ pub fn read_map(
 /// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
+/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn read_other(
     other_path: &Path,
     output_path: &Path,
     logging: bool,
-    log_string: &str,
+    log_msg: &str,
     game_type: &str,
 ) {
     let re: Regex = Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
@@ -431,7 +431,7 @@ pub fn read_other(
         .unwrap();
 
         if logging {
-            println!("{log_string} {filename}");
+            println!("{log_msg} {filename}");
         }
     }
 }
@@ -441,8 +441,8 @@ pub fn read_other(
 /// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_string` - string to log
-pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, log_string: &str) {
+/// * `log_msg` - message to log
+pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, log_msg: &str) {
     let obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
     let mut lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
@@ -538,7 +538,7 @@ pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, l
     .unwrap();
 
     if logging {
-        println!("{log_string} System.json.");
+        println!("{log_msg} System.json.");
     }
 }
 

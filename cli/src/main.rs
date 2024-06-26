@@ -28,7 +28,7 @@ struct ProgramLocalization<'a> {
     log_arg_desc: &'a str,
     input_dir_arg_desc: &'a str,
     output_dir_arg_desc: &'a str,
-    drunk_arg_desc: &'a str,
+    shuffle_arg_desc: &'a str,
     language_arg_desc: &'a str,
     help_arg_desc: &'a str,
     help_template: &'a str,
@@ -39,15 +39,15 @@ struct ProgramLocalization<'a> {
     input_dir_arg_type: &'a str,
     output_dir_arg_type: &'a str,
     no_arg_type: &'a str,
-    drunk_arg_type: &'a str,
+    shuffle_arg_type: &'a str,
     language_arg_type: &'a str,
     input_dir_does_not_exist: &'a str,
     original_dir_missing: &'a str,
     translation_dirs_missing: &'a str,
-    write_log: &'a str,
-    read_log: &'a str,
-    write_success: &'a str,
-    read_success: &'a str,
+    write_log_msg: &'a str,
+    read_log_msg: &'a str,
+    write_success_msg: &'a str,
+    read_success_msg: &'a str,
     disable_custom_parsing_desc: &'a str,
 }
 
@@ -56,62 +56,62 @@ impl<'a> ProgramLocalization<'a> {
         match language {
             "ru" => ProgramLocalization {
                 program_desc: cstr!("<bold>Инструмент, позволяющий парсить текст .json файлов RPG Maker MV/MZ игр в .txt файлы, а затем записывать их обратно.</bold>"),
-                read_command_desc: cstr!("<bold>Парсит файлы из папки \"original\" или \"data\" входной директории в папку \"translation\" выходной директории.</bold>"),
-                write_command_desc: cstr!("<bold>Записывает переведенные файлы, используя исходные файлы из папки \"original\" или \"data\" входной директории, заменяя текст файлами из папки \"translation\" и выводя результаты в папку \"output\".</bold>"),
+                read_command_desc: cstr!(r#"<bold>Парсит файлы из папки "original" или "data" входной директории в папку "translation" выходной директории.</bold>"#),
+                write_command_desc: cstr!(r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" входной директории, заменяя текст файлами из папки "translation" и выводя результаты в папку "output".</bold>"#),
                 no_arg_desc: "Не обрабатывает указанные файлы.",
                 log_arg_desc: "Включает логирование.",
-                input_dir_arg_desc: "Входная директория, содержащая папки \"original\" или \"data\" и \"translation\", с оригинальным текстом игры и .txt файлами с переводом соответственно.",
-                output_dir_arg_desc: "Выходная директория, в которой будут создана директория \"output\" с папками \"data\" и \"js\", содержащими скомпилированные файлы с переводом.",
-                drunk_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
+                input_dir_arg_desc: r#"Входная директория, содержащая папки "original" или "data" и "translation", с оригинальным текстом игры и .txt файлами с переводом соответственно."#,
+                output_dir_arg_desc: r#"Выходная директория, в которой будут создана директория "output" с папками "data" и "js", содержащими скомпилированные файлы с переводом."#,
+                shuffle_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
                 language_arg_desc: "Устанавливает локализацию инструмента на выбранный язык.",
                 help_arg_desc: "Выводит справочную информацию по программе либо по введёной команде.",
-                help_template: cstr!("{about}\n\n<underline><bold>Использование:</bold></underline> {usage}\n\n<underline><bold>Команды:</bold></underline>\n{subcommands}\n\n<underline><bold>Опции:</bold></underline>\n{options}"),
-                subcommand_help_template: cstr!("{about}\n\n<underline><bold>Использование:</bold></underline> {usage}\n\n<underline><bold>Опции:</bold></underline>\n{options}"),
+                help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
+                subcommand_help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"),
                 possible_values: "Разрешённые значения:",
                 example: "\nПример:",
                 default_value: "Значение по умолчанию:",
                 input_dir_arg_type: "ВХОДНОЙ_ПУТЬ",
                 output_dir_arg_type: "ВЫХОДНОЙ_ПУТЬ",
                 no_arg_type: "ИМЕНА_ФАЙЛОВ",
-                drunk_arg_type: "ЦИФРА",
+                shuffle_arg_type: "ЦИФРА",
                 language_arg_type: "ЯЗЫК",
                 input_dir_does_not_exist: "Входная директория не существует.",
-                original_dir_missing: "Папка \"original\" или \"data\" входной директории не существует.",
-                translation_dirs_missing: "Папки \"translation/maps\" и/или \"translation/other\" входной директории не существуют.",
-                write_log: "Записан файл",
-                write_success: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
-                read_success: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
-                read_log: "Распарсен файл",
+                original_dir_missing: r#"Папка "original" или "data" входной директории не существует."#,
+                translation_dirs_missing: r#"Папки "translation/maps" и/или "translation/other" входной директории не существуют."#,
+                write_log_msg: "Записан файл",
+                write_success_msg: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
+                read_success_msg: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
+                read_log_msg: "Распарсен файл",
                 disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов игр, для которых это имплементировано, парся игровой текст целиком и сырым.",
             },
             "en" => ProgramLocalization {
                 program_desc: cstr!("<bold>A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.</bold>"),
-                read_command_desc: cstr!("<bold>Parses files from \"original\" or \"data\" folders of input directory to \"translation\" folder of output directory.</bold>"),
-                write_command_desc: cstr!("<bold>Writes translated files using original files from \"original\" or \"data\" folders of input directory and writes results to \"output\" folder of output directory.</bold>"),
+                read_command_desc: cstr!(r#"<bold>Parses files from "original" or "data" folders of input directory to "translation" folder of output directory.</bold>"#),
+                write_command_desc: cstr!(r#"<bold>Writes translated files using original files from "original" or "data" folders of input directory and writes results to "output" folder of output directory.</bold>"#),
                 no_arg_desc: "Skips processing the specified files.",
                 log_arg_desc: "Enables logging.",
-                input_dir_arg_desc: "Input directory, containing folders \"original\" or \"data\" and \"translation\", with original game text and .txt files with translation respectively.",
-                output_dir_arg_desc: "Output directory, containing an \"output\" folder with folders \"data\" and \"js\", containing compiled .txt files with translation.",
-                drunk_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
+                input_dir_arg_desc: r#"Input directory, containing folders "original" or "data" and "translation", with original game text and .txt files with translation respectively."#,
+                output_dir_arg_desc: r#"Output directory, containing an "output" folder with folders "data" and "js", containing compiled .txt files with translation."#,
+                shuffle_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
                 language_arg_desc: "Sets the localization of the tool to the selected language.",
                 help_arg_desc: "Prints the program's help message or for the entered subcommand.",
-                help_template: cstr!("{about}\n\n<underline><bold>Usage:</bold></underline> {usage}\n\n<underline><bold>Commands:</bold></underline>\n{subcommands}\n\n<underline><bold>Options:</bold></underline>\n{options}"),
-                subcommand_help_template: cstr!("{about}\n\n<underline><bold>Usage:</bold></underline> {usage}\n\n<underline><bold>Options:</bold></underline>\n{options}"),
+                help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
+                subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
                 possible_values: "Allowed values:",
                 example: "Example:",
                 default_value: "Default value:",
                 input_dir_arg_type: "INPUT_PATH",
                 output_dir_arg_type: "OUTPUT_PATH",
                 no_arg_type: "FILENAMES",
-                drunk_arg_type: "NUMBER",
+                shuffle_arg_type: "NUMBER",
                 language_arg_type: "LANGUAGE",
                 input_dir_does_not_exist: "Input directory does not exist.",
-                original_dir_missing: "The \"original\" or \"data\" folder in the input directory does not exist.",
-                translation_dirs_missing: "The \"translation/maps\" and/or \"translation/other\" folders in the input directory do not exist.",
-                write_log: "Wrote file",
-                write_success: "All files were written successfully.\nTime spent (in seconds):",
-                read_success: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
-                read_log: "Parsed file",
+                original_dir_missing: r#"The "original" or "data" folder in the input directory does not exist."#,
+                translation_dirs_missing: r#"The "translation/maps" and/or "translation/other" folders in the input directory do not exist."#,
+                write_log_msg: "Wrote file",
+                write_success_msg: "All files were written successfully.\nTime spent (in seconds):",
+                read_success_msg: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
+                read_log_msg: "Parsed file",
                 disable_custom_parsing_desc: "Disables custom parsing of specific game, where it's implemented, and parses whole raw game text.",
             },
             _ => unreachable!(),
@@ -202,16 +202,16 @@ fn main() {
         .value_parser(POSSIBLE_WRITE_NO_VALUES)
         .hide_possible_values(true);
 
-    let drunk_arg: Arg = Arg::new("drunk")
-        .short('d')
-        .long("drunk")
+    let shuffle_arg: Arg = Arg::new("shuffle")
+        .short('s')
+        .long("shuffle")
         .action(ArgAction::Set)
-        .value_name(localization.drunk_arg_type)
+        .value_name(localization.shuffle_arg_type)
         .default_value("0")
         .value_parser(value_parser!(u8).range(0..=2))
         .help(cformat!(
-            "{} {} --drunk 1.<bold>\n[{} {}]\n[{} {}]</bold>",
-            localization.drunk_arg_desc,
+            "{} {} --shuffle 1.<bold>\n[{} {}]\n[{} {}]</bold>",
+            localization.shuffle_arg_desc,
             localization.example,
             localization.possible_values,
             "0, 1, 2",
@@ -227,7 +227,7 @@ fn main() {
         .next_line_help(true)
         .about(localization.write_command_desc)
         .arg(write_no_arg)
-        .arg(drunk_arg)
+        .arg(shuffle_arg)
         .arg(&help_arg);
 
     // Main subcommand
@@ -378,19 +378,20 @@ fn main() {
             create_dir_all(&paths.maps).unwrap();
             create_dir_all(&paths.other).unwrap();
 
-            let system_file_path: PathBuf = if !write_options.5 {
-                paths.original.join("System.json")
+            let system_file_path: PathBuf = paths.original.join("System.json");
+
+            let game_type: &str = if !write_options.5 {
+                get_game_type(&system_file_path)
             } else {
-                PathBuf::from("")
+                ""
             };
-            let game_type: &str = get_game_type(&system_file_path);
 
             if write_options.0 {
                 read_map(
                     &paths.original,
                     &paths.maps,
                     write_options.4,
-                    localization.read_log,
+                    localization.read_log_msg,
                     game_type,
                 );
             }
@@ -400,7 +401,7 @@ fn main() {
                     &paths.original,
                     &paths.other,
                     write_options.4,
-                    localization.read_log,
+                    localization.read_log_msg,
                     game_type,
                 );
             }
@@ -410,22 +411,22 @@ fn main() {
                     &system_file_path,
                     &paths.other,
                     write_options.4,
-                    localization.read_log,
+                    localization.read_log_msg,
                 );
             }
 
             println!(
                 "{} {}.",
-                localization.read_success,
+                localization.read_success_msg,
                 start_time.elapsed().as_secs_f64()
             );
         }
 
         "write" => {
-            let drunk: u8 = *matches
+            let shuffle: u8 = *matches
                 .subcommand_matches("write")
                 .unwrap()
-                .get_one::<u8>("drunk")
+                .get_one::<u8>("shuffle")
                 .unwrap();
 
             let input_dir: PathBuf =
@@ -491,21 +492,22 @@ fn main() {
             create_dir_all(&paths.output).unwrap();
             create_dir_all(&paths.plugins_output).unwrap();
 
-            let system_file_path: PathBuf = if !write_options.5 {
-                paths.original.join("System.json")
+            let system_file_path: PathBuf = paths.original.join("System.json");
+
+            let game_type: &str = if !write_options.5 {
+                get_game_type(&system_file_path)
             } else {
-                PathBuf::from("")
+                ""
             };
-            let game_type: &str = get_game_type(&system_file_path);
 
             if write_options.0 {
                 write_maps(
                     &paths.maps,
                     &paths.original,
                     &paths.output,
-                    drunk,
+                    shuffle,
                     write_options.4,
-                    localization.write_log,
+                    localization.write_log_msg,
                     game_type,
                 );
             }
@@ -515,9 +517,9 @@ fn main() {
                     &paths.other,
                     &paths.original,
                     &paths.output,
-                    drunk,
+                    shuffle,
                     write_options.4,
-                    localization.write_log,
+                    localization.write_log_msg,
                     game_type,
                 );
             }
@@ -527,9 +529,9 @@ fn main() {
                     &system_file_path,
                     &paths.other,
                     &paths.output,
-                    drunk,
+                    shuffle,
                     write_options.4,
-                    localization.write_log,
+                    localization.write_log_msg,
                 );
             }
 
@@ -538,15 +540,16 @@ fn main() {
                     &paths.plugins.join("plugins.json"),
                     &paths.plugins,
                     &paths.plugins_output,
-                    drunk,
+                    shuffle,
                     write_options.4,
-                    localization.write_log,
+                    localization.write_log_msg,
+                    game_type,
                 );
             }
 
             println!(
                 "{} {}.",
-                localization.write_success,
+                localization.write_success_msg,
                 start_time.elapsed().as_secs_f64()
             );
         }
