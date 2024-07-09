@@ -824,12 +824,7 @@ pub fn write_plugins(
     shuffle_level: u8,
     logging: bool,
     log_msg: &str,
-    game_type: &str,
 ) {
-    if game_type != "termina" {
-        return;
-    }
-
     let mut obj_arr: Vec<Value> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
     let plugins_original_text_vec: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))

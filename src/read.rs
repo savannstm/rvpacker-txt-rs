@@ -321,11 +321,11 @@ pub fn read_other(
                         continue;
                     }
 
-                    let variable: &str = variable.unwrap();
+                    let variable_string: &str = variable.unwrap();
 
-                    if !variable.is_empty() {
+                    if !variable_string.is_empty() {
                         let parsed: Option<String> =
-                            parse_variable(variable, name, &filename, game_type);
+                            parse_variable(variable_string, name, &filename, game_type);
 
                         if let Some(parsed) = parsed {
                             other_lines.insert(parsed.replace('\n', r"\#"));
