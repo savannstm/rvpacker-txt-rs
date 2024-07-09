@@ -1,91 +1,57 @@
-# RU
+# rvpacker-json-txt
 
-# Строение репозитория и использование программы
+[README на русском](https://github.com/savannstm/rpg-maker-translation-tools/blob/main/README-ru.md)
 
-## Директория cli
+## General
 
-В данной директории хранится бинарный файл `json-writer`, позволяющий парсить текст игр на движках RPG Maker MV/MZ,
-а затем записывать его обратно в рабочие игровые .json файлы.
+This tool is designed to read RPG Maker game files into .txt files and write them back to .json.
 
-Получить справку по его использованию можно с помощью `json-writer -h`.
+This tool inherits its name from the original rvpacker tool, which was created for those versions of RPG Maker that did not use .json files.
 
-В директории `ruby-writer` хранятся TypeScript файлы утилиты `ruby-writer`, позволяющей парсить текст игр на движках RPG Maker XP/VX/VX Ace, а затем записывать его обратно в рабочие игровые .rxdata, .rvdata или .rvdata2 файлы.
+This tool for RPG Maker XP, VX and VX Ace engines that don't use .json files can be found in [this repository](https://github.com/savannstm/rvpacker-txt).
 
-Тип движка игры, текст которой парсится и записывается, утилита определяет автоматически.
+[A GUI](https://github.com/savannstm/rpgm-translation-gui) that allows comfortably edit parsed files (and it also automatically parses unparsed games when you select their folder) (and you also can easily write files back to .json with a single button click) (and it also supports RPG Maker XP, VX and VX Ace!)
 
-Для использования, вам необходим [Bun](https://bun.sh/). После его установки, вам необходимо выполнить команду `bun i` для установки зависимостей утилиты, а затем вы можете получить справку по ней, используя `bun run ruby-writer.ts -h`.
+## Installation
 
-## Директория gui
+You can download binary files in the Releases section.
 
-В этой директории хранится исходный код новой версии программы, написанной на Tauri.
+Files with the .exe extension are designed for Windows of any architecture, while files without an extension are designed for Linux x64.
 
-Сообщения об ошибках и коммиты приветствуются.
+## Usage
 
-**Скачать последнюю версию можно из вкладки Releases.**
+You can get help on usage by calling `json-writer -h.`
 
-### Билдинг приложения
+```
+A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.
 
-Клонируйте репозиторий с помощью\
-`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
+Usage: rvpacker-json-txt.exe [OPTIONS] [COMMAND]
 
-Перейдите в директорию `gui` и установите все необходимые Node.js библиотеки с помощью\
-`npm install`.
+Commands:
+  read   Parses files from "original" or "data" folders of input directory to "translation" folder of output
+             directory.
+  write  Writes translated files using original files from "original" or "data" folders of input directory and
+             writes results to "output" folder of output directory.
 
-Запустите\
-`npm run tauri dev`,\
-чтобы запустить приложение в девелопер режиме, либо\
-`npm run tauri build`,\
-чтобы забилдить приложение под вашу текущую ОС.
+Options:
+  -i, --input-dir <INPUT_PATH>    Input directory, containing folders "original" or "data" and "translation", with
+                                  original game text and .txt files with translation respectively.
+  -o, --output-dir <OUTPUT_PATH>  Output directory, containing an "output" folder with folders "data" and "js",
+                                  containing compiled .txt files with translation.
+  -l, --language <LANGUAGE>       Sets the localization of the tool to the selected language. Example: --language en.
+                                  [Allowed values: ru, en]
+      --log                       Enables logging.
+      --disable-custom-parsing    Disables built-in custom parsing for some games.
+  -h, --help                      Prints the program's help message or for the entered subcommand.
+```
 
-Если вы хотите внести какие-то изменения в код проекта - вносите его в фронтенд файлы из директории `src`, либо бэкенд файлы из директории `src-tauri/src`.
+Examples:
 
-После билдинга в директории `gui/src-tauri` появится директория `target`, содержащая бинарный файл с билдом программы и распространяемые пакеты в директории `target/bundle`.
+`rvpacker-json-txt read --input-dir "E:/Documents/RPGMakerGame"` parses the text of the game into the `translation` folder of the specified directory.
 
-## Лицензия
+`rvpacker-json-txt write --input-dir E:/Documents/RPGMakerGame"` will write the translation from the \_trans files of the `translation` folder to .the json files to the `output` folder.
 
-Репозиторий лицензирован под [WTFPL](http://www.wtfpl.net/).
-Это означает, что вы можете безнаказанно использовать и модифицировать программу в каком угодно виде. Вы можете делать всё, что захотите.
-
-# EN
-
-# Repository order and program usage
-
-## cli Directory
-
-This directory contains a binary file `json-writer`, which allows you to parse the text of games on the RPG Maker MV/MZ engine,
-and then write it back to the working game.json files.
-
-You can get help using it using `json-writer -h'.
-
-The `ruby-writer` directory stores TypeScript files of the `ruby-writer` utility, which allows you to parse the text of games on RPG Maker XP/VX/VX Ace engines, and then write it back to working game .rxdata, .rvdata or .rvdata2 files.
-
-The utility automatically determines the type of the game engine, the text of which is parsed and written.
-
-To use it, you need [Bun](https://bun.sh/). After installing it, you need to run the `bun i` command to install the utility's dependencies, and then you can get help on it using `bun run ruby-writer.ts -h`.
-
-## gui Directory
-
-This directory contains the source code of new program version, written with Tauri.
-
-Issues and commits are welcome.
-
-### Program manual building
-
-Clone the repository with\
-`git clone https://github.com/savannstm/rpg-maker-translation-tools.git`.
-
-cd to the `gui` directory and install all needed node.js dependencies with\
-`npm install`.
-
-Run\
-`npm run tauri dev`,\
-to run the program in dev mode, or\
-`npm run tauri build`,\
-to build the program for your current OS.
-
-If you want to make some edits to the source code - edit frontend files in `src` directory, or backend files in `src-tauri/src` directory.
-
-After the build, `target` directory will be created in the `gui/src-tauri` path, containing binary file with program build and distributable bundled packages in the `target/bundle` directory.
+The tool does not parse text from a plugins.js file since it is very difficult to isolate the text displayed in the game from the plugins.
 
 ## License
 
