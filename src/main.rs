@@ -5,7 +5,6 @@ use std::{
     env::args,
     fs::{create_dir_all, read_to_string},
     path::{Path, PathBuf},
-    process::exit,
     time::Instant,
 };
 use sys_locale::get_locale;
@@ -19,7 +18,6 @@ use write::*;
 mod shuffle;
 use shuffle::shuffle_words;
 
-#[derive(Debug, Clone, Copy)]
 enum Language {
     English,
     Russian,
@@ -145,8 +143,6 @@ impl<'a> ProgramLocalization<'a> {
     }
 }
 
-static ALLOWED_LANGUAGES: [&str; 2] = ["ru", "en"];
-
 fn get_game_type(system_file_path: &Path) -> &str {
     let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
@@ -164,11 +160,13 @@ fn determine_language() -> Language {
     let args_vec: Vec<String> = args().collect();
 
     for (i, arg) in args_vec.iter().enumerate() {
-        if (arg == "-l" || arg == "--language")
-            && ALLOWED_LANGUAGES.contains(&args_vec[i + 1].as_str())
-        {
+        if arg == "-l" || arg == "--language" {
             locale = args_vec[i + 1].to_string();
         }
+    }
+
+    if let Some((first, _)) = locale.split_once('_') {
+        locale = first.to_string()
     }
 
     match locale.as_str() {
@@ -222,20 +220,18 @@ fn main() {
         .hide_default_value(true)
         .display_order(2);
 
-    const ALLOWED_DISABLE_PROCESSING_VALUES: [&str; 4] = ["maps", "other", "system", "plugins"];
     let disable_processing_arg: Arg = Arg::new("disable-processing")
         .long("disable-processing")
         .value_delimiter(',')
         .value_name(localization.disable_processing_arg_type)
         .help(cformat!(
-            "{}\n{} --disable-processing=maps,other,system.<bold>\n[{} {}]</bold>",
+            "{}\n{} --disable-processing=maps,other,system.<bold>\n[{} maps, other, system, plugins]</bold>",
             localization.disable_processing_arg_desc,
             localization.example,
             localization.possible_values,
-            ALLOWED_DISABLE_PROCESSING_VALUES.join(", ")
         ))
         .global(true)
-        .value_parser(ALLOWED_DISABLE_PROCESSING_VALUES)
+        .value_parser(["maps", "other", "system", "plugins"])
         .display_order(2);
 
     let disable_custom_parsing_flag: Arg = Arg::new("disable-custom-parsing")
@@ -251,13 +247,12 @@ fn main() {
         .value_name(localization.language_arg_type)
         .global(true)
         .help(cformat!(
-            "{}\n{} --language en.<bold>\n[{} {}]</bold>",
+            "{}\n{} --language en.<bold>\n[{} en, ru]</bold>",
             localization.language_arg_desc,
             localization.example,
             localization.possible_values,
-            ALLOWED_LANGUAGES.join(", ")
         ))
-        .value_parser(ALLOWED_LANGUAGES)
+        .value_parser(["en", "ru"])
         .display_order(98);
 
     let log_flag: Arg = Arg::new("log")
@@ -308,7 +303,7 @@ fn main() {
         .hide_possible_values(true);
 
     let matches: ArgMatches = cli.get_matches();
-    let command: &str = matches.subcommand_name().unwrap_or_else(|| exit(1));
+    let command: &str = matches.subcommand_name().unwrap();
 
     let (
         disable_maps_processing,
@@ -370,10 +365,6 @@ fn main() {
         )
     };
 
-    if !maps_path.exists() || !other_path.exists() {
-        panic!("{}", localization.translation_dirs_missing);
-    }
-
     let system_file_path: PathBuf = original_path.join("System.json");
 
     let game_type: &str = if disable_custom_parsing {
@@ -421,11 +412,9 @@ fn main() {
             start_time.elapsed().as_secs_f64()
         );
     } else {
-        let shuffle_level: u8 = *matches
-            .subcommand_matches(command)
-            .unwrap()
-            .get_one::<u8>("shuffle_level")
-            .unwrap();
+        if !maps_path.exists() || !other_path.exists() {
+            panic!("{}", localization.translation_dirs_missing);
+        }
 
         let plugins_path: PathBuf = input_dir.join("translation/plugins");
 
@@ -437,6 +426,12 @@ fn main() {
 
         create_dir_all(&output_path).unwrap();
         create_dir_all(&plugins_output_path).unwrap();
+
+        let shuffle_level: u8 = *matches
+            .subcommand_matches(command)
+            .unwrap()
+            .get_one::<u8>("shuffle_level")
+            .unwrap();
 
         if !disable_maps_processing {
             write_maps(

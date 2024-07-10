@@ -1,24 +1,24 @@
 use fancy_regex::Regex;
-use fnv::{FnvBuildHasher, FnvHashMap};
 use indexmap::IndexSet;
 use rayon::prelude::*;
 use serde_json::{from_str, Value};
 use std::{
+    collections::HashMap,
     fs::{read_dir, read_to_string, write, DirEntry},
+    hash::BuildHasherDefault,
     path::Path,
 };
+use xxhash_rust::xxh3::Xxh3;
 
-#[allow(clippy::single_match, unused_mut)]
-fn parse_parameter(code: u16, mut parameter: &str, game_type: &str) -> Option<String> {
+#[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
+fn parse_parameter<'a>(code: u16, mut parameter: &'a str, game_type: &str) -> Option<&'a str> {
     match code {
         401 | 405 => match game_type {
-            "termina" => {}
-            // Implement custom parsing for other games
+            // Implement custom parsing
             _ => {}
         },
         102 => match game_type {
-            "termina" => {}
-            // Implement custom parsing for other games
+            // Implement custom parsing
             _ => {}
         },
         356 => match game_type {
@@ -29,16 +29,16 @@ fn parse_parameter(code: u16, mut parameter: &str, game_type: &str) -> Option<St
                     return None;
                 }
             }
-            // Implement custom parsing for other games
-            _ => return None,
+            // Implement custom parsing
+            _ => {}
         },
-        _ => return None,
+        _ => unreachable!(),
     }
 
-    Some(parameter.to_string())
+    Some(parameter)
 }
 
-#[allow(clippy::single_match, unused_mut)]
+#[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_variable(
     mut variable: &str,
     name: &str,
@@ -47,15 +47,12 @@ fn parse_variable(
 ) -> Option<String> {
     match name {
         "name" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "nickname" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "description" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "note" => match game_type {
@@ -87,7 +84,7 @@ fn parse_variable(
             }
             _ => {}
         },
-        _ => return None,
+        _ => unreachable!(),
     }
 
     Some(variable.to_string())
@@ -118,7 +115,7 @@ pub fn read_map(
         })
         .collect();
 
-    let maps_obj_map: FnvHashMap<String, Value> = maps_files
+    let maps_obj_map: HashMap<String, Value, BuildHasherDefault<Xxh3>> = maps_files
         .iter()
         .map(|entry: &DirEntry| {
             (
@@ -128,8 +125,8 @@ pub fn read_map(
         })
         .collect();
 
-    let mut maps_lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
-    let mut names_lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
+    let mut maps_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+    let mut names_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
 
     for (filename, obj) in maps_obj_map {
         if let Some(display_name) = obj["displayName"].as_str() {
@@ -159,14 +156,14 @@ pub fn read_map(
                             in_sequence = true;
 
                             if parameter_value.is_string() {
-                                let parameter_string: &str = parameter_value.as_str().unwrap();
+                                let parameter_str: &str = parameter_value.as_str().unwrap();
 
-                                if !parameter_string.is_empty() {
-                                    let parsed: Option<String> =
-                                        parse_parameter(code, parameter_string, game_type);
+                                if !parameter_str.is_empty() {
+                                    let parsed: Option<&str> =
+                                        parse_parameter(code, parameter_str, game_type);
 
                                     if let Some(parsed) = parsed {
-                                        line.push(parsed);
+                                        line.push(parsed.to_string());
                                     }
                                 }
                             }
@@ -184,18 +181,18 @@ pub fn read_map(
                                             parameter_value.as_array().unwrap()
                                         {
                                             if subparameter_value.is_string() {
-                                                let subparameter_string: &str =
+                                                let subparameter_str: &str =
                                                     subparameter_value.as_str().unwrap();
 
-                                                if !subparameter_string.is_empty() {
-                                                    let parsed: Option<String> = parse_parameter(
+                                                if !subparameter_str.is_empty() {
+                                                    let parsed: Option<&str> = parse_parameter(
                                                         code,
-                                                        subparameter_string,
+                                                        subparameter_str,
                                                         game_type,
                                                     );
 
                                                     if let Some(parsed) = parsed {
-                                                        maps_lines.insert(parsed);
+                                                        maps_lines.insert(parsed.to_string());
                                                     }
                                                 }
                                             }
@@ -205,15 +202,14 @@ pub fn read_map(
 
                                 356 => {
                                     if parameter_value.is_string() {
-                                        let parameter_string: &str =
-                                            parameter_value.as_str().unwrap();
+                                        let parameter_str: &str = parameter_value.as_str().unwrap();
 
-                                        if !parameter_string.is_empty() {
-                                            let parsed: Option<String> =
-                                                parse_parameter(code, parameter_string, game_type);
+                                        if !parameter_str.is_empty() {
+                                            let parsed: Option<&str> =
+                                                parse_parameter(code, parameter_str, game_type);
 
                                             if let Some(parsed) = parsed {
-                                                maps_lines.insert(parsed);
+                                                maps_lines.insert(parsed.to_string());
                                             }
                                         }
                                     }
@@ -292,7 +288,7 @@ pub fn read_other(
         })
         .collect();
 
-    let other_obj_arr_map: FnvHashMap<String, Vec<Value>> = other_files
+    let other_obj_arr_map: HashMap<String, Vec<Value>, BuildHasherDefault<Xxh3>> = other_files
         .par_iter()
         .map(|entry: &DirEntry| {
             (
@@ -305,7 +301,7 @@ pub fn read_other(
     for (filename, obj_arr) in other_obj_arr_map {
         let other_processed_filename: String =
             filename[0..filename.rfind('.').unwrap()].to_lowercase();
-        let mut other_lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
+        let mut other_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
 
         // Other files except CommonEvents.json and Troops.json have the structure that consists
         // of name, nickname, description and note
@@ -321,11 +317,11 @@ pub fn read_other(
                         continue;
                     }
 
-                    let variable_string: &str = variable.unwrap();
+                    let variable_str: &str = variable.unwrap();
 
-                    if !variable_string.is_empty() {
+                    if !variable_str.is_empty() {
                         let parsed: Option<String> =
-                            parse_variable(variable_string, name, &filename, game_type);
+                            parse_variable(variable_str, name, &filename, game_type);
 
                         if let Some(parsed) = parsed {
                             other_lines.insert(parsed.replace('\n', r"\#"));
@@ -367,18 +363,18 @@ pub fn read_other(
                         let code: u16 = list["code"].as_u64().unwrap() as u16;
 
                         for parameter_value in list["parameters"].as_array().unwrap() {
-                            if code == 401 || code == 405 {
+                            if [401, 405].contains(&code) {
                                 in_sequence = true;
 
                                 if parameter_value.is_string() {
-                                    let parameter_string: &str = parameter_value.as_str().unwrap();
+                                    let parameter_str: &str = parameter_value.as_str().unwrap();
 
-                                    if !parameter_string.is_empty() {
-                                        let parsed: Option<String> =
-                                            parse_parameter(code, parameter_string, game_type);
+                                    if !parameter_str.is_empty() {
+                                        let parsed: Option<&str> =
+                                            parse_parameter(code, parameter_str, game_type);
 
                                         if let Some(parsed) = parsed {
-                                            line.push(parsed);
+                                            line.push(parsed.to_string());
                                         }
                                     }
                                 }
@@ -396,19 +392,18 @@ pub fn read_other(
                                                 parameter_value.as_array().unwrap()
                                             {
                                                 if subparameter_value.is_string() {
-                                                    let subparameter_string: &str =
+                                                    let subparameter_str: &str =
                                                         subparameter_value.as_str().unwrap();
 
-                                                    if !subparameter_string.is_empty() {
-                                                        let parsed: Option<String> =
-                                                            parse_parameter(
-                                                                code,
-                                                                subparameter_string,
-                                                                game_type,
-                                                            );
+                                                    if !subparameter_str.is_empty() {
+                                                        let parsed: Option<&str> = parse_parameter(
+                                                            code,
+                                                            subparameter_str,
+                                                            game_type,
+                                                        );
 
                                                         if let Some(parsed) = parsed {
-                                                            other_lines.insert(parsed);
+                                                            other_lines.insert(parsed.to_string());
                                                         }
                                                     }
                                                 }
@@ -418,18 +413,15 @@ pub fn read_other(
 
                                     356 => {
                                         if parameter_value.is_string() {
-                                            let parameter_string: &str =
+                                            let parameter_str: &str =
                                                 parameter_value.as_str().unwrap();
 
-                                            if !parameter_string.is_empty() {
-                                                let parsed: Option<String> = parse_parameter(
-                                                    code,
-                                                    parameter_string,
-                                                    game_type,
-                                                );
+                                            if !parameter_str.is_empty() {
+                                                let parsed: Option<&str> =
+                                                    parse_parameter(code, parameter_str, game_type);
 
                                                 if let Some(parsed) = parsed {
-                                                    other_lines.insert(parsed);
+                                                    other_lines.insert(parsed.to_string());
                                                 }
                                             }
                                         }
@@ -474,7 +466,7 @@ pub fn read_other(
 pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, log_msg: &str) {
     let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
-    let mut system_lines: IndexSet<String, FnvBuildHasher> = IndexSet::default();
+    let mut system_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
 
     // Armor types names
     // Normally it's system strings, but might be needed for some purposes

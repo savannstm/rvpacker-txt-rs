@@ -1,31 +1,31 @@
 use fancy_regex::Regex;
-use fnv::{FnvHashMap, FnvHashSet};
 use rand::{rngs::ThreadRng, seq::SliceRandom, thread_rng};
 use rayon::prelude::*;
 use serde_json::{from_str, to_string, to_value, Value};
 use std::{
+    collections::{HashMap, HashSet},
     fs::{read_dir, read_to_string, write, DirEntry},
+    hash::BuildHasherDefault,
     path::Path,
 };
+use xxhash_rust::xxh3::Xxh3;
 
 use crate::shuffle_words;
 
-#[allow(clippy::single_match, unused_mut)]
-fn get_parameter_translated(
+#[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
+fn get_parameter_translated<'a>(
     code: u16,
-    mut parameter: &str,
-    hashmap: &FnvHashMap<&str, &str>,
+    mut parameter: &'a str,
+    hashmap: &'a HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
     game_type: &str,
-) -> Option<String> {
+) -> Option<&'a &'a str> {
     match code {
         401 | 402 | 405 => match game_type {
-            "termina" => {}
-            // Implement custom parsing for other games
+            // Implement custom parsing
             _ => {}
         },
         102 => match game_type {
-            "termina" => {}
-            // Implement custom parsing for other games
+            // Implement custom parsing
             _ => {}
         },
         356 => match game_type {
@@ -36,34 +36,31 @@ fn get_parameter_translated(
                     return None;
                 }
             }
-            // Implement custom parsing for other games
-            _ => return None,
+            // Implement custom parsing
+            _ => {}
         },
-        _ => return None,
+        _ => unreachable!(),
     }
 
-    hashmap.get(parameter).map(|text: &&str| text.to_string())
+    hashmap.get(parameter)
 }
 
-#[allow(clippy::single_match, unused_mut)]
+#[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn get_variable_translated(
-    mut variable: &str,
-    name: &str,
+    mut variable_text: &str,
+    variable_name: &str,
     filename: &str,
-    hashmap: &FnvHashMap<&str, &str>,
+    hashmap: &HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
     game_type: &str,
 ) -> Option<String> {
-    match name {
+    match variable_name {
         "name" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "nickname" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "description" => match game_type {
-            "termina" => {}
             _ => {}
         },
         "note" => match game_type {
@@ -75,20 +72,21 @@ fn get_variable_translated(
                         "<Menu Category: Healing>",
                         "<Menu Category: Body bag>",
                     ] {
-                        if variable.contains(string) {
-                            return Some(variable.replace(string, hashmap[string]));
+                        if variable_text.contains(string) {
+                            return Some(variable_text.replacen(string, hashmap[string], 1));
                         }
                     }
                 }
             }
             _ => {}
         },
-        _ => return None,
+        _ => unreachable!(),
     }
 
-    hashmap.get(variable).map(|text: &&str| text.to_string())
+    hashmap.get(variable_text).map(|s| s.to_string())
 }
 
+// ! Maybe this function must be removed in favor of splitting translation strings at '\#'s and replacing by parts
 /// Merges sequences of objects with codes 401 and 405 inside list objects.
 /// Merging is perfectly valid in RPG Maker MV/MZ, and it's much faster and easier than replacing text in each object in a loop.
 /// # Parameters
@@ -107,7 +105,7 @@ fn merge_seq(json: &mut Value) {
         let object: &Value = &json_array[i];
         let code: u16 = object["code"].as_u64().unwrap() as u16;
 
-        if code == 401 || code == 405 {
+        if [401, 405].contains(&code) {
             if first.is_none() {
                 first = Some(i);
             }
@@ -202,33 +200,41 @@ pub fn write_maps(
 ) {
     let select_maps_re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
-    let mut maps_obj_map: FnvHashMap<String, Value> = read_dir(original_path)
-        .unwrap()
-        .par_bridge()
-        .flatten()
-        .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<String, Value>, entry: DirEntry| {
-                let filename: String = entry.file_name().into_string().unwrap();
+    let mut maps_obj_map: HashMap<String, Value, BuildHasherDefault<Xxh3>> =
+        read_dir(original_path)
+            .unwrap()
+            .par_bridge()
+            .flatten()
+            .fold(
+                HashMap::default,
+                |mut map: HashMap<String, Value, BuildHasherDefault<Xxh3>>, entry: DirEntry| {
+                    let filename: String = entry.file_name().into_string().unwrap();
 
-                if select_maps_re.is_match(&filename).unwrap() {
-                    map.insert(
-                        filename,
-                        merge_map(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
-                    );
-                }
-                map
-            },
-        )
-        .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<String, Value>, b: FnvHashMap<String, Value>| {
-                a.extend(b);
-                a
-            },
-        );
+                    if select_maps_re.is_match(&filename).unwrap() {
+                        map.insert(
+                            filename,
+                            merge_map(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
+                        );
+                    }
+                    map
+                },
+            )
+            .reduce(
+                HashMap::default,
+                |mut a: HashMap<String, Value, BuildHasherDefault<Xxh3>>,
+                 b: HashMap<String, Value, BuildHasherDefault<Xxh3>>| {
+                    a.extend(b);
+                    a
+                },
+            );
 
     let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
+        .unwrap()
+        .par_split('\n')
+        .map(|line: &str| line.replace(r"\#", "\n"))
+        .collect();
+
+    let names_original_text_vec: Vec<String> = read_to_string(maps_path.join("names.txt"))
         .unwrap()
         .par_split('\n')
         .map(|line: &str| line.replace(r"\#", "\n"))
@@ -240,12 +246,6 @@ pub fn write_maps(
             .par_split('\n')
             .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
             .collect();
-
-    let names_original_text_vec: Vec<String> = read_to_string(maps_path.join("names.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.replace(r"\#", "\n"))
-        .collect();
 
     let mut names_translated_text_vec: Vec<String> =
         read_to_string(maps_path.join("names_trans.txt"))
@@ -271,37 +271,40 @@ pub fn write_maps(
         }
     }
 
-    let maps_translation_map: FnvHashMap<&str, &str> = maps_original_text_vec
-        .par_iter()
-        .zip(maps_translated_text_vec.par_iter())
-        .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
-                map.insert(key.as_str(), value.as_str());
-                map
-            },
-        )
-        .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
-                a.extend(b);
-                a
-            },
-        );
+    let maps_translation_map: HashMap<&str, &str, BuildHasherDefault<Xxh3>> =
+        maps_original_text_vec
+            .par_iter()
+            .zip(maps_translated_text_vec.par_iter())
+            .fold(
+                HashMap::default,
+                |mut map: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                 (key, value): (&String, &String)| {
+                    map.insert(key.as_str(), value.as_str());
+                    map
+                },
+            )
+            .reduce(
+                HashMap::default,
+                |mut a: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                 b: HashMap<&str, &str, BuildHasherDefault<Xxh3>>| {
+                    a.extend(b);
+                    a
+                },
+            );
 
-    let names_translation_map: FnvHashMap<&str, &str> = names_original_text_vec
+    let names_translation_map: HashMap<&str, &str> = names_original_text_vec
         .par_iter()
         .zip(names_translated_text_vec.par_iter())
         .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
+            HashMap::default,
+            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
+            HashMap::default,
+            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
@@ -353,14 +356,14 @@ pub fn write_maps(
                                         .par_iter_mut()
                                         .for_each(|parameter_value: &mut Value| {
                                             if parameter_value.is_string() {
-                                                let parameter: &str =
+                                                let parameter_str: &str =
                                                     parameter_value.as_str().unwrap();
 
                                                 if [401, 402, 356].contains(&code) {
-                                                    let translated: Option<String> =
+                                                    let translated: Option<&&str> =
                                                         get_parameter_translated(
                                                             code,
-                                                            parameter,
+                                                            parameter_str,
                                                             &maps_translation_map,
                                                             game_type,
                                                         );
@@ -375,14 +378,14 @@ pub fn write_maps(
                                                     .unwrap()
                                                     .par_iter_mut()
                                                     .for_each(|subparameter_value: &mut Value| {
-                                                        let subparameter_string: &str =
+                                                        let subparameter_str: &str =
                                                             subparameter_value.as_str().unwrap();
 
                                                         if subparameter_value.is_string() {
-                                                            let translated: Option<String> =
+                                                            let translated: Option<&&str> =
                                                                 get_parameter_translated(
                                                                     code,
-                                                                    subparameter_string,
+                                                                    subparameter_str,
                                                                     &maps_translation_map,
                                                                     game_type,
                                                                 );
@@ -428,13 +431,13 @@ pub fn write_other(
     let select_other_re: Regex =
         Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
 
-    let mut other_obj_arr_map: FnvHashMap<String, Vec<Value>> = read_dir(original_path)
+    let mut other_obj_arr_map: HashMap<String, Vec<Value>> = read_dir(original_path)
         .unwrap()
         .par_bridge()
         .flatten()
         .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<String, Vec<Value>>, entry: DirEntry| {
+            HashMap::default,
+            |mut map: HashMap<String, Vec<Value>>, entry: DirEntry| {
                 let filename: String = entry.file_name().into_string().unwrap();
 
                 if select_other_re.is_match(&filename).unwrap() {
@@ -451,8 +454,8 @@ pub fn write_other(
             },
         )
         .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<String, Vec<Value>>, b: FnvHashMap<String, Vec<Value>>| {
+            HashMap::default,
+            |mut a: HashMap<String, Vec<Value>>, b: HashMap<String, Vec<Value>>| {
                 a.extend(b);
                 a
             },
@@ -495,23 +498,26 @@ pub fn write_other(
                 }
             }
 
-            let other_translation_map: FnvHashMap<&str, &str> = other_original_text
-                .par_iter()
-                .zip(other_translated_text.par_iter())
-                .fold(
-                    FnvHashMap::default,
-                    |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
-                        map.insert(key.as_str(), value.as_str());
-                        map
-                    },
-                )
-                .reduce(
-                    FnvHashMap::default,
-                    |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
-                        a.extend(b);
-                        a
-                    },
-                );
+            let other_translation_map: HashMap<&str, &str, BuildHasherDefault<Xxh3>> =
+                other_original_text
+                    .par_iter()
+                    .zip(other_translated_text.par_iter())
+                    .fold(
+                        HashMap::default,
+                        |mut map: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                         (key, value): (&String, &String)| {
+                            map.insert(key.as_str(), value.as_str());
+                            map
+                        },
+                    )
+                    .reduce(
+                        HashMap::default,
+                        |mut a: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                         b: HashMap<&str, &str, BuildHasherDefault<Xxh3>>| {
+                            a.extend(b);
+                            a
+                        },
+                    );
 
             // Other files except CommonEvents.json and Troops.json have the structure that consists
             // of name, nickname, description and note
@@ -520,29 +526,29 @@ pub fn write_other(
                     .par_iter_mut()
                     .skip(1) //Skipping first element in array as it is null
                     .for_each(|obj: &mut Value| {
-                        for (variable, name) in [
+                        for (variable_value, variable_name) in [
                             (obj["name"].take(), "name"),
                             (obj["nickname"].take(), "nickname"),
                             (obj["description"].take(), "description"),
                             (obj["note"].take(), "note"),
                         ] {
-                            if !variable.is_string() {
+                            if !variable_value.is_string() {
                                 continue;
                             }
 
-                            let variable_string: &str = variable.as_str().unwrap();
+                            let variable_str: &str = variable_value.as_str().unwrap();
 
-                            if !variable_string.is_empty() {
+                            if !variable_str.is_empty() {
                                 let translated: Option<String> = get_variable_translated(
-                                    variable_string,
-                                    name,
+                                    variable_str,
+                                    variable_name,
                                     filename,
                                     &other_translation_map,
                                     game_type,
                                 );
 
                                 if let Some(text) = translated {
-                                    obj[name] = to_value(text).unwrap();
+                                    obj[variable_name] = to_value(text).unwrap();
                                 }
                             }
                         }
@@ -554,8 +560,8 @@ pub fn write_other(
                     .skip(1) //Skipping first element in array as it is null
                     .for_each(|obj: &mut Value| {
                         //CommonEvents doesn't have pages, so we can just check if it's Troops
-                        let pages_length: usize = if filename.starts_with("Troops") {
-                            obj["pages"].as_array().unwrap().len()
+                        let pages_length: u32 = if filename.starts_with("Troops") {
+                            obj["pages"].as_array().unwrap().len() as u32
                         } else {
                             1
                         };
@@ -564,7 +570,7 @@ pub fn write_other(
                             //If element has pages, then we'll iterate over them
                             //Otherwise we'll just iterate over the list
                             let list: &mut Value = if pages_length != 1 {
-                                &mut obj["pages"][i]["list"]
+                                &mut obj["pages"][i as usize]["list"]
                             } else {
                                 &mut obj["list"]
                             };
@@ -587,14 +593,14 @@ pub fn write_other(
                                         .par_iter_mut()
                                         .for_each(|parameter_value: &mut Value| {
                                             if parameter_value.is_string() {
-                                                let parameter: &str =
+                                                let parameter_str: &str =
                                                     parameter_value.as_str().unwrap();
 
                                                 if [401, 402, 405, 356].contains(&code) {
-                                                    let translated: Option<String> =
+                                                    let translated: Option<&&str> =
                                                         get_parameter_translated(
                                                             code,
-                                                            parameter,
+                                                            parameter_str,
                                                             &other_translation_map,
                                                             game_type,
                                                         );
@@ -609,14 +615,14 @@ pub fn write_other(
                                                     .unwrap()
                                                     .par_iter_mut()
                                                     .for_each(|subparameter_value: &mut Value| {
-                                                        let subparameter: &str =
+                                                        let subparameter_str: &str =
                                                             subparameter_value.as_str().unwrap();
 
                                                         if subparameter_value.is_string() {
-                                                            let translated: Option<String> =
+                                                            let translated: Option<&&str> =
                                                                 get_parameter_translated(
                                                                     code,
-                                                                    subparameter,
+                                                                    subparameter_str,
                                                                     &other_translation_map,
                                                                     game_type,
                                                                 );
@@ -688,19 +694,19 @@ pub fn write_system(
         }
     }
 
-    let system_translation_map: FnvHashMap<&str, &str> = system_original_text
+    let system_translation_map: HashMap<&str, &str> = system_original_text
         .par_iter()
         .zip(system_translated_text.par_iter())
         .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
+            HashMap::default,
+            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
+            HashMap::default,
+            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
@@ -852,19 +858,19 @@ pub fn write_plugins(
         }
     }
 
-    let plugins_translation_map: FnvHashMap<&str, &str> = plugins_original_text_vec
+    let plugins_translation_map: HashMap<&str, &str> = plugins_original_text_vec
         .par_iter()
         .zip(plugins_translated_text_vec.par_iter())
         .fold(
-            FnvHashMap::default,
-            |mut map: FnvHashMap<&str, &str>, (key, value): (&String, &String)| {
+            HashMap::default,
+            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
                 map.insert(key.as_str(), value.as_str());
                 map
             },
         )
         .reduce(
-            FnvHashMap::default,
-            |mut a: FnvHashMap<&str, &str>, b: FnvHashMap<&str, &str>| {
+            HashMap::default,
+            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
                 a.extend(b);
                 a
             },
@@ -874,7 +880,7 @@ pub fn write_plugins(
         // For now, plugins writing only implemented for Fear & Hunger: Termina, so you should manually translate the plugins.js file if it's not Termina
 
         // Plugins with needed text
-        let plugin_names: FnvHashSet<&str> = FnvHashSet::from_iter([
+        let plugin_names: HashSet<&str, BuildHasherDefault<Xxh3>> = HashSet::from_iter([
             "YEP_BattleEngineCore",
             "YEP_OptionsCore",
             "SRD_NameInputUpgrade",
