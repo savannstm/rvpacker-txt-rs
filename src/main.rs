@@ -23,6 +23,25 @@ enum Language {
     Russian,
 }
 
+#[derive(PartialEq)]
+enum ProcessingType {
+    Force,
+    Append,
+    Default,
+}
+
+impl AsRef<ProcessingType> for ProcessingType {
+    fn as_ref(&self) -> &ProcessingType {
+        self
+    }
+}
+
+impl PartialEq<ProcessingType> for &ProcessingType {
+    fn eq(&self, other: &ProcessingType) -> bool {
+        *self == other
+    }
+}
+
 struct ProgramLocalization<'a> {
     // General program descriptions
     about_msg: &'a str,
@@ -40,6 +59,8 @@ struct ProgramLocalization<'a> {
     log_arg_desc: &'a str,
     shuffle_arg_desc: &'a str,
     language_arg_desc: &'a str,
+    force_arg_desc: &'a str,
+    append_arg_desc: &'a str,
     help_arg_desc: &'a str,
     disable_custom_parsing_desc: &'a str,
 
@@ -59,6 +80,8 @@ struct ProgramLocalization<'a> {
     read_log_msg: &'a str,
     write_success_msg: &'a str,
     read_success_msg: &'a str,
+    file_already_parsed_msg: &'a str,
+    file_is_not_parsed_msg: &'a str,
 
     // Misc
     possible_values: &'a str,
@@ -85,6 +108,8 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_arg_desc: r#"Output directory, containing an "output" folder with folders "data" and "js", containing compiled .txt files with translation."#,
             shuffle_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
             language_arg_desc: "Sets the localization of the tool to the selected language.",
+            force_arg_desc: "Force rewrite all files. Cannot be used with --append.",
+            append_arg_desc: "When you update the rvpacker-json-txt, you probably should re-read your files with append, as some new text might be added to parser. Cannot be used with --force.",
             help_arg_desc: "Prints the program's help message or for the entered subcommand.",
             help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
             subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
@@ -104,6 +129,8 @@ impl<'a> ProgramLocalization<'a> {
             write_success_msg: "All files were written successfully.\nTime spent (in seconds):",
             read_success_msg: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
             read_log_msg: "Parsed file",
+            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
+            file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             disable_custom_parsing_desc: "Disables built-in custom parsing for some games.",
         }
     }
@@ -119,6 +146,8 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_arg_desc: r#"Выходная директория, в которой будут создана директория "output" с папками "data" и "js", содержащими скомпилированные файлы с переводом."#,
             shuffle_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
             language_arg_desc: "Устанавливает локализацию инструмента на выбранный язык.",
+            force_arg_desc: "Принудительно перезаписать все файлы. Не может быть использован с --append.",
+            append_arg_desc: "Когда вы обновляете rvpacker-json-txt, вам наверное стоит повторно прочитать файлы игры с флагом --append, поскольку новый текст может быть добавлен в парсер. Не может быть использован с --force.",
             help_arg_desc: "Выводит справочную информацию по программе либо по введёной команде.",
             help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
             subcommand_help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"),
@@ -138,20 +167,22 @@ impl<'a> ProgramLocalization<'a> {
             write_success_msg: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
             read_success_msg: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
             read_log_msg: "Распарсен файл",
+            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
+            file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов для некоторых игр.",
         }
     }
 }
 
-fn get_game_type(system_file_path: &Path) -> &str {
+fn get_game_type(system_file_path: &Path) -> Option<&str> {
     let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
 
     if game_title.contains("termina") {
-        return "termina";
+        return Some("termina");
     }
 
-    ""
+    None
 }
 
 fn determine_language() -> Language {
@@ -269,10 +300,26 @@ fn main() {
         .action(ArgAction::Help)
         .display_order(100);
 
+    let force_flag: Arg = Arg::new("force")
+        .short('f')
+        .long("force")
+        .action(ArgAction::SetTrue)
+        .help(localization.force_arg_desc)
+        .display_order(95)
+        .conflicts_with("append");
+
+    let append_flag: Arg = Arg::new("append")
+        .short('a')
+        .long("append")
+        .action(ArgAction::SetTrue)
+        .help(localization.append_arg_desc)
+        .display_order(96);
+
     let read_subcommand: Command = Command::new("read")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.read_command_desc)
+        .args([force_flag, append_flag])
         .arg(&help_flag);
 
     let write_subcommand: Command = Command::new("write")
@@ -367,23 +414,40 @@ fn main() {
 
     let system_file_path: PathBuf = original_path.join("System.json");
 
-    let game_type: &str = if disable_custom_parsing {
-        ""
+    let game_type: Option<&str> = if disable_custom_parsing {
+        None
     } else {
         get_game_type(&system_file_path)
     };
 
     if command == "read" {
+        let read_matches: &ArgMatches = matches.subcommand_matches(command).unwrap();
+
+        let force: bool = read_matches.get_flag("force");
+        let append: bool = read_matches.get_flag("append");
+
+        let processing_type: ProcessingType = if force {
+            ProcessingType::Force
+        } else if append {
+            ProcessingType::Append
+        } else {
+            ProcessingType::Default
+        };
+
         create_dir_all(&maps_path).unwrap();
         create_dir_all(&other_path).unwrap();
+
+        unsafe { read::LOG_MSG = localization.read_log_msg }
+        unsafe { read::FILE_ALREADY_PARSED = localization.file_already_parsed_msg }
+        unsafe { read::FILE_IS_NOT_PARSED = localization.file_is_not_parsed_msg }
 
         if !disable_maps_processing {
             read_map(
                 &original_path,
                 &maps_path,
                 enable_logging,
-                localization.read_log_msg,
                 game_type,
+                &processing_type,
             );
         }
 
@@ -392,8 +456,8 @@ fn main() {
                 &original_path,
                 &other_path,
                 enable_logging,
-                localization.read_log_msg,
                 game_type,
+                &processing_type,
             );
         }
 
@@ -402,7 +466,7 @@ fn main() {
                 &system_file_path,
                 &other_path,
                 enable_logging,
-                localization.read_log_msg,
+                &processing_type,
             );
         }
 
@@ -433,6 +497,8 @@ fn main() {
             .get_one::<u8>("shuffle_level")
             .unwrap();
 
+        unsafe { write::LOG_MSG = localization.write_log_msg }
+
         if !disable_maps_processing {
             write_maps(
                 &maps_path,
@@ -440,7 +506,6 @@ fn main() {
                 &output_path,
                 shuffle_level,
                 enable_logging,
-                localization.write_log_msg,
                 game_type,
             );
         }
@@ -452,7 +517,6 @@ fn main() {
                 &output_path,
                 shuffle_level,
                 enable_logging,
-                localization.write_log_msg,
                 game_type,
             );
         }
@@ -464,18 +528,20 @@ fn main() {
                 &output_path,
                 shuffle_level,
                 enable_logging,
-                localization.write_log_msg,
             );
         }
 
-        if !disable_plugins_processing && plugins_path.exists() && game_type == "termina" {
+        if !disable_plugins_processing
+            && plugins_path.exists()
+            && game_type.is_some()
+            && game_type.unwrap() == "termina"
+        {
             write_plugins(
                 &plugins_path.join("plugins.json"),
                 &plugins_path,
                 &plugins_output_path,
                 shuffle_level,
                 enable_logging,
-                localization.write_log_msg,
             );
         }
 

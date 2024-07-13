@@ -12,34 +12,38 @@ use xxhash_rust::xxh3::Xxh3;
 
 use crate::shuffle_words;
 
+pub static mut LOG_MSG: &str = "";
+
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn get_parameter_translated<'a>(
     code: u16,
     mut parameter: &'a str,
     hashmap: &'a HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
-    game_type: &str,
+    game_type: Option<&str>,
 ) -> Option<&'a &'a str> {
-    match code {
-        401 | 402 | 405 => match game_type {
-            // Implement custom parsing
-            _ => {}
-        },
-        102 => match game_type {
-            // Implement custom parsing
-            _ => {}
-        },
-        356 => match game_type {
-            "termina" => {
-                if !parameter.starts_with("GabText")
-                    && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
-                {
-                    return None;
+    if let Some(game_type) = game_type {
+        match code {
+            401 | 405 => match game_type {
+                // Implement custom parsing
+                _ => {}
+            },
+            102 | 402 => match game_type {
+                // Implement custom parsing
+                _ => {}
+            },
+            356 => match game_type {
+                "termina" => {
+                    if !parameter.starts_with("GabText")
+                        && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
+                    {
+                        return None;
+                    }
                 }
-            }
-            // Implement custom parsing
-            _ => {}
-        },
-        _ => unreachable!(),
+                // Implement custom parsing
+                _ => {}
+            },
+            _ => unreachable!(),
+        }
     }
 
     hashmap.get(parameter)
@@ -51,36 +55,38 @@ fn get_variable_translated(
     variable_name: &str,
     filename: &str,
     hashmap: &HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
-    game_type: &str,
+    game_type: Option<&str>,
 ) -> Option<String> {
-    match variable_name {
-        "name" => match game_type {
-            _ => {}
-        },
-        "nickname" => match game_type {
-            _ => {}
-        },
-        "description" => match game_type {
-            _ => {}
-        },
-        "note" => match game_type {
-            "termina" => {
-                if filename.starts_with("Items") {
-                    for string in [
-                        "<Menu Category: Items>",
-                        "<Menu Category: Food>",
-                        "<Menu Category: Healing>",
-                        "<Menu Category: Body bag>",
-                    ] {
-                        if variable_text.contains(string) {
-                            return Some(variable_text.replacen(string, hashmap[string], 1));
+    if let Some(game_type) = game_type {
+        match variable_name {
+            "name" => match game_type {
+                _ => {}
+            },
+            "nickname" => match game_type {
+                _ => {}
+            },
+            "description" => match game_type {
+                _ => {}
+            },
+            "note" => match game_type {
+                "termina" => {
+                    if filename.starts_with("Items") {
+                        for string in [
+                            "<Menu Category: Items>",
+                            "<Menu Category: Food>",
+                            "<Menu Category: Healing>",
+                            "<Menu Category: Body bag>",
+                        ] {
+                            if variable_text.contains(string) {
+                                return Some(variable_text.replacen(string, hashmap[string], 1));
+                            }
                         }
                     }
                 }
-            }
-            _ => {}
-        },
-        _ => unreachable!(),
+                _ => {}
+            },
+            _ => unreachable!(),
+        }
     }
 
     hashmap.get(variable_text).map(|s| s.to_string())
@@ -187,7 +193,6 @@ pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
 /// * `output_path` - path to the output directory
 /// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn write_maps(
     maps_path: &Path,
@@ -195,8 +200,7 @@ pub fn write_maps(
     output_path: &Path,
     shuffle_level: u8,
     logging: bool,
-    log_msg: &str,
-    game_type: &str,
+    game_type: Option<&str>,
 ) {
     let select_maps_re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
@@ -357,7 +361,7 @@ pub fn write_maps(
                                         .for_each(|parameter_value: &mut Value| {
                                             if parameter_value.is_string() {
                                                 let parameter_str: &str =
-                                                    parameter_value.as_str().unwrap();
+                                                    parameter_value.as_str().unwrap().trim();
 
                                                 if [401, 402, 356].contains(&code) {
                                                     let translated: Option<&&str> =
@@ -379,7 +383,10 @@ pub fn write_maps(
                                                     .par_iter_mut()
                                                     .for_each(|subparameter_value: &mut Value| {
                                                         let subparameter_str: &str =
-                                                            subparameter_value.as_str().unwrap();
+                                                            subparameter_value
+                                                                .as_str()
+                                                                .unwrap()
+                                                                .trim();
 
                                                         if subparameter_value.is_string() {
                                                             let translated: Option<&&str> =
@@ -405,7 +412,7 @@ pub fn write_maps(
             write(output_path.join(filename), obj.to_string()).unwrap();
 
             if logging {
-                println!("{log_msg} {filename}");
+                println!("{} {filename}", unsafe { LOG_MSG });
             }
         });
 }
@@ -417,7 +424,6 @@ pub fn write_maps(
 /// * `output_path` - path to the output directory
 /// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
 pub fn write_other(
     other_path: &Path,
@@ -425,8 +431,7 @@ pub fn write_other(
     output_path: &Path,
     shuffle_level: u8,
     logging: bool,
-    log_msg: &str,
-    game_type: &str,
+    game_type: Option<&str>,
 ) {
     let select_other_re: Regex =
         Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
@@ -476,14 +481,14 @@ pub fn write_other(
                 read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace(r"\#", "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                     .collect();
 
             let mut other_translated_text: Vec<String> =
                 read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
                     .unwrap()
                     .par_split('\n')
-                    .map(|line: &str| line.replace(r"\#", "\n"))
+                    .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                     .collect();
 
             if shuffle_level > 0 {
@@ -536,7 +541,7 @@ pub fn write_other(
                                 continue;
                             }
 
-                            let variable_str: &str = variable_value.as_str().unwrap();
+                            let variable_str: &str = variable_value.as_str().unwrap().trim();
 
                             if !variable_str.is_empty() {
                                 let translated: Option<String> = get_variable_translated(
@@ -594,7 +599,7 @@ pub fn write_other(
                                         .for_each(|parameter_value: &mut Value| {
                                             if parameter_value.is_string() {
                                                 let parameter_str: &str =
-                                                    parameter_value.as_str().unwrap();
+                                                    parameter_value.as_str().unwrap().trim();
 
                                                 if [401, 402, 405, 356].contains(&code) {
                                                     let translated: Option<&&str> =
@@ -616,7 +621,10 @@ pub fn write_other(
                                                     .par_iter_mut()
                                                     .for_each(|subparameter_value: &mut Value| {
                                                         let subparameter_str: &str =
-                                                            subparameter_value.as_str().unwrap();
+                                                            subparameter_value
+                                                                .as_str()
+                                                                .unwrap()
+                                                                .trim();
 
                                                         if subparameter_value.is_string() {
                                                             let translated: Option<&&str> =
@@ -644,7 +652,7 @@ pub fn write_other(
             write(output_path.join(filename), to_string(obj_arr).unwrap()).unwrap();
 
             if logging {
-                println!("{log_msg} {filename}");
+                println!("{} {filename}", unsafe { LOG_MSG });
             }
         });
 }
@@ -658,14 +666,12 @@ pub fn write_other(
 /// * `output_path` - path to the output directory
 /// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 pub fn write_system(
     system_file_path: &Path,
     other_path: &Path,
     output_path: &Path,
     shuffle_level: u8,
     logging: bool,
-    log_msg: &str,
 ) {
     let mut system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
@@ -742,10 +748,6 @@ pub fn write_system(
             }
         });
 
-    if let Some(text) = system_translation_map.get(system_obj["gameTitle"].as_str().unwrap()) {
-        system_obj["gameTitle"] = to_value(text).unwrap();
-    }
-
     system_obj["skillTypes"]
         .as_array_mut()
         .unwrap()
@@ -803,6 +805,8 @@ pub fn write_system(
             }
         });
 
+    system_obj["gameTitle"] = to_value(system_translated_text.last().unwrap()).unwrap();
+
     write(
         output_path.join("System.json"),
         to_string(&system_obj).unwrap(),
@@ -810,7 +814,7 @@ pub fn write_system(
     .unwrap();
 
     if logging {
-        println!("{log_msg} System.json");
+        println!("{} System.json", unsafe { LOG_MSG });
     }
 }
 
@@ -821,7 +825,6 @@ pub fn write_system(
 /// * `output_path` - path to the output directory
 /// * `shuffle_level` - level of shuffle
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 /// * `game_type` - game type, currently function executes only if it's `termina`
 pub fn write_plugins(
     pluigns_file_path: &Path,
@@ -829,7 +832,6 @@ pub fn write_plugins(
     output_path: &Path,
     shuffle_level: u8,
     logging: bool,
-    log_msg: &str,
 ) {
     let mut obj_arr: Vec<Value> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
@@ -952,6 +954,6 @@ pub fn write_plugins(
     .unwrap();
 
     if logging {
-        println!("{log_msg} plugins.js");
+        println!("{} plugins.js", unsafe { LOG_MSG });
     }
 }

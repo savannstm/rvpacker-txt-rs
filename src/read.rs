@@ -1,5 +1,5 @@
 use fancy_regex::Regex;
-use indexmap::IndexSet;
+use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
 use serde_json::{from_str, Value};
 use std::{
@@ -10,29 +10,41 @@ use std::{
 };
 use xxhash_rust::xxh3::Xxh3;
 
+use crate::ProcessingType;
+
+pub static mut LOG_MSG: &str = "";
+pub static mut FILE_ALREADY_PARSED: &str = "";
+pub static mut FILE_IS_NOT_PARSED: &str = "";
+
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
-fn parse_parameter<'a>(code: u16, mut parameter: &'a str, game_type: &str) -> Option<&'a str> {
-    match code {
-        401 | 405 => match game_type {
-            // Implement custom parsing
-            _ => {}
-        },
-        102 => match game_type {
-            // Implement custom parsing
-            _ => {}
-        },
-        356 => match game_type {
-            "termina" => {
-                if !parameter.starts_with("GabText")
-                    && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
-                {
-                    return None;
+fn parse_parameter<'a>(
+    code: u16,
+    mut parameter: &'a str,
+    game_type: Option<&str>,
+) -> Option<&'a str> {
+    if let Some(game_type) = game_type {
+        match code {
+            401 | 405 => match game_type {
+                // Implement custom parsing
+                _ => {}
+            },
+            102 => match game_type {
+                // Implement custom parsing
+                _ => {}
+            },
+            356 => match game_type {
+                "termina" => {
+                    if !parameter.starts_with("GabText")
+                        && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
+                    {
+                        return None;
+                    }
                 }
-            }
-            // Implement custom parsing
-            _ => {}
-        },
-        _ => unreachable!(),
+                // Implement custom parsing
+                _ => {}
+            },
+            _ => unreachable!(),
+        }
     }
 
     Some(parameter)
@@ -43,67 +55,80 @@ fn parse_variable(
     mut variable: &str,
     name: &str,
     filename: &str,
-    game_type: &str,
+    game_type: Option<&str>,
 ) -> Option<String> {
-    match name {
-        "name" => match game_type {
-            _ => {}
-        },
-        "nickname" => match game_type {
-            _ => {}
-        },
-        "description" => match game_type {
-            _ => {}
-        },
-        "note" => match game_type {
-            "termina" => {
-                if !filename.starts_with("Common") && !filename.starts_with("Troops") {
-                    if filename.starts_with("Items") {
-                        for string in [
-                            "<Menu Category: Items>",
-                            "<Menu Category: Food>",
-                            "<Menu Category: Healing>",
-                            "<Menu Category: Body bag>",
-                        ] {
-                            if variable.contains(string) {
-                                return Some(string.to_string());
+    if let Some(game_type) = game_type {
+        match name {
+            "name" => match game_type {
+                _ => {}
+            },
+            "nickname" => match game_type {
+                _ => {}
+            },
+            "description" => match game_type {
+                _ => {}
+            },
+            "note" => match game_type {
+                "termina" => {
+                    if !filename.starts_with("Common") && !filename.starts_with("Troops") {
+                        if filename.starts_with("Items") {
+                            for string in [
+                                "<Menu Category: Items>",
+                                "<Menu Category: Food>",
+                                "<Menu Category: Healing>",
+                                "<Menu Category: Body bag>",
+                            ] {
+                                if variable.contains(string) {
+                                    return Some(string.to_string());
+                                }
                             }
                         }
-                    }
 
-                    if filename.starts_with("Classes") {
-                        return Some(variable.to_string());
-                    }
+                        if filename.starts_with("Classes") {
+                            return Some(variable.to_string());
+                        }
 
-                    if filename.starts_with("Armors") && !variable.starts_with("///") {
-                        return Some(variable.to_string());
-                    }
+                        if filename.starts_with("Armors") && !variable.starts_with("///") {
+                            return Some(variable.to_string());
+                        }
 
-                    return None;
+                        return None;
+                    }
                 }
-            }
-            _ => {}
-        },
-        _ => unreachable!(),
+                _ => {}
+            },
+            _ => unreachable!(),
+        }
     }
 
     Some(variable.to_string())
 }
 
+// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all Map .json files of map_path and parses them into .txt files in output_path.
 /// # Parameters
 /// * `map_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
+/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_map(
     maps_path: &Path,
     output_path: &Path,
     logging: bool,
-    log_msg: &str,
-    game_type: &str,
+    game_type: Option<&str>,
+    mut processing_type: &ProcessingType,
 ) {
+    let maps_output_path: &Path = &output_path.join("maps.txt");
+    let maps_trans_output_path: &Path = &output_path.join("maps_trans.txt");
+    let names_output_path: &Path = &output_path.join("names.txt");
+    let names_trans_output_path: &Path = &output_path.join("names_trans.txt");
+
+    if processing_type == ProcessingType::Default && maps_trans_output_path.exists() {
+        println!("maps_trans.txt {}", unsafe { FILE_ALREADY_PARSED });
+        return;
+    }
+
     let select_maps_re: Regex = Regex::new(r"^Map[0-9].*json$").unwrap();
 
     let maps_files: Vec<DirEntry> = read_dir(maps_path)
@@ -116,8 +141,8 @@ pub fn read_map(
         .collect();
 
     let maps_obj_map: HashMap<String, Value, BuildHasherDefault<Xxh3>> = maps_files
-        .iter()
-        .map(|entry: &DirEntry| {
+        .into_iter()
+        .map(|entry: DirEntry| {
             (
                 entry.file_name().into_string().unwrap(),
                 from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
@@ -128,10 +153,50 @@ pub fn read_map(
     let mut maps_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
     let mut names_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
 
+    let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
+        IndexMap::default();
+    let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
+        IndexMap::default();
+
+    if processing_type == ProcessingType::Append {
+        if maps_trans_output_path.exists() {
+            for (original, translated) in read_to_string(maps_output_path)
+                .unwrap()
+                .split('\n')
+                .zip(read_to_string(maps_trans_output_path).unwrap().split('\n'))
+            {
+                maps_translation_map.insert(original.to_string(), translated.to_string());
+            }
+
+            for (original, translated) in read_to_string(names_output_path)
+                .unwrap()
+                .split('\n')
+                .zip(read_to_string(names_trans_output_path).unwrap().split('\n'))
+            {
+                names_translation_map.insert(original.to_string(), translated.to_string());
+            }
+        } else {
+            println!("{}", unsafe { FILE_IS_NOT_PARSED });
+            processing_type = &ProcessingType::Default;
+        }
+    }
+
     for (filename, obj) in maps_obj_map {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
-                names_lines.insert(display_name.to_string());
+                let display_name_string: String = display_name.to_string();
+
+                if processing_type == ProcessingType::Append
+                    && !names_translation_map.contains_key(&display_name_string)
+                {
+                    names_translation_map.shift_insert(
+                        names_lines.len(),
+                        display_name_string.clone(),
+                        "".into(),
+                    );
+                }
+
+                names_lines.insert(display_name_string);
             }
         }
 
@@ -143,7 +208,7 @@ pub fn read_map(
 
             for page in event["pages"].as_array().unwrap().iter() {
                 let mut in_sequence: bool = false;
-                let mut line: Vec<String> = Vec::new();
+                let mut line: Vec<String> = Vec::with_capacity(4);
 
                 for list in page["list"].as_array().unwrap() {
                     //401 - dialogue lines
@@ -169,7 +234,20 @@ pub fn read_map(
                             }
                         } else {
                             if in_sequence {
-                                maps_lines.insert(line.join(r"\#"));
+                                let joined: String = line.join(r"\#").trim().to_string();
+
+                                if processing_type == ProcessingType::Append
+                                    && !maps_translation_map.contains_key(&joined)
+                                {
+                                    maps_translation_map.shift_insert(
+                                        maps_lines.len(),
+                                        joined.clone(),
+                                        "".into(),
+                                    );
+                                }
+
+                                maps_lines.insert(joined);
+
                                 line.clear();
                                 in_sequence = false;
                             }
@@ -182,7 +260,7 @@ pub fn read_map(
                                         {
                                             if subparameter_value.is_string() {
                                                 let subparameter_str: &str =
-                                                    subparameter_value.as_str().unwrap();
+                                                    subparameter_value.as_str().unwrap().trim();
 
                                                 if !subparameter_str.is_empty() {
                                                     let parsed: Option<&str> = parse_parameter(
@@ -192,7 +270,21 @@ pub fn read_map(
                                                     );
 
                                                     if let Some(parsed) = parsed {
-                                                        maps_lines.insert(parsed.to_string());
+                                                        let parsed_string: String =
+                                                            parsed.to_string();
+
+                                                        if processing_type == ProcessingType::Append
+                                                            && !maps_translation_map
+                                                                .contains_key(&parsed_string)
+                                                        {
+                                                            maps_translation_map.shift_insert(
+                                                                maps_lines.len(),
+                                                                parsed_string.clone(),
+                                                                "".into(),
+                                                            );
+                                                        }
+
+                                                        maps_lines.insert(parsed_string);
                                                     }
                                                 }
                                             }
@@ -202,14 +294,28 @@ pub fn read_map(
 
                                 356 => {
                                     if parameter_value.is_string() {
-                                        let parameter_str: &str = parameter_value.as_str().unwrap();
+                                        let parameter_str: &str =
+                                            parameter_value.as_str().unwrap().trim();
 
                                         if !parameter_str.is_empty() {
                                             let parsed: Option<&str> =
                                                 parse_parameter(code, parameter_str, game_type);
 
                                             if let Some(parsed) = parsed {
-                                                maps_lines.insert(parsed.to_string());
+                                                let parsed_string: String = parsed.to_string();
+
+                                                if processing_type == ProcessingType::Append
+                                                    && !maps_translation_map
+                                                        .contains_key(&parsed_string)
+                                                {
+                                                    maps_translation_map.shift_insert(
+                                                        maps_lines.len(),
+                                                        parsed_string.clone(),
+                                                        "".into(),
+                                                    );
+                                                }
+
+                                                maps_lines.insert(parsed_string);
                                             }
                                         }
                                     }
@@ -224,56 +330,55 @@ pub fn read_map(
         }
 
         if logging {
-            println!("{log_msg} {filename}.");
+            println!("{} {filename}.", unsafe { LOG_MSG });
         }
     }
 
-    write(
-        output_path.join("maps.txt"),
-        maps_lines
-            .iter()
-            .cloned()
-            .collect::<Vec<String>>()
-            .join("\n"),
-    )
-    .unwrap();
+    let (
+        maps_original_content,
+        maps_translated_content,
+        names_original_content,
+        names_translated_content,
+    ) = if processing_type == ProcessingType::Append {
+        let maps_collected: (Vec<String>, Vec<String>) = maps_translation_map.into_iter().unzip();
+        let names_collected: (Vec<String>, Vec<String>) = names_translation_map.into_iter().unzip();
+        (
+            maps_collected.0.join("\n"),
+            maps_collected.1.join("\n"),
+            names_collected.0.join("\n"),
+            names_collected.1.join("\n"),
+        )
+    } else {
+        let maps_length: usize = maps_lines.len() - 1;
+        let names_length: usize = names_lines.len() - 1;
+        (
+            maps_lines.into_iter().collect::<Vec<String>>().join("\n"),
+            "\n".repeat(maps_length),
+            names_lines.into_iter().collect::<Vec<String>>().join("\n"),
+            "\n".repeat(names_length),
+        )
+    };
 
-    write(
-        output_path.join("names.txt"),
-        names_lines
-            .iter()
-            .cloned()
-            .collect::<Vec<String>>()
-            .join("\n"),
-    )
-    .unwrap();
-
-    write(
-        output_path.join("maps_trans.txt"),
-        "\n".repeat(maps_lines.len() - 1),
-    )
-    .unwrap();
-
-    write(
-        output_path.join("names_trans.txt"),
-        "\n".repeat(names_lines.len() - 1),
-    )
-    .unwrap();
+    write(maps_output_path, maps_original_content).unwrap();
+    write(maps_trans_output_path, maps_translated_content).unwrap();
+    write(names_output_path, names_original_content).unwrap();
+    write(names_trans_output_path, names_translated_content).unwrap();
 }
 
+// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all Other .json files of other_path and parses them into .txt files in output_path.
 /// # Parameters
 /// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
 /// * `game_type` - game type for custom parsing
+/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_other(
     other_path: &Path,
     output_path: &Path,
     logging: bool,
-    log_msg: &str,
-    game_type: &str,
+    game_type: Option<&str>,
+    processing_type: &ProcessingType,
 ) {
     let select_other_re: Regex =
         Regex::new(r"^(?!Map|Tilesets|Animations|States|System).*json$").unwrap();
@@ -298,10 +403,47 @@ pub fn read_other(
         })
         .collect();
 
+    let mut internal_processing_type: &ProcessingType = processing_type;
+
     for (filename, obj_arr) in other_obj_arr_map {
         let other_processed_filename: String =
             filename[0..filename.rfind('.').unwrap()].to_lowercase();
+
+        let other_output_path: &Path = &output_path.join(other_processed_filename.clone() + ".txt");
+        let other_trans_output_path: &Path =
+            &output_path.join(other_processed_filename + "_trans.txt");
+
+        if processing_type == ProcessingType::Default && other_trans_output_path.exists() {
+            println!(
+                "{} {}",
+                other_trans_output_path
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap(),
+                unsafe { FILE_ALREADY_PARSED }
+            );
+            continue;
+        }
+
         let mut other_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+        let mut other_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
+            IndexMap::default();
+
+        if processing_type == ProcessingType::Append {
+            if other_trans_output_path.exists() {
+                for (original, translated) in read_to_string(other_output_path)
+                    .unwrap()
+                    .split('\n')
+                    .zip(read_to_string(other_trans_output_path).unwrap().split('\n'))
+                {
+                    other_translation_map.insert(original.to_string(), translated.to_string());
+                }
+            } else {
+                println!("{}", unsafe { FILE_IS_NOT_PARSED });
+                internal_processing_type = &ProcessingType::Default;
+            }
+        }
 
         // Other files except CommonEvents.json and Troops.json have the structure that consists
         // of name, nickname, description and note
@@ -317,14 +459,26 @@ pub fn read_other(
                         continue;
                     }
 
-                    let variable_str: &str = variable.unwrap();
+                    let variable_str: &str = variable.unwrap().trim();
 
                     if !variable_str.is_empty() {
                         let parsed: Option<String> =
                             parse_variable(variable_str, name, &filename, game_type);
 
                         if let Some(parsed) = parsed {
-                            other_lines.insert(parsed.replace('\n', r"\#"));
+                            let replaced: String = parsed.replace('\n', r"\#");
+
+                            if internal_processing_type == ProcessingType::Append
+                                && !other_translation_map.contains_key(&replaced)
+                            {
+                                other_translation_map.shift_insert(
+                                    other_lines.len(),
+                                    replaced.clone(),
+                                    "".into(),
+                                );
+                            }
+
+                            other_lines.insert(replaced);
                         }
                     }
                 }
@@ -333,7 +487,7 @@ pub fn read_other(
         //Other files have the structure somewhat similar to Maps.json files
         else {
             //Skipping first element in array as it is null
-            for obj in obj_arr.iter().skip(1) {
+            for obj in obj_arr.into_iter().skip(1) {
                 //CommonEvents doesn't have pages, so we can just check if it's Troops
                 let pages_length: u32 = if filename.starts_with("Troops") {
                     obj["pages"].as_array().unwrap().len() as u32
@@ -380,7 +534,20 @@ pub fn read_other(
                                 }
                             } else {
                                 if in_sequence {
-                                    other_lines.insert(line.join(r"\#"));
+                                    let joined: String = line.join(r"\#").trim().to_string();
+
+                                    if internal_processing_type == ProcessingType::Append
+                                        && !other_translation_map.contains_key(&joined)
+                                    {
+                                        other_translation_map.shift_insert(
+                                            other_lines.len(),
+                                            joined.clone(),
+                                            "".into(),
+                                        );
+                                    }
+
+                                    other_lines.insert(joined);
+
                                     line.clear();
                                     in_sequence = false;
                                 }
@@ -393,7 +560,7 @@ pub fn read_other(
                                             {
                                                 if subparameter_value.is_string() {
                                                     let subparameter_str: &str =
-                                                        subparameter_value.as_str().unwrap();
+                                                        subparameter_value.as_str().unwrap().trim();
 
                                                     if !subparameter_str.is_empty() {
                                                         let parsed: Option<&str> = parse_parameter(
@@ -403,7 +570,22 @@ pub fn read_other(
                                                         );
 
                                                         if let Some(parsed) = parsed {
-                                                            other_lines.insert(parsed.to_string());
+                                                            let parsed_string: String =
+                                                                parsed.to_string();
+
+                                                            if internal_processing_type
+                                                                == ProcessingType::Append
+                                                                && !other_translation_map
+                                                                    .contains_key(&parsed_string)
+                                                            {
+                                                                other_translation_map.shift_insert(
+                                                                    other_lines.len(),
+                                                                    parsed_string.clone(),
+                                                                    "".into(),
+                                                                );
+                                                            }
+
+                                                            other_lines.insert(parsed_string);
                                                         }
                                                     }
                                                 }
@@ -414,14 +596,27 @@ pub fn read_other(
                                     356 => {
                                         if parameter_value.is_string() {
                                             let parameter_str: &str =
-                                                parameter_value.as_str().unwrap();
+                                                parameter_value.as_str().unwrap().trim();
 
                                             if !parameter_str.is_empty() {
                                                 let parsed: Option<&str> =
                                                     parse_parameter(code, parameter_str, game_type);
 
                                                 if let Some(parsed) = parsed {
-                                                    other_lines.insert(parsed.to_string());
+                                                    let parsed_string: String = parsed.to_string();
+
+                                                    if processing_type == ProcessingType::Append
+                                                        && !other_translation_map
+                                                            .contains_key(&parsed_string)
+                                                    {
+                                                        other_translation_map.shift_insert(
+                                                            other_lines.len(),
+                                                            parsed_string.clone(),
+                                                            "".into(),
+                                                        );
+                                                    }
+
+                                                    other_lines.insert(parsed_string);
                                                 }
                                             }
                                         }
@@ -436,77 +631,154 @@ pub fn read_other(
             }
         }
 
-        write(
-            output_path.join(format!("{other_processed_filename}.txt")),
-            other_lines
-                .iter()
-                .cloned()
-                .collect::<Vec<String>>()
-                .join("\n"),
-        )
-        .unwrap();
-        write(
-            output_path.join(format!("{other_processed_filename}_trans.txt")),
-            "\n".repeat(other_lines.len() - 1),
-        )
-        .unwrap();
+        let (original_content, translation_content) = if processing_type == ProcessingType::Append {
+            let collected: (Vec<String>, Vec<String>) = other_translation_map.into_iter().unzip();
+            (collected.0.join("\n"), collected.1.join("\n"))
+        } else {
+            let length: usize = other_lines.len() - 1;
+
+            (
+                other_lines.into_iter().collect::<Vec<String>>().join("\n"),
+                "\n".repeat(length),
+            )
+        };
+
+        write(other_output_path, original_content).unwrap();
+        write(other_trans_output_path, translation_content).unwrap();
 
         if logging {
-            println!("{log_msg} {filename}");
+            println!("{} {filename}", unsafe { LOG_MSG });
         }
     }
 }
 
+// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads System .json file of other_path and parses it into .txt file in output_path.
 /// # Parameters
 /// * `other_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
 /// * `logging` - whether to log or not
-/// * `log_msg` - message to log
-pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, log_msg: &str) {
+/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
+pub fn read_system(
+    system_file_path: &Path,
+    output_path: &Path,
+    logging: bool,
+    mut processing_type: &ProcessingType,
+) {
+    let system_output_path: &Path = &output_path.join("system.txt");
+    let system_trans_output_path: &Path = &output_path.join("system_trans.txt");
+
+    if processing_type == ProcessingType::Default && system_trans_output_path.exists() {
+        println!("system_trans.txt {}", unsafe { FILE_ALREADY_PARSED });
+        return;
+    }
+
     let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
     let mut system_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+    let mut system_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
+        IndexMap::default();
+
+    if processing_type == ProcessingType::Append {
+        if system_trans_output_path.exists() {
+            for (original, translated) in
+                read_to_string(system_output_path).unwrap().split('\n').zip(
+                    read_to_string(system_trans_output_path)
+                        .unwrap()
+                        .split('\n'),
+                )
+            {
+                system_translation_map.insert(original.to_string(), translated.to_string());
+            }
+        } else {
+            println!("{}", unsafe { FILE_IS_NOT_PARSED });
+            processing_type = &ProcessingType::Default;
+        }
+    }
 
     // Armor types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["armorTypes"].as_array().unwrap() {
-        let slice_ref: &str = string.as_str().unwrap();
+        let str_slice: &str = string.as_str().unwrap();
 
-        if !slice_ref.is_empty() {
-            system_lines.insert(slice_ref.to_string());
+        if !str_slice.is_empty() {
+            let slice_string: String = str_slice.to_string();
+
+            if processing_type == ProcessingType::Append
+                && !system_translation_map.contains_key(&slice_string)
+            {
+                system_translation_map.shift_insert(
+                    system_lines.len(),
+                    slice_string.clone(),
+                    "".into(),
+                );
+            }
+
+            system_lines.insert(slice_string);
         }
     }
 
     // Element types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["elements"].as_array().unwrap() {
-        let slice_ref: &str = string.as_str().unwrap();
+        let str_slice: &str = string.as_str().unwrap();
 
-        if !slice_ref.is_empty() {
-            system_lines.insert(slice_ref.to_string());
+        if !str_slice.is_empty() {
+            let slice_string: String = str_slice.to_string();
+
+            if processing_type == ProcessingType::Append
+                && !system_translation_map.contains_key(&slice_string)
+            {
+                system_translation_map.shift_insert(
+                    system_lines.len(),
+                    slice_string.clone(),
+                    "".into(),
+                );
+            }
+
+            system_lines.insert(slice_string);
         }
     }
 
     // Names of equipment slots
     for string in system_obj["equipTypes"].as_array().unwrap() {
-        let slice_ref: &str = string.as_str().unwrap();
+        let str_slice: &str = string.as_str().unwrap();
 
-        if !slice_ref.is_empty() {
-            system_lines.insert(slice_ref.to_string());
+        if !str_slice.is_empty() {
+            let slice_string: String = str_slice.to_string();
+
+            if processing_type == ProcessingType::Append
+                && !system_translation_map.contains_key(&slice_string)
+            {
+                system_translation_map.shift_insert(
+                    system_lines.len(),
+                    slice_string.clone(),
+                    "".into(),
+                );
+            }
+
+            system_lines.insert(slice_string);
         }
     }
 
-    // Game title, parsed just for fun
-    // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
-    system_lines.insert(system_obj["gameTitle"].as_str().unwrap().to_string());
-
     // Names of battle options
     for string in system_obj["skillTypes"].as_array().unwrap() {
-        let slice_ref: &str = string.as_str().unwrap();
+        let str_slice: &str = string.as_str().unwrap();
 
-        if !slice_ref.is_empty() {
-            system_lines.insert(string.to_string());
+        if !str_slice.is_empty() {
+            let slice_string: String = str_slice.to_string();
+
+            if processing_type == ProcessingType::Append
+                && !system_translation_map.contains_key(&slice_string)
+            {
+                system_translation_map.shift_insert(
+                    system_lines.len(),
+                    slice_string.clone(),
+                    "".into(),
+                );
+            }
+
+            system_lines.insert(slice_string);
         }
     }
 
@@ -515,10 +787,22 @@ pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, l
         if key != "messages" {
             for string in value.as_array().unwrap() {
                 if string.is_string() {
-                    let slice_ref: &str = string.as_str().unwrap();
+                    let str_slice: &str = string.as_str().unwrap();
 
-                    if !slice_ref.is_empty() {
-                        system_lines.insert(slice_ref.to_string());
+                    if !str_slice.is_empty() {
+                        let slice_string: String = str_slice.to_string();
+
+                        if processing_type == ProcessingType::Append
+                            && !system_translation_map.contains_key(&slice_string)
+                        {
+                            system_translation_map.shift_insert(
+                                system_lines.len(),
+                                slice_string.clone(),
+                                "".into(),
+                            );
+                        }
+
+                        system_lines.insert(slice_string);
                     }
                 }
             }
@@ -528,10 +812,22 @@ pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, l
             }
 
             for message_string in value.as_object().unwrap().values() {
-                let slice_ref: &str = message_string.as_str().unwrap();
+                let str_slice: &str = message_string.as_str().unwrap();
 
-                if !slice_ref.is_empty() {
-                    system_lines.insert(slice_ref.to_string());
+                if !str_slice.is_empty() {
+                    let slice_string: String = str_slice.to_string();
+
+                    if processing_type == ProcessingType::Append
+                        && !system_translation_map.contains_key(&slice_string)
+                    {
+                        system_translation_map.shift_insert(
+                            system_lines.len(),
+                            slice_string.clone(),
+                            "".into(),
+                        );
+                    }
+
+                    system_lines.insert(slice_string);
                 }
             }
         }
@@ -540,31 +836,59 @@ pub fn read_system(system_file_path: &Path, output_path: &Path, logging: bool, l
     // Weapon types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["weaponTypes"].as_array().unwrap() {
-        let slice_ref: &str = string.as_str().unwrap();
+        let str_slice: &str = string.as_str().unwrap();
 
-        if !slice_ref.is_empty() {
-            system_lines.insert(slice_ref.to_string());
+        if !str_slice.is_empty() {
+            let slice_string: String = str_slice.to_string();
+
+            if processing_type == ProcessingType::Append
+                && !system_translation_map.contains_key(&slice_string)
+            {
+                system_translation_map.shift_insert(
+                    system_lines.len(),
+                    slice_string.clone(),
+                    "".into(),
+                );
+            }
+
+            system_lines.insert(slice_string);
         }
     }
 
-    write(
-        output_path.join("system.txt"),
-        system_lines
-            .iter()
-            .cloned()
-            .collect::<Vec<String>>()
-            .join("\n"),
-    )
-    .unwrap();
+    // Game title, parsed just for fun
+    // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
+    {
+        let game_title_string: String = system_obj["gameTitle"].as_str().unwrap().to_string();
 
-    write(
-        output_path.join("system_trans.txt"),
-        "\n".repeat(system_lines.len() - 1),
-    )
-    .unwrap();
+        if processing_type == ProcessingType::Append
+            && !system_translation_map.contains_key(&game_title_string)
+        {
+            system_translation_map.shift_insert(
+                system_lines.len(),
+                game_title_string.clone(),
+                "".into(),
+            );
+        }
+
+        system_lines.insert(game_title_string);
+    }
+
+    let (original_content, translated_content) = if processing_type == ProcessingType::Append {
+        let collected: (Vec<String>, Vec<String>) = system_translation_map.into_iter().unzip();
+        (collected.0.join("\n"), collected.1.join("\n"))
+    } else {
+        let length: usize = system_lines.len() - 1;
+        (
+            system_lines.into_iter().collect::<Vec<String>>().join("\n"),
+            "\n".repeat(length),
+        )
+    };
+
+    write(system_output_path, original_content).unwrap();
+    write(system_trans_output_path, translated_content).unwrap();
 
     if logging {
-        println!("{log_msg} System.json.");
+        println!("{} System.json.", unsafe { LOG_MSG });
     }
 }
 
