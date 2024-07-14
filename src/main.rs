@@ -358,7 +358,7 @@ fn main() {
         disable_system_processing,
         disable_plugins_processing,
     ) = matches
-        .get_many::<String>("disable_processing")
+        .get_many::<String>("disable-processing")
         .map(|disable_processing_args| {
             let mut flags = (false, false, false, false);
 
