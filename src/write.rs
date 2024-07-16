@@ -92,100 +92,6 @@ fn get_variable_translated(
     hashmap.get(variable_text).map(|s| s.to_string())
 }
 
-// ! Maybe this function must be removed in favor of splitting translation strings at '\#'s and replacing by parts
-/// Merges sequences of objects with codes 401 and 405 inside list objects.
-/// Merging is perfectly valid in RPG Maker MV/MZ, and it's much faster and easier than replacing text in each object in a loop.
-/// # Parameters
-/// * `json` - list object, which objects with codes 401 and 405 should be merged
-fn merge_seq(json: &mut Value) {
-    let mut first: Option<usize> = None;
-    let mut number: i16 = -1;
-    let mut sequence: bool = false;
-    let mut string_vec: Vec<String> = Vec::new();
-
-    let mut i: usize = 0;
-
-    let json_array: &mut Vec<Value> = json.as_array_mut().unwrap();
-
-    while i < json_array.len() {
-        let object: &Value = &json_array[i];
-        let code: u16 = object["code"].as_u64().unwrap() as u16;
-
-        if [401, 405].contains(&code) {
-            if first.is_none() {
-                first = Some(i);
-            }
-
-            number += 1;
-            string_vec.push(object["parameters"][0].as_str().unwrap().to_string());
-            sequence = true;
-        } else if i > 0 && sequence && first.is_some() && number != -1 {
-            json_array[first.unwrap()]["parameters"][0] = to_value(string_vec.join("\n")).unwrap();
-
-            let start_index: usize = first.unwrap() + 1;
-            let items_to_delete: usize = start_index + number as usize;
-            json_array.par_drain(start_index..items_to_delete);
-
-            string_vec.clear();
-            i -= number as usize;
-            number = -1;
-            first = None;
-            sequence = false;
-        }
-
-        i += 1;
-    }
-}
-
-/// Merges lists's objects with codes 401 and 405 in Map files.
-/// # Parameters
-/// * `obj` - object, which lists's objects with codes 401 and 405 should be merged
-/// # Returns
-/// * `Value` - object with merged lists's objects
-pub fn merge_map(mut obj: Value) -> Value {
-    obj["events"]
-        .as_array_mut()
-        .unwrap()
-        .par_iter_mut()
-        .skip(1) //Skipping first element in array as it is null
-        .for_each(|event: &mut Value| {
-            if !event["pages"].is_array() {
-                return;
-            }
-
-            event["pages"]
-                .as_array_mut()
-                .unwrap()
-                .par_iter_mut()
-                .for_each(|page: &mut Value| merge_seq(&mut page["list"]));
-        });
-
-    obj
-}
-
-/// Merges lists's objects with codes 401 and 405 in Other files.
-/// # Parameters
-/// * `obj_arr` - array of objects, which lists's objects with codes 401 and 405 should be merged
-/// # Returns
-/// * `Vec<Value>` - array of objects with merged lists's objects
-pub fn merge_other(mut obj_arr: Vec<Value>) -> Vec<Value> {
-    obj_arr.par_iter_mut().for_each(|obj: &mut Value| {
-        if obj["pages"].is_array() {
-            obj["pages"]
-                .as_array_mut()
-                .unwrap()
-                .par_iter_mut()
-                .for_each(|page: &mut Value| {
-                    merge_seq(&mut page["list"]);
-                });
-        } else if obj["list"].is_array() {
-            merge_seq(&mut obj["list"]);
-        }
-    });
-
-    obj_arr
-}
-
 /// Writes .txt files from maps folder back to their initial form.
 /// # Parameters
 /// * `maps_path` - path to the maps directory
@@ -217,7 +123,7 @@ pub fn write_maps(
                     if select_maps_re.is_match(&filename).unwrap() {
                         map.insert(
                             filename,
-                            merge_map(from_str(&read_to_string(entry.path()).unwrap()).unwrap()),
+                            from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
                         );
                     }
                     map
@@ -296,28 +202,32 @@ pub fn write_maps(
                 },
             );
 
-    let names_translation_map: HashMap<&str, &str> = names_original_text_vec
-        .par_iter()
-        .zip(names_translated_text_vec.par_iter())
-        .fold(
-            HashMap::default,
-            |mut map: HashMap<&str, &str>, (key, value): (&String, &String)| {
-                map.insert(key.as_str(), value.as_str());
-                map
-            },
-        )
-        .reduce(
-            HashMap::default,
-            |mut a: HashMap<&str, &str>, b: HashMap<&str, &str>| {
-                a.extend(b);
-                a
-            },
-        );
+    let names_translation_map: HashMap<&str, &str, BuildHasherDefault<Xxh3>> =
+        names_original_text_vec
+            .par_iter()
+            .zip(names_translated_text_vec.par_iter())
+            .fold(
+                HashMap::default,
+                |mut map: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                 (key, value): (&String, &String)| {
+                    map.insert(key.as_str(), value.as_str());
+                    map
+                },
+            )
+            .reduce(
+                HashMap::default,
+                |mut a: HashMap<&str, &str, BuildHasherDefault<Xxh3>>,
+                 b: HashMap<&str, &str, BuildHasherDefault<Xxh3>>| {
+                    a.extend(b);
+                    a
+                },
+            );
 
-    //401 - dialogue lines
-    //102, 402 - dialogue choices
-    //356 - system lines (special texts)
-    const ALLOWED_CODES: [u16; 4] = [401, 402, 356, 102];
+    // 401 - dialogue lines
+    // 102 - dialogue choices array
+    // 402 - one of the dialogue choices from the array
+    // 356 - system lines (special texts)
+    const ALLOWED_CODES: [u16; 4] = [401, 102, 402, 356];
 
     maps_obj_map
         .par_iter_mut()
@@ -343,69 +253,116 @@ pub fn write_maps(
                         .unwrap()
                         .par_iter_mut()
                         .for_each(|page: &mut Value| {
-                            page["list"]
-                                .as_array_mut()
-                                .unwrap()
-                                .par_iter_mut()
-                                .for_each(|item: &mut Value| {
-                                    let code: u16 = item["code"].as_u64().unwrap() as u16;
+                            let mut in_sequence: bool = false;
+                            let mut line: Vec<String> = Vec::with_capacity(4);
+                            let mut item_indices: Vec<usize> = Vec::with_capacity(4);
 
-                                    if !ALLOWED_CODES.contains(&code) {
-                                        return;
-                                    }
+                            let list: &mut Vec<Value> = page["list"].as_array_mut().unwrap();
+                            let list_len = list.len();
 
-                                    item["parameters"]
-                                        .as_array_mut()
-                                        .unwrap()
-                                        .par_iter_mut()
-                                        .for_each(|parameter_value: &mut Value| {
-                                            if parameter_value.is_string() {
-                                                let parameter_str: &str =
-                                                    parameter_value.as_str().unwrap().trim();
+                            for it in 0..list_len {
+                                let code: u16 = list[it]["code"].as_u64().unwrap() as u16;
 
-                                                if [401, 402, 356].contains(&code) {
-                                                    let translated: Option<&&str> =
-                                                        get_parameter_translated(
-                                                            code,
-                                                            parameter_str,
-                                                            &maps_translation_map,
-                                                            game_type,
-                                                        );
+                                if !ALLOWED_CODES.contains(&code) {
+                                    if in_sequence {
+                                        let joined: String = line.join("\n").trim().into();
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            401,
+                                            &joined,
+                                            &maps_translation_map,
+                                            game_type,
+                                        );
 
-                                                    if let Some(text) = translated {
-                                                        *parameter_value = to_value(text).unwrap();
-                                                    }
+                                        if let Some(text) = translated {
+                                            let split: Vec<&str> = text.split('\n').collect();
+                                            let split_length: usize = split.len();
+                                            let line_length: usize = line.len();
+
+                                            for (i, &index) in item_indices.iter().enumerate() {
+                                                if i < split_length {
+                                                    list[index]["parameters"][0] =
+                                                        to_value(split[i]).unwrap();
+                                                } else {
+                                                    list[index]["parameters"][0] =
+                                                        to_value("").unwrap();
                                                 }
-                                            } else if code == 102 && parameter_value.is_array() {
-                                                parameter_value
-                                                    .as_array_mut()
-                                                    .unwrap()
-                                                    .par_iter_mut()
-                                                    .for_each(|subparameter_value: &mut Value| {
-                                                        if subparameter_value.is_string() {
-                                                            let subparameter_str: &str =
-                                                                subparameter_value
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .trim();
-
-                                                            let translated: Option<&&str> =
-                                                                get_parameter_translated(
-                                                                    code,
-                                                                    subparameter_str,
-                                                                    &maps_translation_map,
-                                                                    game_type,
-                                                                );
-
-                                                            if let Some(text) = translated {
-                                                                *subparameter_value =
-                                                                    to_value(text).unwrap();
-                                                            }
-                                                        }
-                                                    });
                                             }
-                                        });
-                                });
+
+                                            if split_length > line_length {
+                                                let remaining: String =
+                                                    split[line_length..].join("\n");
+
+                                                list[*item_indices.last().unwrap()]["parameters"]
+                                                    [0] = to_value(remaining).unwrap();
+                                            }
+                                        }
+
+                                        line.clear();
+                                        item_indices.clear();
+                                        in_sequence = false;
+                                    }
+                                    continue;
+                                }
+
+                                if code == 401 {
+                                    if let Some(parameter_str) = list[it]["parameters"][0].as_str()
+                                    {
+                                        line.push(parameter_str.to_string());
+                                        item_indices.push(it);
+                                        in_sequence = true;
+                                    }
+                                } else if code == 356 {
+                                    if let Some(parameter_str) = list[it]["parameters"][0].as_str()
+                                    {
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            code,
+                                            parameter_str,
+                                            &maps_translation_map,
+                                            game_type,
+                                        );
+
+                                        if let Some(translated) = translated {
+                                            list[it]["parameters"][0] =
+                                                to_value(translated).unwrap();
+                                        }
+                                    }
+                                } else if code == 402 {
+                                    if let Some(parameter_str) = list[it]["parameters"][1].as_str()
+                                    {
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            code,
+                                            parameter_str,
+                                            &maps_translation_map,
+                                            game_type,
+                                        );
+
+                                        if let Some(translated) = translated {
+                                            list[it]["parameters"][1] =
+                                                to_value(translated).unwrap();
+                                        }
+                                    }
+                                } else if code == 102 && list[it]["parameters"][0].is_array() {
+                                    for i in 0..list[it]["parameters"][0].as_array().unwrap().len()
+                                    {
+                                        if let Some(subparameter_str) =
+                                            list[it]["parameters"][0][i].as_str()
+                                        {
+                                            let translated: Option<&&str> =
+                                                get_parameter_translated(
+                                                    code,
+                                                    subparameter_str,
+                                                    &maps_translation_map,
+                                                    game_type,
+                                                );
+
+                                            if let Some(translated) = translated {
+                                                list[it]["parameters"][0][i] =
+                                                    to_value(translated).unwrap();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         });
                 });
 
@@ -447,11 +404,7 @@ pub fn write_other(
 
                 if select_other_re.is_match(&filename).unwrap() {
                     let json: Vec<Value> =
-                        if filename.starts_with("Common") || filename.starts_with("Troops") {
-                            merge_other(from_str(&read_to_string(entry.path()).unwrap()).unwrap())
-                        } else {
-                            from_str(&read_to_string(entry.path()).unwrap()).unwrap()
-                        };
+                        from_str(&read_to_string(entry.path()).unwrap()).unwrap();
 
                     map.insert(filename, json);
                 }
@@ -466,10 +419,11 @@ pub fn write_other(
             },
         );
 
-    //401 - dialogue lines
-    //102, 402 - dialogue choices
-    //356 - system lines (special texts)
-    //405 - credits lines
+    // 401 - dialogue lines
+    // 405 - credits lines
+    // 102 - dialogue choices array
+    // 402 - one of the dialogue choices from the array
+    // 356 - system lines (special texts)
     const ALLOWED_CODES: [u16; 5] = [401, 402, 405, 356, 102];
 
     other_obj_arr_map
@@ -583,67 +537,122 @@ pub fn write_other(
                                 continue;
                             }
 
-                            list.as_array_mut().unwrap().par_iter_mut().for_each(
-                                |list: &mut Value| {
-                                    let code: u16 = list["code"].as_u64().unwrap() as u16;
+                            let list_arr: &mut Vec<Value> = list.as_array_mut().unwrap();
+                            let list_len: usize = list_arr.len();
 
-                                    if !ALLOWED_CODES.contains(&code) {
-                                        return;
-                                    }
+                            let mut in_sequence: bool = false;
+                            let mut line: Vec<String> = Vec::with_capacity(4);
+                            let mut item_indices: Vec<usize> = Vec::with_capacity(4);
 
-                                    list["parameters"]
-                                        .as_array_mut()
-                                        .unwrap()
-                                        .par_iter_mut()
-                                        .for_each(|parameter_value: &mut Value| {
-                                            if parameter_value.is_string() {
-                                                let parameter_str: &str =
-                                                    parameter_value.as_str().unwrap().trim();
+                            for it in 0..list_len {
+                                let code: u16 = list_arr[it]["code"].as_u64().unwrap() as u16;
 
-                                                if [401, 402, 405, 356].contains(&code) {
-                                                    let translated: Option<&&str> =
-                                                        get_parameter_translated(
-                                                            code,
-                                                            parameter_str,
-                                                            &other_translation_map,
-                                                            game_type,
-                                                        );
+                                if !ALLOWED_CODES.contains(&code) {
+                                    if in_sequence {
+                                        let joined: String = line.join("\n").trim().into();
 
-                                                    if let Some(text) = translated {
-                                                        *parameter_value = to_value(text).unwrap();
-                                                    }
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            401,
+                                            &joined,
+                                            &other_translation_map,
+                                            game_type,
+                                        );
+
+                                        if let Some(text) = translated {
+                                            let split: Vec<&str> = text.split('\n').collect();
+                                            let split_length: usize = split.len();
+                                            let line_length: usize = line.len();
+
+                                            for (i, &index) in item_indices.iter().enumerate() {
+                                                if i < split_length {
+                                                    list_arr[index]["parameters"][0] =
+                                                        to_value(split[i]).unwrap();
+                                                } else {
+                                                    list_arr[index]["parameters"][0] =
+                                                        to_value("").unwrap();
                                                 }
-                                            } else if code == 102 && parameter_value.is_array() {
-                                                parameter_value
-                                                    .as_array_mut()
-                                                    .unwrap()
-                                                    .par_iter_mut()
-                                                    .for_each(|subparameter_value: &mut Value| {
-                                                        if subparameter_value.is_string() {
-                                                            let subparameter_str: &str =
-                                                                subparameter_value
-                                                                    .as_str()
-                                                                    .unwrap()
-                                                                    .trim();
-
-                                                            let translated: Option<&&str> =
-                                                                get_parameter_translated(
-                                                                    code,
-                                                                    subparameter_str,
-                                                                    &other_translation_map,
-                                                                    game_type,
-                                                                );
-
-                                                            if let Some(text) = translated {
-                                                                *subparameter_value =
-                                                                    to_value(text).unwrap();
-                                                            }
-                                                        }
-                                                    });
                                             }
-                                        });
-                                },
-                            );
+
+                                            if split_length > line_length {
+                                                let remaining: String =
+                                                    split[line_length..].join("\n");
+
+                                                list_arr[*item_indices.last().unwrap()]
+                                                    ["parameters"][0] =
+                                                    to_value(remaining).unwrap();
+                                            }
+                                        }
+
+                                        line.clear();
+                                        item_indices.clear();
+                                        in_sequence = false
+                                    }
+                                    continue;
+                                }
+
+                                if [401, 405].contains(&code) {
+                                    if let Some(parameter_str) =
+                                        list_arr[it]["parameters"][0].as_str()
+                                    {
+                                        line.push(parameter_str.to_string());
+                                        item_indices.push(it);
+                                        in_sequence = true;
+                                    }
+                                } else if code == 356 {
+                                    if let Some(parameter_str) =
+                                        list_arr[it]["parameters"][0].as_str()
+                                    {
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            code,
+                                            parameter_str,
+                                            &other_translation_map,
+                                            game_type,
+                                        );
+
+                                        if let Some(translated) = translated {
+                                            list_arr[it]["parameters"][0] =
+                                                to_value(translated).unwrap();
+                                        }
+                                    }
+                                } else if code == 402 {
+                                    if let Some(parameter_str) =
+                                        list_arr[it]["parameters"][1].as_str()
+                                    {
+                                        let translated: Option<&&str> = get_parameter_translated(
+                                            code,
+                                            parameter_str,
+                                            &other_translation_map,
+                                            game_type,
+                                        );
+
+                                        if let Some(translated) = translated {
+                                            list_arr[it]["parameters"][1] =
+                                                to_value(translated).unwrap();
+                                        }
+                                    }
+                                } else if code == 102 && list_arr[it]["parameters"][0].is_array() {
+                                    for i in
+                                        0..list_arr[it]["parameters"][0].as_array().unwrap().len()
+                                    {
+                                        if let Some(subparameter_str) =
+                                            list_arr[it]["parameters"][0][i].as_str()
+                                        {
+                                            let translated: Option<&&str> =
+                                                get_parameter_translated(
+                                                    code,
+                                                    subparameter_str,
+                                                    &other_translation_map,
+                                                    game_type,
+                                                );
+
+                                            if let Some(translated) = translated {
+                                                list_arr[it]["parameters"][0][i] =
+                                                    to_value(translated).unwrap();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     });
             }

@@ -181,6 +181,12 @@ pub fn read_map(
         }
     }
 
+    // 401 - dialogue lines
+    // 102 - dialogue choices array
+    // 402 - one of the dialogue choices from the array
+    // 356 - system lines (special texts)
+    const ALLOWED_CODES: [u16; 4] = [401, 102, 402, 356];
+
     for (filename, obj) in maps_obj_map {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
@@ -211,117 +217,88 @@ pub fn read_map(
                 let mut line: Vec<String> = Vec::with_capacity(4);
 
                 for list in page["list"].as_array().unwrap() {
-                    //401 - dialogue lines
-                    //102 - dialogue choices
-                    //356 - system lines (special texts)
                     let code: u16 = list["code"].as_u64().unwrap() as u16;
 
-                    for parameter_value in list["parameters"].as_array().unwrap() {
-                        if code == 401 {
-                            in_sequence = true;
+                    if !ALLOWED_CODES.contains(&code) {
+                        if in_sequence {
+                            let joined: String = line.join(r"\#").trim().to_string();
 
-                            if parameter_value.is_string() {
-                                let parameter_str: &str = parameter_value.as_str().unwrap();
+                            if processing_type == ProcessingType::Append
+                                && !maps_translation_map.contains_key(&joined)
+                            {
+                                maps_translation_map.shift_insert(
+                                    maps_lines.len(),
+                                    joined.clone(),
+                                    "".into(),
+                                );
+                            }
 
-                                if !parameter_str.is_empty() {
+                            maps_lines.insert(joined);
+
+                            line.clear();
+                            in_sequence = false;
+                        }
+                        continue;
+                    }
+
+                    let parameters: &Vec<Value> = list["parameters"].as_array().unwrap();
+
+                    if code == 401 {
+                        if let Some(parameter_str) = parameters[0].as_str() {
+                            if !parameter_str.is_empty() {
+                                let parsed: Option<&str> =
+                                    parse_parameter(code, parameter_str, game_type);
+
+                                if let Some(parsed) = parsed {
+                                    in_sequence = true;
+                                    line.push(parsed.to_string());
+                                }
+                            }
+                        }
+                    } else if code == 102 && parameters[0].is_array() {
+                        for i in 0..parameters[0].as_array().unwrap().len() {
+                            if let Some(subparameter_str) = parameters[0][i].as_str() {
+                                if !subparameter_str.is_empty() {
                                     let parsed: Option<&str> =
-                                        parse_parameter(code, parameter_str, game_type);
+                                        parse_parameter(code, subparameter_str, game_type);
 
                                     if let Some(parsed) = parsed {
-                                        line.push(parsed.to_string());
+                                        let parsed_string: String = parsed.to_string();
+
+                                        if processing_type == ProcessingType::Append
+                                            && !maps_translation_map.contains_key(&parsed_string)
+                                        {
+                                            maps_translation_map.shift_insert(
+                                                maps_lines.len(),
+                                                parsed_string.clone(),
+                                                "".into(),
+                                            );
+                                        }
+
+                                        maps_lines.insert(parsed_string);
                                     }
                                 }
                             }
-                        } else {
-                            if in_sequence {
-                                let joined: String = line.join(r"\#").trim().to_string();
+                        }
+                    } else if let Some(parameter_str) = parameters[0].as_str() {
+                        if !parameter_str.is_empty() {
+                            let parsed: Option<&str> =
+                                parse_parameter(code, parameter_str, game_type);
+
+                            if let Some(parsed) = parsed {
+                                let parsed_string: String = parsed.to_string();
 
                                 if processing_type == ProcessingType::Append
-                                    && !maps_translation_map.contains_key(&joined)
+                                    && !maps_translation_map.contains_key(&parsed_string)
                                 {
                                     maps_translation_map.shift_insert(
                                         maps_lines.len(),
-                                        joined.clone(),
+                                        parsed_string.clone(),
                                         "".into(),
                                     );
                                 }
 
-                                maps_lines.insert(joined);
-
-                                line.clear();
-                                in_sequence = false;
-                            }
-
-                            match code {
-                                102 => {
-                                    if parameter_value.is_array() {
-                                        for subparameter_value in
-                                            parameter_value.as_array().unwrap()
-                                        {
-                                            if subparameter_value.is_string() {
-                                                let subparameter_str: &str =
-                                                    subparameter_value.as_str().unwrap().trim();
-
-                                                if !subparameter_str.is_empty() {
-                                                    let parsed: Option<&str> = parse_parameter(
-                                                        code,
-                                                        subparameter_str,
-                                                        game_type,
-                                                    );
-
-                                                    if let Some(parsed) = parsed {
-                                                        let parsed_string: String =
-                                                            parsed.to_string();
-
-                                                        if processing_type == ProcessingType::Append
-                                                            && !maps_translation_map
-                                                                .contains_key(&parsed_string)
-                                                        {
-                                                            maps_translation_map.shift_insert(
-                                                                maps_lines.len(),
-                                                                parsed_string.clone(),
-                                                                "".into(),
-                                                            );
-                                                        }
-
-                                                        maps_lines.insert(parsed_string);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                356 => {
-                                    if parameter_value.is_string() {
-                                        let parameter_str: &str =
-                                            parameter_value.as_str().unwrap().trim();
-
-                                        if !parameter_str.is_empty() {
-                                            let parsed: Option<&str> =
-                                                parse_parameter(code, parameter_str, game_type);
-
-                                            if let Some(parsed) = parsed {
-                                                let parsed_string: String = parsed.to_string();
-
-                                                if processing_type == ProcessingType::Append
-                                                    && !maps_translation_map
-                                                        .contains_key(&parsed_string)
-                                                {
-                                                    maps_translation_map.shift_insert(
-                                                        maps_lines.len(),
-                                                        parsed_string.clone(),
-                                                        "".into(),
-                                                    );
-                                                }
-
-                                                maps_lines.insert(parsed_string);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                _ => {}
+                                maps_lines.insert(parsed_string);
                             }
                         }
                     }
@@ -404,6 +381,13 @@ pub fn read_other(
         .collect();
 
     let mut internal_processing_type: &ProcessingType = processing_type;
+
+    // 401 - dialogue lines
+    // 405 - credits lines
+    // 102 - dialogue choices array
+    // 402 - one of the dialogue choices from the array
+    // 356 - system lines (special texts)
+    const ALLOWED_CODES: [u16; 5] = [401, 402, 405, 356, 102];
 
     for (filename, obj_arr) in other_obj_arr_map {
         let other_processed_filename: String =
@@ -507,122 +491,115 @@ pub fn read_other(
                     }
 
                     let mut in_sequence: bool = false;
-                    let mut line: Vec<String> = Vec::with_capacity(256);
+                    let mut line: Vec<String> = Vec::with_capacity(256); // well it's 256 because of credits and i won't change it
 
                     for list in list.as_array().unwrap() {
-                        //401 - dialogue lines
-                        //102 - dialogue choices
-                        //356 - system lines (special texts)
-                        //405 - credits lines
                         let code: u16 = list["code"].as_u64().unwrap() as u16;
 
-                        for parameter_value in list["parameters"].as_array().unwrap() {
-                            if [401, 405].contains(&code) {
-                                in_sequence = true;
+                        if !ALLOWED_CODES.contains(&code) {
+                            if in_sequence {
+                                let joined: String = line.join(r"\#").trim().to_string();
 
-                                if parameter_value.is_string() {
-                                    let parameter_str: &str = parameter_value.as_str().unwrap();
+                                if processing_type == ProcessingType::Append
+                                    && !other_translation_map.contains_key(&joined)
+                                {
+                                    other_translation_map.shift_insert(
+                                        other_lines.len(),
+                                        joined.clone(),
+                                        "".into(),
+                                    );
+                                }
 
-                                    if !parameter_str.is_empty() {
+                                other_lines.insert(joined);
+
+                                line.clear();
+                                in_sequence = false;
+                            }
+                            continue;
+                        }
+
+                        let parameters: &Vec<Value> = list["parameters"].as_array().unwrap();
+
+                        if [401, 405].contains(&code) {
+                            if let Some(parameter_str) = parameters[0].as_str() {
+                                if !parameter_str.is_empty() {
+                                    let parsed: Option<&str> =
+                                        parse_parameter(code, parameter_str, game_type);
+
+                                    if let Some(parsed) = parsed {
+                                        in_sequence = true;
+                                        line.push(parsed.to_string());
+                                    }
+                                }
+                            }
+                        } else if code == 102 && parameters[0].is_array() {
+                            for i in 0..parameters[0].as_array().unwrap().len() {
+                                if let Some(subparameter_str) = parameters[0][i].as_str() {
+                                    if !subparameter_str.is_empty() {
                                         let parsed: Option<&str> =
-                                            parse_parameter(code, parameter_str, game_type);
+                                            parse_parameter(code, subparameter_str, game_type);
 
                                         if let Some(parsed) = parsed {
-                                            line.push(parsed.to_string());
+                                            let parsed_string: String = parsed.to_string();
+
+                                            if processing_type == ProcessingType::Append
+                                                && !other_translation_map
+                                                    .contains_key(&parsed_string)
+                                            {
+                                                other_translation_map.shift_insert(
+                                                    other_lines.len(),
+                                                    parsed_string.clone(),
+                                                    "".into(),
+                                                );
+                                            }
+
+                                            other_lines.insert(parsed_string);
                                         }
                                     }
                                 }
-                            } else {
-                                if in_sequence {
-                                    let joined: String = line.join(r"\#").trim().to_string();
+                            }
+                        } else if code == 402 {
+                            if let Some(parameter_str) = parameters[1].as_str() {
+                                if !parameter_str.is_empty() {
+                                    let parsed: Option<&str> =
+                                        parse_parameter(code, parameter_str, game_type);
 
-                                    if internal_processing_type == ProcessingType::Append
-                                        && !other_translation_map.contains_key(&joined)
+                                    if let Some(parsed) = parsed {
+                                        let parsed_string: String = parsed.to_string();
+
+                                        if processing_type == ProcessingType::Append
+                                            && !other_translation_map.contains_key(&parsed_string)
+                                        {
+                                            other_translation_map.shift_insert(
+                                                other_lines.len(),
+                                                parsed_string.clone(),
+                                                "".into(),
+                                            );
+                                        }
+
+                                        other_lines.insert(parsed_string);
+                                    }
+                                }
+                            }
+                        } else if let Some(parameter_str) = parameters[0].as_str() {
+                            if !parameter_str.is_empty() {
+                                let parsed: Option<&str> =
+                                    parse_parameter(code, parameter_str, game_type);
+
+                                if let Some(parsed) = parsed {
+                                    let parsed_string: String = parsed.to_string();
+
+                                    if processing_type == ProcessingType::Append
+                                        && !other_translation_map.contains_key(&parsed_string)
                                     {
                                         other_translation_map.shift_insert(
                                             other_lines.len(),
-                                            joined.clone(),
+                                            parsed_string.clone(),
                                             "".into(),
                                         );
                                     }
 
-                                    other_lines.insert(joined);
-
-                                    line.clear();
-                                    in_sequence = false;
-                                }
-
-                                match code {
-                                    102 => {
-                                        if parameter_value.is_array() {
-                                            for subparameter_value in
-                                                parameter_value.as_array().unwrap()
-                                            {
-                                                if subparameter_value.is_string() {
-                                                    let subparameter_str: &str =
-                                                        subparameter_value.as_str().unwrap().trim();
-
-                                                    if !subparameter_str.is_empty() {
-                                                        let parsed: Option<&str> = parse_parameter(
-                                                            code,
-                                                            subparameter_str,
-                                                            game_type,
-                                                        );
-
-                                                        if let Some(parsed) = parsed {
-                                                            let parsed_string: String =
-                                                                parsed.to_string();
-
-                                                            if internal_processing_type
-                                                                == ProcessingType::Append
-                                                                && !other_translation_map
-                                                                    .contains_key(&parsed_string)
-                                                            {
-                                                                other_translation_map.shift_insert(
-                                                                    other_lines.len(),
-                                                                    parsed_string.clone(),
-                                                                    "".into(),
-                                                                );
-                                                            }
-
-                                                            other_lines.insert(parsed_string);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    356 => {
-                                        if parameter_value.is_string() {
-                                            let parameter_str: &str =
-                                                parameter_value.as_str().unwrap().trim();
-
-                                            if !parameter_str.is_empty() {
-                                                let parsed: Option<&str> =
-                                                    parse_parameter(code, parameter_str, game_type);
-
-                                                if let Some(parsed) = parsed {
-                                                    let parsed_string: String = parsed.to_string();
-
-                                                    if processing_type == ProcessingType::Append
-                                                        && !other_translation_map
-                                                            .contains_key(&parsed_string)
-                                                    {
-                                                        other_translation_map.shift_insert(
-                                                            other_lines.len(),
-                                                            parsed_string.clone(),
-                                                            "".into(),
-                                                        );
-                                                    }
-
-                                                    other_lines.insert(parsed_string);
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    _ => {}
+                                    other_lines.insert(parsed_string);
                                 }
                             }
                         }
