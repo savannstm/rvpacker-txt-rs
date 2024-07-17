@@ -16,7 +16,7 @@ This tool for RPG Maker XP, VX and VX Ace engines that don't use .json files can
 
 You can download binary files in the Releases section.
 
-Files with the .exe extension are designed for Windows of any architecture, while files without an extension are designed for Linux x64.
+Files with the .exe extension are designed for Windows x64, while files without an extension are designed for Linux x64.
 
 ## Usage
 
