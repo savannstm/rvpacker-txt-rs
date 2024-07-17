@@ -1,6 +1,6 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
-use serde_json::{from_str, Value};
+use sonic_rs::{from_str, JsonValueTrait, Value};
 use std::{
     env::args,
     fs::{create_dir_all, read_to_string},
@@ -42,6 +42,22 @@ impl PartialEq<ProcessingType> for &ProcessingType {
     }
 }
 
+trait IntoRSplit {
+    fn into_rsplit_once(self, delimiter: char) -> Option<(String, String)>;
+}
+
+// genius implementation
+impl IntoRSplit for String {
+    fn into_rsplit_once(self, delimiter: char) -> Option<(String, String)> {
+        if let Some(pos) = self.rfind(delimiter) {
+            let (left, right) = self.split_at(pos);
+            Some((left.to_string(), right[delimiter.len_utf8()..].to_string()))
+        } else {
+            None
+        }
+    }
+}
+
 struct ProgramLocalization<'a> {
     // General program descriptions
     about_msg: &'a str,
@@ -78,10 +94,9 @@ struct ProgramLocalization<'a> {
     translation_dirs_missing: &'a str,
     write_log_msg: &'a str,
     read_log_msg: &'a str,
-    write_success_msg: &'a str,
-    read_success_msg: &'a str,
     file_already_parsed_msg: &'a str,
     file_is_not_parsed_msg: &'a str,
+    done_in_msg: &'a str,
 
     // Misc
     possible_values: &'a str,
@@ -126,12 +141,11 @@ impl<'a> ProgramLocalization<'a> {
             original_dir_missing: r#"The "original" or "data" folder in the input directory does not exist."#,
             translation_dirs_missing: r#"The "translation/maps" and/or "translation/other" folders in the input directory do not exist."#,
             write_log_msg: "Wrote file",
-            write_success_msg: "All files were written successfully.\nTime spent (in seconds):",
-            read_success_msg: "The entire game text was successfully parsed.\nTime spent: (in seconds):",
             read_log_msg: "Parsed file",
             file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             disable_custom_parsing_desc: "Disables built-in custom parsing for some games.",
+            done_in_msg: "Done in:"
         }
     }
 
@@ -164,12 +178,11 @@ impl<'a> ProgramLocalization<'a> {
             original_dir_missing: r#"Папка "original" или "data" входной директории не существует."#,
             translation_dirs_missing: r#"Папки "translation/maps" и/или "translation/other" входной директории не существуют."#,
             write_log_msg: "Записан файл",
-            write_success_msg: "Все файлы были записаны успешно.\nПотрачено (в секундах):",
-            read_success_msg: "Весь игровой текст был успешно запарсен.\nПотрачено (в секундах):",
             read_log_msg: "Распарсен файл",
             file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов для некоторых игр.",
+            done_in_msg: "Выполнено за:"
         }
     }
 }
@@ -350,7 +363,7 @@ fn main() {
         .hide_possible_values(true);
 
     let matches: ArgMatches = cli.get_matches();
-    let command: &str = matches.subcommand_name().unwrap();
+    let (subcommand, subcommand_matches): (&str, &ArgMatches) = matches.subcommand().unwrap();
 
     let (
         disable_maps_processing,
@@ -400,7 +413,7 @@ fn main() {
         }
     }
 
-    let (maps_path, other_path) = if output_dir == PathBuf::from("./") {
+    let (maps_path, other_path) = if output_dir.to_str().unwrap() == "./" {
         (
             input_dir.join("translation/maps"),
             input_dir.join("translation/other"),
@@ -420,11 +433,9 @@ fn main() {
         get_game_type(&system_file_path)
     };
 
-    if command == "read" {
-        let read_matches: &ArgMatches = matches.subcommand_matches(command).unwrap();
-
-        let force: bool = read_matches.get_flag("force");
-        let append: bool = read_matches.get_flag("append");
+    if subcommand == "read" {
+        let force: bool = subcommand_matches.get_flag("force");
+        let append: bool = subcommand_matches.get_flag("append");
 
         let processing_type: ProcessingType = if force {
             ProcessingType::Force
@@ -469,12 +480,6 @@ fn main() {
                 &processing_type,
             );
         }
-
-        println!(
-            "{} {}.",
-            localization.read_success_msg,
-            start_time.elapsed().as_secs_f64()
-        );
     } else {
         if !maps_path.exists() || !other_path.exists() {
             panic!("{}", localization.translation_dirs_missing);
@@ -482,7 +487,7 @@ fn main() {
 
         let plugins_path: PathBuf = input_dir.join("translation/plugins");
 
-        let (output_path, plugins_output_path) = if output_dir == PathBuf::from("./") {
+        let (output_path, plugins_output_path) = if output_dir.to_str().unwrap() == "./" {
             (input_dir.join("output/data"), input_dir.join("output/js"))
         } else {
             (output_dir.join("output/data"), output_dir.join("output/js"))
@@ -491,11 +496,7 @@ fn main() {
         create_dir_all(&output_path).unwrap();
         create_dir_all(&plugins_output_path).unwrap();
 
-        let shuffle_level: u8 = *matches
-            .subcommand_matches(command)
-            .unwrap()
-            .get_one::<u8>("shuffle_level")
-            .unwrap();
+        let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle_level").unwrap();
 
         unsafe { write::LOG_MSG = localization.write_log_msg }
 
@@ -544,11 +545,11 @@ fn main() {
                 enable_logging,
             );
         }
-
-        println!(
-            "{} {}.",
-            localization.write_success_msg,
-            start_time.elapsed().as_secs_f64()
-        );
     }
+
+    println!(
+        "{} {}",
+        localization.done_in_msg,
+        start_time.elapsed().as_secs_f64()
+    );
 }

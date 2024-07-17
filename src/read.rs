@@ -1,7 +1,7 @@
 use fancy_regex::Regex;
 use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
-use serde_json::{from_str, Value};
+use sonic_rs::{from_str, Array, JsonContainerTrait, JsonValueTrait, Value};
 use std::{
     collections::HashMap,
     fs::{read_dir, read_to_string, write, DirEntry},
@@ -17,11 +17,7 @@ pub static mut FILE_ALREADY_PARSED: &str = "";
 pub static mut FILE_IS_NOT_PARSED: &str = "";
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
-fn parse_parameter<'a>(
-    code: u16,
-    mut parameter: &'a str,
-    game_type: Option<&str>,
-) -> Option<&'a str> {
+fn parse_parameter(code: u16, mut parameter: &str, game_type: Option<&str>) -> Option<String> {
     if let Some(game_type) = game_type {
         match code {
             401 | 405 => match game_type {
@@ -43,11 +39,12 @@ fn parse_parameter<'a>(
                 // Implement custom parsing
                 _ => {}
             },
+            324 => {}
             _ => unreachable!(),
         }
     }
 
-    Some(parameter)
+    Some(parameter.to_string())
 }
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
@@ -185,7 +182,8 @@ pub fn read_map(
     // 102 - dialogue choices array
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
-    const ALLOWED_CODES: [u16; 4] = [401, 102, 402, 356];
+    // 324 - i don't know what is it but it's some used in-game lines
+    const ALLOWED_CODES: [u16; 5] = [401, 102, 402, 356, 324];
 
     for (filename, obj) in maps_obj_map {
         if let Some(display_name) = obj["displayName"].as_str() {
@@ -241,64 +239,79 @@ pub fn read_map(
                         continue;
                     }
 
-                    let parameters: &Vec<Value> = list["parameters"].as_array().unwrap();
+                    let parameters: &Array = list["parameters"].as_array().unwrap();
 
                     if code == 401 {
                         if let Some(parameter_str) = parameters[0].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<&str> =
+                                let parsed: Option<String> =
                                     parse_parameter(code, parameter_str, game_type);
 
                                 if let Some(parsed) = parsed {
                                     in_sequence = true;
-                                    line.push(parsed.to_string());
+                                    line.push(parsed);
                                 }
                             }
                         }
-                    } else if code == 102 && parameters[0].is_array() {
+                    } else if parameters[0].is_array() {
                         for i in 0..parameters[0].as_array().unwrap().len() {
                             if let Some(subparameter_str) = parameters[0][i].as_str() {
                                 if !subparameter_str.is_empty() {
-                                    let parsed: Option<&str> =
+                                    let parsed: Option<String> =
                                         parse_parameter(code, subparameter_str, game_type);
 
                                     if let Some(parsed) = parsed {
-                                        let parsed_string: String = parsed.to_string();
-
                                         if processing_type == ProcessingType::Append
-                                            && !maps_translation_map.contains_key(&parsed_string)
+                                            && !maps_translation_map.contains_key(&parsed)
                                         {
                                             maps_translation_map.shift_insert(
                                                 maps_lines.len(),
-                                                parsed_string.clone(),
+                                                parsed.clone(),
                                                 "".into(),
                                             );
                                         }
 
-                                        maps_lines.insert(parsed_string);
+                                        maps_lines.insert(parsed);
                                     }
                                 }
                             }
                         }
                     } else if let Some(parameter_str) = parameters[0].as_str() {
                         if !parameter_str.is_empty() {
-                            let parsed: Option<&str> =
+                            let parsed: Option<String> =
                                 parse_parameter(code, parameter_str, game_type);
 
                             if let Some(parsed) = parsed {
-                                let parsed_string: String = parsed.to_string();
-
                                 if processing_type == ProcessingType::Append
-                                    && !maps_translation_map.contains_key(&parsed_string)
+                                    && !maps_translation_map.contains_key(&parsed)
                                 {
                                     maps_translation_map.shift_insert(
                                         maps_lines.len(),
-                                        parsed_string.clone(),
+                                        parsed.clone(),
                                         "".into(),
                                     );
                                 }
 
-                                maps_lines.insert(parsed_string);
+                                maps_lines.insert(parsed);
+                            }
+                        }
+                    } else if let Some(parameter_str) = parameters[1].as_str() {
+                        if !parameter_str.is_empty() {
+                            let parsed: Option<String> =
+                                parse_parameter(code, parameter_str, game_type);
+
+                            if let Some(parsed) = parsed {
+                                if processing_type == ProcessingType::Append
+                                    && !maps_translation_map.contains_key(&parsed)
+                                {
+                                    maps_translation_map.shift_insert(
+                                        maps_lines.len(),
+                                        parsed.clone(),
+                                        "".into(),
+                                    );
+                                }
+
+                                maps_lines.insert(parsed);
                             }
                         }
                     }
@@ -387,7 +400,8 @@ pub fn read_other(
     // 102 - dialogue choices array
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
-    const ALLOWED_CODES: [u16; 5] = [401, 402, 405, 356, 102];
+    // 324 - i don't know what is it but it's some used in-game lines
+    const ALLOWED_CODES: [u16; 6] = [401, 402, 405, 356, 102, 324];
 
     for (filename, obj_arr) in other_obj_arr_map {
         let other_processed_filename: String =
@@ -518,12 +532,12 @@ pub fn read_other(
                             continue;
                         }
 
-                        let parameters: &Vec<Value> = list["parameters"].as_array().unwrap();
+                        let parameters: &Array = list["parameters"].as_array().unwrap();
 
                         if [401, 405].contains(&code) {
                             if let Some(parameter_str) = parameters[0].as_str() {
                                 if !parameter_str.is_empty() {
-                                    let parsed: Option<&str> =
+                                    let parsed: Option<String> =
                                         parse_parameter(code, parameter_str, game_type);
 
                                     if let Some(parsed) = parsed {
@@ -532,74 +546,65 @@ pub fn read_other(
                                     }
                                 }
                             }
-                        } else if code == 102 && parameters[0].is_array() {
+                        } else if parameters[0].is_array() {
                             for i in 0..parameters[0].as_array().unwrap().len() {
                                 if let Some(subparameter_str) = parameters[0][i].as_str() {
                                     if !subparameter_str.is_empty() {
-                                        let parsed: Option<&str> =
+                                        let parsed: Option<String> =
                                             parse_parameter(code, subparameter_str, game_type);
 
                                         if let Some(parsed) = parsed {
-                                            let parsed_string: String = parsed.to_string();
-
                                             if processing_type == ProcessingType::Append
-                                                && !other_translation_map
-                                                    .contains_key(&parsed_string)
+                                                && !other_translation_map.contains_key(&parsed)
                                             {
                                                 other_translation_map.shift_insert(
                                                     other_lines.len(),
-                                                    parsed_string.clone(),
+                                                    parsed.clone(),
                                                     "".into(),
                                                 );
                                             }
 
-                                            other_lines.insert(parsed_string);
+                                            other_lines.insert(parsed);
                                         }
-                                    }
-                                }
-                            }
-                        } else if code == 402 {
-                            if let Some(parameter_str) = parameters[1].as_str() {
-                                if !parameter_str.is_empty() {
-                                    let parsed: Option<&str> =
-                                        parse_parameter(code, parameter_str, game_type);
-
-                                    if let Some(parsed) = parsed {
-                                        let parsed_string: String = parsed.to_string();
-
-                                        if processing_type == ProcessingType::Append
-                                            && !other_translation_map.contains_key(&parsed_string)
-                                        {
-                                            other_translation_map.shift_insert(
-                                                other_lines.len(),
-                                                parsed_string.clone(),
-                                                "".into(),
-                                            );
-                                        }
-
-                                        other_lines.insert(parsed_string);
                                     }
                                 }
                             }
                         } else if let Some(parameter_str) = parameters[0].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<&str> =
+                                let parsed: Option<String> =
                                     parse_parameter(code, parameter_str, game_type);
 
                                 if let Some(parsed) = parsed {
-                                    let parsed_string: String = parsed.to_string();
-
                                     if processing_type == ProcessingType::Append
-                                        && !other_translation_map.contains_key(&parsed_string)
+                                        && !other_translation_map.contains_key(&parsed)
                                     {
                                         other_translation_map.shift_insert(
                                             other_lines.len(),
-                                            parsed_string.clone(),
+                                            parsed.clone(),
                                             "".into(),
                                         );
                                     }
 
-                                    other_lines.insert(parsed_string);
+                                    other_lines.insert(parsed);
+                                }
+                            }
+                        } else if let Some(parameter_str) = parameters[1].as_str() {
+                            if !parameter_str.is_empty() {
+                                let parsed: Option<String> =
+                                    parse_parameter(code, parameter_str, game_type);
+
+                                if let Some(parsed) = parsed {
+                                    if processing_type == ProcessingType::Append
+                                        && !other_translation_map.contains_key(&parsed)
+                                    {
+                                        other_translation_map.shift_insert(
+                                            other_lines.len(),
+                                            parsed.clone(),
+                                            "".into(),
+                                        );
+                                    }
+
+                                    other_lines.insert(parsed);
                                 }
                             }
                         }
@@ -613,7 +618,6 @@ pub fn read_other(
             (collected.0.join("\n"), collected.1.join("\n"))
         } else {
             let length: usize = other_lines.len() - 1;
-
             (
                 other_lines.into_iter().collect::<Vec<String>>().join("\n"),
                 "\n".repeat(length),
@@ -676,10 +680,10 @@ pub fn read_system(
     // Armor types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["armorTypes"].as_array().unwrap() {
-        let str_slice: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap();
 
-        if !str_slice.is_empty() {
-            let slice_string: String = str_slice.to_string();
+        if !str.is_empty() {
+            let slice_string: String = str.to_string();
 
             if processing_type == ProcessingType::Append
                 && !system_translation_map.contains_key(&slice_string)
@@ -698,10 +702,10 @@ pub fn read_system(
     // Element types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["elements"].as_array().unwrap() {
-        let str_slice: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap();
 
-        if !str_slice.is_empty() {
-            let slice_string: String = str_slice.to_string();
+        if !str.is_empty() {
+            let slice_string: String = str.to_string();
 
             if processing_type == ProcessingType::Append
                 && !system_translation_map.contains_key(&slice_string)
@@ -719,10 +723,10 @@ pub fn read_system(
 
     // Names of equipment slots
     for string in system_obj["equipTypes"].as_array().unwrap() {
-        let str_slice: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap();
 
-        if !str_slice.is_empty() {
-            let slice_string: String = str_slice.to_string();
+        if !str.is_empty() {
+            let slice_string: String = str.to_string();
 
             if processing_type == ProcessingType::Append
                 && !system_translation_map.contains_key(&slice_string)
@@ -740,10 +744,10 @@ pub fn read_system(
 
     // Names of battle options
     for string in system_obj["skillTypes"].as_array().unwrap() {
-        let str_slice: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap();
 
-        if !str_slice.is_empty() {
-            let slice_string: String = str_slice.to_string();
+        if !str.is_empty() {
+            let slice_string: String = str.to_string();
 
             if processing_type == ProcessingType::Append
                 && !system_translation_map.contains_key(&slice_string)
@@ -763,23 +767,21 @@ pub fn read_system(
     for (key, value) in system_obj["terms"].as_object().unwrap() {
         if key != "messages" {
             for string in value.as_array().unwrap() {
-                if string.is_string() {
-                    let str_slice: &str = string.as_str().unwrap();
-
-                    if !str_slice.is_empty() {
-                        let slice_string: String = str_slice.to_string();
+                if let Some(str) = string.as_str() {
+                    if !str.is_empty() {
+                        let string: String = str.to_string();
 
                         if processing_type == ProcessingType::Append
-                            && !system_translation_map.contains_key(&slice_string)
+                            && !system_translation_map.contains_key(&string)
                         {
                             system_translation_map.shift_insert(
                                 system_lines.len(),
-                                slice_string.clone(),
+                                string.clone(),
                                 "".into(),
                             );
                         }
 
-                        system_lines.insert(slice_string);
+                        system_lines.insert(string);
                     }
                 }
             }
@@ -788,11 +790,11 @@ pub fn read_system(
                 continue;
             }
 
-            for message_string in value.as_object().unwrap().values() {
-                let str_slice: &str = message_string.as_str().unwrap();
+            for (_, message_string) in value.as_object().unwrap().iter() {
+                let str: &str = message_string.as_str().unwrap();
 
-                if !str_slice.is_empty() {
-                    let slice_string: String = str_slice.to_string();
+                if !str.is_empty() {
+                    let slice_string: String = str.to_string();
 
                     if processing_type == ProcessingType::Append
                         && !system_translation_map.contains_key(&slice_string)
@@ -813,10 +815,10 @@ pub fn read_system(
     // Weapon types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["weaponTypes"].as_array().unwrap() {
-        let str_slice: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap();
 
-        if !str_slice.is_empty() {
-            let slice_string: String = str_slice.to_string();
+        if !str.is_empty() {
+            let slice_string: String = str.to_string();
 
             if processing_type == ProcessingType::Append
                 && !system_translation_map.contains_key(&slice_string)
