@@ -15,12 +15,9 @@ mod write;
 use read::*;
 use write::*;
 
-mod shuffle;
-use shuffle::shuffle_words;
-
-enum Language {
-    English,
-    Russian,
+#[derive(PartialEq)]
+enum GameType {
+    Termina,
 }
 
 #[derive(PartialEq)]
@@ -40,6 +37,25 @@ impl PartialEq<ProcessingType> for &ProcessingType {
     fn eq(&self, other: &ProcessingType) -> bool {
         *self == other
     }
+}
+
+enum Code {
+    Dialogue, // also goes for credit
+    Choice,
+    System,
+    Unknown,
+}
+
+enum Language {
+    English,
+    Russian,
+}
+
+enum Variable {
+    Name,
+    Nickname,
+    Description,
+    Note,
 }
 
 trait IntoRSplit {
@@ -187,12 +203,12 @@ impl<'a> ProgramLocalization<'a> {
     }
 }
 
-fn get_game_type(system_file_path: &Path) -> Option<&str> {
+fn get_game_type(system_file_path: &Path) -> Option<GameType> {
     let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
 
     if game_title.contains("termina") {
-        return Some("termina");
+        return Some(GameType::Termina);
     }
 
     None
@@ -225,7 +241,7 @@ fn main() {
     let language: Language = determine_language();
     let localization: ProgramLocalization = ProgramLocalization::new(language);
 
-    let input_dir_arg: Arg = Arg::new("input_dir")
+    let input_dir_arg: Arg = Arg::new("input-dir")
         .short('i')
         .long("input-dir")
         .global(true)
@@ -236,7 +252,7 @@ fn main() {
         .hide_default_value(true)
         .display_order(0);
 
-    let output_dir_arg: Arg = Arg::new("output_dir")
+    let output_dir_arg: Arg = Arg::new("output-dir")
         .short('o')
         .long("output-dir")
         .global(true)
@@ -247,7 +263,7 @@ fn main() {
         .hide_default_value(true)
         .display_order(1);
 
-    let shuffle_level_arg: Arg = Arg::new("shuffle_level")
+    let shuffle_level_arg: Arg = Arg::new("shuffle-level")
         .short('s')
         .long("shuffle-level")
         .action(ArgAction::Set)
@@ -343,7 +359,7 @@ fn main() {
         .arg(shuffle_level_arg)
         .arg(&help_flag);
 
-    let cli: Command = Command::new("fh-termina-json-writer")
+    let cli: Command = Command::new("")
         .disable_version_flag(true)
         .disable_help_subcommand(true)
         .disable_help_flag(true)
@@ -391,13 +407,13 @@ fn main() {
     let enable_logging: bool = matches.get_flag("log");
     let disable_custom_parsing: bool = matches.get_flag("disable-custom-parsing");
 
-    let input_dir: &Path = matches.get_one::<PathBuf>("input_dir").unwrap();
+    let input_dir: &Path = matches.get_one::<PathBuf>("input-dir").unwrap();
 
     if !input_dir.exists() {
         panic!("{}", localization.input_dir_not_exist);
     }
 
-    let output_dir: &Path = matches.get_one::<PathBuf>("output_dir").unwrap();
+    let output_dir: &Path = matches.get_one::<PathBuf>("output-dir").unwrap();
 
     if !output_dir.exists() {
         panic!("{}", localization.output_dir_not_exist)
@@ -427,7 +443,7 @@ fn main() {
 
     let system_file_path: PathBuf = original_path.join("System.json");
 
-    let game_type: Option<&str> = if disable_custom_parsing {
+    let game_type: Option<GameType> = if disable_custom_parsing {
         None
     } else {
         get_game_type(&system_file_path)
@@ -438,6 +454,7 @@ fn main() {
         let append: bool = subcommand_matches.get_flag("append");
 
         let processing_type: ProcessingType = if force {
+            // implement a warning for force mode
             ProcessingType::Force
         } else if append {
             ProcessingType::Append
@@ -457,7 +474,7 @@ fn main() {
                 &original_path,
                 &maps_path,
                 enable_logging,
-                game_type,
+                &game_type,
                 &processing_type,
             );
         }
@@ -467,7 +484,7 @@ fn main() {
                 &original_path,
                 &other_path,
                 enable_logging,
-                game_type,
+                &game_type,
                 &processing_type,
             );
         }
@@ -496,7 +513,7 @@ fn main() {
         create_dir_all(&output_path).unwrap();
         create_dir_all(&plugins_output_path).unwrap();
 
-        let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle_level").unwrap();
+        let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle-level").unwrap();
 
         unsafe { write::LOG_MSG = localization.write_log_msg }
 
@@ -507,7 +524,7 @@ fn main() {
                 &output_path,
                 shuffle_level,
                 enable_logging,
-                game_type,
+                &game_type,
             );
         }
 
@@ -518,7 +535,7 @@ fn main() {
                 &output_path,
                 shuffle_level,
                 enable_logging,
-                game_type,
+                &game_type,
             );
         }
 
@@ -535,7 +552,7 @@ fn main() {
         if !disable_plugins_processing
             && plugins_path.exists()
             && game_type.is_some()
-            && game_type.unwrap() == "termina"
+            && game_type.unwrap() == GameType::Termina
         {
             write_plugins(
                 &plugins_path.join("plugins.json"),
