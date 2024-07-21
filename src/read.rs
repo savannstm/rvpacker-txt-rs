@@ -3,10 +3,11 @@ use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
 use sonic_rs::{from_str, Array, JsonContainerTrait, JsonValueTrait, Object, Value};
 use std::{
-    collections::HashMap,
+    ffi::OsString,
     fs::{read_dir, read_to_string, write, DirEntry},
     hash::BuildHasherDefault,
     path::Path,
+    str::from_utf8_unchecked,
 };
 use xxhash_rust::xxh3::Xxh3;
 
@@ -121,27 +122,35 @@ pub fn read_map(
 
     let maps_files: Vec<DirEntry> = read_dir(maps_path)
         .unwrap()
-        .flatten()
-        .filter(|entry: &DirEntry| {
-            let filename = entry.file_name();
-            let filename_str: &str = filename.to_str().unwrap();
+        .filter_map(|entry: Result<DirEntry, _>| match entry {
+            Ok(entry) => {
+                let filename_os_string = entry.file_name();
+                let filename: &str =
+                    unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
 
-            let slice: char;
-            unsafe {
-                slice = *filename_str.as_bytes().get_unchecked(4) as char;
+                let slice: char;
+                unsafe {
+                    slice = *filename.as_bytes().get_unchecked(4) as char;
+                }
+
+                if filename.starts_with("Map")
+                    && slice.is_ascii_digit()
+                    && filename.ends_with("json")
+                {
+                    Some(entry)
+                } else {
+                    None
+                }
             }
-
-            filename_str.starts_with("Map")
-                && slice.is_ascii_digit()
-                && filename_str.ends_with("json")
+            Err(_) => None,
         })
         .collect();
 
-    let maps_obj_map: HashMap<String, Object, BuildHasherDefault<Xxh3>> = maps_files
+    let maps_obj_vec: Vec<(String, Object)> = maps_files
         .into_iter()
         .map(|entry: DirEntry| {
             (
-                entry.file_name().into_string().unwrap(),
+                unsafe { from_utf8_unchecked(entry.file_name().as_encoded_bytes()).to_string() },
                 from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
             )
         })
@@ -184,7 +193,7 @@ pub fn read_map(
     // 324 - i don't know what is it but it's some used in-game lines
     const ALLOWED_CODES: [u64; 4] = [401, 102, 356, 324];
 
-    for (filename, obj) in maps_obj_map {
+    for (filename, obj) in maps_obj_vec.into_iter() {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
                 let display_name_string: String = display_name.to_string();
@@ -371,26 +380,31 @@ pub fn read_other(
 ) {
     let other_files: Vec<DirEntry> = read_dir(other_path)
         .unwrap()
-        .flatten()
-        .filter(|entry: &DirEntry| {
-            let file_name_osstring = entry.file_name();
-            let (real_name, extension) = file_name_osstring
-                .to_str()
-                .unwrap()
-                .split_once('.')
-                .unwrap();
+        .filter_map(|entry: Result<DirEntry, _>| match entry {
+            Ok(entry) => {
+                let filename_os_string: OsString = entry.file_name();
+                let filename: &str =
+                    unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                let (real_name, extension) = filename.split_once('.').unwrap();
 
-            !real_name.starts_with("Map")
-                && !matches!(real_name, "Tilesets" | "Animations" | "States" | "System")
-                && extension == "json"
+                if !real_name.starts_with("Map")
+                    && !matches!(real_name, "Tilesets" | "Animations" | "States" | "System")
+                    && extension == "json"
+                {
+                    Some(entry)
+                } else {
+                    None
+                }
+            }
+            Err(_) => None,
         })
         .collect();
 
-    let other_obj_arr_map: HashMap<String, Array, BuildHasherDefault<Xxh3>> = other_files
-        .par_iter()
-        .map(|entry: &DirEntry| {
+    let other_obj_arr_map: Vec<(String, Array)> = other_files
+        .into_par_iter()
+        .map(|entry: DirEntry| {
             (
-                entry.file_name().into_string().unwrap(),
+                unsafe { from_utf8_unchecked(entry.file_name().as_encoded_bytes()).to_string() },
                 from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
             )
         })
@@ -405,7 +419,7 @@ pub fn read_other(
     // 324 - i don't know what is it but it's some used in-game lines
     const ALLOWED_CODES: [u64; 5] = [401, 405, 356, 102, 324];
 
-    for (filename, obj_arr) in other_obj_arr_map {
+    for (filename, obj_arr) in other_obj_arr_map.into_iter() {
         let other_processed_filename: String =
             filename[0..filename.rfind('.').unwrap()].to_lowercase();
 
@@ -416,11 +430,14 @@ pub fn read_other(
         if processing_type == ProcessingType::Default && other_trans_output_path.exists() {
             println!(
                 "{} {}",
-                other_trans_output_path
-                    .file_name()
-                    .unwrap()
-                    .to_str()
-                    .unwrap(),
+                unsafe {
+                    from_utf8_unchecked(
+                        other_trans_output_path
+                            .file_name()
+                            .unwrap()
+                            .as_encoded_bytes(),
+                    )
+                },
                 unsafe { FILE_ALREADY_PARSED }
             );
             continue;
@@ -542,7 +559,7 @@ pub fn read_other(
 
                                     if let Some(parsed) = parsed {
                                         in_sequence = true;
-                                        line.push(parsed.to_string());
+                                        line.push(parsed);
                                     }
                                 }
                             }

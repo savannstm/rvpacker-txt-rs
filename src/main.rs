@@ -1,10 +1,13 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
-use sonic_rs::{from_str, JsonValueTrait, Value};
+use fastrand::seed;
+use sonic_rs::{from_str, JsonValueTrait, Object};
 use std::{
     env::args,
     fs::{create_dir_all, read_to_string},
+    io::stdin,
     path::{Path, PathBuf},
+    process::exit,
     time::Instant,
 };
 use sys_locale::get_locale;
@@ -113,6 +116,7 @@ struct ProgramLocalization<'a> {
     file_already_parsed_msg: &'a str,
     file_is_not_parsed_msg: &'a str,
     done_in_msg: &'a str,
+    force_mode_warning: &'a str,
 
     // Misc
     possible_values: &'a str,
@@ -161,7 +165,8 @@ impl<'a> ProgramLocalization<'a> {
             file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             disable_custom_parsing_desc: "Disables built-in custom parsing for some games.",
-            done_in_msg: "Done in:"
+            done_in_msg: "Done in:",
+            force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the folder, including _trans. Input 'Y' to continue."
         }
     }
 
@@ -198,13 +203,14 @@ impl<'a> ProgramLocalization<'a> {
             file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов для некоторых игр.",
-            done_in_msg: "Выполнено за:"
+            done_in_msg: "Выполнено за:",
+            force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, включая _trans-файлы. Введите Y, чтобы продолжить."
         }
     }
 }
 
 fn get_game_type(system_file_path: &Path) -> Option<GameType> {
-    let system_obj: Value = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
+    let system_obj: Object = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
 
     if game_title.contains("termina") {
@@ -236,6 +242,7 @@ fn determine_language() -> Language {
 }
 
 fn main() {
+    seed(69);
     let start_time: Instant = Instant::now();
 
     let language: Language = determine_language();
@@ -387,12 +394,12 @@ fn main() {
         disable_system_processing,
         disable_plugins_processing,
     ) = matches
-        .get_many::<String>("disable-processing")
+        .get_many::<&str>("disable-processing")
         .map(|disable_processing_args| {
             let mut flags = (false, false, false, false);
 
             for disable_processing_of in disable_processing_args {
-                match disable_processing_of.as_str() {
+                match *disable_processing_of {
                     "maps" => flags.0 = true,
                     "other" => flags.1 = true,
                     "system" => flags.2 = true,
@@ -429,7 +436,7 @@ fn main() {
         }
     }
 
-    let (maps_path, other_path) = if output_dir.to_str().unwrap() == "./" {
+    let (maps_path, other_path) = if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
         (
             input_dir.join("translation/maps"),
             input_dir.join("translation/other"),
@@ -454,7 +461,15 @@ fn main() {
         let append: bool = subcommand_matches.get_flag("append");
 
         let processing_type: ProcessingType = if force {
-            // implement a warning for force mode
+            println!("{}", localization.force_mode_warning);
+
+            let mut buf: String = String::new();
+            stdin().read_line(&mut buf).unwrap();
+
+            if buf != "Y" {
+                exit(0);
+            }
+
             ProcessingType::Force
         } else if append {
             ProcessingType::Append
@@ -504,11 +519,12 @@ fn main() {
 
         let plugins_path: PathBuf = input_dir.join("translation/plugins");
 
-        let (output_path, plugins_output_path) = if output_dir.to_str().unwrap() == "./" {
-            (input_dir.join("output/data"), input_dir.join("output/js"))
-        } else {
-            (output_dir.join("output/data"), output_dir.join("output/js"))
-        };
+        let (output_path, plugins_output_path) =
+            if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
+                (input_dir.join("output/data"), input_dir.join("output/js"))
+            } else {
+                (output_dir.join("output/data"), output_dir.join("output/js"))
+            };
 
         create_dir_all(&output_path).unwrap();
         create_dir_all(&plugins_output_path).unwrap();
