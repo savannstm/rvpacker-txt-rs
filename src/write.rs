@@ -1,10 +1,9 @@
-use crate::{Code, GameType, IntoRSplit, Variable};
+use crate::{romanize_string, Code, GameType, IntoRSplit, Variable};
 use fancy_regex::{Captures, Error, Match, Regex};
 use fastrand::shuffle;
 use rayon::prelude::*;
 use sonic_rs::{
-    from_str, to_string, to_value, Array, JsonContainerTrait, JsonValueMutTrait, JsonValueTrait,
-    Object, Value,
+    from_str, to_string, to_value, Array, JsonContainerTrait, JsonValueMutTrait, JsonValueTrait, Object, Value,
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -117,6 +116,7 @@ pub fn write_maps(
     maps_path: &Path,
     original_path: &Path,
     output_path: &Path,
+    romanize: bool,
     shuffle_level: u8,
     logging: bool,
     game_type: &Option<GameType>,
@@ -129,18 +129,14 @@ pub fn write_maps(
             |mut vec: Vec<(String, Object)>, entry: Result<DirEntry, _>| match entry {
                 Ok(entry) => {
                     let filename: OsString = entry.file_name();
-                    let filename_str: &str =
-                        unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
+                    let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
 
                     let slice: char;
                     unsafe {
                         slice = *filename_str.as_bytes().get_unchecked(4) as char;
                     }
 
-                    if filename_str.starts_with("Map")
-                        && slice.is_ascii_digit()
-                        && filename_str.ends_with("json")
-                    {
+                    if filename_str.starts_with("Map") && slice.is_ascii_digit() && filename_str.ends_with("json") {
                         vec.push((
                             filename_str.to_string(),
                             from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
@@ -168,19 +164,17 @@ pub fn write_maps(
         .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
         .collect();
 
-    let mut maps_translated_text_vec: Vec<String> =
-        read_to_string(maps_path.join("maps_trans.txt"))
-            .unwrap()
-            .par_split('\n')
-            .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-            .collect();
+    let mut maps_translated_text_vec: Vec<String> = read_to_string(maps_path.join("maps_trans.txt"))
+        .unwrap()
+        .par_split('\n')
+        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+        .collect();
 
-    let mut names_translated_text_vec: Vec<String> =
-        read_to_string(maps_path.join("names_trans.txt"))
-            .unwrap()
-            .par_split('\n')
-            .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-            .collect();
+    let mut names_translated_text_vec: Vec<String> = read_to_string(maps_path.join("names_trans.txt"))
+        .unwrap()
+        .par_split('\n')
+        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+        .collect();
 
     if shuffle_level > 0 {
         shuffle(&mut maps_translated_text_vec);
@@ -197,39 +191,35 @@ pub fn write_maps(
         }
     }
 
-    let maps_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> =
-        maps_original_text_vec
-            .into_par_iter()
-            .zip(maps_translated_text_vec.into_par_iter())
-            .fold(
-                HashMap::default,
-                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>,
-                 (key, value): (String, String)| {
-                    map.insert(key, value);
-                    map
-                },
-            )
-            .reduce(HashMap::default, |mut a, b| {
-                a.extend(b);
-                a
-            });
+    let maps_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = maps_original_text_vec
+        .into_par_iter()
+        .zip(maps_translated_text_vec.into_par_iter())
+        .fold(
+            HashMap::default,
+            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                map.insert(key, value);
+                map
+            },
+        )
+        .reduce(HashMap::default, |mut a, b| {
+            a.extend(b);
+            a
+        });
 
-    let names_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> =
-        names_original_text_vec
-            .into_par_iter()
-            .zip(names_translated_text_vec.into_par_iter())
-            .fold(
-                HashMap::default,
-                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>,
-                 (key, value): (String, String)| {
-                    map.insert(key, value);
-                    map
-                },
-            )
-            .reduce(HashMap::default, |mut a, b| {
-                a.extend(b);
-                a
-            });
+    let names_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = names_original_text_vec
+        .into_par_iter()
+        .zip(names_translated_text_vec.into_par_iter())
+        .fold(
+            HashMap::default,
+            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                map.insert(key, value);
+                map
+            },
+        )
+        .reduce(HashMap::default, |mut a, b| {
+            a.extend(b);
+            a
+        });
 
     // 401 - dialogue lines
     // 102 - dialogue choices array
@@ -238,145 +228,159 @@ pub fn write_maps(
     // 324 - i don't know what is it but it's some used in-game lines
     const ALLOWED_CODES: [u64; 5] = [401, 102, 402, 356, 324];
 
-    maps_obj_vec
-        .into_par_iter()
-        .for_each(|(filename, mut obj)| {
-            if let Some(location_name) =
-                names_translation_map.get(obj["displayName"].as_str().unwrap())
-            {
-                obj["displayName"] = to_value(location_name).unwrap();
-            }
+    maps_obj_vec.into_par_iter().for_each(|(filename, mut obj)| {
+        let mut display_name: String = obj["displayName"].as_str().unwrap().to_string();
 
-            obj["events"]
-                .as_array_mut()
-                .unwrap()
-                .par_iter_mut()
-                .skip(1) //Skipping first element in array as it is null
-                .for_each(|event: &mut Value| {
-                    if event.is_null() {
-                        return;
-                    }
+        if romanize {
+            display_name = romanize_string(display_name)
+        }
 
-                    event["pages"]
-                        .as_array_mut()
-                        .unwrap()
-                        .par_iter_mut()
-                        .for_each(|page: &mut Value| {
-                            let mut in_sequence: bool = false;
-                            let mut line: Vec<String> = Vec::with_capacity(4);
-                            let mut item_indices: Vec<usize> = Vec::with_capacity(4);
+        if let Some(location_name) = names_translation_map.get(&display_name) {
+            obj["displayName"] = to_value(location_name).unwrap();
+        }
 
-                            let list: &mut Array = page["list"].as_array_mut().unwrap();
-                            let list_len: usize = list.len();
+        drop(display_name);
 
-                            for it in 0..list_len {
-                                let code: u64 = list[it]["code"].as_u64().unwrap();
+        obj["events"]
+            .as_array_mut()
+            .unwrap()
+            .par_iter_mut()
+            .skip(1) //Skipping first element in array as it is null
+            .for_each(|event: &mut Value| {
+                if event.is_null() {
+                    return;
+                }
 
-                                if !ALLOWED_CODES.contains(&code) {
-                                    if in_sequence {
-                                        let joined: String = line.join("\n").trim().into();
+                event["pages"]
+                    .as_array_mut()
+                    .unwrap()
+                    .par_iter_mut()
+                    .for_each(|page: &mut Value| {
+                        let mut in_sequence: bool = false;
+                        let mut line: Vec<String> = Vec::with_capacity(4);
+                        let mut item_indices: Vec<usize> = Vec::with_capacity(4);
+
+                        let list: &mut Array = page["list"].as_array_mut().unwrap();
+                        let list_len: usize = list.len();
+
+                        for it in 0..list_len {
+                            let code: u64 = list[it]["code"].as_u64().unwrap();
+
+                            if !ALLOWED_CODES.contains(&code) {
+                                if in_sequence {
+                                    let mut joined: String = line.join("\n").trim().to_string();
+
+                                    if romanize {
+                                        joined = romanize_string(joined);
+                                    }
+
+                                    let translated: Option<String> = get_parameter_translated(
+                                        Code::Dialogue,
+                                        &joined,
+                                        &maps_translation_map,
+                                        game_type,
+                                    );
+
+                                    if let Some(text) = translated {
+                                        let split: Vec<&str> = text.split('\n').collect();
+                                        let split_length: usize = split.len();
+                                        let line_length: usize = line.len();
+
+                                        for (i, &index) in item_indices.iter().enumerate() {
+                                            if i < split_length {
+                                                list[index]["parameters"][0] = to_value(split[i]).unwrap();
+                                            } else {
+                                                list[index]["parameters"][0] = to_value("").unwrap();
+                                            }
+                                        }
+
+                                        if split_length > line_length {
+                                            let remaining: String = split[line_length..].join("\n");
+
+                                            list[*item_indices.last().unwrap()]["parameters"][0] =
+                                                to_value(&remaining).unwrap();
+                                        }
+                                    }
+
+                                    line.clear();
+                                    item_indices.clear();
+                                    in_sequence = false;
+                                }
+                                continue;
+                            }
+
+                            if code == 401 {
+                                if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
+                                    line.push(parameter_str.to_string());
+                                    item_indices.push(it);
+                                    in_sequence = true;
+                                }
+                            } else if list[it]["parameters"][0].is_array() {
+                                for i in 0..list[it]["parameters"][0].as_array().unwrap().len() {
+                                    if let Some(subparameter_str) = list[it]["parameters"][0][i].as_str() {
+                                        let mut subparameter_string: String = subparameter_str.to_string();
+
+                                        if romanize {
+                                            subparameter_string = romanize_string(subparameter_string);
+                                        }
+
                                         let translated: Option<String> = get_parameter_translated(
-                                            Code::Dialogue,
-                                            &joined,
+                                            Code::Choice,
+                                            &subparameter_string,
                                             &maps_translation_map,
                                             game_type,
                                         );
 
-                                        if let Some(text) = translated {
-                                            let split: Vec<&str> = text.split('\n').collect();
-                                            let split_length: usize = split.len();
-                                            let line_length: usize = line.len();
-
-                                            for (i, &index) in item_indices.iter().enumerate() {
-                                                if i < split_length {
-                                                    list[index]["parameters"][0] =
-                                                        to_value(split[i]).unwrap();
-                                                } else {
-                                                    list[index]["parameters"][0] =
-                                                        to_value("").unwrap();
-                                                }
-                                            }
-
-                                            if split_length > line_length {
-                                                let remaining: String =
-                                                    split[line_length..].join("\n");
-
-                                                list[*item_indices.last().unwrap()]["parameters"]
-                                                    [0] = to_value(&remaining).unwrap();
-                                            }
+                                        if let Some(translated) = translated {
+                                            list[it]["parameters"][0][i] = to_value(&translated).unwrap();
                                         }
-
-                                        line.clear();
-                                        item_indices.clear();
-                                        in_sequence = false;
                                     }
-                                    continue;
+                                }
+                            } else if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
+                                let mut parameter_string: String = parameter_str.to_string();
+
+                                if romanize {
+                                    parameter_string = romanize_string(parameter_string);
                                 }
 
-                                if code == 401 {
-                                    if let Some(parameter_str) = list[it]["parameters"][0].as_str()
-                                    {
-                                        line.push(parameter_str.to_string());
-                                        item_indices.push(it);
-                                        in_sequence = true;
-                                    }
-                                } else if list[it]["parameters"][0].is_array() {
-                                    for i in 0..list[it]["parameters"][0].as_array().unwrap().len()
-                                    {
-                                        if let Some(subparameter_str) =
-                                            list[it]["parameters"][0][i].as_str()
-                                        {
-                                            let translated: Option<String> =
-                                                get_parameter_translated(
-                                                    Code::Choice,
-                                                    subparameter_str,
-                                                    &maps_translation_map,
-                                                    game_type,
-                                                );
+                                let translated: Option<String> = get_parameter_translated(
+                                    Code::System,
+                                    &parameter_string,
+                                    &maps_translation_map,
+                                    game_type,
+                                );
 
-                                            if let Some(translated) = translated {
-                                                list[it]["parameters"][0][i] =
-                                                    to_value(&translated).unwrap();
-                                            }
-                                        }
-                                    }
-                                } else if let Some(parameter_str) =
-                                    list[it]["parameters"][0].as_str()
-                                {
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::System,
-                                        parameter_str,
-                                        &maps_translation_map,
-                                        game_type,
-                                    );
+                                if let Some(translated) = translated {
+                                    list[it]["parameters"][0] = to_value(&translated).unwrap();
+                                }
+                            } else if let Some(parameter_str) = list[it]["parameters"][1].as_str() {
+                                let mut parameter_string: String = parameter_str.to_string();
 
-                                    if let Some(translated) = translated {
-                                        list[it]["parameters"][0] = to_value(&translated).unwrap();
-                                    }
-                                } else if let Some(parameter_str) =
-                                    list[it]["parameters"][1].as_str()
-                                {
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::Unknown,
-                                        parameter_str,
-                                        &maps_translation_map,
-                                        game_type,
-                                    );
+                                if romanize {
+                                    parameter_string = romanize_string(parameter_string);
+                                }
 
-                                    if let Some(translated) = translated {
-                                        list[it]["parameters"][1] = to_value(&translated).unwrap();
-                                    }
+                                let translated: Option<String> = get_parameter_translated(
+                                    Code::Unknown,
+                                    &parameter_string,
+                                    &maps_translation_map,
+                                    game_type,
+                                );
+
+                                if let Some(translated) = translated {
+                                    list[it]["parameters"][1] = to_value(&translated).unwrap();
                                 }
                             }
-                        });
-                });
+                        }
+                    });
+            });
 
-            write(output_path.join(&filename), to_string(&obj).unwrap()).unwrap();
+        write(output_path.join(&filename), to_string(&obj).unwrap()).unwrap();
 
-            if logging {
-                println!("{} {filename}", unsafe { LOG_MSG });
-            }
-        });
+        if logging {
+            println!("{} {filename}", unsafe { LOG_MSG });
+        }
+    });
 }
 
 /// Writes .txt files from other folder back to their initial form.
@@ -391,6 +395,7 @@ pub fn write_other(
     other_path: &Path,
     original_path: &Path,
     output_path: &Path,
+    romanize: bool,
     shuffle_level: u8,
     logging: bool,
     game_type: &Option<GameType>,
@@ -403,8 +408,7 @@ pub fn write_other(
             |mut vec: Vec<(String, Array)>, entry: Result<DirEntry, _>| match entry {
                 Ok(entry) => {
                     let filename_os_string: OsString = entry.file_name();
-                    let filename: &str =
-                        unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                    let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
                     let (real_name, extension) = filename.split_once('.').unwrap();
 
                     if !real_name.starts_with("Map")
@@ -434,73 +438,72 @@ pub fn write_other(
     // 324 - i don't know what is it but it's some used in-game lines
     const ALLOWED_CODES: [u64; 6] = [401, 402, 405, 356, 102, 324];
 
-    other_obj_arr_vec
-        .into_par_iter()
-        .for_each(|(filename, mut obj_arr)| {
-            let other_processed_filename: &str = &filename[..filename.len() - 5];
+    other_obj_arr_vec.into_par_iter().for_each(|(filename, mut obj_arr)| {
+        let other_processed_filename: &str = &filename[..filename.len() - 5];
 
-            let other_original_text: Vec<String> =
-                read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
-                    .unwrap()
-                    .par_split('\n')
-                    .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-                    .collect();
+        let other_original_text: Vec<String> =
+            read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
+                .unwrap()
+                .par_split('\n')
+                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+                .collect();
 
-            let mut other_translated_text: Vec<String> =
-                read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
-                    .unwrap()
-                    .par_split('\n')
-                    .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-                    .collect();
+        let mut other_translated_text: Vec<String> =
+            read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
+                .unwrap()
+                .par_split('\n')
+                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+                .collect();
 
-            if shuffle_level > 0 {
-                shuffle(&mut other_translated_text);
+        if shuffle_level > 0 {
+            shuffle(&mut other_translated_text);
 
-                if shuffle_level == 2 {
-                    for text_string in other_translated_text.iter_mut() {
-                        *text_string = shuffle_words(text_string);
-                    }
+            if shuffle_level == 2 {
+                for text_string in other_translated_text.iter_mut() {
+                    *text_string = shuffle_words(text_string);
                 }
             }
+        }
 
-            let other_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> =
-                other_original_text
-                    .into_par_iter()
-                    .zip(other_translated_text.into_par_iter())
-                    .fold(
-                        HashMap::default,
-                        |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>,
-                         (key, value): (String, String)| {
-                            map.insert(key, value);
-                            map
-                        },
-                    )
-                    .reduce(HashMap::default, |mut a, b| {
-                        a.extend(b);
-                        a
-                    });
+        let other_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = other_original_text
+            .into_par_iter()
+            .zip(other_translated_text.into_par_iter())
+            .fold(
+                HashMap::default,
+                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                    map.insert(key, value);
+                    map
+                },
+            )
+            .reduce(HashMap::default, |mut a, b| {
+                a.extend(b);
+                a
+            });
 
-            // Other files except CommonEvents.json and Troops.json have the structure that consists
-            // of name, nickname, description and note
-            if !filename.starts_with("Co") && !filename.starts_with("Tr") {
-                obj_arr
-                    .par_iter_mut()
-                    .skip(1) // Skipping first element in array as it is null
-                    .for_each(|obj: &mut Value| {
-                        for (variable_name, variable_enum) in [
-                            ("name", Variable::Name),
-                            ("nickname", Variable::Nickname),
-                            ("description", Variable::Description),
-                            ("note", Variable::Note),
-                        ] {
-                            let variable_value: &Value = obj.get(variable_name).unwrap();
-
+        // Other files except CommonEvents.json and Troops.json have the structure that consists
+        // of name, nickname, description and note
+        if !filename.starts_with("Co") && !filename.starts_with("Tr") {
+            obj_arr
+                .par_iter_mut()
+                .skip(1) // Skipping first element in array as it is null
+                .for_each(|obj: &mut Value| {
+                    for (variable_name, variable_enum) in [
+                        ("name", Variable::Name),
+                        ("nickname", Variable::Nickname),
+                        ("description", Variable::Description),
+                        ("note", Variable::Note),
+                    ] {
+                        if let Some(variable_value) = obj.get(variable_name) {
                             if let Some(variable_str) = variable_value.as_str() {
-                                let variable_str: &str = variable_str.trim();
+                                let mut variable_string: String = variable_str.trim().to_string();
 
-                                if !variable_str.is_empty() {
+                                if !variable_string.is_empty() {
+                                    if romanize {
+                                        variable_string = romanize_string(variable_string)
+                                    }
+
                                     let translated: Option<String> = get_variable_translated(
-                                        variable_str,
+                                        &variable_string,
                                         variable_enum,
                                         &filename,
                                         &other_translation_map,
@@ -513,155 +516,160 @@ pub fn write_other(
                                 }
                             }
                         }
-                    });
-            } else {
-                //Other files have the structure somewhat similar to Maps.json files
-                obj_arr
-                    .par_iter_mut()
-                    .skip(1) //Skipping first element in array as it is null
-                    .for_each(|obj: &mut Value| {
-                        //CommonEvents doesn't have pages, so we can just check if it's Troops
-                        let pages_length: usize = if filename.starts_with("Troops") {
-                            obj["pages"].as_array().unwrap().len()
+                    }
+                });
+        } else {
+            //Other files have the structure somewhat similar to Maps.json files
+            obj_arr
+                .par_iter_mut()
+                .skip(1) //Skipping first element in array as it is null
+                .for_each(|obj: &mut Value| {
+                    //CommonEvents doesn't have pages, so we can just check if it's Troops
+                    let pages_length: usize = if filename.starts_with("Troops") {
+                        obj["pages"].as_array().unwrap().len()
+                    } else {
+                        1
+                    };
+
+                    for i in 0..pages_length {
+                        //If element has pages, then we'll iterate over them
+                        //Otherwise we'll just iterate over the list
+                        let list: &mut Value = if pages_length != 1 {
+                            &mut obj["pages"][i]["list"]
                         } else {
-                            1
+                            &mut obj["list"]
                         };
 
-                        for i in 0..pages_length {
-                            //If element has pages, then we'll iterate over them
-                            //Otherwise we'll just iterate over the list
-                            let list: &mut Value = if pages_length != 1 {
-                                &mut obj["pages"][i]["list"]
-                            } else {
-                                &mut obj["list"]
-                            };
+                        if !list.is_array() {
+                            continue;
+                        }
 
-                            if !list.is_array() {
+                        let list_arr: &mut Array = list.as_array_mut().unwrap();
+                        let list_len: usize = list_arr.len();
+
+                        let mut in_sequence: bool = false;
+                        let mut line: Vec<String> = Vec::with_capacity(4);
+                        let mut item_indices: Vec<usize> = Vec::with_capacity(4);
+
+                        for it in 0..list_len {
+                            let code: u64 = list_arr[it]["code"].as_u64().unwrap();
+
+                            if !ALLOWED_CODES.contains(&code) {
+                                if in_sequence {
+                                    let mut joined: String = line.join("\n").trim().to_string();
+
+                                    if romanize {
+                                        joined = romanize_string(joined)
+                                    }
+
+                                    let translated: Option<String> = get_parameter_translated(
+                                        Code::Dialogue,
+                                        &joined,
+                                        &other_translation_map,
+                                        game_type,
+                                    );
+
+                                    if let Some(text) = translated {
+                                        let split: Vec<&str> = text.split('\n').collect();
+                                        let split_length: usize = split.len();
+                                        let line_length: usize = line.len();
+
+                                        for (i, &index) in item_indices.iter().enumerate() {
+                                            if i < split_length {
+                                                list_arr[index]["parameters"][0] = to_value(split[i]).unwrap();
+                                            } else {
+                                                list_arr[index]["parameters"][0] = to_value("").unwrap();
+                                            }
+                                        }
+
+                                        if split_length > line_length {
+                                            let remaining: String = split[line_length..].join("\n");
+
+                                            list_arr[*item_indices.last().unwrap()]["parameters"][0] =
+                                                to_value(&remaining).unwrap();
+                                        }
+                                    }
+
+                                    line.clear();
+                                    item_indices.clear();
+                                    in_sequence = false
+                                }
                                 continue;
                             }
 
-                            let list_arr: &mut Array = list.as_array_mut().unwrap();
-                            let list_len: usize = list_arr.len();
+                            if [401, 405].contains(&code) {
+                                if let Some(parameter_str) = list_arr[it]["parameters"][0].as_str() {
+                                    line.push(parameter_str.to_string());
+                                    item_indices.push(it);
+                                    in_sequence = true;
+                                }
+                            } else if list_arr[it]["parameters"][0].is_array() {
+                                for i in 0..list_arr[it]["parameters"][0].as_array().unwrap().len() {
+                                    if let Some(subparameter_str) = list_arr[it]["parameters"][0][i].as_str() {
+                                        let mut subparameter_string = subparameter_str.to_string();
 
-                            let mut in_sequence: bool = false;
-                            let mut line: Vec<String> = Vec::with_capacity(4);
-                            let mut item_indices: Vec<usize> = Vec::with_capacity(4);
-
-                            for it in 0..list_len {
-                                let code: u64 = list_arr[it]["code"].as_u64().unwrap();
-
-                                if !ALLOWED_CODES.contains(&code) {
-                                    if in_sequence {
-                                        let joined: String = line.join("\n").trim().into();
+                                        if romanize {
+                                            subparameter_string = romanize_string(subparameter_string);
+                                        }
 
                                         let translated: Option<String> = get_parameter_translated(
                                             Code::Dialogue,
-                                            &joined,
+                                            &subparameter_string,
                                             &other_translation_map,
                                             game_type,
                                         );
 
-                                        if let Some(text) = translated {
-                                            let split: Vec<&str> = text.split('\n').collect();
-                                            let split_length: usize = split.len();
-                                            let line_length: usize = line.len();
-
-                                            for (i, &index) in item_indices.iter().enumerate() {
-                                                if i < split_length {
-                                                    list_arr[index]["parameters"][0] =
-                                                        to_value(split[i]).unwrap();
-                                                } else {
-                                                    list_arr[index]["parameters"][0] =
-                                                        to_value("").unwrap();
-                                                }
-                                            }
-
-                                            if split_length > line_length {
-                                                let remaining: String =
-                                                    split[line_length..].join("\n");
-
-                                                list_arr[*item_indices.last().unwrap()]
-                                                    ["parameters"][0] =
-                                                    to_value(&remaining).unwrap();
-                                            }
+                                        if let Some(translated) = translated {
+                                            list_arr[it]["parameters"][0][i] = to_value(&translated).unwrap();
                                         }
-
-                                        line.clear();
-                                        item_indices.clear();
-                                        in_sequence = false
                                     }
-                                    continue;
+                                }
+                            } else if let Some(parameter_str) = list_arr[it]["parameters"][0].as_str() {
+                                let mut parameter_string: String = parameter_str.to_string();
+
+                                if romanize {
+                                    parameter_string = romanize_string(parameter_string);
                                 }
 
-                                if [401, 405].contains(&code) {
-                                    if let Some(parameter_str) =
-                                        list_arr[it]["parameters"][0].as_str()
-                                    {
-                                        line.push(parameter_str.to_string());
-                                        item_indices.push(it);
-                                        in_sequence = true;
-                                    }
-                                } else if list_arr[it]["parameters"][0].is_array() {
-                                    for i in
-                                        0..list_arr[it]["parameters"][0].as_array().unwrap().len()
-                                    {
-                                        if let Some(subparameter_str) =
-                                            list_arr[it]["parameters"][0][i].as_str()
-                                        {
-                                            let translated: Option<String> =
-                                                get_parameter_translated(
-                                                    Code::Dialogue,
-                                                    subparameter_str,
-                                                    &other_translation_map,
-                                                    game_type,
-                                                );
+                                let translated: Option<String> = get_parameter_translated(
+                                    Code::System,
+                                    &parameter_string,
+                                    &other_translation_map,
+                                    game_type,
+                                );
 
-                                            if let Some(translated) = translated {
-                                                list_arr[it]["parameters"][0][i] =
-                                                    to_value(&translated).unwrap();
-                                            }
-                                        }
-                                    }
-                                } else if let Some(parameter_str) =
-                                    list_arr[it]["parameters"][0].as_str()
-                                {
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::System,
-                                        parameter_str,
-                                        &other_translation_map,
-                                        game_type,
-                                    );
+                                if let Some(translated) = translated {
+                                    list_arr[it]["parameters"][0] = to_value(&translated).unwrap();
+                                }
+                            } else if let Some(parameter_str) = list_arr[it]["parameters"][1].as_str() {
+                                let mut parameter_string: String = parameter_str.to_string();
 
-                                    if let Some(translated) = translated {
-                                        list_arr[it]["parameters"][0] =
-                                            to_value(&translated).unwrap();
-                                    }
-                                } else if let Some(parameter_str) =
-                                    list_arr[it]["parameters"][1].as_str()
-                                {
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::Unknown,
-                                        parameter_str,
-                                        &other_translation_map,
-                                        game_type,
-                                    );
+                                if romanize {
+                                    parameter_string = romanize_string(parameter_string);
+                                }
 
-                                    if let Some(translated) = translated {
-                                        list_arr[it]["parameters"][1] =
-                                            to_value(&translated).unwrap();
-                                    }
+                                let translated: Option<String> = get_parameter_translated(
+                                    Code::Unknown,
+                                    &parameter_string,
+                                    &other_translation_map,
+                                    game_type,
+                                );
+
+                                if let Some(translated) = translated {
+                                    list_arr[it]["parameters"][1] = to_value(&translated).unwrap();
                                 }
                             }
                         }
-                    });
-            }
+                    }
+                });
+        }
 
-            write(output_path.join(&filename), to_string(&obj_arr).unwrap()).unwrap();
+        write(output_path.join(&filename), to_string(&obj_arr).unwrap()).unwrap();
 
-            if logging {
-                println!("{} {filename}", unsafe { LOG_MSG });
-            }
-        });
+        if logging {
+            println!("{} {filename}", unsafe { LOG_MSG });
+        }
+    });
 }
 
 /// Writes system.txt file back to its initial form.
@@ -677,6 +685,7 @@ pub fn write_system(
     system_file_path: &Path,
     other_path: &Path,
     output_path: &Path,
+    romanize: bool,
     shuffle_level: u8,
     logging: bool,
 ) {
@@ -688,11 +697,10 @@ pub fn write_system(
         .map(|line: &str| line.trim().to_string())
         .collect();
 
-    let system_translation_string: (String, String) =
-        read_to_string(other_path.join("system_trans.txt"))
-            .unwrap()
-            .into_rsplit_once('\n')
-            .unwrap();
+    let system_translation_string: (String, String) = read_to_string(other_path.join("system_trans.txt"))
+        .unwrap()
+        .into_rsplit_once('\n')
+        .unwrap();
 
     let game_title: String = system_translation_string.1;
 
@@ -712,30 +720,34 @@ pub fn write_system(
         }
     }
 
-    let system_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> =
-        system_original_text
-            .into_par_iter()
-            .zip(system_translated_text.into_par_iter())
-            .fold(
-                HashMap::default,
-                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>,
-                 (key, value): (String, String)| {
-                    map.insert(key, value);
-                    map
-                },
-            )
-            .reduce(HashMap::default, |mut a, b| {
-                a.extend(b);
-                a
-            });
+    let system_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = system_original_text
+        .into_par_iter()
+        .zip(system_translated_text.into_par_iter())
+        .fold(
+            HashMap::default,
+            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                map.insert(key, value);
+                map
+            },
+        )
+        .reduce(HashMap::default, |mut a, b| {
+            a.extend(b);
+            a
+        });
 
     system_obj["armorTypes"]
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
-        .for_each(|string: &mut Value| {
-            if let Some(text) = system_translation_map.get(string.as_str().unwrap().trim()) {
-                *string = to_value(text).unwrap();
+        .for_each(|value: &mut Value| {
+            let mut string: String = value.as_str().unwrap().trim().to_string();
+
+            if romanize {
+                string = romanize_string(string);
+            }
+
+            if let Some(text) = system_translation_map.get(&string) {
+                *value = to_value(text).unwrap();
             }
         });
 
@@ -743,9 +755,15 @@ pub fn write_system(
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
-        .for_each(|string: &mut Value| {
-            if let Some(text) = system_translation_map.get(string.as_str().unwrap().trim()) {
-                *string = to_value(text).unwrap();
+        .for_each(|value: &mut Value| {
+            let mut string: String = value.as_str().unwrap().trim().to_string();
+
+            if romanize {
+                string = romanize_string(string);
+            }
+
+            if let Some(text) = system_translation_map.get(&string) {
+                *value = to_value(text).unwrap();
             }
         });
 
@@ -753,9 +771,15 @@ pub fn write_system(
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
-        .for_each(|string: &mut Value| {
-            if let Some(text) = system_translation_map.get(string.as_str().unwrap().trim()) {
-                *string = to_value(text).unwrap();
+        .for_each(|value: &mut Value| {
+            let mut string: String = value.as_str().unwrap().trim().to_string();
+
+            if romanize {
+                string = romanize_string(string);
+            }
+
+            if let Some(text) = system_translation_map.get(&string) {
+                *value = to_value(text).unwrap();
             }
         });
 
@@ -763,9 +787,15 @@ pub fn write_system(
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
-        .for_each(|string: &mut Value| {
-            if let Some(text) = system_translation_map.get(string.as_str().unwrap().trim()) {
-                *string = to_value(text).unwrap();
+        .for_each(|value: &mut Value| {
+            let mut string: String = value.as_str().unwrap().trim().to_string();
+
+            if romanize {
+                string = romanize_string(string);
+            }
+
+            if let Some(text) = system_translation_map.get(&string) {
+                *value = to_value(text).unwrap();
             }
         });
 
@@ -780,10 +810,16 @@ pub fn write_system(
                     .as_array_mut()
                     .unwrap()
                     .par_iter_mut()
-                    .for_each(|string: &mut Value| {
-                        if let Some(str) = string.as_str() {
-                            if let Some(text) = system_translation_map.get(str.trim()) {
-                                *string = to_value(text).unwrap();
+                    .for_each(|subvalue: &mut Value| {
+                        if let Some(str) = subvalue.as_str() {
+                            let mut string: String = str.trim().to_string();
+
+                            if romanize {
+                                string = romanize_string(string);
+                            }
+
+                            if let Some(text) = system_translation_map.get(&string) {
+                                *subvalue = to_value(text).unwrap();
                             }
                         }
                     });
@@ -797,11 +833,15 @@ pub fn write_system(
                     .unwrap()
                     .iter_mut()
                     .par_bridge()
-                    .for_each(|(_, string)| {
-                        if let Some(text) =
-                            system_translation_map.get(string.as_str().unwrap().trim())
-                        {
-                            *string = to_value(text).unwrap();
+                    .for_each(|(_, value)| {
+                        let mut string: String = value.as_str().unwrap().trim().to_string();
+
+                        if romanize {
+                            string = romanize_string(string)
+                        }
+
+                        if let Some(text) = system_translation_map.get(&string) {
+                            *value = to_value(text).unwrap();
                         }
                     });
             }
@@ -811,19 +851,21 @@ pub fn write_system(
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
-        .for_each(|string: &mut Value| {
-            if let Some(text) = system_translation_map.get(string.as_str().unwrap().trim()) {
-                *string = to_value(text).unwrap();
+        .for_each(|value: &mut Value| {
+            let mut string: String = value.as_str().unwrap().trim().to_string();
+
+            if romanize {
+                string = romanize_string(string);
+            }
+
+            if let Some(text) = system_translation_map.get(&string) {
+                *value = to_value(text).unwrap();
             }
         });
 
     system_obj["gameTitle"] = to_value(&game_title).unwrap();
 
-    write(
-        output_path.join("System.json"),
-        to_string(&system_obj).unwrap(),
-    )
-    .unwrap();
+    write(output_path.join("System.json"), to_string(&system_obj).unwrap()).unwrap();
 
     if logging {
         println!("{} System.json", unsafe { LOG_MSG });
@@ -853,12 +895,11 @@ pub fn write_plugins(
         .map(|line: &str| line.to_string())
         .collect();
 
-    let mut plugins_translated_text_vec: Vec<String> =
-        read_to_string(plugins_path.join("plugins_trans.txt"))
-            .unwrap()
-            .par_split('\n')
-            .map(|line: &str| line.to_string())
-            .collect();
+    let mut plugins_translated_text_vec: Vec<String> = read_to_string(plugins_path.join("plugins_trans.txt"))
+        .unwrap()
+        .par_split('\n')
+        .map(|line: &str| line.to_string())
+        .collect();
 
     if shuffle_level > 0 {
         shuffle(&mut plugins_translated_text_vec);
@@ -870,22 +911,20 @@ pub fn write_plugins(
         }
     }
 
-    let plugins_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> =
-        plugins_original_text_vec
-            .into_par_iter()
-            .zip(plugins_translated_text_vec.into_par_iter())
-            .fold(
-                HashMap::default,
-                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>,
-                 (key, value): (String, String)| {
-                    map.insert(key, value);
-                    map
-                },
-            )
-            .reduce(HashMap::default, |mut a, b| {
-                a.extend(b);
-                a
-            });
+    let plugins_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = plugins_original_text_vec
+        .into_par_iter()
+        .zip(plugins_translated_text_vec.into_par_iter())
+        .fold(
+            HashMap::default,
+            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                map.insert(key, value);
+                map
+            },
+        )
+        .reduce(HashMap::default, |mut a, b| {
+            a.extend(b);
+            a
+        });
 
     obj_arr.par_iter_mut().for_each(|obj: &mut Object| {
         // For now, plugins writing only implemented for Fear & Hunger: Termina, so you should manually translate the plugins.js file if it's not Termina
@@ -916,20 +955,19 @@ pub fn write_plugins(
                     .unwrap()
                     .iter_mut()
                     .par_bridge()
-                    .for_each(|(key, string): (&str, &mut Value)| {
-                        let mut str: String = string.as_str().unwrap().to_string();
+                    .for_each(|(key, value): (&str, &mut Value)| {
+                        let mut string: String = value.as_str().unwrap().to_string();
 
                         if key == "OptionsCategories" {
-                            for (text, translated_text) in plugins_translation_map
-                                .keys()
-                                .zip(plugins_translation_map.values())
+                            for (text, translated_text) in
+                                plugins_translation_map.keys().zip(plugins_translation_map.values())
                             {
-                                str = str.replacen(text, translated_text, 1);
+                                string = string.replacen(text, translated_text, 1);
                             }
 
-                            *string = to_value(&str).unwrap();
-                        } else if let Some(param) = plugins_translation_map.get(&str) {
-                            *string = to_value(param).unwrap();
+                            *value = to_value(&string).unwrap();
+                        } else if let Some(param) = plugins_translation_map.get(&string) {
+                            *value = to_value(param).unwrap();
                         }
                     });
             }

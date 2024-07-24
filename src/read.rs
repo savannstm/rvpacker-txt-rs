@@ -1,4 +1,4 @@
-use crate::{Code, GameType, ProcessingType, Variable};
+use crate::{romanize_string, Code, GameType, ProcessingType, Variable};
 use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
 use sonic_rs::{from_str, Array, JsonContainerTrait, JsonValueTrait, Object, Value};
@@ -16,11 +16,7 @@ pub static mut FILE_ALREADY_PARSED: &str = "";
 pub static mut FILE_IS_NOT_PARSED: &str = "";
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
-fn parse_parameter(
-    code: Code,
-    mut parameter: &str,
-    game_type: &Option<GameType>,
-) -> Option<String> {
+fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>) -> Option<String> {
     if let Some(game_type) = game_type {
         match code {
             Code::Dialogue => match game_type {
@@ -48,12 +44,7 @@ fn parse_parameter(
 }
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
-fn parse_variable(
-    mut variable: &str,
-    name: Variable,
-    filename: &str,
-    game_type: &Option<GameType>,
-) -> Option<String> {
+fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type: &Option<GameType>) -> Option<String> {
     if let Some(game_type) = game_type {
         match name {
             Variable::Name => match game_type {
@@ -106,6 +97,7 @@ fn parse_variable(
 pub fn read_map(
     maps_path: &Path,
     output_path: &Path,
+    romanize: bool,
     logging: bool,
     game_type: &Option<GameType>,
     mut processing_type: &ProcessingType,
@@ -125,18 +117,14 @@ pub fn read_map(
         .filter_map(|entry: Result<DirEntry, _>| match entry {
             Ok(entry) => {
                 let filename_os_string = entry.file_name();
-                let filename: &str =
-                    unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
 
                 let slice: char;
                 unsafe {
                     slice = *filename.as_bytes().get_unchecked(4) as char;
                 }
 
-                if filename.starts_with("Map")
-                    && slice.is_ascii_digit()
-                    && filename.ends_with("json")
-                {
+                if filename.starts_with("Map") && slice.is_ascii_digit() && filename.ends_with("json") {
                     Some(entry)
                 } else {
                     None
@@ -159,10 +147,8 @@ pub fn read_map(
     let mut maps_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
     let mut names_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
 
-    let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
-        IndexMap::default();
-    let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
-        IndexMap::default();
+    let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
+    let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
     if processing_type == ProcessingType::Append {
         if maps_trans_output_path.exists() {
@@ -196,16 +182,16 @@ pub fn read_map(
     for (filename, obj) in maps_obj_vec.into_iter() {
         if let Some(display_name) = obj["displayName"].as_str() {
             if !display_name.is_empty() {
-                let display_name_string: String = display_name.to_string();
+                let mut display_name_string: String = display_name.to_string();
+
+                if romanize {
+                    display_name_string = romanize_string(display_name_string);
+                }
 
                 if processing_type == ProcessingType::Append
                     && !names_translation_map.contains_key(&display_name_string)
                 {
-                    names_translation_map.shift_insert(
-                        names_lines.len(),
-                        display_name_string.clone(),
-                        "".into(),
-                    );
+                    names_translation_map.shift_insert(names_lines.len(), display_name_string.clone(), "".into());
                 }
 
                 names_lines.insert(display_name_string);
@@ -227,16 +213,15 @@ pub fn read_map(
 
                     if !ALLOWED_CODES.contains(&code) {
                         if in_sequence {
-                            let joined: String = line.join(r"\#").trim().to_string();
+                            let mut joined: String = line.join(r"\#").trim().to_string();
 
-                            if processing_type == ProcessingType::Append
-                                && !maps_translation_map.contains_key(&joined)
+                            if romanize {
+                                joined = romanize_string(joined);
+                            }
+
+                            if processing_type == ProcessingType::Append && !maps_translation_map.contains_key(&joined)
                             {
-                                maps_translation_map.shift_insert(
-                                    maps_lines.len(),
-                                    joined.clone(),
-                                    "".into(),
-                                );
+                                maps_translation_map.shift_insert(maps_lines.len(), joined.clone(), "".into());
                             }
 
                             maps_lines.insert(joined);
@@ -252,8 +237,7 @@ pub fn read_map(
                     if code == 401 {
                         if let Some(parameter_str) = parameters[0].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<String> =
-                                    parse_parameter(Code::Dialogue, parameter_str, game_type);
+                                let parsed: Option<String> = parse_parameter(Code::Dialogue, parameter_str, game_type);
 
                                 if let Some(parsed) = parsed {
                                     in_sequence = true;
@@ -268,7 +252,11 @@ pub fn read_map(
                                     let parsed: Option<String> =
                                         parse_parameter(Code::Choice, subparameter_str, game_type);
 
-                                    if let Some(parsed) = parsed {
+                                    if let Some(mut parsed) = parsed {
+                                        if romanize {
+                                            parsed = romanize_string(parsed);
+                                        }
+
                                         if processing_type == ProcessingType::Append
                                             && !maps_translation_map.contains_key(&parsed)
                                         {
@@ -286,18 +274,17 @@ pub fn read_map(
                         }
                     } else if let Some(parameter_str) = parameters[0].as_str() {
                         if !parameter_str.is_empty() {
-                            let parsed: Option<String> =
-                                parse_parameter(Code::System, parameter_str, game_type);
+                            let parsed: Option<String> = parse_parameter(Code::System, parameter_str, game_type);
 
-                            if let Some(parsed) = parsed {
+                            if let Some(mut parsed) = parsed {
+                                if romanize {
+                                    parsed = romanize_string(parsed);
+                                }
+
                                 if processing_type == ProcessingType::Append
                                     && !maps_translation_map.contains_key(&parsed)
                                 {
-                                    maps_translation_map.shift_insert(
-                                        maps_lines.len(),
-                                        parsed.clone(),
-                                        "".into(),
-                                    );
+                                    maps_translation_map.shift_insert(maps_lines.len(), parsed.clone(), "".into());
                                 }
 
                                 maps_lines.insert(parsed);
@@ -305,18 +292,17 @@ pub fn read_map(
                         }
                     } else if let Some(parameter_str) = parameters[1].as_str() {
                         if !parameter_str.is_empty() {
-                            let parsed: Option<String> =
-                                parse_parameter(Code::Unknown, parameter_str, game_type);
+                            let parsed: Option<String> = parse_parameter(Code::Unknown, parameter_str, game_type);
 
-                            if let Some(parsed) = parsed {
+                            if let Some(mut parsed) = parsed {
+                                if romanize {
+                                    parsed = romanize_string(parsed);
+                                }
+
                                 if processing_type == ProcessingType::Append
                                     && !maps_translation_map.contains_key(&parsed)
                                 {
-                                    maps_translation_map.shift_insert(
-                                        maps_lines.len(),
-                                        parsed.clone(),
-                                        "".into(),
-                                    );
+                                    maps_translation_map.shift_insert(maps_lines.len(), parsed.clone(), "".into());
                                 }
 
                                 maps_lines.insert(parsed);
@@ -332,30 +318,26 @@ pub fn read_map(
         }
     }
 
-    let (
-        maps_original_content,
-        maps_translated_content,
-        names_original_content,
-        names_translated_content,
-    ) = if processing_type == ProcessingType::Append {
-        let maps_collected: (Vec<String>, Vec<String>) = maps_translation_map.into_iter().unzip();
-        let names_collected: (Vec<String>, Vec<String>) = names_translation_map.into_iter().unzip();
-        (
-            maps_collected.0.join("\n"),
-            maps_collected.1.join("\n"),
-            names_collected.0.join("\n"),
-            names_collected.1.join("\n"),
-        )
-    } else {
-        let maps_length: usize = maps_lines.len() - 1;
-        let names_length: usize = names_lines.len() - 1;
-        (
-            maps_lines.into_iter().collect::<Vec<String>>().join("\n"),
-            "\n".repeat(maps_length),
-            names_lines.into_iter().collect::<Vec<String>>().join("\n"),
-            "\n".repeat(names_length),
-        )
-    };
+    let (maps_original_content, maps_translated_content, names_original_content, names_translated_content) =
+        if processing_type == ProcessingType::Append {
+            let maps_collected: (Vec<String>, Vec<String>) = maps_translation_map.into_iter().unzip();
+            let names_collected: (Vec<String>, Vec<String>) = names_translation_map.into_iter().unzip();
+            (
+                maps_collected.0.join("\n"),
+                maps_collected.1.join("\n"),
+                names_collected.0.join("\n"),
+                names_collected.1.join("\n"),
+            )
+        } else {
+            let maps_length: usize = maps_lines.len() - 1;
+            let names_length: usize = names_lines.len() - 1;
+            (
+                maps_lines.into_iter().collect::<Vec<String>>().join("\n"),
+                "\n".repeat(maps_length),
+                names_lines.into_iter().collect::<Vec<String>>().join("\n"),
+                "\n".repeat(names_length),
+            )
+        };
 
     write(maps_output_path, maps_original_content).unwrap();
     write(maps_trans_output_path, maps_translated_content).unwrap();
@@ -374,6 +356,7 @@ pub fn read_map(
 pub fn read_other(
     other_path: &Path,
     output_path: &Path,
+    romanize: bool,
     logging: bool,
     game_type: &Option<GameType>,
     processing_type: &ProcessingType,
@@ -383,8 +366,7 @@ pub fn read_other(
         .filter_map(|entry: Result<DirEntry, _>| match entry {
             Ok(entry) => {
                 let filename_os_string: OsString = entry.file_name();
-                let filename: &str =
-                    unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
                 let (real_name, extension) = filename.split_once('.').unwrap();
 
                 if !real_name.starts_with("Map")
@@ -420,32 +402,22 @@ pub fn read_other(
     const ALLOWED_CODES: [u64; 5] = [401, 405, 356, 102, 324];
 
     for (filename, obj_arr) in other_obj_arr_map.into_iter() {
-        let other_processed_filename: String =
-            filename[0..filename.rfind('.').unwrap()].to_lowercase();
+        let other_processed_filename: String = filename[0..filename.rfind('.').unwrap()].to_lowercase();
 
         let other_output_path: &Path = &output_path.join(other_processed_filename.clone() + ".txt");
-        let other_trans_output_path: &Path =
-            &output_path.join(other_processed_filename + "_trans.txt");
+        let other_trans_output_path: &Path = &output_path.join(other_processed_filename + "_trans.txt");
 
         if processing_type == ProcessingType::Default && other_trans_output_path.exists() {
             println!(
                 "{} {}",
-                unsafe {
-                    from_utf8_unchecked(
-                        other_trans_output_path
-                            .file_name()
-                            .unwrap()
-                            .as_encoded_bytes(),
-                    )
-                },
+                unsafe { from_utf8_unchecked(other_trans_output_path.file_name().unwrap().as_encoded_bytes(),) },
                 unsafe { FILE_ALREADY_PARSED }
             );
             continue;
         }
 
         let mut other_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
-        let mut other_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
-            IndexMap::default();
+        let mut other_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
         if processing_type == ProcessingType::Append {
             if other_trans_output_path.exists() {
@@ -476,20 +448,19 @@ pub fn read_other(
                         variable_str = variable_str.trim();
 
                         if !variable_str.is_empty() {
-                            let parsed: Option<String> =
-                                parse_variable(variable_str, name, &filename, game_type);
+                            let parsed: Option<String> = parse_variable(variable_str, name, &filename, game_type);
 
-                            if let Some(parsed) = parsed {
+                            if let Some(mut parsed) = parsed {
+                                if romanize {
+                                    parsed = romanize_string(parsed);
+                                }
+
                                 let replaced: String = parsed.replace('\n', r"\#");
 
                                 if inner_processing_type == ProcessingType::Append
                                     && !other_translation_map.contains_key(&replaced)
                                 {
-                                    other_translation_map.shift_insert(
-                                        other_lines.len(),
-                                        replaced.clone(),
-                                        "".into(),
-                                    );
+                                    other_translation_map.shift_insert(other_lines.len(), replaced.clone(), "".into());
                                 }
 
                                 other_lines.insert(replaced);
@@ -529,16 +500,16 @@ pub fn read_other(
 
                         if !ALLOWED_CODES.contains(&code) {
                             if in_sequence {
-                                let joined: String = line.join(r"\#").trim().to_string();
+                                let mut joined: String = line.join(r"\#").trim().to_string();
+
+                                if romanize {
+                                    joined = romanize_string(joined);
+                                }
 
                                 if processing_type == ProcessingType::Append
                                     && !other_translation_map.contains_key(&joined)
                                 {
-                                    other_translation_map.shift_insert(
-                                        other_lines.len(),
-                                        joined.clone(),
-                                        "".into(),
-                                    );
+                                    other_translation_map.shift_insert(other_lines.len(), joined.clone(), "".into());
                                 }
 
                                 other_lines.insert(joined);
@@ -567,13 +538,14 @@ pub fn read_other(
                             for i in 0..parameters[0].as_array().unwrap().len() {
                                 if let Some(subparameter_str) = parameters[0][i].as_str() {
                                     if !subparameter_str.is_empty() {
-                                        let parsed: Option<String> = parse_parameter(
-                                            Code::Choice,
-                                            subparameter_str,
-                                            game_type,
-                                        );
+                                        let parsed: Option<String> =
+                                            parse_parameter(Code::Choice, subparameter_str, game_type);
 
-                                        if let Some(parsed) = parsed {
+                                        if let Some(mut parsed) = parsed {
+                                            if romanize {
+                                                parsed = romanize_string(parsed);
+                                            }
+
                                             if processing_type == ProcessingType::Append
                                                 && !other_translation_map.contains_key(&parsed)
                                             {
@@ -591,10 +563,13 @@ pub fn read_other(
                             }
                         } else if let Some(parameter_str) = parameters[0].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<String> =
-                                    parse_parameter(Code::System, parameter_str, game_type);
+                                let parsed: Option<String> = parse_parameter(Code::System, parameter_str, game_type);
 
-                                if let Some(parsed) = parsed {
+                                if let Some(mut parsed) = parsed {
+                                    if romanize {
+                                        parsed = romanize_string(parsed);
+                                    }
+
                                     if processing_type == ProcessingType::Append
                                         && !other_translation_map.contains_key(&parsed)
                                     {
@@ -610,10 +585,13 @@ pub fn read_other(
                             }
                         } else if let Some(parameter_str) = parameters[1].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<String> =
-                                    parse_parameter(Code::Unknown, parameter_str, game_type);
+                                let parsed: Option<String> = parse_parameter(Code::Unknown, parameter_str, game_type);
 
-                                if let Some(parsed) = parsed {
+                                if let Some(mut parsed) = parsed {
+                                    if romanize {
+                                        parsed = romanize_string(parsed);
+                                    }
+
                                     if processing_type == ProcessingType::Append
                                         && !other_translation_map.contains_key(&parsed)
                                     {
@@ -663,6 +641,7 @@ pub fn read_other(
 pub fn read_system(
     system_file_path: &Path,
     output_path: &Path,
+    romanize: bool,
     logging: bool,
     mut processing_type: &ProcessingType,
 ) {
@@ -677,17 +656,14 @@ pub fn read_system(
     let system_obj: Object = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
 
     let mut system_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
-    let mut system_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> =
-        IndexMap::default();
+    let mut system_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
     if processing_type == ProcessingType::Append {
         if system_trans_output_path.exists() {
-            for (original, translated) in
-                read_to_string(system_output_path).unwrap().split('\n').zip(
-                    read_to_string(system_trans_output_path)
-                        .unwrap()
-                        .split('\n'),
-                )
+            for (original, translated) in read_to_string(system_output_path)
+                .unwrap()
+                .split('\n')
+                .zip(read_to_string(system_trans_output_path).unwrap().split('\n'))
             {
                 system_translation_map.insert(original.to_string(), translated.to_string());
             }
@@ -703,11 +679,13 @@ pub fn read_system(
         let str: &str = string.as_str().unwrap();
 
         if !str.is_empty() {
-            let string: String = str.to_string();
+            let mut string: String = str.to_string();
 
-            if processing_type == ProcessingType::Append
-                && !system_translation_map.contains_key(&string)
-            {
+            if romanize {
+                string = romanize_string(string)
+            }
+
+            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -721,11 +699,13 @@ pub fn read_system(
         let str: &str = string.as_str().unwrap();
 
         if !str.is_empty() {
-            let string: String = str.to_string();
+            let mut string: String = str.to_string();
 
-            if processing_type == ProcessingType::Append
-                && !system_translation_map.contains_key(&string)
-            {
+            if romanize {
+                string = romanize_string(string)
+            }
+
+            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -738,11 +718,13 @@ pub fn read_system(
         let str: &str = string.as_str().unwrap();
 
         if !str.is_empty() {
-            let string: String = str.to_string();
+            let mut string: String = str.to_string();
 
-            if processing_type == ProcessingType::Append
-                && !system_translation_map.contains_key(&string)
-            {
+            if romanize {
+                string = romanize_string(string)
+            }
+
+            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -755,11 +737,13 @@ pub fn read_system(
         let str: &str = string.as_str().unwrap();
 
         if !str.is_empty() {
-            let string: String = str.to_string();
+            let mut string: String = str.to_string();
 
-            if processing_type == ProcessingType::Append
-                && !system_translation_map.contains_key(&string)
-            {
+            if romanize {
+                string = romanize_string(string)
+            }
+
+            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -773,16 +757,14 @@ pub fn read_system(
             for string in value.as_array().unwrap() {
                 if let Some(str) = string.as_str() {
                     if !str.is_empty() {
-                        let string: String = str.to_string();
+                        let mut string: String = str.to_string();
 
-                        if processing_type == ProcessingType::Append
-                            && !system_translation_map.contains_key(&string)
-                        {
-                            system_translation_map.shift_insert(
-                                system_lines.len(),
-                                string.clone(),
-                                "".into(),
-                            );
+                        if romanize {
+                            string = romanize_string(string)
+                        }
+
+                        if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+                            system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
                         }
 
                         system_lines.insert(string);
@@ -798,16 +780,14 @@ pub fn read_system(
                 let str: &str = message_string.as_str().unwrap();
 
                 if !str.is_empty() {
-                    let string: String = str.to_string();
+                    let mut string: String = str.to_string();
 
-                    if processing_type == ProcessingType::Append
-                        && !system_translation_map.contains_key(&string)
-                    {
-                        system_translation_map.shift_insert(
-                            system_lines.len(),
-                            string.clone(),
-                            "".into(),
-                        );
+                    if romanize {
+                        string = romanize_string(string)
+                    }
+
+                    if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+                        system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
                     }
 
                     system_lines.insert(string);
@@ -822,11 +802,13 @@ pub fn read_system(
         let str: &str = string.as_str().unwrap();
 
         if !str.is_empty() {
-            let string: String = str.to_string();
+            let mut string: String = str.to_string();
 
-            if processing_type == ProcessingType::Append
-                && !system_translation_map.contains_key(&string)
-            {
+            if romanize {
+                string = romanize_string(string)
+            }
+
+            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -837,16 +819,14 @@ pub fn read_system(
     // Game title, parsed just for fun
     // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
     {
-        let game_title_string: String = system_obj["gameTitle"].as_str().unwrap().to_string();
+        let mut game_title_string: String = system_obj["gameTitle"].as_str().unwrap().to_string();
 
-        if processing_type == ProcessingType::Append
-            && !system_translation_map.contains_key(&game_title_string)
-        {
-            system_translation_map.shift_insert(
-                system_lines.len(),
-                game_title_string.clone(),
-                "".into(),
-            );
+        if romanize {
+            game_title_string = romanize_string(game_title_string)
+        }
+
+        if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&game_title_string) {
+            system_translation_map.shift_insert(system_lines.len(), game_title_string.clone(), "".into());
         }
 
         system_lines.insert(game_title_string);
