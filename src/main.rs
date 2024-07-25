@@ -15,29 +15,26 @@ use sys_locale::get_locale;
 mod read;
 mod write;
 
-use read::*;
-use write::*;
-
 #[derive(PartialEq)]
 enum GameType {
     Termina,
 }
 
 #[derive(PartialEq)]
-enum ProcessingType {
+enum ProcessingMode {
     Force,
     Append,
     Default,
 }
 
-impl AsRef<ProcessingType> for ProcessingType {
-    fn as_ref(&self) -> &ProcessingType {
+impl AsRef<ProcessingMode> for ProcessingMode {
+    fn as_ref(&self) -> &ProcessingMode {
         self
     }
 }
 
-impl PartialEq<ProcessingType> for &ProcessingType {
-    fn eq(&self, other: &ProcessingType) -> bool {
+impl PartialEq<ProcessingMode> for &ProcessingMode {
+    fn eq(&self, other: &ProcessingMode) -> bool {
         *self == other
     }
 }
@@ -122,8 +119,8 @@ struct ProgramLocalization<'a> {
     output_dir_not_exist: &'a str,
     original_dir_missing: &'a str,
     translation_dirs_missing: &'a str,
-    write_log_msg: &'a str,
-    read_log_msg: &'a str,
+    file_written_msg: &'a str,
+    file_parsed_msg: &'a str,
     file_already_parsed_msg: &'a str,
     file_is_not_parsed_msg: &'a str,
     done_in_msg: &'a str,
@@ -190,8 +187,8 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_not_exist: "Output directory does not exist.",
             original_dir_missing: r#"The "original" or "data" folder in the input directory does not exist."#,
             translation_dirs_missing: r#"The "translation/maps" and/or "translation/other" folders in the input directory do not exist."#,
-            write_log_msg: "Wrote file",
-            read_log_msg: "Parsed file",
+            file_written_msg: "Wrote file",
+            file_parsed_msg: "Parsed file",
             file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             done_in_msg: "Done in:",
@@ -246,8 +243,8 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_not_exist: "Выходная директория не существует.",
             original_dir_missing: r#"Папка "original" или "data" входной директории не существует."#,
             translation_dirs_missing: r#"Папки "translation/maps" и/или "translation/other" входной директории не существуют."#,
-            write_log_msg: "Записан файл",
-            read_log_msg: "Распарсен файл",
+            file_written_msg: "Записан файл",
+            file_parsed_msg: "Распарсен файл",
             file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             done_in_msg: "Выполнено за:",
@@ -271,13 +268,13 @@ where
     let mut actual_string: String = String::from(string);
 
     while i < actual_string.len() {
-        let replacement = match &actual_string[i..].chars().next() {
+        let replacement: &str = match &actual_string[i..].chars().next() {
             Some('。') => ".",
             Some('、') => ",",
             Some('・') => "·",
             Some('゠') => "–",
             Some('＝') => "—",
-            Some('…') => {
+            Some('…') | Some('‥') => {
                 if i + 3 <= actual_string.len() {
                     i += 2;
                     "..."
@@ -296,6 +293,8 @@ where
             Some('］') | Some('】') | Some('〗') | Some('〛') => "]",
             Some('〜') => "~",
             Some('？') => "?",
+            Some('！') => "!",
+            Some('：') => ":",
             _ => {
                 i += 1;
                 continue;
@@ -563,7 +562,7 @@ fn main() {
             })
             .unwrap_or((false, false, false, false));
 
-    let enable_logging: bool = matches.get_flag("log");
+    let logging: bool = matches.get_flag("log");
     let disable_custom_parsing: bool = matches.get_flag("disable-custom-parsing");
     let romanize: bool = matches.get_flag("romanize");
 
@@ -609,42 +608,43 @@ fn main() {
     let mut wait_time: f64 = 0f64;
 
     if subcommand == "read" {
+        use read::*;
+
         let force: bool = subcommand_matches.get_flag("force");
         let append: bool = subcommand_matches.get_flag("append");
 
-        let processing_type: ProcessingType = if force {
+        let processing_type: ProcessingMode = if force {
             let start_time = Instant::now();
             println!("{}", localization.force_mode_warning);
 
             let mut buf: String = String::new();
             stdin().read_line(&mut buf).unwrap();
 
-            if buf.trim() != "Y" {
+            if buf.trim_end() != "Y" {
                 exit(0);
             }
 
             wait_time += start_time.elapsed().as_secs_f64();
 
-            ProcessingType::Force
+            ProcessingMode::Force
         } else if append {
-            ProcessingType::Append
+            ProcessingMode::Append
         } else {
-            ProcessingType::Default
+            ProcessingMode::Default
         };
 
         create_dir_all(&maps_path).unwrap();
         create_dir_all(&other_path).unwrap();
-
-        unsafe { read::LOG_MSG = localization.read_log_msg }
-        unsafe { read::FILE_ALREADY_PARSED = localization.file_already_parsed_msg }
-        unsafe { read::FILE_IS_NOT_PARSED = localization.file_is_not_parsed_msg }
 
         if !disable_maps_processing {
             read_map(
                 &original_path,
                 &maps_path,
                 romanize,
-                enable_logging,
+                logging,
+                localization.file_parsed_msg,
+                localization.file_already_parsed_msg,
+                localization.file_is_not_parsed_msg,
                 &game_type,
                 &processing_type,
             );
@@ -655,7 +655,10 @@ fn main() {
                 &original_path,
                 &other_path,
                 romanize,
-                enable_logging,
+                logging,
+                localization.file_parsed_msg,
+                localization.file_already_parsed_msg,
+                localization.file_is_not_parsed_msg,
                 &game_type,
                 &processing_type,
             );
@@ -666,11 +669,16 @@ fn main() {
                 &system_file_path,
                 &other_path,
                 romanize,
-                enable_logging,
+                logging,
+                localization.file_parsed_msg,
+                localization.file_already_parsed_msg,
+                localization.file_is_not_parsed_msg,
                 &processing_type,
             );
         }
     } else {
+        use write::*;
+
         if !maps_path.exists() || !other_path.exists() {
             panic!("{}", localization.translation_dirs_missing);
         }
@@ -688,8 +696,6 @@ fn main() {
 
         let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle-level").unwrap();
 
-        unsafe { write::LOG_MSG = localization.write_log_msg }
-
         if !disable_maps_processing {
             write_maps(
                 &maps_path,
@@ -697,7 +703,8 @@ fn main() {
                 &output_path,
                 romanize,
                 shuffle_level,
-                enable_logging,
+                logging,
+                localization.file_written_msg,
                 &game_type,
             );
         }
@@ -709,7 +716,8 @@ fn main() {
                 &output_path,
                 romanize,
                 shuffle_level,
-                enable_logging,
+                logging,
+                localization.file_written_msg,
                 &game_type,
             );
         }
@@ -721,7 +729,8 @@ fn main() {
                 &output_path,
                 romanize,
                 shuffle_level,
-                enable_logging,
+                logging,
+                localization.file_written_msg,
             );
         }
 
@@ -735,7 +744,8 @@ fn main() {
                 &plugins_path,
                 &plugins_output_path,
                 shuffle_level,
-                enable_logging,
+                logging,
+                localization.file_written_msg,
             );
         }
     }

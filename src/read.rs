@@ -1,4 +1,4 @@
-use crate::{romanize_string, Code, GameType, ProcessingType, Variable};
+use crate::{romanize_string, Code, GameType, ProcessingMode, Variable};
 use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
 use sonic_rs::{from_str, Array, JsonContainerTrait, JsonValueTrait, Object, Value};
@@ -11,32 +11,23 @@ use std::{
 };
 use xxhash_rust::xxh3::Xxh3;
 
-pub static mut LOG_MSG: &str = "";
-pub static mut FILE_ALREADY_PARSED: &str = "";
-pub static mut FILE_IS_NOT_PARSED: &str = "";
-
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>) -> Option<String> {
     if let Some(game_type) = game_type {
-        match code {
-            Code::Dialogue => match game_type {
-                // Implement custom parsing
-                _ => {}
-            },
-            Code::Choice => match game_type {
-                // Implement custom parsing
-                _ => {}
-            },
-            Code::System => match game_type {
-                GameType::Termina => {
+        match game_type {
+            GameType::Termina => match code {
+                Code::Dialogue => {}
+                Code::Choice => {}
+                Code::System => {
                     if !parameter.starts_with("Gab")
                         && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
                     {
                         return None;
                     }
                 }
+                Code::Unknown => {}
             },
-            Code::Unknown => {}
+            // custom processing for other games
         }
     }
 
@@ -46,18 +37,12 @@ fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type: &Option<GameType>) -> Option<String> {
     if let Some(game_type) = game_type {
-        match name {
-            Variable::Name => match game_type {
-                _ => {}
-            },
-            Variable::Nickname => match game_type {
-                _ => {}
-            },
-            Variable::Description => match game_type {
-                _ => {}
-            },
-            Variable::Note => match game_type {
-                GameType::Termina => {
+        match game_type {
+            GameType::Termina => match name {
+                Variable::Name => {}
+                Variable::Nickname => {}
+                Variable::Description => {}
+                Variable::Note => {
                     if !filename.starts_with("Co") && !filename.starts_with("Tr") {
                         if filename.starts_with("It") {
                             for string in [
@@ -80,6 +65,7 @@ fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type:
                     }
                 }
             },
+            // custom processing for other games
         }
     }
 
@@ -89,26 +75,33 @@ fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type:
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all Map .json files of map_path and parses them into .txt files in output_path.
 /// # Parameters
-/// * `map_path` - path to directory than contains .json files
+/// * `maps_path` - path to directory than contains .json game files
 /// * `output_path` - path to output directory
-/// * `logging` - whether to log or not
+/// * `romanize` - whether to romanize text
+/// * `logging` - whether to log
+/// * `file_parsed_msg` - message to log when file is parsed
+/// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
+/// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
 /// * `game_type` - game type for custom parsing
-/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_map(
     maps_path: &Path,
     output_path: &Path,
     romanize: bool,
     logging: bool,
+    file_parsed_msg: &str,
+    file_already_parsed_msg: &str,
+    file_is_not_parsed_msg: &str,
     game_type: &Option<GameType>,
-    mut processing_type: &ProcessingType,
+    mut processing_mode: &ProcessingMode,
 ) {
     let maps_output_path: &Path = &output_path.join("maps.txt");
     let maps_trans_output_path: &Path = &output_path.join("maps_trans.txt");
     let names_output_path: &Path = &output_path.join("names.txt");
     let names_trans_output_path: &Path = &output_path.join("names_trans.txt");
 
-    if processing_type == ProcessingType::Default && maps_trans_output_path.exists() {
-        println!("maps_trans.txt {}", unsafe { FILE_ALREADY_PARSED });
+    if processing_mode == ProcessingMode::Default && maps_trans_output_path.exists() {
+        println!("maps_trans.txt {file_already_parsed_msg}");
         return;
     }
 
@@ -116,7 +109,7 @@ pub fn read_map(
         .unwrap()
         .filter_map(|entry: Result<DirEntry, _>| match entry {
             Ok(entry) => {
-                let filename_os_string = entry.file_name();
+                let filename_os_string: OsString = entry.file_name();
                 let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
 
                 let slice: char;
@@ -150,7 +143,7 @@ pub fn read_map(
     let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
     let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
-    if processing_type == ProcessingType::Append {
+    if processing_mode == ProcessingMode::Append {
         if maps_trans_output_path.exists() {
             for (original, translated) in read_to_string(maps_output_path)
                 .unwrap()
@@ -168,8 +161,8 @@ pub fn read_map(
                 names_translation_map.insert(original.to_string(), translated.to_string());
             }
         } else {
-            println!("{}", unsafe { FILE_IS_NOT_PARSED });
-            processing_type = &ProcessingType::Default;
+            println!("{file_is_not_parsed_msg}");
+            processing_mode = &ProcessingMode::Default;
         }
     }
 
@@ -188,7 +181,7 @@ pub fn read_map(
                     display_name_string = romanize_string(display_name_string);
                 }
 
-                if processing_type == ProcessingType::Append
+                if processing_mode == ProcessingMode::Append
                     && !names_translation_map.contains_key(&display_name_string)
                 {
                     names_translation_map.shift_insert(names_lines.len(), display_name_string.clone(), "".into());
@@ -219,7 +212,7 @@ pub fn read_map(
                                 joined = romanize_string(joined);
                             }
 
-                            if processing_type == ProcessingType::Append && !maps_translation_map.contains_key(&joined)
+                            if processing_mode == ProcessingMode::Append && !maps_translation_map.contains_key(&joined)
                             {
                                 maps_translation_map.shift_insert(maps_lines.len(), joined.clone(), "".into());
                             }
@@ -257,7 +250,7 @@ pub fn read_map(
                                             parsed = romanize_string(parsed);
                                         }
 
-                                        if processing_type == ProcessingType::Append
+                                        if processing_mode == ProcessingMode::Append
                                             && !maps_translation_map.contains_key(&parsed)
                                         {
                                             maps_translation_map.shift_insert(
@@ -281,7 +274,7 @@ pub fn read_map(
                                     parsed = romanize_string(parsed);
                                 }
 
-                                if processing_type == ProcessingType::Append
+                                if processing_mode == ProcessingMode::Append
                                     && !maps_translation_map.contains_key(&parsed)
                                 {
                                     maps_translation_map.shift_insert(maps_lines.len(), parsed.clone(), "".into());
@@ -299,7 +292,7 @@ pub fn read_map(
                                     parsed = romanize_string(parsed);
                                 }
 
-                                if processing_type == ProcessingType::Append
+                                if processing_mode == ProcessingMode::Append
                                     && !maps_translation_map.contains_key(&parsed)
                                 {
                                     maps_translation_map.shift_insert(maps_lines.len(), parsed.clone(), "".into());
@@ -314,12 +307,12 @@ pub fn read_map(
         }
 
         if logging {
-            println!("{} {filename}.", unsafe { LOG_MSG });
+            println!("{file_parsed_msg} {filename}.");
         }
     }
 
     let (maps_original_content, maps_translated_content, names_original_content, names_translated_content) =
-        if processing_type == ProcessingType::Append {
+        if processing_mode == ProcessingMode::Append {
             let maps_collected: (Vec<String>, Vec<String>) = maps_translation_map.into_iter().unzip();
             let names_collected: (Vec<String>, Vec<String>) = names_translation_map.into_iter().unzip();
             (
@@ -348,18 +341,25 @@ pub fn read_map(
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all Other .json files of other_path and parses them into .txt files in output_path.
 /// # Parameters
-/// * `other_path` - path to directory than contains .json files
+/// * `other_path` - path to directory than contains .json game files
 /// * `output_path` - path to output directory
-/// * `logging` - whether to log or not
+/// * `romanize` - whether to romanize text
+/// * `logging` - whether to log
+/// * `file_parsed_msg` - message to log when file is parsed
+/// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
+/// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
 /// * `game_type` - game type for custom parsing
-/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_other(
     other_path: &Path,
     output_path: &Path,
     romanize: bool,
     logging: bool,
+    file_parsed_msg: &str,
+    file_already_parsed_msg: &str,
+    file_is_not_parsed_msg: &str,
     game_type: &Option<GameType>,
-    processing_type: &ProcessingType,
+    processing_mode: &ProcessingMode,
 ) {
     let other_files: Vec<DirEntry> = read_dir(other_path)
         .unwrap()
@@ -392,7 +392,7 @@ pub fn read_other(
         })
         .collect();
 
-    let mut inner_processing_type: &ProcessingType = processing_type;
+    let mut inner_processing_type: &ProcessingMode = processing_mode;
 
     // 401 - dialogue lines
     // 405 - credits lines
@@ -407,19 +407,17 @@ pub fn read_other(
         let other_output_path: &Path = &output_path.join(other_processed_filename.clone() + ".txt");
         let other_trans_output_path: &Path = &output_path.join(other_processed_filename + "_trans.txt");
 
-        if processing_type == ProcessingType::Default && other_trans_output_path.exists() {
-            println!(
-                "{} {}",
-                unsafe { from_utf8_unchecked(other_trans_output_path.file_name().unwrap().as_encoded_bytes(),) },
-                unsafe { FILE_ALREADY_PARSED }
-            );
+        if processing_mode == ProcessingMode::Default && other_trans_output_path.exists() {
+            println!("{} {file_already_parsed_msg}", unsafe {
+                from_utf8_unchecked(other_trans_output_path.file_name().unwrap().as_encoded_bytes())
+            });
             continue;
         }
 
         let mut other_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
         let mut other_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
-        if processing_type == ProcessingType::Append {
+        if processing_mode == ProcessingMode::Append {
             if other_trans_output_path.exists() {
                 for (original, translated) in read_to_string(other_output_path)
                     .unwrap()
@@ -429,8 +427,8 @@ pub fn read_other(
                     other_translation_map.insert(original.to_string(), translated.to_string());
                 }
             } else {
-                println!("{}", unsafe { FILE_IS_NOT_PARSED });
-                inner_processing_type = &ProcessingType::Default;
+                println!("{file_is_not_parsed_msg}");
+                inner_processing_type = &ProcessingMode::Default;
             }
         }
 
@@ -457,7 +455,7 @@ pub fn read_other(
 
                                 let replaced: String = parsed.replace('\n', r"\#");
 
-                                if inner_processing_type == ProcessingType::Append
+                                if inner_processing_type == ProcessingMode::Append
                                     && !other_translation_map.contains_key(&replaced)
                                 {
                                     other_translation_map.shift_insert(other_lines.len(), replaced.clone(), "".into());
@@ -506,7 +504,7 @@ pub fn read_other(
                                     joined = romanize_string(joined);
                                 }
 
-                                if processing_type == ProcessingType::Append
+                                if processing_mode == ProcessingMode::Append
                                     && !other_translation_map.contains_key(&joined)
                                 {
                                     other_translation_map.shift_insert(other_lines.len(), joined.clone(), "".into());
@@ -546,7 +544,7 @@ pub fn read_other(
                                                 parsed = romanize_string(parsed);
                                             }
 
-                                            if processing_type == ProcessingType::Append
+                                            if processing_mode == ProcessingMode::Append
                                                 && !other_translation_map.contains_key(&parsed)
                                             {
                                                 other_translation_map.shift_insert(
@@ -570,7 +568,7 @@ pub fn read_other(
                                         parsed = romanize_string(parsed);
                                     }
 
-                                    if processing_type == ProcessingType::Append
+                                    if processing_mode == ProcessingMode::Append
                                         && !other_translation_map.contains_key(&parsed)
                                     {
                                         other_translation_map.shift_insert(
@@ -592,7 +590,7 @@ pub fn read_other(
                                         parsed = romanize_string(parsed);
                                     }
 
-                                    if processing_type == ProcessingType::Append
+                                    if processing_mode == ProcessingMode::Append
                                         && !other_translation_map.contains_key(&parsed)
                                     {
                                         other_translation_map.shift_insert(
@@ -611,7 +609,7 @@ pub fn read_other(
             }
         }
 
-        let (original_content, translation_content) = if processing_type == ProcessingType::Append {
+        let (original_content, translation_content) = if processing_mode == ProcessingMode::Append {
             let collected: (Vec<String>, Vec<String>) = other_translation_map.into_iter().unzip();
             (collected.0.join("\n"), collected.1.join("\n"))
         } else {
@@ -626,30 +624,37 @@ pub fn read_other(
         write(other_trans_output_path, translation_content).unwrap();
 
         if logging {
-            println!("{} {filename}", unsafe { LOG_MSG });
+            println!("{file_parsed_msg} {filename}");
         }
     }
 }
 
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
-/// Reads System .json file of other_path and parses it into .txt file in output_path.
+/// Reads System .json file of system_file_path and parses it into .txt file of output_path.
 /// # Parameters
-/// * `other_path` - path to directory than contains .json files
+/// * `system_file_path` - path to directory than contains .json files
 /// * `output_path` - path to output directory
-/// * `logging` - whether to log or not
-/// * `processing_type` - whether to read in default mode, force rewrite or append new text to existing files
+/// * `romanize` - whether to romanize text
+/// * `logging` - whether to log
+/// * `file_parsed_msg` - message to log when file is parsed
+/// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
+/// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_system(
     system_file_path: &Path,
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    mut processing_type: &ProcessingType,
+    file_parsed_msg: &str,
+    file_already_parsed_msg: &str,
+    file_is_not_parsed_msg: &str,
+    mut processing_mode: &ProcessingMode,
 ) {
     let system_output_path: &Path = &output_path.join("system.txt");
     let system_trans_output_path: &Path = &output_path.join("system_trans.txt");
 
-    if processing_type == ProcessingType::Default && system_trans_output_path.exists() {
-        println!("system_trans.txt {}", unsafe { FILE_ALREADY_PARSED });
+    if processing_mode == ProcessingMode::Default && system_trans_output_path.exists() {
+        println!("system_trans.txt {file_already_parsed_msg}");
         return;
     }
 
@@ -658,7 +663,7 @@ pub fn read_system(
     let mut system_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
     let mut system_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
 
-    if processing_type == ProcessingType::Append {
+    if processing_mode == ProcessingMode::Append {
         if system_trans_output_path.exists() {
             for (original, translated) in read_to_string(system_output_path)
                 .unwrap()
@@ -668,8 +673,8 @@ pub fn read_system(
                 system_translation_map.insert(original.to_string(), translated.to_string());
             }
         } else {
-            println!("{}", unsafe { FILE_IS_NOT_PARSED });
-            processing_type = &ProcessingType::Default;
+            println!("{file_is_not_parsed_msg}");
+            processing_mode = &ProcessingMode::Default;
         }
     }
 
@@ -685,7 +690,7 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -705,7 +710,7 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -724,7 +729,7 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -743,7 +748,7 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -763,7 +768,7 @@ pub fn read_system(
                             string = romanize_string(string)
                         }
 
-                        if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+                        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                             system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
                         }
 
@@ -786,7 +791,7 @@ pub fn read_system(
                         string = romanize_string(string)
                     }
 
-                    if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+                    if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                         system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
                     }
 
@@ -808,7 +813,7 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&string) {
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
                 system_translation_map.shift_insert(system_lines.len(), string.clone(), "".into());
             }
 
@@ -825,14 +830,14 @@ pub fn read_system(
             game_title_string = romanize_string(game_title_string)
         }
 
-        if processing_type == ProcessingType::Append && !system_translation_map.contains_key(&game_title_string) {
+        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&game_title_string) {
             system_translation_map.shift_insert(system_lines.len(), game_title_string.clone(), "".into());
         }
 
         system_lines.insert(game_title_string);
     }
 
-    let (original_content, translated_content) = if processing_type == ProcessingType::Append {
+    let (original_content, translated_content) = if processing_mode == ProcessingMode::Append {
         let collected: (Vec<String>, Vec<String>) = system_translation_map.into_iter().unzip();
         (collected.0.join("\n"), collected.1.join("\n"))
     } else {
@@ -847,7 +852,7 @@ pub fn read_system(
     write(system_trans_output_path, translated_content).unwrap();
 
     if logging {
-        println!("{} System.json.", unsafe { LOG_MSG });
+        println!("{file_parsed_msg} System.json.");
     }
 }
 
