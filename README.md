@@ -28,21 +28,40 @@ A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice
 Usage: rvpacker-json-txt.exe [OPTIONS] [COMMAND]
 
 Commands:
-  read   Parses files from "original" or "data" folders of input directory to "translation" folder of output
-             directory.
-  write  Writes translated files using original files from "original" or "data" folders of input directory and
-             writes results to "output" folder of output directory.
+  read
+          Parses files from "original" or "data" folders of input directory to "translation" folder of output directory.
+  write
+          Writes translated files using original files from "original" or "data" folders of input directory and writes
+          results to "output" folder of output directory.
 
 Options:
-  -i, --input-dir <INPUT_PATH>    Input directory, containing folders "original" or "data" and "translation", with
-                                  original game text and .txt files with translation respectively.
-  -o, --output-dir <OUTPUT_PATH>  Output directory, containing an "output" folder with folders "data" and "js",
-                                  containing compiled .txt files with translation.
-  -l, --language <LANGUAGE>       Sets the localization of the tool to the selected language. Example: --language en.
-                                  [Allowed values: ru, en]
-      --log                       Enables logging.
-      --disable-custom-parsing    Disables built-in custom parsing for some games.
-  -h, --help                      Prints the program's help message or for the entered subcommand.
+  -i, --input-dir <INPUT_PATH>
+          When reading: Input directory, containing folder "original" or "data" with original game files.
+          When writing: Input directory, containing folder "original" or "data" with original game files, and folder
+          "translation" with translation .txt files.
+  -o, --output-dir <OUTPUT_PATH>
+          When reading: Output directory, where a "translation" folder with translation .txt files will be created.
+          When writing: Output directory, where an "output" folder with "data" and "js" subfolders with game files with
+          translated text from .txt files will be created.
+      --disable-processing <FILENAMES>
+          Skips processing specified files.
+          Example: --disable-processing=maps,other,system.
+          [Allowed values: maps, other, system, plugins]
+  -r, --romanize
+          When reading: If you parsing text from a Japanese game, that contains symbols like 「」, which are just the
+          Japanese quotation marks, it automatically replaces these symbols by their roman equivalents. (in this case,
+          "")
+          When writing: Only use this flag if you've read text with it, to correctly write all files.
+      --disable-custom-parsing
+          Disables built-in custom parsing for some games.
+  -l, --language <LANGUAGE>
+          Sets the localization of the tool to the selected language.
+          Example: --language en.
+          [Allowed values: en, ru]
+      --log
+          Enables logging.
+  -h, --help
+          Prints the program's help message or for the entered subcommand.
 ```
 
 Examples:
