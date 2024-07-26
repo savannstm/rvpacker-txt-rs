@@ -146,7 +146,7 @@ impl<'a> ProgramLocalization<'a> {
         ProgramLocalization {
             // About message and templates
             about_msg: cstr!("<bold>A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
+            help_template: cstr!("{about}\n\n<underline,bold>Usage:</> rvpacker-json-txt COMMAND [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
             subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
 
             // Command descriptions
@@ -206,7 +206,7 @@ impl<'a> ProgramLocalization<'a> {
     fn load_russian() -> Self {
         ProgramLocalization {
             about_msg: cstr!("<bold>Инструмент, позволяющий парсить текст .json файлов RPG Maker MV/MZ игр в .txt файлы, а затем записывать их обратно.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
+            help_template: cstr!("{about}\n\n<underline,bold>Использование:</> rvpacker-json-txt КОМАНДА [ОПЦИИ]\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
             subcommand_help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"),
 
             read_command_desc: cstr!(r#"<bold>Парсит файлы из папки "original" или "data" входной директории в папку "translation" выходной директории.</bold>"#),
@@ -505,11 +505,13 @@ fn main() {
         .action(ArgAction::Help)
         .display_order(100);
 
+    let silent_flag: Arg = Arg::new("silent").long("silent").hide(true).action(ArgAction::SetTrue);
+
     let read_subcommand: Command = Command::new("read")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.read_command_desc)
-        .args([force_flag, append_flag])
+        .args([force_flag, append_flag, silent_flag])
         .arg(&help_flag);
 
     let write_subcommand: Command = Command::new("write")
@@ -612,19 +614,22 @@ fn main() {
 
         let force: bool = subcommand_matches.get_flag("force");
         let append: bool = subcommand_matches.get_flag("append");
+        let silent: bool = subcommand_matches.get_flag("silent");
 
         let processing_type: ProcessingMode = if force {
-            let start_time = Instant::now();
-            println!("{}", localization.force_mode_warning);
+            if !silent {
+                let start_time: Instant = Instant::now();
+                println!("{}", localization.force_mode_warning);
 
-            let mut buf: String = String::new();
-            stdin().read_line(&mut buf).unwrap();
+                let mut buf: String = String::new();
+                stdin().read_line(&mut buf).unwrap();
 
-            if buf.trim_end() != "Y" {
-                exit(0);
+                if buf.trim_end() != "Y" {
+                    exit(0);
+                }
+
+                wait_time += start_time.elapsed().as_secs_f64();
             }
-
-            wait_time += start_time.elapsed().as_secs_f64();
 
             ProcessingMode::Force
         } else if append {

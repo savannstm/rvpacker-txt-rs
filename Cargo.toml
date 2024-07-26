@@ -1,6 +1,6 @@
 [package]
 name = "rvpacker-json-txt"
-version = "1.7.1"
+version = "1.7.2"
 edition = "2021"
 
 [dependencies]
@@ -10,6 +10,6 @@ sys-locale = "^0.3.1"
 clap = { version = "^4.5.7", features = ["wrap_help"] }
 color-print = "^0.3.6"
 fancy-regex = "^0.13.0"
-xxhash-rust = {version = "0.8.11", features = ["xxh3"]}
+xxhash-rust = { version = "0.8.11", features = ["xxh3"] }
 sonic-rs = "0.3.8"
 fastrand = "2.1.0"
