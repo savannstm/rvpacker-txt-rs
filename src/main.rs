@@ -1,10 +1,12 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
 use fastrand::seed;
+use lazy_static::lazy_static;
+use regex::Regex;
 use sonic_rs::{from_str, JsonValueTrait, Object};
 use std::{
     env::args,
-    fs::{create_dir_all, read_to_string},
+    fs::{create_dir_all, read_to_string, write},
     io::stdin,
     path::{Path, PathBuf},
     process::exit,
@@ -94,13 +96,12 @@ struct ProgramLocalization<'a> {
     shuffle_level_arg_desc: &'a str,
     disable_processing_arg_desc: &'a str,
 
-    romanize_read_desc: &'a str,
-    romanize_write_desc: &'a str,
+    romanize_desc: &'a str,
 
     force_arg_desc: &'a str,
     append_arg_desc: &'a str,
 
-    disable_custom_parsing_desc: &'a str,
+    disable_custom_processing_desc: &'a str,
 
     language_arg_desc: &'a str,
 
@@ -125,6 +126,9 @@ struct ProgramLocalization<'a> {
     file_is_not_parsed_msg: &'a str,
     done_in_msg: &'a str,
     force_mode_warning: &'a str,
+    custom_processing_enabled_msg: &'a str,
+    enabling_romanize_metadata_msg: &'a str,
+    disabling_custom_processing_metadata_msg: &'a str,
 
     // Misc
     possible_values: &'a str,
@@ -145,7 +149,7 @@ impl<'a> ProgramLocalization<'a> {
     fn load_english() -> Self {
         ProgramLocalization {
             // About message and templates
-            about_msg: cstr!("<bold>A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.</bold>"),
+            about_msg: cstr!("<bold>This tool allows to parse RPG Maker MV/MZ games text to .txt files and write them back to their initial form.</bold>"),
             help_template: cstr!("{about}\n\n<underline,bold>Usage:</> rvpacker-json-txt COMMAND [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
             subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
 
@@ -163,13 +167,12 @@ impl<'a> ProgramLocalization<'a> {
             shuffle_level_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
             disable_processing_arg_desc: "Skips processing specified files.",
 
-            romanize_read_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents. (in this case, "")"#,
-            romanize_write_desc: "Only use this flag if you've read text with it, to correctly write all files.",
+            romanize_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents (in this case, ""). This flag will automatically be used when writing if you parsed game text with it."#,
 
             force_arg_desc: "Force rewrite all files. Cannot be used with --append.",
             append_arg_desc: "When the game, which files you've parsed, or the rvpacker-json-txt updates, you probably should re-read game files using --append flag, to append any unparsed text to the existing without overwriting translation. Cannot be used with --force.",
 
-            disable_custom_parsing_desc: "Disables built-in custom parsing for some games.",
+            disable_custom_processing_desc: "Disables built-in custom processing, implemented for some games. This flag will automatically be used when writing if you parsed game text with it.",
             language_arg_desc: "Sets the localization of the tool to the selected language.",
 
             log_arg_desc: "Enables logging.",
@@ -193,6 +196,9 @@ impl<'a> ProgramLocalization<'a> {
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             done_in_msg: "Done in:",
             force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the folder, including _trans. Input 'Y' to continue.",
+            custom_processing_enabled_msg: "Custom processing for this game will be used. Use --disable-custom-processing to disable it.",
+            enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
+            disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from previous read.",
 
             // Misc
             possible_values: "Allowed values:",
@@ -221,13 +227,12 @@ impl<'a> ProgramLocalization<'a> {
             shuffle_level_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
             disable_processing_arg_desc: "Не обрабатывает указанные файлы.",
 
-            romanize_read_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, "")"#,
-            romanize_write_desc: "Используйте этот флаг, лишь если вы прочитали текст с его использованием, чтобы корректно записать все файлы.",
+            romanize_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, "")"#,
 
             force_arg_desc: "Принудительно перезаписать все файлы. Не может быть использован с --append.",
             append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-json-txt обновляется, вы, наверное, должны перечитать файлы игры используя флаг --append, чтобы добавить любой нераспарсенный текст к имеющемуся без перезаписи прогресса. Не может быть использован с --force.",
 
-            disable_custom_parsing_desc: "Отключает использование индивидуальных способов парсинга файлов для некоторых игр.",
+            disable_custom_processing_desc: "Отключает использование индивидуальных способов обработки текста, имплементированных для некоторых игр. Этот флаг будет автоматически применён при записи, если текст игры был прочитан с его использованием.",
             language_arg_desc: "Устанавливает локализацию инструмента на выбранный язык.",
 
             log_arg_desc: "Включает логирование.",
@@ -249,6 +254,9 @@ impl<'a> ProgramLocalization<'a> {
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             done_in_msg: "Выполнено за:",
             force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, включая _trans-файлы. Введите Y, чтобы продолжить.",
+            custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. Используйте --disable-custom-processing, чтобы отключить её.",
+            enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста будет использована.",
+            disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная обработка текста будет выключена.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
@@ -259,55 +267,48 @@ impl<'a> ProgramLocalization<'a> {
     }
 }
 
+lazy_static! {pub static ref STRING_IS_ONLY_SYMBOLS_RE: Regex = Regex::new(r#"^[.()+-:;\[\]^~%&!№$@`*/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s]+$"#).unwrap();}
+
 pub fn romanize_string<T>(string: T) -> String
 where
     T: AsRef<str>,
     std::string::String: std::convert::From<T>,
 {
-    let mut i: usize = 0;
-    let mut actual_string: String = String::from(string);
+    let actual_string: String = String::from(string);
+    let mut result: String = String::new();
 
-    while i < actual_string.len() {
-        let replacement: &str = match &actual_string[i..].chars().next() {
-            Some('。') => ".",
-            Some('、') => ",",
-            Some('・') => "·",
-            Some('゠') => "–",
-            Some('＝') => "—",
-            Some('…') | Some('‥') => {
-                if i + 3 <= actual_string.len() {
-                    i += 2;
-                    "..."
-                } else {
-                    i += 1;
-                    continue;
-                }
-            }
-            Some('「') | Some('」') | Some('〈') | Some('〉') => "'",
-            Some('『') | Some('』') | Some('《') | Some('》') => "\"",
-            Some('（') | Some('〔') | Some('｟') | Some('〘') => "(",
-            Some('）') | Some('〕') | Some('｠') | Some('〙') => ")",
-            Some('｛') => "{",
-            Some('｝') => "}",
-            Some('［') | Some('【') | Some('〖') | Some('〚') => "[",
-            Some('］') | Some('】') | Some('〗') | Some('〛') => "]",
-            Some('〜') => "~",
-            Some('？') => "?",
-            Some('！') => "!",
-            Some('：') => ":",
+    for char in actual_string.chars() {
+        let replacement: &str = match char {
+            '。' => ".",
+            '、' | '，' => ",",
+            '・' => "·",
+            '゠' => "–",
+            '＝' | 'ー' => "—",
+            '「' | '」' | '〈' | '〉' => "'",
+            '『' | '』' | '《' | '》' => "\"",
+            '（' | '〔' | '｟' | '〘' => "(",
+            '）' | '〕' | '｠' | '〙' => ")",
+            '｛' => "{",
+            '｝' => "}",
+            '［' | '【' | '〖' | '〚' => "[",
+            '］' | '】' | '〗' | '〛' => "]",
+            '〜' => "~",
+            '？' => "?",
+            '！' => "!",
+            '：' => ":",
+            '※' => "*",
+            '…' | '‥' => "...",
             _ => {
-                i += 1;
+                result.push(char);
                 continue;
             }
         };
 
-        actual_string.replace_range(i..i + replacement.len(), replacement);
-        i += 1;
+        result.push_str(replacement);
     }
 
-    actual_string
+    result
 }
-
 fn get_game_type(system_file_path: &Path) -> Option<GameType> {
     let system_obj: Object = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
@@ -354,17 +355,15 @@ fn main() {
     let (language, subcommand): (Language, Option<String>) = preparse_arguments();
     let localization: ProgramLocalization = ProgramLocalization::new(language);
 
-    let (input_dir_arg_desc, output_dir_arg_desc, romanize_arg_desc) = if let Some(subcommand) = subcommand {
+    let (input_dir_arg_desc, output_dir_arg_desc) = if let Some(subcommand) = subcommand {
         match subcommand.as_str() {
             "read" => (
                 localization.input_dir_arg_read_desc.to_string(),
                 localization.output_dir_arg_read_desc.to_string(),
-                localization.romanize_read_desc.to_string(),
             ),
             "write" => (
                 localization.input_dir_arg_write_desc.to_string(),
                 localization.output_dir_arg_write_desc.to_string(),
-                localization.romanize_write_desc.to_string(),
             ),
             _ => unreachable!(),
         }
@@ -383,13 +382,6 @@ fn main() {
                 localization.output_dir_arg_read_desc,
                 localization.when_writing,
                 localization.output_dir_arg_write_desc
-            ),
-            format!(
-                "{} {}\n{} {}",
-                localization.when_reading,
-                localization.romanize_read_desc,
-                localization.when_writing,
-                localization.romanize_write_desc
             ),
         )
     };
@@ -452,7 +444,7 @@ fn main() {
         .long("romanize")
         .global(true)
         .action(ArgAction::SetTrue)
-        .help(romanize_arg_desc)
+        .help(localization.romanize_desc)
         .display_order(4);
 
     let force_flag: Arg = Arg::new("force")
@@ -470,11 +462,11 @@ fn main() {
         .help(localization.append_arg_desc)
         .display_order(96);
 
-    let disable_custom_parsing_flag: Arg = Arg::new("disable-custom-parsing")
-        .long("disable-custom-parsing")
+    let disable_custom_processing_flag: Arg = Arg::new("disable-custom-processing")
+        .long("disable-custom-processing")
         .action(ArgAction::SetTrue)
         .global(true)
-        .help(localization.disable_custom_parsing_desc)
+        .help(localization.disable_custom_processing_desc)
         .display_order(97);
 
     let language_arg: Arg = Arg::new("language")
@@ -536,7 +528,7 @@ fn main() {
             disable_processing_arg,
             romanize_arg,
             language_arg,
-            disable_custom_parsing_flag,
+            disable_custom_processing_flag,
             log_flag,
             help_flag,
         ])
@@ -565,8 +557,8 @@ fn main() {
             .unwrap_or((false, false, false, false));
 
     let logging: bool = matches.get_flag("log");
-    let disable_custom_parsing: bool = matches.get_flag("disable-custom-parsing");
-    let romanize: bool = matches.get_flag("romanize");
+    let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
+    let mut romanize: bool = matches.get_flag("romanize");
 
     let input_dir: &Path = matches.get_one::<PathBuf>("input-dir").unwrap();
 
@@ -590,22 +582,31 @@ fn main() {
         }
     }
 
-    let (maps_path, other_path) = if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
-        (input_dir.join("translation/maps"), input_dir.join("translation/other"))
+    let (maps_path, other_path, metadata_file_path) = if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
+        (
+            input_dir.join("translation/maps"),
+            input_dir.join("translation/other"),
+            input_dir.join("translation/.rvpacker-json-txt-metadata.json"),
+        )
     } else {
         (
             output_dir.join("translation/maps"),
             output_dir.join("translation/other"),
+            output_dir.join("translation/.rvpacker-json-txt-metadata.json"),
         )
     };
 
     let system_file_path: PathBuf = original_path.join("System.json");
 
-    let game_type: Option<GameType> = if disable_custom_parsing {
+    let mut game_type: Option<GameType> = if disable_custom_processing {
         None
     } else {
         get_game_type(&system_file_path)
     };
+
+    if game_type.is_some() {
+        println!("{}", localization.custom_processing_enabled_msg);
+    }
 
     let mut wait_time: f64 = 0f64;
 
@@ -640,6 +641,14 @@ fn main() {
 
         create_dir_all(&maps_path).unwrap();
         create_dir_all(&other_path).unwrap();
+
+        println!("{}", metadata_file_path.display());
+
+        write(
+            metadata_file_path,
+            format!(r#"{{"romanize": {romanize}, "disableCustomProcessing": {disable_custom_processing}}}"#),
+        )
+        .unwrap();
 
         if !disable_maps_processing {
             read_map(
@@ -700,6 +709,23 @@ fn main() {
         create_dir_all(&plugins_output_path).unwrap();
 
         let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle-level").unwrap();
+
+        if metadata_file_path.exists() {
+            let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
+
+            let romanize_bool: bool = metadata["romanize"].as_bool().unwrap();
+            let disable_custom_processing_bool: bool = metadata["disableCustomProcessing"].as_bool().unwrap();
+
+            if romanize_bool {
+                println!("{}", localization.enabling_romanize_metadata_msg);
+                romanize = romanize_bool;
+            }
+
+            if disable_custom_processing_bool && game_type.is_some() {
+                println!("{}", localization.disabling_custom_processing_metadata_msg);
+                game_type = None;
+            }
+        }
 
         if !disable_maps_processing {
             write_maps(

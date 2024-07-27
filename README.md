@@ -23,9 +23,9 @@ Files with the .exe extension are designed for Windows x64, while files without 
 You can get help on usage by calling `json-writer -h.`
 
 ```
-A tool that parses .json files of RPG Maker MV/MZ games into .txt files and vice versa.
+This tool allows to parse RPG Maker MV/MZ games text to .txt files and write them back to their initial form.
 
-Usage: rvpacker-json-txt.exe [OPTIONS] [COMMAND]
+Usage: rvpacker-json-txt COMMAND [OPTIONS]
 
 Commands:
   read
@@ -48,12 +48,12 @@ Options:
           Example: --disable-processing=maps,other,system.
           [Allowed values: maps, other, system, plugins]
   -r, --romanize
-          When reading: If you parsing text from a Japanese game, that contains symbols like 「」, which are just the
-          Japanese quotation marks, it automatically replaces these symbols by their roman equivalents. (in this case,
-          "")
-          When writing: Only use this flag if you've read text with it, to correctly write all files.
-      --disable-custom-parsing
-          Disables built-in custom parsing for some games.
+          If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation
+          marks, it automatically replaces these symbols by their roman equivalents (in this case, ""). This flag will
+          automatically be used when writing if you parsed game text with it.
+      --disable-custom-processing
+          Disables built-in custom processing, implemented for some games. This flag will automatically be used when
+          writing if you parsed game text with it.
   -l, --language <LANGUAGE>
           Sets the localization of the tool to the selected language.
           Example: --language en.

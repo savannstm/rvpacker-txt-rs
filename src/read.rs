@@ -1,4 +1,4 @@
-use crate::{romanize_string, Code, GameType, ProcessingMode, Variable};
+use crate::{romanize_string, Code, GameType, ProcessingMode, Variable, STRING_IS_ONLY_SYMBOLS_RE};
 use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
 use sonic_rs::{from_str, Array, JsonContainerTrait, JsonValueTrait, Object, Value};
@@ -13,6 +13,10 @@ use xxhash_rust::xxh3::Xxh3;
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>) -> Option<String> {
+    if STRING_IS_ONLY_SYMBOLS_RE.is_match(parameter) {
+        return None;
+    }
+
     if let Some(game_type) = game_type {
         match game_type {
             GameType::Termina => match code {
@@ -36,6 +40,10 @@ fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type: &Option<GameType>) -> Option<String> {
+    if STRING_IS_ONLY_SYMBOLS_RE.is_match(variable) {
+        return None;
+    }
+
     if let Some(game_type) = game_type {
         match game_type {
             GameType::Termina => match name {

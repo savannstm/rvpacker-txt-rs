@@ -1,7 +1,7 @@
 use crate::{romanize_string, Code, GameType, IntoRSplit, Variable};
-use fancy_regex::{Captures, Error, Match, Regex};
 use fastrand::shuffle;
 use rayon::prelude::*;
+use regex::{Captures, Match, Regex};
 use sonic_rs::{
     from_str, to_string, to_value, Array, JsonContainerTrait, JsonValueMutTrait, JsonValueTrait, Object, Value,
 };
@@ -17,10 +17,7 @@ use xxhash_rust::xxh3::Xxh3;
 
 pub fn shuffle_words(string: &str) -> String {
     let re: Regex = Regex::new(r"\S+").unwrap();
-    let mut words: Vec<&str> = re
-        .find_iter(string)
-        .filter_map(|m: Result<Match, Error>| m.ok().map(|m: Match| m.as_str()))
-        .collect();
+    let mut words: Vec<&str> = re.find_iter(string).map(|m: Match| m.as_str()).collect();
 
     shuffle(&mut words);
 
