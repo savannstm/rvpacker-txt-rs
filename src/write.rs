@@ -313,8 +313,8 @@ pub fn write_maps(
                                 let translated: Option<String> =
                                     get_parameter_translated(Code::Dialogue, &joined, &maps_translation_map, game_type);
 
-                                if let Some(text) = translated {
-                                    let split: Vec<&str> = text.split('\n').collect();
+                                if let Some(translated) = translated {
+                                    let split: Vec<&str> = translated.split('\n').collect();
                                     let split_length: usize = split.len();
                                     let line_length: usize = line.len();
 
@@ -555,8 +555,8 @@ pub fn write_other(
                                         game_type,
                                     );
 
-                                    if let Some(text) = translated {
-                                        obj[variable_name] = to_value(&text).unwrap();
+                                    if let Some(translated) = translated {
+                                        obj[variable_name] = to_value(&translated).unwrap();
                                     }
                                 }
                             }
@@ -613,8 +613,8 @@ pub fn write_other(
                                     game_type,
                                 );
 
-                                if let Some(text) = translated {
-                                    let split: Vec<&str> = text.split('\n').collect();
+                                if let Some(translated) = translated {
+                                    let split: Vec<&str> = translated.split('\n').collect();
                                     let split_length: usize = split.len();
                                     let line_length: usize = line.len();
 
@@ -764,8 +764,8 @@ pub fn write_system(
             shuffle(&mut system_translated_text);
         }
         2 => {
-            for text_string in system_translated_text.iter_mut() {
-                *text_string = shuffle_words(text_string);
+            for translated_string in system_translated_text.iter_mut() {
+                *translated_string = shuffle_words(translated_string);
             }
         }
         _ => {}
@@ -797,8 +797,12 @@ pub fn write_system(
                 string = romanize_string(string);
             }
 
-            if let Some(text) = system_translation_map.get(&string) {
-                *value = to_value(text).unwrap();
+            if let Some(translated) = system_translation_map.get(&string) {
+                if translated.is_empty() {
+                    return;
+                }
+
+                *value = to_value(translated).unwrap();
             }
         });
 
@@ -813,8 +817,12 @@ pub fn write_system(
                 string = romanize_string(string);
             }
 
-            if let Some(text) = system_translation_map.get(&string) {
-                *value = to_value(text).unwrap();
+            if let Some(translated) = system_translation_map.get(&string) {
+                if translated.is_empty() {
+                    return;
+                }
+
+                *value = to_value(translated).unwrap();
             }
         });
 
@@ -829,8 +837,12 @@ pub fn write_system(
                 string = romanize_string(string);
             }
 
-            if let Some(text) = system_translation_map.get(&string) {
-                *value = to_value(text).unwrap();
+            if let Some(translated) = system_translation_map.get(&string) {
+                if translated.is_empty() {
+                    return;
+                }
+
+                *value = to_value(translated).unwrap();
             }
         });
 
@@ -845,8 +857,12 @@ pub fn write_system(
                 string = romanize_string(string);
             }
 
-            if let Some(text) = system_translation_map.get(&string) {
-                *value = to_value(text).unwrap();
+            if let Some(translated) = system_translation_map.get(&string) {
+                if translated.is_empty() {
+                    return;
+                }
+
+                *value = to_value(translated).unwrap();
             }
         });
 
@@ -869,8 +885,12 @@ pub fn write_system(
                                 string = romanize_string(string);
                             }
 
-                            if let Some(text) = system_translation_map.get(&string) {
-                                *subvalue = to_value(text).unwrap();
+                            if let Some(translated) = system_translation_map.get(&string) {
+                                if translated.is_empty() {
+                                    return;
+                                }
+
+                                *subvalue = to_value(translated).unwrap();
                             }
                         }
                     });
@@ -891,8 +911,12 @@ pub fn write_system(
                             string = romanize_string(string)
                         }
 
-                        if let Some(text) = system_translation_map.get(&string) {
-                            *value = to_value(text).unwrap();
+                        if let Some(translated) = system_translation_map.get(&string) {
+                            if translated.is_empty() {
+                                return;
+                            }
+
+                            *value = to_value(translated).unwrap();
                         }
                     });
             }
@@ -909,8 +933,12 @@ pub fn write_system(
                 string = romanize_string(string);
             }
 
-            if let Some(text) = system_translation_map.get(&string) {
-                *value = to_value(text).unwrap();
+            if let Some(translated) = system_translation_map.get(&string) {
+                if translated.is_empty() {
+                    return;
+                }
+
+                *value = to_value(translated).unwrap();
             }
         });
 

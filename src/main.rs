@@ -351,7 +351,6 @@ fn preparse_arguments() -> (Language, Option<String>) {
 }
 
 fn main() {
-    seed(69);
     let start_time: Instant = Instant::now();
 
     let (language, subcommand): (Language, Option<String>) = preparse_arguments();
@@ -709,6 +708,10 @@ fn main() {
         create_dir_all(&plugins_output_path).unwrap();
 
         let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle-level").unwrap();
+
+        if shuffle_level > 0 {
+            seed(69);
+        }
 
         if metadata_file_path.exists() {
             let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
