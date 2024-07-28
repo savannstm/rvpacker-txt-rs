@@ -19,19 +19,25 @@ fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>
 
     if let Some(game_type) = game_type {
         match game_type {
-            GameType::Termina => match code {
-                Code::Dialogue => {}
-                Code::Choice => {}
-                Code::System => {
-                    if !parameter.starts_with("Gab")
-                        && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
-                    {
-                        return None;
-                    }
+            GameType::Termina => {
+                if parameter
+                    .chars()
+                    .all(|char: char| char.is_ascii_lowercase() || char.is_ascii_punctuation())
+                {
+                    return None;
                 }
-                Code::Unknown => {}
-            },
-            // custom processing for other games
+
+                match code {
+                    Code::System => {
+                        if !parameter.starts_with("Gab")
+                            && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
+                        {
+                            return None;
+                        }
+                    }
+                    _ => {}
+                }
+            } // custom processing for other games
         }
     }
 
@@ -39,45 +45,162 @@ fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>
 }
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
-fn parse_variable(mut variable: &str, name: Variable, filename: &str, game_type: &Option<GameType>) -> Option<String> {
-    if STRING_IS_ONLY_SYMBOLS_RE.is_match(variable) {
+fn parse_variable(
+    mut variable_text: &str,
+    variable_name: &Variable,
+    filename: &str,
+    game_type: &Option<GameType>,
+) -> Option<String> {
+    if STRING_IS_ONLY_SYMBOLS_RE.is_match(variable_text) {
         return None;
     }
 
     if let Some(game_type) = game_type {
         match game_type {
-            GameType::Termina => match name {
-                Variable::Name => {}
-                Variable::Nickname => {}
-                Variable::Description => {}
-                Variable::Note => {
-                    if !filename.starts_with("Co") && !filename.starts_with("Tr") {
-                        if filename.starts_with("It") {
+            GameType::Termina => {
+                if variable_text.contains("---") || variable_text.starts_with("///") {
+                    return None;
+                }
+
+                match variable_name {
+                    Variable::Name | Variable::Nickname => {
+                        if filename.starts_with("Ac") {
+                            if ![
+                                "Levi",
+                                "Marina",
+                                "Daan",
+                                "Abella",
+                                "O'saa",
+                                "Blood golem",
+                                "Marcoh",
+                                "Karin",
+                                "Olivia",
+                                "Ghoul",
+                                "Villager",
+                                "August",
+                                "Caligura",
+                                "Henryk",
+                                "Pav",
+                                "Tanaka",
+                                "Samarie",
+                            ]
+                            .contains(&variable_text)
+                            {
+                                return None;
+                            }
+                        } else if filename.starts_with("Ar") {
+                            if variable_text.starts_with("test_armor") {
+                                return None;
+                            }
+                        } else if filename.starts_with("Cl") {
+                            if [
+                                "Girl",
+                                "Kid demon",
+                                "Captain",
+                                "Marriage",
+                                "Marriage2",
+                                "Baby demon",
+                                "Buckman",
+                                "Nas'hrah",
+                                "Skeleton",
+                            ]
+                            .contains(&variable_text)
+                            {
+                                return None;
+                            }
+                        } else if filename.starts_with("En") {
+                            if ["Spank Tank", "giant", "test"].contains(&variable_text) {
+                                return None;
+                            }
+                        } else if filename.starts_with("It") {
+                            if [
+                                "Torch",
+                                "Flashlight",
+                                "Stick",
+                                "Quill",
+                                "Empty scroll",
+                                "Soul stone_NOT_USE",
+                                "Cube of depths",
+                                "Worm juice",
+                                "Silver shilling",
+                                "Coded letter #1 - UNUSED",
+                                "Black vial",
+                                "Torturer's notes 1",
+                                "Purple vial",
+                                "Orange vial",
+                                "Red vial",
+                                "Green vial",
+                                "Pinecone pig instructions",
+                                "Grilled salmonsnake meat",
+                                "Empty scroll",
+                                "Water vial",
+                                "Blood vial",
+                                "Devil's Grass",
+                                "Stone",
+                                "Codex #1",
+                                "The Tale of the Pocketcat I",
+                                "The Tale of the Pocketcat II",
+                            ]
+                            .contains(&variable_text)
+                                || variable_text.starts_with("The Fellowship")
+                                || variable_text.starts_with("Studies of")
+                                || variable_text.starts_with("Blueish")
+                                || variable_text.starts_with("Skeletal")
+                                || variable_text.ends_with("soul")
+                                || variable_text.ends_with("schematics")
+                            {
+                                return None;
+                            }
+                        } else if filename.starts_with("We") && variable_text == "makeshift2" {
+                            return None;
+                        }
+                    }
+                    Variable::Note => {
+                        if let Some(first_char) = variable_text.chars().next() {
+                            if (first_char.is_ascii_alphabetic() || first_char == '"') && variable_text.contains("\n\n")
+                            {
+                                return Some(
+                                    variable_text
+                                        .trim()
+                                        .split_once('\n')
+                                        .unwrap_or((variable_text, ""))
+                                        .0
+                                        .to_string(),
+                                );
+                            }
+                        }
+
+                        if variable_text.split('\n').all(|line: &str| {
+                            line.is_empty()
+                                || (line.starts_with('<') && line.ends_with('>'))
+                                || (line.starts_with(|char: char| char.is_ascii_lowercase())
+                                    && line.ends_with(|char: char| char.is_numeric()))
+                        }) {
+                            return None;
+                        }
+
+                        if filename.starts_with("Ac") {
+                            return None;
+                        } else if filename.starts_with("It") {
                             for string in [
                                 "<Menu Category: Items>",
                                 "<Menu Category: Food>",
                                 "<Menu Category: Healing>",
                                 "<Menu Category: Body bag>",
                             ] {
-                                if variable.contains(string) {
-                                    return Some(string.to_string());
+                                if variable_text.contains(string) {
+                                    return None;
                                 }
                             }
-                        } else if filename.starts_with("Cl")
-                            || (filename.starts_with("Ar") && !variable.starts_with("///"))
-                        {
-                            return Some(variable.to_string());
                         }
-
-                        return None;
                     }
+                    _ => {}
                 }
-            },
-            // custom processing for other games
+            } // custom processing for other games
         }
     }
 
-    Some(variable.to_string())
+    Some(variable_text.to_string())
 }
 
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
@@ -212,24 +335,32 @@ pub fn read_map(
                 for list in page["list"].as_array().unwrap() {
                     let code: u64 = list["code"].as_u64().unwrap();
 
-                    if !ALLOWED_CODES.contains(&code) {
-                        if in_sequence {
-                            let mut joined: String = line.join(r"\#").trim().to_string();
+                    if in_sequence && code != 401 {
+                        if !line.is_empty() {
+                            let mut joined: String = line.join("\n").trim().replace('\n', r"\#");
 
                             if romanize {
                                 joined = romanize_string(joined);
                             }
 
-                            if processing_mode == ProcessingMode::Append && !maps_translation_map.contains_key(&joined)
-                            {
-                                maps_translation_map.shift_insert(maps_lines.len(), joined.clone(), "".into());
+                            let parsed: Option<String> = parse_parameter(Code::Dialogue, &joined, game_type);
+
+                            if let Some(parsed) = parsed {
+                                if processing_mode == ProcessingMode::Append
+                                    && !maps_translation_map.contains_key(&joined)
+                                {
+                                    maps_translation_map.shift_insert(maps_lines.len(), parsed.clone(), "".into());
+                                }
+
+                                maps_lines.insert(parsed);
                             }
 
-                            maps_lines.insert(joined);
-
                             line.clear();
-                            in_sequence = false;
                         }
+                        in_sequence = false;
+                    }
+
+                    if !ALLOWED_CODES.contains(&code) {
                         continue;
                     }
 
@@ -238,12 +369,8 @@ pub fn read_map(
                     if code == 401 {
                         if let Some(parameter_str) = parameters[0].as_str() {
                             if !parameter_str.is_empty() {
-                                let parsed: Option<String> = parse_parameter(Code::Dialogue, parameter_str, game_type);
-
-                                if let Some(parsed) = parsed {
-                                    in_sequence = true;
-                                    line.push(parsed);
-                                }
+                                in_sequence = true;
+                                line.push(parameter_str.trim().to_string()); // Maybe this shouldn't be trimmed
                             }
                         }
                     } else if parameters[0].is_array() {
@@ -443,7 +570,18 @@ pub fn read_other(
         // Other files except CommonEvents.json and Troops.json have the structure that consists
         // of name, nickname, description and note
         if !filename.starts_with("Co") && !filename.starts_with("Tr") {
-            for obj in obj_arr {
+            if filename.starts_with("It") {
+                for string in [
+                    "<Menu Category: Items>",
+                    "<Menu Category: Food>",
+                    "<Menu Category: Healing>",
+                    "<Menu Category: Body bag>",
+                ] {
+                    other_lines.insert(string.to_string());
+                }
+            }
+
+            'obj: for obj in obj_arr {
                 for (variable, name) in [
                     (obj["name"].as_str(), Variable::Name),
                     (obj["nickname"].as_str(), Variable::Nickname),
@@ -454,14 +592,18 @@ pub fn read_other(
                         variable_str = variable_str.trim();
 
                         if !variable_str.is_empty() {
-                            let parsed: Option<String> = parse_variable(variable_str, name, &filename, game_type);
+                            let parsed: Option<String> = parse_variable(variable_str, &name, &filename, game_type);
 
                             if let Some(mut parsed) = parsed {
                                 if romanize {
                                     parsed = romanize_string(parsed);
                                 }
 
-                                let replaced: String = parsed.replace('\n', r"\#");
+                                let replaced: String = parsed
+                                    .split('\n')
+                                    .map(|line: &str| line.trim())
+                                    .collect::<Vec<_>>()
+                                    .join(r"\#");
 
                                 if inner_processing_type == ProcessingMode::Append
                                     && !other_translation_map.contains_key(&replaced)
@@ -470,6 +612,8 @@ pub fn read_other(
                                 }
 
                                 other_lines.insert(replaced);
+                            } else if name == Variable::Name {
+                                continue 'obj;
                             }
                         }
                     }
@@ -501,43 +645,50 @@ pub fn read_other(
                     let mut in_sequence: bool = false;
                     let mut line: Vec<String> = Vec::with_capacity(256); // well it's 256 because of credits and i won't change it
 
-                    for list in list.as_array().unwrap() {
-                        let code: u64 = list["code"].as_u64().unwrap();
+                    for item in list.as_array().unwrap() {
+                        let code: u64 = item["code"].as_u64().unwrap();
 
-                        if !ALLOWED_CODES.contains(&code) {
-                            if in_sequence {
-                                let mut joined: String = line.join(r"\#").trim().to_string();
+                        if in_sequence && ![401, 405].contains(&code) {
+                            if !line.is_empty() {
+                                let mut joined: String = line.join("\n").trim().replace('\n', r"\#");
 
                                 if romanize {
                                     joined = romanize_string(joined);
                                 }
 
-                                if processing_mode == ProcessingMode::Append
-                                    && !other_translation_map.contains_key(&joined)
-                                {
-                                    other_translation_map.shift_insert(other_lines.len(), joined.clone(), "".into());
+                                let parsed: Option<String> = parse_parameter(Code::Dialogue, &joined, game_type);
+
+                                if let Some(parsed) = parsed {
+                                    if processing_mode == ProcessingMode::Append
+                                        && !other_translation_map.contains_key(&joined)
+                                    {
+                                        other_translation_map.shift_insert(
+                                            other_lines.len(),
+                                            parsed.clone(),
+                                            "".into(),
+                                        );
+                                    }
+
+                                    other_lines.insert(parsed);
                                 }
 
-                                other_lines.insert(joined);
-
                                 line.clear();
-                                in_sequence = false;
                             }
+                            in_sequence = false;
+                        }
+
+                        if !ALLOWED_CODES.contains(&code) {
                             continue;
                         }
 
-                        let parameters: &Array = list["parameters"].as_array().unwrap();
+                        let parameters: &Array = item["parameters"].as_array().unwrap();
 
                         if [401, 405].contains(&code) {
                             if let Some(parameter_str) = parameters[0].as_str() {
                                 if !parameter_str.is_empty() {
-                                    let parsed: Option<String> =
-                                        parse_parameter(Code::Dialogue, parameter_str, game_type);
-
-                                    if let Some(parsed) = parsed {
-                                        in_sequence = true;
-                                        line.push(parsed);
-                                    }
+                                    in_sequence = true;
+                                    // Maybe this shouldn't be trimmed
+                                    line.push(parameter_str.trim().to_string());
                                 }
                             }
                         } else if parameters[0].is_array() {
@@ -689,7 +840,7 @@ pub fn read_system(
     // Armor types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["armorTypes"].as_array().unwrap() {
-        let str: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
             let mut string: String = str.to_string();
@@ -709,7 +860,7 @@ pub fn read_system(
     // Element types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["elements"].as_array().unwrap() {
-        let str: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
             let mut string: String = str.to_string();
@@ -728,7 +879,7 @@ pub fn read_system(
 
     // Names of equipment slots
     for string in system_obj["equipTypes"].as_array().unwrap() {
-        let str: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
             let mut string: String = str.to_string();
@@ -747,7 +898,7 @@ pub fn read_system(
 
     // Names of battle options
     for string in system_obj["skillTypes"].as_array().unwrap() {
-        let str: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
             let mut string: String = str.to_string();
@@ -768,7 +919,9 @@ pub fn read_system(
     for (key, value) in system_obj["terms"].as_object().unwrap() {
         if key != "messages" {
             for string in value.as_array().unwrap() {
-                if let Some(str) = string.as_str() {
+                if let Some(mut str) = string.as_str() {
+                    str = str.trim();
+
                     if !str.is_empty() {
                         let mut string: String = str.to_string();
 
@@ -790,7 +943,7 @@ pub fn read_system(
             }
 
             for (_, message_string) in value.as_object().unwrap().iter() {
-                let str: &str = message_string.as_str().unwrap();
+                let str: &str = message_string.as_str().unwrap().trim();
 
                 if !str.is_empty() {
                     let mut string: String = str.to_string();
@@ -812,7 +965,7 @@ pub fn read_system(
     // Weapon types names
     // Normally it's system strings, but might be needed for some purposes
     for string in system_obj["weaponTypes"].as_array().unwrap() {
-        let str: &str = string.as_str().unwrap();
+        let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
             let mut string: String = str.to_string();
@@ -832,7 +985,7 @@ pub fn read_system(
     // Game title, parsed just for fun
     // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
     {
-        let mut game_title_string: String = system_obj["gameTitle"].as_str().unwrap().to_string();
+        let mut game_title_string: String = system_obj["gameTitle"].as_str().unwrap().trim().to_string();
 
         if romanize {
             game_title_string = romanize_string(game_title_string)

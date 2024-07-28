@@ -35,8 +35,6 @@ fn get_parameter_translated<'a>(
     if let Some(game_type) = game_type {
         match game_type {
             GameType::Termina => match code {
-                Code::Dialogue => {}
-                Code::Choice => {}
                 Code::System => {
                     if !parameter.starts_with("Gab")
                         && (!parameter.starts_with("choice_text") || parameter.ends_with("????"))
@@ -44,13 +42,24 @@ fn get_parameter_translated<'a>(
                         return None;
                     }
                 }
-                Code::Unknown => {}
+                _ => {}
             },
             // custom processing for other games
         }
     }
 
-    hashmap.get(parameter).map(|s: &String| s.to_owned())
+    let translated: Option<String> = hashmap.get(parameter).map(|translated: &String| {
+        let mut result: String = translated.to_owned();
+        result
+    });
+
+    if let Some(ref translated) = translated {
+        if translated.is_empty() {
+            return None;
+        }
+    }
+
+    translated
 }
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
@@ -61,13 +70,32 @@ fn get_variable_translated(
     hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
     game_type: &Option<GameType>,
 ) -> Option<String> {
+    let mut remaining_strings: Vec<&str> = Vec::new();
+    // 0 is insert at start, 1 is insert at end
+    let mut insert_positions: Vec<u8> = Vec::new();
+
     if let Some(game_type) = game_type {
         match game_type {
             GameType::Termina => match variable_name {
-                Variable::Name => {}
-                Variable::Nickname => {}
-                Variable::Description => {}
+                Variable::Description => {
+                    if let Some(description_and_note) = variable_text.split_once("\n\n") {
+                        variable_text = description_and_note.0
+                    }
+                }
                 Variable::Note => {
+                    if !variable_text.contains("Menu Category") {
+                        if let Some(first_char) = variable_text.chars().next() {
+                            if first_char.is_ascii_alphabetic() || first_char == '"' {
+                                let text_and_note: (&str, &str) =
+                                    variable_text.trim().split_once('\n').unwrap_or((variable_text, ""));
+
+                                variable_text = text_and_note.0;
+                                remaining_strings.push(text_and_note.1);
+                                insert_positions.push(1);
+                            }
+                        }
+                    }
+
                     if filename.starts_with("It") {
                         for string in [
                             "<Menu Category: Items>",
@@ -81,12 +109,33 @@ fn get_variable_translated(
                         }
                     }
                 }
+                _ => {}
             },
             // custom processing for other games
         }
     }
 
-    hashmap.get(variable_text).map(|s: &String| s.to_owned())
+    let translated: Option<String> = hashmap.get(variable_text).map(|translated: &String| {
+        let mut result: String = translated.to_owned();
+
+        for (string, position) in remaining_strings.into_iter().zip(insert_positions.into_iter()) {
+            if position == 1 {
+                result.push_str(string);
+            } else {
+                result = string.to_owned() + &result
+            }
+        }
+
+        result
+    });
+
+    if let Some(ref translated) = translated {
+        if translated.is_empty() {
+            return None;
+        }
+    }
+
+    translated
 }
 
 /// Writes .txt files from maps folder back to their initial form.
@@ -256,52 +305,49 @@ pub fn write_maps(
                         for it in 0..list_len {
                             let code: u64 = list[it]["code"].as_u64().unwrap();
 
-                            if !ALLOWED_CODES.contains(&code) {
-                                if in_sequence {
-                                    let mut joined: String = line.join("\n").trim().to_string();
+                            if in_sequence && code != 401 {
+                                let mut joined: String = line.join("\n").trim().to_string();
 
-                                    if romanize {
-                                        joined = romanize_string(joined);
-                                    }
-
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::Dialogue,
-                                        &joined,
-                                        &maps_translation_map,
-                                        game_type,
-                                    );
-
-                                    if let Some(text) = translated {
-                                        let split: Vec<&str> = text.split('\n').collect();
-                                        let split_length: usize = split.len();
-                                        let line_length: usize = line.len();
-
-                                        for (i, &index) in item_indices.iter().enumerate() {
-                                            if i < split_length {
-                                                list[index]["parameters"][0] = to_value(split[i]).unwrap();
-                                            } else {
-                                                list[index]["parameters"][0] = to_value("").unwrap();
-                                            }
-                                        }
-
-                                        if split_length > line_length {
-                                            let remaining: String = split[line_length..].join("\n");
-
-                                            list[*item_indices.last().unwrap()]["parameters"][0] =
-                                                to_value(&remaining).unwrap();
-                                        }
-                                    }
-
-                                    line.clear();
-                                    item_indices.clear();
-                                    in_sequence = false;
+                                if romanize {
+                                    joined = romanize_string(joined);
                                 }
+
+                                let translated: Option<String> =
+                                    get_parameter_translated(Code::Dialogue, &joined, &maps_translation_map, game_type);
+
+                                if let Some(text) = translated {
+                                    let split: Vec<&str> = text.split('\n').collect();
+                                    let split_length: usize = split.len();
+                                    let line_length: usize = line.len();
+
+                                    for (i, &index) in item_indices.iter().enumerate() {
+                                        if i < split_length {
+                                            list[index]["parameters"][0] = to_value(split[i]).unwrap();
+                                        } else {
+                                            list[index]["parameters"][0] = to_value("").unwrap();
+                                        }
+                                    }
+
+                                    if split_length > line_length {
+                                        let remaining: String = split[line_length..].join("\n");
+
+                                        list[*item_indices.last().unwrap()]["parameters"][0] =
+                                            to_value(&remaining).unwrap();
+                                    }
+                                }
+
+                                line.clear();
+                                item_indices.clear();
+                                in_sequence = false;
+                            }
+
+                            if !ALLOWED_CODES.contains(&code) {
                                 continue;
                             }
 
                             if code == 401 {
                                 if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
-                                    line.push(parameter_str.to_string());
+                                    line.push(parameter_str.trim().to_string());
                                     item_indices.push(it);
                                     in_sequence = true;
                                 }
@@ -549,52 +595,53 @@ pub fn write_other(
                         for it in 0..list_len {
                             let code: u64 = list_arr[it]["code"].as_u64().unwrap();
 
-                            if !ALLOWED_CODES.contains(&code) {
-                                if in_sequence {
-                                    let mut joined: String = line.join("\n").trim().to_string();
+                            if in_sequence && ![401, 405].contains(&code) {
+                                let mut joined: String = line.join("\n").trim().to_string();
 
-                                    if romanize {
-                                        joined = romanize_string(joined)
-                                    }
-
-                                    let translated: Option<String> = get_parameter_translated(
-                                        Code::Dialogue,
-                                        &joined,
-                                        &other_translation_map,
-                                        game_type,
-                                    );
-
-                                    if let Some(text) = translated {
-                                        let split: Vec<&str> = text.split('\n').collect();
-                                        let split_length: usize = split.len();
-                                        let line_length: usize = line.len();
-
-                                        for (i, &index) in item_indices.iter().enumerate() {
-                                            if i < split_length {
-                                                list_arr[index]["parameters"][0] = to_value(split[i]).unwrap();
-                                            } else {
-                                                list_arr[index]["parameters"][0] = to_value("").unwrap();
-                                            }
-                                        }
-
-                                        if split_length > line_length {
-                                            let remaining: String = split[line_length..].join("\n");
-
-                                            list_arr[*item_indices.last().unwrap()]["parameters"][0] =
-                                                to_value(&remaining).unwrap();
-                                        }
-                                    }
-
-                                    line.clear();
-                                    item_indices.clear();
-                                    in_sequence = false
+                                if romanize {
+                                    joined = romanize_string(joined)
                                 }
+
+                                let translated: Option<String> = get_parameter_translated(
+                                    Code::Dialogue,
+                                    &joined,
+                                    &other_translation_map,
+                                    game_type,
+                                );
+
+                                if let Some(text) = translated {
+                                    let split: Vec<&str> = text.split('\n').collect();
+                                    let split_length: usize = split.len();
+                                    let line_length: usize = line.len();
+
+                                    for (i, &index) in item_indices.iter().enumerate() {
+                                        if i < split_length {
+                                            list_arr[index]["parameters"][0] = to_value(split[i]).unwrap();
+                                        } else {
+                                            list_arr[index]["parameters"][0] = to_value("").unwrap();
+                                        }
+                                    }
+
+                                    if split_length > line_length {
+                                        let remaining: String = split[line_length..].join("\n");
+
+                                        list_arr[*item_indices.last().unwrap()]["parameters"][0] =
+                                            to_value(&remaining).unwrap();
+                                    }
+                                }
+
+                                line.clear();
+                                item_indices.clear();
+                                in_sequence = false
+                            }
+
+                            if !ALLOWED_CODES.contains(&code) {
                                 continue;
                             }
 
                             if [401, 405].contains(&code) {
                                 if let Some(parameter_str) = list_arr[it]["parameters"][0].as_str() {
-                                    line.push(parameter_str.to_string());
+                                    line.push(parameter_str.trim().to_string());
                                     item_indices.push(it);
                                     in_sequence = true;
                                 }

@@ -53,6 +53,7 @@ enum Language {
     Russian,
 }
 
+#[derive(PartialEq)]
 enum Variable {
     Name,
     Nickname,
@@ -267,7 +268,7 @@ impl<'a> ProgramLocalization<'a> {
     }
 }
 
-lazy_static! {pub static ref STRING_IS_ONLY_SYMBOLS_RE: Regex = Regex::new(r#"^[.()+-:;\[\]^~%&!№$@`*/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s]+$"#).unwrap();}
+lazy_static! {pub static ref STRING_IS_ONLY_SYMBOLS_RE: Regex = Regex::new(r#"^[.()+\-:;\[\]^~%&!№$@`*\/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s0-9]+$"#).unwrap();}
 
 pub fn romanize_string<T>(string: T) -> String
 where
@@ -309,6 +310,7 @@ where
 
     result
 }
+
 fn get_game_type(system_file_path: &Path) -> Option<GameType> {
     let system_obj: Object = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
     let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
@@ -642,11 +644,9 @@ fn main() {
         create_dir_all(&maps_path).unwrap();
         create_dir_all(&other_path).unwrap();
 
-        println!("{}", metadata_file_path.display());
-
         write(
             metadata_file_path,
-            format!(r#"{{"romanize": {romanize}, "disableCustomProcessing": {disable_custom_processing}}}"#),
+            format!(r#"{{"romanize":{romanize},"disableCustomProcessing":{disable_custom_processing}}}"#),
         )
         .unwrap();
 
