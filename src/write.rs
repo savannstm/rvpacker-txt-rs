@@ -99,7 +99,6 @@ fn get_variable_translated(
 
                         if is_continuation_of_description {
                             if let Some((left, _)) = note.trim_start().split_once('\n') {
-                                println!("LEFT: {left}");
                                 if left.ends_with('.') || left.ends_with('%') {
                                     note_string = "\n".to_string() + left;
                                 }
