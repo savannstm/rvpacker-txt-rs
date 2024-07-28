@@ -543,6 +543,12 @@ pub fn write_other(
                                         variable_string = romanize_string(variable_string)
                                     }
 
+                                    variable_string = variable_string
+                                        .split('\n')
+                                        .map(|line: &str| line.trim())
+                                        .collect::<Vec<_>>()
+                                        .join("\n");
+
                                     let translated: Option<String> = get_variable_translated(
                                         &variable_string,
                                         variable_enum,
