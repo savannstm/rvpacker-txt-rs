@@ -83,16 +83,14 @@ fn get_variable_translated(
                     }
                 }
                 Variable::Note => {
-                    if !variable_text.contains("Menu Category") {
-                        if let Some(first_char) = variable_text.chars().next() {
-                            if first_char.is_ascii_alphabetic() || first_char == '"' {
-                                let text_and_note: (&str, &str) =
-                                    variable_text.trim().split_once('\n').unwrap_or((variable_text, ""));
+                    if let Some(first_char) = variable_text.chars().next() {
+                        if (first_char.is_ascii_alphabetic() || first_char == '"') && variable_text.contains("\n\n") {
+                            let text_and_note: (&str, &str) =
+                                variable_text.trim().split_once('\n').unwrap_or((variable_text, ""));
 
-                                variable_text = text_and_note.0;
-                                remaining_strings.push(text_and_note.1);
-                                insert_positions.push(1);
-                            }
+                            variable_text = text_and_note.0;
+                            remaining_strings.push(text_and_note.1);
+                            insert_positions.push(1);
                         }
                     }
 
