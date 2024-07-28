@@ -66,6 +66,7 @@ fn get_parameter_translated<'a>(
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn get_variable_translated(
     mut variable_text: String,
+    note_text: Option<&str>, // note_text is some only when getting description
     variable_name: Variable,
     filename: &str,
     hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
@@ -78,11 +79,41 @@ fn get_variable_translated(
     if let Some(game_type) = game_type {
         match game_type {
             GameType::Termina => match variable_name {
-                Variable::Description => {
-                    if let Some(description_and_note) = variable_text.split_once("\n\n") {
-                        variable_text = description_and_note.0.to_string()
+                Variable::Description => match note_text {
+                    Some(mut note) => {
+                        let mut note_string: String = String::from(note);
+
+                        let mut note_chars: std::str::Chars = note.chars();
+                        let mut is_continuation_of_description: bool = false;
+
+                        if let Some(first_char) = note_chars.next() {
+                            if let Some(second_char) = note_chars.next() {
+                                if ((first_char == '\n' && second_char != '\n')
+                                    || (first_char.is_ascii_alphabetic() || first_char == '"'))
+                                    && !['.', '!', '/', '?'].contains(&first_char)
+                                {
+                                    is_continuation_of_description = true;
+                                }
+                            }
+                        }
+
+                        if is_continuation_of_description {
+                            if let Some((left, _)) = note.trim_start().split_once('\n') {
+                                println!("LEFT: {left}");
+                                if left.ends_with('.') || left.ends_with('%') {
+                                    note_string = "\n".to_string() + left;
+                                }
+                            } else if note.ends_with('.') || note.ends_with('%') {
+                                note_string = "\n".to_string() + note
+                            }
+
+                            if !note_string.is_empty() {
+                                variable_text = variable_text + &note_string
+                            }
+                        }
                     }
-                }
+                    None => {}
+                },
                 Variable::Note => {
                     if filename.starts_with("It") {
                         for string in [
@@ -575,6 +606,14 @@ pub fn write_other(
 
                                     let translated: Option<String> = get_variable_translated(
                                         variable_string,
+                                        if variable_type != Variable::Description {
+                                            None
+                                        } else {
+                                            match obj.get("note") {
+                                                Some(str) => str.as_str(),
+                                                None => None,
+                                            }
+                                        },
                                         variable_type,
                                         &filename,
                                         &other_translation_map,

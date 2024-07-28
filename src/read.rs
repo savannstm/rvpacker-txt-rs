@@ -174,14 +174,14 @@ fn parse_variable(
                         }
 
                         if is_continuation_of_description {
-                            if let Some(parts) = variable_text.trim_start().split_once('\n') {
-                                if !parts.0.ends_with('.') {
+                            if let Some((left, _)) = variable_text.trim_start().split_once('\n') {
+                                if !left.ends_with('.') && !left.ends_with('%') {
                                     return None;
                                 }
 
-                                variable_text = r"\#".to_string() + parts.0;
+                                variable_text = r"\#".to_string() + left;
                             } else {
-                                if !variable_text.ends_with('.') {
+                                if !variable_text.ends_with('.') && !variable_text.ends_with('%') {
                                     return None;
                                 }
 
