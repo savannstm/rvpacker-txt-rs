@@ -1,3 +1,4 @@
+#![allow(clippy::too_many_arguments)]
 use crate::{romanize_string, Code, GameType, ProcessingMode, Variable, STRING_IS_ONLY_SYMBOLS_RE};
 use indexmap::{IndexMap, IndexSet};
 use rayon::prelude::*;
@@ -46,14 +47,16 @@ fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_variable(
-    mut variable_text: &str,
+    mut variable_text: String,
     variable_name: &Variable,
     filename: &str,
     game_type: &Option<GameType>,
-) -> Option<String> {
-    if STRING_IS_ONLY_SYMBOLS_RE.is_match(variable_text) {
+) -> Option<(String, bool)> {
+    if STRING_IS_ONLY_SYMBOLS_RE.is_match(&variable_text) {
         return None;
     }
+
+    let mut is_continuation_of_description: bool = false;
 
     if let Some(game_type) = game_type {
         match game_type {
@@ -84,7 +87,7 @@ fn parse_variable(
                                 "Tanaka",
                                 "Samarie",
                             ]
-                            .contains(&variable_text)
+                            .contains(&variable_text.as_str())
                             {
                                 return None;
                             }
@@ -104,12 +107,12 @@ fn parse_variable(
                                 "Nas'hrah",
                                 "Skeleton",
                             ]
-                            .contains(&variable_text)
+                            .contains(&variable_text.as_str())
                             {
                                 return None;
                             }
                         } else if filename.starts_with("En") {
-                            if ["Spank Tank", "giant", "test"].contains(&variable_text) {
+                            if ["Spank Tank", "giant", "test"].contains(&variable_text.as_str()) {
                                 return None;
                             }
                         } else if filename.starts_with("It") {
@@ -140,8 +143,9 @@ fn parse_variable(
                                 "Codex #1",
                                 "The Tale of the Pocketcat I",
                                 "The Tale of the Pocketcat II",
+                                "New poems of love and torment",
                             ]
-                            .contains(&variable_text)
+                            .contains(&variable_text.as_str())
                                 || variable_text.starts_with("The Fellowship")
                                 || variable_text.starts_with("Studies of")
                                 || variable_text.starts_with("Blueish")
@@ -156,42 +160,39 @@ fn parse_variable(
                         }
                     }
                     Variable::Note => {
-                        if let Some(first_char) = variable_text.chars().next() {
-                            if (first_char.is_ascii_alphabetic() || first_char == '"') && variable_text.contains("\n\n")
-                            {
-                                return Some(
-                                    variable_text
-                                        .trim()
-                                        .split_once('\n')
-                                        .unwrap_or((variable_text, ""))
-                                        .0
-                                        .to_string(),
-                                );
+                        let mut variable_text_chars: std::str::Chars = variable_text.chars();
+
+                        if let Some(first_char) = variable_text_chars.next() {
+                            if let Some(second_char) = variable_text_chars.next() {
+                                if ((first_char == '\n' && second_char != '\n')
+                                    || (first_char.is_ascii_alphabetic() || first_char == '"'))
+                                    && !['.', '!', '/', '?'].contains(&first_char)
+                                {
+                                    is_continuation_of_description = true;
+                                }
                             }
                         }
 
-                        if variable_text.split('\n').all(|line: &str| {
-                            line.is_empty()
-                                || (line.starts_with('<') && line.ends_with('>'))
-                                || (line.starts_with(|char: char| char.is_ascii_lowercase())
-                                    && line.ends_with(|char: char| char.is_numeric()))
-                        }) {
+                        if is_continuation_of_description {
+                            if let Some(parts) = variable_text.trim_start().split_once('\n') {
+                                if !parts.0.ends_with('.') {
+                                    return None;
+                                }
+
+                                variable_text = r"\#".to_string() + parts.0;
+                            } else {
+                                if !variable_text.ends_with('.') {
+                                    return None;
+                                }
+
+                                variable_text = r"\#".to_string() + &variable_text
+                            }
+                        } else {
                             return None;
                         }
 
                         if filename.starts_with("Ac") {
                             return None;
-                        } else if filename.starts_with("It") {
-                            for string in [
-                                "<Menu Category: Items>",
-                                "<Menu Category: Food>",
-                                "<Menu Category: Healing>",
-                                "<Menu Category: Body bag>",
-                            ] {
-                                if variable_text.contains(string) {
-                                    return None;
-                                }
-                            }
                         }
                     }
                     _ => {}
@@ -200,7 +201,7 @@ fn parse_variable(
         }
     }
 
-    Some(variable_text.to_string())
+    Some((variable_text, is_continuation_of_description))
 }
 
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
@@ -582,6 +583,8 @@ pub fn read_other(
             }
 
             'obj: for obj in obj_arr {
+                let mut prev_variable_name: Option<Variable> = None;
+
                 for (variable, name) in [
                     (obj["name"].as_str(), Variable::Name),
                     (obj["nickname"].as_str(), Variable::Nickname),
@@ -592,9 +595,30 @@ pub fn read_other(
                         variable_str = variable_str.trim();
 
                         if !variable_str.is_empty() {
-                            let parsed: Option<String> = parse_variable(variable_str, &name, &filename, game_type);
+                            let parsed: Option<(String, bool)> =
+                                parse_variable(variable_str.to_string(), &name, &filename, game_type);
 
-                            if let Some(mut parsed) = parsed {
+                            if let Some((mut parsed, is_continuation_of_description)) = parsed {
+                                if is_continuation_of_description {
+                                    if prev_variable_name != Some(Variable::Description) {
+                                        continue;
+                                    }
+
+                                    if let Some(last) = other_lines.pop() {
+                                        other_lines.insert(last + &parsed);
+                                    }
+
+                                    if inner_processing_type == ProcessingMode::Append {
+                                        if let Some((key, value)) = other_translation_map.pop() {
+                                            other_translation_map.insert(key, value + &parsed);
+                                        }
+                                    }
+
+                                    continue;
+                                }
+
+                                prev_variable_name = Some(name);
+
                                 if romanize {
                                     parsed = romanize_string(parsed);
                                 }

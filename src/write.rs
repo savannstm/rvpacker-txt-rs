@@ -1,3 +1,4 @@
+#![allow(clippy::too_many_arguments)]
 use crate::{romanize_string, Code, GameType, IntoRSplit, Variable};
 use fastrand::shuffle;
 use rayon::prelude::*;
@@ -64,13 +65,13 @@ fn get_parameter_translated<'a>(
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn get_variable_translated(
-    mut variable_text: &str,
+    mut variable_text: String,
     variable_name: Variable,
     filename: &str,
     hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
     game_type: &Option<GameType>,
 ) -> Option<String> {
-    let mut remaining_strings: Vec<&str> = Vec::new();
+    let mut remaining_strings: Vec<String> = Vec::new();
     // 0 is insert at start, 1 is insert at end
     let mut insert_positions: Vec<u8> = Vec::new();
 
@@ -79,21 +80,10 @@ fn get_variable_translated(
             GameType::Termina => match variable_name {
                 Variable::Description => {
                     if let Some(description_and_note) = variable_text.split_once("\n\n") {
-                        variable_text = description_and_note.0
+                        variable_text = description_and_note.0.to_string()
                     }
                 }
                 Variable::Note => {
-                    if let Some(first_char) = variable_text.chars().next() {
-                        if (first_char.is_ascii_alphabetic() || first_char == '"') && variable_text.contains("\n\n") {
-                            let text_and_note: (&str, &str) =
-                                variable_text.trim().split_once('\n').unwrap_or((variable_text, ""));
-
-                            variable_text = text_and_note.0;
-                            remaining_strings.push(text_and_note.1);
-                            insert_positions.push(1);
-                        }
-                    }
-
                     if filename.starts_with("It") {
                         for string in [
                             "<Menu Category: Items>",
@@ -102,9 +92,33 @@ fn get_variable_translated(
                             "<Menu Category: Body bag>",
                         ] {
                             if variable_text.contains(string) {
-                                return Some(variable_text.replacen(string, &hashmap[string], 1));
+                                variable_text = variable_text.replace(string, &hashmap[string]);
                             }
                         }
+                    }
+
+                    let mut variable_text_chars: std::str::Chars = variable_text.chars();
+                    let mut is_continuation_of_description: bool = false;
+
+                    if let Some(first_char) = variable_text_chars.next() {
+                        if let Some(second_char) = variable_text_chars.next() {
+                            if ((first_char == '\n' && second_char != '\n')
+                                || (first_char.is_ascii_alphabetic() || first_char == '"'))
+                                && !['.', '!', '/', '?'].contains(&first_char)
+                            {
+                                is_continuation_of_description = true;
+                            }
+                        }
+                    }
+
+                    if is_continuation_of_description {
+                        if let Some(parts) = variable_text.trim_start().split_once('\n') {
+                            return Some(parts.1.to_string());
+                        } else {
+                            return Some("".to_string());
+                        }
+                    } else {
+                        return Some(variable_text);
                     }
                 }
                 _ => {}
@@ -113,14 +127,22 @@ fn get_variable_translated(
         }
     }
 
-    let translated: Option<String> = hashmap.get(variable_text).map(|translated: &String| {
+    let translated: Option<String> = hashmap.get(&variable_text).map(|translated: &String| {
         let mut result: String = translated.to_owned();
 
         for (string, position) in remaining_strings.into_iter().zip(insert_positions.into_iter()) {
             if position == 1 {
-                result.push_str(string);
+                result.push_str(&string);
             } else {
                 result = string.to_owned() + &result
+            }
+        }
+
+        if variable_name == Variable::Note {
+            if let Some(first_char) = result.chars().next() {
+                if first_char != '\n' {
+                    result = "\n".to_owned() + &result
+                }
             }
         }
 
@@ -526,7 +548,7 @@ pub fn write_other(
                 .par_iter_mut()
                 .skip(1) // Skipping first element in array as it is null
                 .for_each(|obj: &mut Value| {
-                    for (variable_name, variable_enum) in [
+                    for (variable_name, variable_type) in [
                         ("name", Variable::Name),
                         ("nickname", Variable::Nickname),
                         ("description", Variable::Description),
@@ -534,7 +556,11 @@ pub fn write_other(
                     ] {
                         if let Some(variable_value) = obj.get(variable_name) {
                             if let Some(variable_str) = variable_value.as_str() {
-                                let mut variable_string: String = variable_str.trim().to_string();
+                                let mut variable_string: String = if variable_type != Variable::Note {
+                                    variable_str.trim().to_string()
+                                } else {
+                                    variable_str.to_string()
+                                };
 
                                 if !variable_string.is_empty() {
                                     if romanize {
@@ -548,8 +574,8 @@ pub fn write_other(
                                         .join("\n");
 
                                     let translated: Option<String> = get_variable_translated(
-                                        &variable_string,
-                                        variable_enum,
+                                        variable_string,
+                                        variable_type,
                                         &filename,
                                         &other_translation_map,
                                         game_type,
