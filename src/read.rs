@@ -279,8 +279,16 @@ pub fn read_map(
         if maps_trans_output_path.exists() {
             for (original, translated) in read_to_string(maps_output_path)
                 .unwrap()
-                .split('\n')
-                .zip(read_to_string(maps_trans_output_path).unwrap().split('\n'))
+                .par_split('\n')
+                .collect::<Vec<_>>()
+                .into_iter()
+                .zip(
+                    read_to_string(maps_trans_output_path)
+                        .unwrap()
+                        .par_split('\n')
+                        .collect::<Vec<_>>()
+                        .into_iter(),
+                )
             {
                 maps_translation_map.insert(original.to_string(), translated.to_string());
             }
@@ -358,6 +366,7 @@ pub fn read_map(
 
                             line.clear();
                         }
+
                         in_sequence = false;
                     }
 
@@ -557,8 +566,16 @@ pub fn read_other(
             if other_trans_output_path.exists() {
                 for (original, translated) in read_to_string(other_output_path)
                     .unwrap()
-                    .split('\n')
-                    .zip(read_to_string(other_trans_output_path).unwrap().split('\n'))
+                    .par_split('\n')
+                    .collect::<Vec<_>>()
+                    .into_iter()
+                    .zip(
+                        read_to_string(other_trans_output_path)
+                            .unwrap()
+                            .par_split('\n')
+                            .collect::<Vec<_>>()
+                            .into_iter(),
+                    )
                 {
                     other_translation_map.insert(original.to_string(), translated.to_string());
                 }
@@ -585,18 +602,18 @@ pub fn read_other(
             'obj: for obj in obj_arr {
                 let mut prev_variable_name: Option<Variable> = None;
 
-                for (variable, name) in [
+                for (variable_text, variable_name) in [
                     (obj["name"].as_str(), Variable::Name),
                     (obj["nickname"].as_str(), Variable::Nickname),
                     (obj["description"].as_str(), Variable::Description),
                     (obj["note"].as_str(), Variable::Note),
                 ] {
-                    if let Some(mut variable_str) = variable {
+                    if let Some(mut variable_str) = variable_text {
                         variable_str = variable_str.trim();
 
                         if !variable_str.is_empty() {
                             let parsed: Option<(String, bool)> =
-                                parse_variable(variable_str.to_string(), &name, &filename, game_type);
+                                parse_variable(variable_str.to_string(), &variable_name, &filename, game_type);
 
                             if let Some((mut parsed, is_continuation_of_description)) = parsed {
                                 if is_continuation_of_description {
@@ -617,7 +634,7 @@ pub fn read_other(
                                     continue;
                                 }
 
-                                prev_variable_name = Some(name);
+                                prev_variable_name = Some(variable_name);
 
                                 if romanize {
                                     parsed = romanize_string(parsed);
@@ -636,7 +653,7 @@ pub fn read_other(
                                 }
 
                                 other_lines.insert(replaced);
-                            } else if name == Variable::Name {
+                            } else if variable_name == Variable::Name {
                                 continue 'obj;
                             }
                         }
@@ -649,7 +666,7 @@ pub fn read_other(
             //Skipping first element in array as it is null
             for obj in obj_arr.into_iter().skip(1) {
                 //CommonEvents doesn't have pages, so we can just check if it's Troops
-                let pages_length: usize = if filename.starts_with("Troops") {
+                let pages_length: usize = if filename.starts_with("Tr") {
                     obj["pages"].as_array().unwrap().len()
                 } else {
                     1
@@ -698,6 +715,7 @@ pub fn read_other(
 
                                 line.clear();
                             }
+
                             in_sequence = false;
                         }
 
@@ -850,8 +868,16 @@ pub fn read_system(
         if system_trans_output_path.exists() {
             for (original, translated) in read_to_string(system_output_path)
                 .unwrap()
-                .split('\n')
-                .zip(read_to_string(system_trans_output_path).unwrap().split('\n'))
+                .par_split('\n')
+                .collect::<Vec<_>>()
+                .into_iter()
+                .zip(
+                    read_to_string(system_trans_output_path)
+                        .unwrap()
+                        .par_split('\n')
+                        .collect::<Vec<_>>()
+                        .into_iter(),
+                )
             {
                 system_translation_map.insert(original.to_string(), translated.to_string());
             }

@@ -61,22 +61,6 @@ enum Variable {
     Note,
 }
 
-trait IntoRSplit {
-    fn into_rsplit_once(self, delimiter: char) -> Option<(String, String)>;
-}
-
-// genius implementation
-impl IntoRSplit for String {
-    fn into_rsplit_once(self, delimiter: char) -> Option<(String, String)> {
-        if let Some(pos) = self.rfind(delimiter) {
-            let (left, right) = self.split_at(pos);
-            Some((left.to_string(), right[delimiter.len_utf8()..].to_string()))
-        } else {
-            None
-        }
-    }
-}
-
 struct ProgramLocalization<'a> {
     // About message and templates
     about_msg: &'a str,
