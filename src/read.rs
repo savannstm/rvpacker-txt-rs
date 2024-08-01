@@ -12,6 +12,24 @@ use std::{
 };
 use xxhash_rust::xxh3::Xxh3;
 
+trait Join {
+    fn join(&self, delimiter: &str) -> String;
+}
+
+impl<T: ToString + AsRef<str>, S: std::hash::BuildHasher> Join for IndexSet<T, S> {
+    fn join(&self, delimiter: &str) -> String {
+        let mut joined: String = String::new();
+        joined.push_str(self.get_index(0).unwrap().as_ref());
+
+        for item in self.iter().skip(1) {
+            joined.push_str(delimiter);
+            joined.push_str(item.as_ref());
+        }
+
+        joined
+    }
+}
+
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_parameter(code: Code, mut parameter: &str, game_type: &Option<GameType>) -> Option<String> {
     if STRING_IS_ONLY_SYMBOLS_RE.is_match(parameter) {
@@ -205,7 +223,7 @@ fn parse_variable(
 }
 
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
-/// Reads all Map .json files of map_path and parses them into .txt files in output_path.
+/// Reads all Map .json files of maps_path and parses them into .txt files in output_path.
 /// # Parameters
 /// * `maps_path` - path to directory than contains .json game files
 /// * `output_path` - path to output directory
@@ -470,9 +488,9 @@ pub fn read_map(
             let maps_length: usize = maps_lines.len() - 1;
             let names_length: usize = names_lines.len() - 1;
             (
-                maps_lines.into_iter().collect::<Vec<String>>().join("\n"),
+                maps_lines.join("\n"),
                 "\n".repeat(maps_length),
-                names_lines.into_iter().collect::<Vec<String>>().join("\n"),
+                names_lines.join("\n"),
                 "\n".repeat(names_length),
             )
         };
@@ -815,10 +833,7 @@ pub fn read_other(
             (collected.0.join("\n"), collected.1.join("\n"))
         } else {
             let length: usize = other_lines.len() - 1;
-            (
-                other_lines.into_iter().collect::<Vec<String>>().join("\n"),
-                "\n".repeat(length),
-            )
+            (other_lines.join("\n"), "\n".repeat(length))
         };
 
         write(other_output_path, original_content).unwrap();
@@ -1053,10 +1068,7 @@ pub fn read_system(
         (collected.0.join("\n"), collected.1.join("\n"))
     } else {
         let length: usize = system_lines.len() - 1;
-        (
-            system_lines.into_iter().collect::<Vec<String>>().join("\n"),
-            "\n".repeat(length),
-        )
+        (system_lines.join("\n"), "\n".repeat(length))
     };
 
     write(system_output_path, original_content).unwrap();

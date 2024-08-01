@@ -384,7 +384,7 @@ pub fn write_maps(
                                         }
 
                                         if split_length > line_length {
-                                            let remaining: String = split[line_length..].join("\n");
+                                            let remaining: String = split[line_length - 1..].join("\n");
 
                                             list[*item_indices.last().unwrap()]["parameters"][0] =
                                                 to_value(&remaining).unwrap();
@@ -705,7 +705,7 @@ pub fn write_other(
                                         }
 
                                         if split_length > line_length {
-                                            let remaining: String = split[line_length..].join("\n");
+                                            let remaining: String = split[line_length - 1..].join("\n");
 
                                             list[*item_indices.last().unwrap()]["parameters"][0] =
                                                 to_value(&remaining).unwrap();
