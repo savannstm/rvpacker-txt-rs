@@ -73,8 +73,7 @@ fn get_translated_variable(
     game_type: &Option<GameType>,
 ) -> Option<String> {
     let mut remaining_strings: Vec<String> = Vec::new();
-    // 0 is insert at start, 1 is insert at end
-    let mut insert_positions: Vec<u8> = Vec::new();
+    let mut insert_positions: Vec<bool> = Vec::new();
 
     if let Some(game_type) = game_type {
         match game_type {
@@ -86,28 +85,32 @@ fn get_translated_variable(
                         let mut note_chars: std::str::Chars = note.chars();
                         let mut is_continuation_of_description: bool = false;
 
-                        if let Some(first_char) = note_chars.next() {
-                            if let Some(second_char) = note_chars.next() {
-                                if ((first_char == '\n' && second_char != '\n')
-                                    || (first_char.is_ascii_alphabetic() || first_char == '"'))
-                                    && !['.', '!', '/', '?'].contains(&first_char)
-                                {
-                                    is_continuation_of_description = true;
+                        if !note.starts_with("flesh puppetry") {
+                            if let Some(first_char) = note_chars.next() {
+                                if let Some(second_char) = note_chars.next() {
+                                    if ((first_char == '\n' && second_char != '\n')
+                                        || (first_char.is_ascii_alphabetic() || first_char == '"' || first_char == '4'))
+                                        && !['.', '!', '/', '?'].contains(&first_char)
+                                    {
+                                        is_continuation_of_description = true;
+                                    }
                                 }
                             }
                         }
 
                         if is_continuation_of_description {
-                            if let Some((left, _)) = note.trim_start().split_once('\n') {
-                                if left.ends_with('.') || left.ends_with('%') {
+                            if let Some((mut left, _)) = note.trim_start().split_once('\n') {
+                                left = left.trim();
+
+                                if left.ends_with(['.', '%', '!', '"']) {
                                     note_string = "\n".to_string() + left;
                                 }
-                            } else if note.ends_with('.') || note.ends_with('%') {
-                                note_string = "\n".to_string() + note
+                            } else if note.ends_with(['.', '%', '!', '"']) {
+                                note_string = note.to_string();
                             }
 
                             if !note_string.is_empty() {
-                                variable_text = variable_text + &note_string
+                                variable_text = variable_text + &note_string;
                             }
                         }
                     }
@@ -133,7 +136,7 @@ fn get_translated_variable(
                     if let Some(first_char) = variable_text_chars.next() {
                         if let Some(second_char) = variable_text_chars.next() {
                             if ((first_char == '\n' && second_char != '\n')
-                                || (first_char.is_ascii_alphabetic() || first_char == '"'))
+                                || (first_char.is_ascii_alphabetic() || first_char == '"' || first_char == '4'))
                                 && !['.', '!', '/', '?'].contains(&first_char)
                             {
                                 is_continuation_of_description = true;
@@ -161,10 +164,11 @@ fn get_translated_variable(
         let mut result: String = translated.to_owned();
 
         for (string, position) in remaining_strings.into_iter().zip(insert_positions.into_iter()) {
-            if position == 1 {
-                result.push_str(&string);
-            } else {
-                result = string.to_owned() + &result
+            match position {
+                true => {
+                    result.push_str(&string);
+                }
+                false => result = string.to_owned() + &result,
             }
         }
 
@@ -218,12 +222,13 @@ pub fn write_maps(
                     let filename: OsString = entry.file_name();
                     let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
 
-                    let slice: char;
+                    let fourth_char: char;
                     unsafe {
-                        slice = *filename_str.as_bytes().get_unchecked(4) as char;
+                        fourth_char = *filename_str.as_bytes().get_unchecked(3) as char;
                     }
 
-                    if filename_str.starts_with("Map") && slice.is_ascii_digit() && filename_str.ends_with("json") {
+                    if filename_str.starts_with("Map") && fourth_char.is_ascii_digit() && filename_str.ends_with("json")
+                    {
                         vec.push((
                             filename_str.to_string(),
                             from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
@@ -350,9 +355,9 @@ pub fn write_maps(
                         let mut item_indices: Vec<usize> = Vec::with_capacity(4);
 
                         let list: &mut Array = page["list"].as_array_mut().unwrap();
-                        let list_len: usize = list.len();
+                        let list_length: usize = list.len();
 
-                        for it in 0..list_len {
+                        for it in 0..list_length {
                             let code: u64 = list[it]["code"].as_u64().unwrap();
 
                             if in_sequence && code != 401 {
@@ -667,13 +672,13 @@ pub fn write_other(
                         }
 
                         let list: &mut Array = list_value.as_array_mut().unwrap();
-                        let list_len: usize = list.len();
+                        let list_length: usize = list.len();
 
                         let mut in_sequence: bool = false;
                         let mut line: Vec<String> = Vec::with_capacity(4);
                         let mut item_indices: Vec<usize> = Vec::with_capacity(4);
 
-                        for it in 0..list_len {
+                        for it in 0..list_length {
                             let code: u64 = list[it]["code"].as_u64().unwrap();
 
                             if in_sequence && ![401, 405].contains(&code) {
