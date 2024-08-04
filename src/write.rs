@@ -89,7 +89,9 @@ fn get_translated_variable(
                             if let Some(first_char) = note_chars.next() {
                                 if let Some(second_char) = note_chars.next() {
                                     if ((first_char == '\n' && second_char != '\n')
-                                        || (first_char.is_ascii_alphabetic() || first_char == '"' || first_char == '4'))
+                                        || (first_char.is_ascii_alphabetic()
+                                            || first_char == '"'
+                                            || note.starts_with("4 sticks")))
                                         && !['.', '!', '/', '?'].contains(&first_char)
                                     {
                                         is_continuation_of_description = true;
@@ -136,7 +138,9 @@ fn get_translated_variable(
                     if let Some(first_char) = variable_text_chars.next() {
                         if let Some(second_char) = variable_text_chars.next() {
                             if ((first_char == '\n' && second_char != '\n')
-                                || (first_char.is_ascii_alphabetic() || first_char == '"' || first_char == '4'))
+                                || (first_char.is_ascii_alphabetic()
+                                    || first_char == '"'
+                                    || variable_text.starts_with("4 sticks")))
                                 && !['.', '!', '/', '?'].contains(&first_char)
                             {
                                 is_continuation_of_description = true;
