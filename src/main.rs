@@ -58,6 +58,10 @@ enum Variable {
     Name,
     Nickname,
     Description,
+    Message1,
+    Message2,
+    Message3,
+    Message4,
     Note,
 }
 
