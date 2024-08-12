@@ -241,7 +241,7 @@ fn parse_variable(
 
 fn parse_list<T: BuildHasher>(
     list: &Array,
-    allowed_codes: &[u64],
+    allowed_codes: &[u16],
     romanize: bool,
     game_type: &Option<GameType>,
     processing_mode: &ProcessingMode,
@@ -252,7 +252,7 @@ fn parse_list<T: BuildHasher>(
     let mut line: Vec<String> = Vec::with_capacity(256);
 
     for item in list {
-        let code: u64 = item["code"].as_u64().unwrap();
+        let code: u16 = item["code"].as_u64().unwrap() as u16;
 
         if in_sequence && [401, 405].binary_search(&code).is_err() {
             if !line.is_empty() {
@@ -457,7 +457,7 @@ pub fn read_map(
     // 102 - dialogue choices array
     // 356 - system lines (special texts)
     // 324, 320 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 5] = [102, 320, 324, 356, 401];
+    const ALLOWED_CODES: [u16; 5] = [102, 320, 324, 356, 401];
 
     for (filename, obj) in maps_obj_vec.into_iter() {
         if let Some(display_name) = obj["displayName"].as_str() {
@@ -589,7 +589,7 @@ pub fn read_other(
     // 102 - dialogue choices array
     // 356 - system lines (special texts)
     // 324, 320 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 6] = [102, 320, 324, 356, 401, 405];
+    const ALLOWED_CODES: [u16; 6] = [102, 320, 324, 356, 401, 405];
 
     for (filename, obj_arr) in other_obj_arr_map.into_iter() {
         let other_processed_filename: String = filename[0..filename.rfind('.').unwrap()].to_lowercase();

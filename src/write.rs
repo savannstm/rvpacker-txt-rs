@@ -226,7 +226,7 @@ fn get_translated_variable(
 
 fn write_list(
     list: &mut Array,
-    allowed_codes: &[u64],
+    allowed_codes: &[u16],
     romanize: bool,
     game_type: &Option<GameType>,
     map: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
@@ -238,7 +238,7 @@ fn write_list(
     let mut item_indices: Vec<usize> = Vec::with_capacity(256);
 
     for it in 0..list_length {
-        let code: u64 = list[it]["code"].as_u64().unwrap();
+        let code: u16 = list[it]["code"].as_u64().unwrap() as u16;
 
         if in_sequence && [401, 405].binary_search(&code).is_err() {
             if !line.is_empty() {
@@ -468,7 +468,7 @@ pub fn write_maps(
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
     // 324, 320 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 6] = [102, 320, 324, 356, 401, 402];
+    const ALLOWED_CODES: [u16; 6] = [102, 320, 324, 356, 401, 402];
 
     maps_obj_vec.into_par_iter().for_each(|(filename, mut obj)| {
         {
@@ -576,7 +576,7 @@ pub fn write_other(
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
     // 324, 320 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 7] = [102, 320, 324, 356, 401, 402, 405];
+    const ALLOWED_CODES: [u16; 7] = [102, 320, 324, 356, 401, 402, 405];
 
     other_obj_arr_vec.into_par_iter().for_each(|(filename, mut obj_arr)| {
         let other_processed_filename: &str = &filename[..filename.len() - 5];
