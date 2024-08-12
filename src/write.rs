@@ -1,6 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{romanize_string, Code, GameType, Variable};
 use fastrand::shuffle;
+use lazy_static::lazy_static;
 use rayon::prelude::*;
 use regex::{Captures, Match, Regex};
 use sonic_rs::{
@@ -16,13 +17,17 @@ use std::{
 };
 use xxhash_rust::xxh3::Xxh3;
 
+lazy_static! {
+    static ref SELECT_WORDS_RE: Regex = Regex::new(r"\S+").unwrap();
+}
+
 pub fn shuffle_words(string: &str) -> String {
-    let re: Regex = Regex::new(r"\S+").unwrap();
-    let mut words: Vec<&str> = re.find_iter(string).map(|m: Match| m.as_str()).collect();
+    let mut words: Vec<&str> = SELECT_WORDS_RE.find_iter(string).map(|m: Match| m.as_str()).collect();
 
     shuffle(&mut words);
 
-    re.replace_all(string, |_: &Captures| words.pop().unwrap_or(""))
+    SELECT_WORDS_RE
+        .replace_all(string, |_: &Captures| words.pop().unwrap_or(""))
         .into_owned()
 }
 
@@ -235,7 +240,7 @@ fn write_list(
     for it in 0..list_length {
         let code: u64 = list[it]["code"].as_u64().unwrap();
 
-        if in_sequence && ![401, 405].contains(&code) {
+        if in_sequence && [401, 405].binary_search(&code).is_err() {
             if !line.is_empty() {
                 let mut joined: String = line.join("\n").trim().to_string();
 
@@ -272,57 +277,71 @@ fn write_list(
             in_sequence = false
         }
 
-        if !allowed_codes.contains(&code) {
+        if allowed_codes.binary_search(&code).is_err() {
             continue;
         }
 
-        if [401, 405].contains(&code) {
-            if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
-                line.push(parameter_str.trim().to_string());
-                item_indices.push(it);
-                in_sequence = true;
+        match code {
+            401 | 405 => {
+                if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
+                    line.push(parameter_str.trim().to_string());
+                    item_indices.push(it);
+                    in_sequence = true;
+                }
             }
-        } else if list[it]["parameters"][0].is_array() {
-            for i in 0..list[it]["parameters"][0].as_array().unwrap().len() {
-                if let Some(subparameter_str) = list[it]["parameters"][0][i].as_str() {
-                    let mut subparameter_string = subparameter_str.to_string();
+            102 => {
+                if list[it]["parameters"][0].is_array() {
+                    for i in 0..list[it]["parameters"][0].as_array().unwrap().len() {
+                        if let Some(subparameter_str) = list[it]["parameters"][0][i].as_str() {
+                            let mut subparameter_string = subparameter_str.to_string();
 
-                    if romanize {
-                        subparameter_string = romanize_string(subparameter_string);
-                    }
+                            if romanize {
+                                subparameter_string = romanize_string(subparameter_string);
+                            }
 
-                    let translated: Option<String> =
-                        get_translated_parameter(Code::Dialogue, &subparameter_string, map, game_type);
+                            let translated: Option<String> =
+                                get_translated_parameter(Code::Dialogue, &subparameter_string, map, game_type);
 
-                    if let Some(translated) = translated {
-                        list[it]["parameters"][0][i] = to_value(&translated).unwrap();
+                            if let Some(translated) = translated {
+                                list[it]["parameters"][0][i] = to_value(&translated).unwrap();
+                            }
+                        }
                     }
                 }
             }
-        } else if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
-            let mut parameter_string: String = parameter_str.to_string();
+            356 => {
+                if let Some(parameter_str) = list[it]["parameters"][0].as_str() {
+                    let mut parameter_string: String = parameter_str.to_string();
 
-            if romanize {
-                parameter_string = romanize_string(parameter_string);
+                    if romanize {
+                        parameter_string = romanize_string(parameter_string);
+                    }
+
+                    let translated: Option<String> =
+                        get_translated_parameter(Code::System, &parameter_string, map, game_type);
+
+                    if let Some(translated) = translated {
+                        list[it]["parameters"][0] = to_value(&translated).unwrap();
+                    }
+                }
             }
+            402 | 324 | 320 => {
+                if let Some(parameter_str) = list[it]["parameters"][1].as_str() {
+                    let mut parameter_string: String = parameter_str.to_string();
 
-            let translated: Option<String> = get_translated_parameter(Code::System, &parameter_string, map, game_type);
+                    if romanize {
+                        parameter_string = romanize_string(parameter_string);
+                    }
 
-            if let Some(translated) = translated {
-                list[it]["parameters"][0] = to_value(&translated).unwrap();
+                    let translated: Option<String> =
+                        get_translated_parameter(Code::Unknown, &parameter_string, map, game_type);
+
+                    if let Some(translated) = translated {
+                        list[it]["parameters"][1] = to_value(&translated).unwrap();
+                    }
+                }
             }
-        } else if let Some(parameter_str) = list[it]["parameters"][1].as_str() {
-            let mut parameter_string: String = parameter_str.to_string();
-
-            if romanize {
-                parameter_string = romanize_string(parameter_string);
-            }
-
-            let translated: Option<String> = get_translated_parameter(Code::Unknown, &parameter_string, map, game_type);
-
-            if let Some(translated) = translated {
-                list[it]["parameters"][1] = to_value(&translated).unwrap();
-            }
+            _ => unreachable!(),
         }
     }
 }
@@ -349,34 +368,29 @@ pub fn write_maps(
     let maps_obj_vec: Vec<(String, Object)> = read_dir(original_path)
         .unwrap()
         .par_bridge()
-        .fold(
-            Vec::new,
-            |mut vec: Vec<(String, Object)>, entry: Result<DirEntry, _>| match entry {
-                Ok(entry) => {
-                    let filename: OsString = entry.file_name();
-                    let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
+        .filter_map(|entry: Result<DirEntry, std::io::Error>| {
+            if let Ok(entry) = entry {
+                let filename: OsString = entry.file_name();
+                let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
 
-                    let fourth_char: char;
-                    unsafe {
-                        fourth_char = *filename_str.as_bytes().get_unchecked(3) as char;
-                    }
-
-                    if filename_str.starts_with("Map") && fourth_char.is_ascii_digit() && filename_str.ends_with("json")
-                    {
-                        vec.push((
-                            filename_str.to_string(),
-                            from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
-                        ))
-                    }
-                    vec
+                let fourth_char: char;
+                unsafe {
+                    fourth_char = *filename_str.as_bytes().get_unchecked(3) as char;
                 }
-                Err(_) => vec![],
-            },
-        )
-        .reduce(Vec::new, |mut a, b| {
-            a.extend(b);
-            a
-        });
+
+                if filename_str.starts_with("Map") && fourth_char.is_ascii_digit() && filename_str.ends_with("json") {
+                    Some((
+                        filename_str.to_string(),
+                        from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
+                    ))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        })
+        .collect();
 
     let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
         .unwrap()
@@ -453,8 +467,8 @@ pub fn write_maps(
     // 102 - dialogue choices array
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
-    // 324 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 5] = [401, 102, 402, 356, 324];
+    // 324, 320 - i don't know what is it but it's some used in-game lines
+    const ALLOWED_CODES: [u64; 6] = [102, 320, 324, 356, 401, 402];
 
     maps_obj_vec.into_par_iter().for_each(|(filename, mut obj)| {
         {
@@ -525,40 +539,44 @@ pub fn write_other(
     let other_obj_arr_vec: Vec<(String, Array)> = read_dir(original_path)
         .unwrap()
         .par_bridge()
-        .fold(
-            Vec::new,
-            |mut vec: Vec<(String, Array)>, entry: Result<DirEntry, _>| match entry {
-                Ok(entry) => {
-                    let filename_os_string: OsString = entry.file_name();
-                    let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
-                    let (real_name, extension) = filename.split_once('.').unwrap();
+        .filter_map(|entry: Result<DirEntry, std::io::Error>| {
+            if let Ok(entry) = entry {
+                let filename_os_string: OsString = entry.file_name();
+                let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                let (real_name, extension) = filename.split_once('.').unwrap();
 
-                    if !real_name.starts_with("Map")
-                        && !matches!(real_name, "Tilesets" | "Animations" | "States" | "System")
-                        && extension == "json"
+                if !real_name.starts_with("Map")
+                    && !matches!(real_name, "Tilesets" | "Animations" | "System")
+                    && extension == "json"
+                {
+                    if game_type
+                        .as_ref()
+                        .is_some_and(|game_type: &GameType| *game_type == GameType::Termina)
+                        && real_name == "States"
                     {
-                        vec.push((
-                            filename.to_string(),
-                            from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
-                        ));
+                        return None;
                     }
-                    vec
+
+                    Some((
+                        filename.to_string(),
+                        from_str(&read_to_string(entry.path()).unwrap()).unwrap(),
+                    ))
+                } else {
+                    None
                 }
-                Err(_) => vec![],
-            },
-        )
-        .reduce(Vec::new, |mut a, b| {
-            a.extend(b);
-            a
-        });
+            } else {
+                None
+            }
+        })
+        .collect();
 
     // 401 - dialogue lines
     // 405 - credits lines
     // 102 - dialogue choices array
     // 402 - one of the dialogue choices from the array
     // 356 - system lines (special texts)
-    // 324 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u64; 6] = [401, 402, 405, 356, 102, 324];
+    // 324, 320 - i don't know what is it but it's some used in-game lines
+    const ALLOWED_CODES: [u64; 7] = [102, 320, 324, 356, 401, 402, 405];
 
     other_obj_arr_vec.into_par_iter().for_each(|(filename, mut obj_arr)| {
         let other_processed_filename: &str = &filename[..filename.len() - 5];
