@@ -287,10 +287,8 @@ fn parse_list<T: BuildHasher>(
         match code {
             401 | 405 => {
                 if let Some(parameter_str) = parameters[0].as_str() {
-                    if !parameter_str.is_empty() {
-                        in_sequence = true;
-                        line.push(parameter_str.trim().to_string()); // Maybe this shouldn't be trimmed
-                    }
+                    in_sequence = true;
+                    line.push(parameter_str.trim().to_string()); // Maybe this shouldn't be trimmed
                 }
             }
             102 => {
@@ -478,7 +476,7 @@ pub fn read_map(
             }
         }
 
-        //Skipping first element in array as it is null
+        // Skipping first element in array as it is null
         for event in obj["events"].as_array().unwrap().iter().skip(1) {
             if !event["pages"].is_array() {
                 continue;

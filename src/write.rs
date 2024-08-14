@@ -487,7 +487,7 @@ pub fn write_maps(
             .as_array_mut()
             .unwrap()
             .par_iter_mut()
-            .skip(1) //Skipping first element in array as it is null
+            .skip(1) // Skipping first element in array as it is null
             .for_each(|event: &mut Value| {
                 if event.is_null() {
                     return;
@@ -686,12 +686,12 @@ pub fn write_other(
                     }
                 });
         } else {
-            //Other files have the structure somewhat similar to Maps.json files
+            // Other files have the structure somewhat similar to Maps.json files
             obj_arr
                 .par_iter_mut()
-                .skip(1) //Skipping first element in array as it is null
+                .skip(1) // Skipping first element in array as it is null
                 .for_each(|obj: &mut Value| {
-                    //CommonEvents doesn't have pages, so we can just check if it's Troops
+                    // CommonEvents doesn't have pages, so we can just check if it's Troops
                     let pages_length: usize = if filename.starts_with("Troops") {
                         obj["pages"].as_array().unwrap().len()
                     } else {
@@ -699,8 +699,8 @@ pub fn write_other(
                     };
 
                     for i in 0..pages_length {
-                        //If element has pages, then we'll iterate over them
-                        //Otherwise we'll just iterate over the list
+                        // If element has pages, then we'll iterate over them
+                        // Otherwise we'll just iterate over the list
                         let list_value: &mut Value = if pages_length != 1 {
                             &mut obj["pages"][i]["list"]
                         } else {
@@ -1035,7 +1035,7 @@ pub fn write_plugins(
 
         // It it's a plugin with the needed text, proceed
         if plugin_names.contains(name) {
-            //YEP_OptionsCore should be processed differently, as its parameters is a mess, that can't even be parsed to json
+            // YEP_OptionsCore should be processed differently, as its parameters is a mess, that can't even be parsed to json
             if name == "YEP_OptionsCore" {
                 obj["parameters"]
                     .as_object_mut()
