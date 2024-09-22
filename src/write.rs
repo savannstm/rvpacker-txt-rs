@@ -409,8 +409,12 @@ fn write_list(
                         get_translated_parameter(Code::Choice, &subparameter_string, map, game_type, engine_type);
 
                     if let Some(translated) = translated {
-                        list[it][parameters_label][0][i] =
-                            json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                        if engine_type == EngineType::New {
+                            list[it][parameters_label][0][i] = Value::from(&translated);
+                        } else {
+                            list[it][parameters_label][0][i] =
+                                json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                        }
                     }
                 }
             }
@@ -447,8 +451,12 @@ fn write_list(
                     get_translated_parameter(Code::System, &parameter_string, map, game_type, engine_type);
 
                 if let Some(translated) = translated {
-                    list[it][parameters_label][0] =
-                        json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                    if engine_type == EngineType::New {
+                        list[it][parameters_label][0] = Value::from(&translated);
+                    } else {
+                        list[it][parameters_label][0] =
+                            json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                    }
                 }
             }
             320 | 324 | 402 => {
@@ -484,8 +492,12 @@ fn write_list(
                     get_translated_parameter(Code::Unknown, &parameter_string, map, game_type, engine_type);
 
                 if let Some(translated) = translated {
-                    list[it][parameters_label][1] =
-                        json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                    if engine_type == EngineType::New {
+                        list[it][parameters_label][1] = Value::from(&translated);
+                    } else {
+                        list[it][parameters_label][1] =
+                            json!({"__type": "bytes", "data": Array::from(translated.as_bytes())});
+                    }
                 }
             }
             _ => unreachable!(),
@@ -1008,7 +1020,7 @@ pub fn write_system(
 
     let system_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = system_original_text
         .into_par_iter()
-        .zip(system_translated_text.into_par_iter())
+        .zip(system_translated_text)
         .fold(
             HashMap::default,
             |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
@@ -1151,7 +1163,7 @@ pub fn write_system(
         .unwrap()
         .iter_mut()
         .for_each(|(key, value): (&str, &mut Value)| {
-            if !key.starts_with("__symbol__") {
+            if engine_type != EngineType::New && !key.starts_with("__symbol__") {
                 return;
             }
 
@@ -1232,7 +1244,7 @@ pub fn write_system(
         println!("{file_written_msg} {}", system_file_path.display());
     }
 
-    write(output_path.join(system_file_path), output_data).unwrap();
+    write(output_path.join(system_file_path.file_name().unwrap()), output_data).unwrap();
 }
 
 /// Writes plugins.txt file back to its initial form. Currently works only if game_type is GameType::Termina.
