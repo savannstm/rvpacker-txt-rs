@@ -1,6 +1,5 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
-use fastrand::seed;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sonic_rs::{from_str, prelude::*, Object};
@@ -820,10 +819,6 @@ fn main() {
         }
 
         let shuffle_level: u8 = *subcommand_matches.get_one("shuffle-level").unwrap();
-
-        if shuffle_level > 0 {
-            seed(69);
-        }
 
         if metadata_file_path.exists() {
             let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
