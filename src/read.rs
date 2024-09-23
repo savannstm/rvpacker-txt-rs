@@ -21,14 +21,17 @@ trait Join {
     fn join(&self, delimiter: &str) -> String;
 }
 
-impl<T: ToString + AsRef<str>, S: std::hash::BuildHasher> Join for IndexSet<T, S> {
+impl<T: ToString + AsRef<str>, S: BuildHasher> Join for IndexSet<T, S> {
     fn join(&self, delimiter: &str) -> String {
         let mut joined: String = String::new();
-        joined.push_str(self.get_index(0).unwrap().as_ref());
 
-        for item in self.iter().skip(1) {
-            joined.push_str(delimiter);
-            joined.push_str(item.as_ref());
+        if !self.is_empty() {
+            joined.push_str(self.get_index(0).unwrap().as_ref());
+
+            for item in self.iter().skip(1) {
+                joined.push_str(delimiter);
+                joined.push_str(item.as_ref());
+            }
         }
 
         joined
