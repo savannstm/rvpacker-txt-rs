@@ -3,8 +3,10 @@ use crate::{
     romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable, ENDS_WITH_IF_RE,
     INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE, STRING_IS_ONLY_SYMBOLS_RE,
 };
+use encoding_rs::{CoderResult, Encoding};
+use flate2::read::ZlibDecoder;
 use indexmap::{IndexMap, IndexSet};
-use marshal_rs::load::load;
+use marshal_rs::load::{load, StringMode};
 use rayon::prelude::*;
 use regex::Regex;
 use sonic_rs::{from_str, from_value, prelude::*, Array, Value};
@@ -12,6 +14,7 @@ use std::{
     ffi::OsString,
     fs::{read, read_dir, read_to_string, write, DirEntry},
     hash::{BuildHasher, BuildHasherDefault},
+    io::Read,
     path::Path,
     str::{from_utf8_unchecked, Chars},
 };
@@ -1266,11 +1269,42 @@ pub fn read_system(
 pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool, logging: bool, file_parsed_msg: &str) {
     let mut strings: Vec<String> = Vec::new();
 
-    let scripts_content: String = read_to_string(scripts_file_path).unwrap();
-    let extracted_strings: IndexSet<String> = extract_strings(&scripts_content, false).0;
+    let scripts_entries: Value = load(&read(scripts_file_path).unwrap(), Some(StringMode::Binary), None);
 
-    let forgot_what_it_does_re: Regex = Regex::new(r"^([d\d\p{P}+-]*|[d\p{P}+-]&*)$").unwrap();
-    let res: [Regex; 11] = [
+    let encodings: [&Encoding; 5] = [
+        encoding_rs::UTF_8,
+        encoding_rs::WINDOWS_1252,
+        encoding_rs::WINDOWS_1251,
+        encoding_rs::SHIFT_JIS,
+        encoding_rs::GB18030,
+    ];
+
+    let mut codes_content: Vec<String> = Vec::with_capacity(256);
+
+    for code in scripts_entries.as_array().unwrap() {
+        let bytes_stream: Vec<u8> = from_value(&code[2]["data"]).unwrap();
+
+        let mut inflated: Vec<u8> = Vec::new();
+        ZlibDecoder::new(&*bytes_stream).read_to_end(&mut inflated).unwrap();
+
+        let mut code_string: String = String::with_capacity(16_777_216);
+
+        for encoding in encodings {
+            let (result, _, had_errors) = encoding
+                .new_decoder()
+                .decode_to_string(&inflated, &mut code_string, true);
+
+            if result == CoderResult::InputEmpty && !had_errors {
+                break;
+            }
+        }
+
+        codes_content.push(code_string);
+    }
+
+    let extracted_strings: IndexSet<String> = extract_strings(&codes_content.join(""), false).0;
+
+    let regexes: [Regex; 11] = [
         Regex::new(r"(Graphics|Data|Audio|Movies|System)\/.*\/?").unwrap(),
         Regex::new(r"r[xv]data2?$").unwrap(),
         STRING_IS_ONLY_SYMBOLS_RE.to_owned(),
@@ -1279,7 +1313,7 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         Regex::new(r"_").unwrap(),
         Regex::new(r"^\\e").unwrap(),
         Regex::new(r".*\(").unwrap(),
-        forgot_what_it_does_re,
+        Regex::new(r"^([d\d\p{P}+-]*|[d\p{P}+-]&*)$").unwrap(),
         Regex::new(r"ALPHAC").unwrap(),
         Regex::new(r"^(Actor<id>|ExtraDropItem|EquipLearnSkill|GameOver|Iconset|Window|true|false|MActor%d|[wr]b|\\f|\\n|\[[A-Z]*\])$").unwrap(),
     ];
@@ -1289,7 +1323,7 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
             continue;
         }
 
-        for re in res.iter() {
+        for re in regexes.iter() {
             if re.is_match(&extracted) {
                 continue 'extracted;
             }

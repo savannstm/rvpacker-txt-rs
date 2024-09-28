@@ -164,13 +164,25 @@ impl<'a> ProgramLocalization<'a> {
     fn load_english() -> Self {
         ProgramLocalization {
             // About message and templates
-            about_msg: cstr!("<bold>This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them back to their initial form.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Usage:</> rvpacker-txt-rs COMMAND [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
-            subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
+            about_msg: cstr!(
+                "<bold>This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them \
+                 back to their initial form.</bold>"
+            ),
+            help_template: cstr!(
+                "{about}\n\n<underline,bold>Usage:</> rvpacker-txt-rs COMMAND \
+                 [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"
+            ),
+            subcommand_help_template: cstr!(
+                "{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"
+            ),
 
             // Command descriptions
-            read_command_desc: cstr!(r#"<bold>Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output directory.</bold>"#),
-            write_command_desc: cstr!(r#"<bold>Writes translated files using original files from "original" or "data" ("Data") folders of input directory and writes results to "output" folder of output directory.</bold>"#),
+            read_command_desc: cstr!(
+                r#"<bold>Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output directory.</bold>"#
+            ),
+            write_command_desc: cstr!(
+                r#"<bold>Writes translated files using original files from "original" or "data" ("Data") folders of input directory and writes results to "output" folder of output directory.</bold>"#
+            ),
 
             // Argument descriptions
             input_dir_arg_read_desc: r#"Input directory, containing folder "original" or "data" ("Data") with original game files."#,
@@ -179,15 +191,20 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_arg_read_desc: r#"Output directory, where a "translation" folder with translation .txt files will be created."#,
             output_dir_arg_write_desc: r#"Output directory, where an "output" folder with "data" ("Data") and/or "js" subfolders with game files with translated text from .txt files will be created."#,
 
-            shuffle_level_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
+            shuffle_level_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words \
+                                     in translation lines.",
             disable_processing_arg_desc: "Skips processing specified files.",
 
             romanize_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents (in this case, ''). This flag will automatically be used when writing if you parsed game text with it."#,
 
             force_arg_desc: "Force rewrite all files. Cannot be used with --append.",
-            append_arg_desc: "When the game, which files you've parsed, or the rvpacker-txt-rs updates, you probably should re-read game files using --append flag, to append any unparsed text to the existing without overwriting translation. Cannot be used with --force.",
+            append_arg_desc: "When the game, which files you've parsed, or the rvpacker-txt-rs updates, you probably \
+                              should re-read game files using --append flag, to append any unparsed text to the \
+                              existing without overwriting translation. Cannot be used with --force.",
 
-            disable_custom_processing_desc: "Disables built-in custom processing, implemented for some games. This flag will automatically be used when writing if you parsed game text with it.",
+            disable_custom_processing_desc: "Disables built-in custom processing, implemented for some games. This \
+                                             flag will automatically be used when writing if you parsed game text \
+                                             with it.",
             language_arg_desc: "Sets the localization of the tool to the selected language.",
 
             log_arg_desc: "Enables logging.",
@@ -207,31 +224,47 @@ impl<'a> ProgramLocalization<'a> {
             translation_dirs_missing: r#"The "translation/maps" and/or "translation/other" folders in the input directory do not exist."#,
             file_written_msg: "Wrote file",
             file_parsed_msg: "Parsed file",
-            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
+            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force \
+                                      flag, or --append if you want append new text to already existing files.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             done_in_msg: "Done in:",
-            force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the folder, including _trans. Input 'Y' to continue.",
-            custom_processing_enabled_msg: "Custom processing for this game will be used. Use --disable-custom-processing to disable it.",
+            force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the \
+                                 folder, including _trans. Input 'Y' to continue.",
+            custom_processing_enabled_msg: "Custom processing for this game will be used. Use \
+                                            --disable-custom-processing to disable it.",
             enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
-            disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from previous read.",
+            disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from \
+                                                       previous read.",
 
             // Misc
             possible_values: "Allowed values:",
             example: "Example:",
             default_value: "Default value:",
             when_reading: "When reading:",
-            when_writing: "When writing:"
+            when_writing: "When writing:",
         }
     }
 
     fn load_russian() -> Self {
         ProgramLocalization {
-            about_msg: cstr!("<bold>Инструмент, позволяющий парсить текст из файлов RPG Maker XP/VX/VXAce/MV/MZ игр в .txt файлы, а затем записывать их обратно в совместимые файлы.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Использование:</> rvpacker-txt-rs КОМАНДА [ОПЦИИ]\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
-            subcommand_help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"),
+            about_msg: cstr!(
+                "<bold>Инструмент, позволяющий парсить текст из файлов RPG Maker XP/VX/VXAce/MV/MZ игр в .txt файлы, \
+                 а затем записывать их обратно в совместимые файлы.</bold>"
+            ),
+            help_template: cstr!(
+                "{about}\n\n<underline,bold>Использование:</> rvpacker-txt-rs КОМАНДА \
+                 [ОПЦИИ]\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"
+            ),
+            subcommand_help_template: cstr!(
+                "{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"
+            ),
 
-            read_command_desc: cstr!(r#"<bold>Парсит файлы из папки "original" или "data" ("Data") входной директории в папку "translation" выходной директории.</bold>"#),
-            write_command_desc: cstr!(r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" ("Data") входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</bold>"#),
+            read_command_desc: cstr!(
+                r#"<bold>Парсит файлы из папки "original" или "data" ("Data") входной директории в папку "translation" выходной директории.</bold>"#
+            ),
+            write_command_desc: cstr!(
+                r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" ("Data") входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</bold>"#
+            ),
 
             input_dir_arg_read_desc: r#"Входная директория, содержащая папку "original" или "data" ("Data") с оригинальными файлами игры."#,
             input_dir_arg_write_desc: r#"Входная директория, содержащая папку "original" или "data" ("Data") с оригинальными файлами игры, а также папку "translation" с .txt файлами перевода."#,
@@ -239,15 +272,21 @@ impl<'a> ProgramLocalization<'a> {
             output_dir_arg_read_desc: r#"Выходная директория, где будет создана папка "translation" с .txt файлами перевода."#,
             output_dir_arg_write_desc: r#"Выходная директория, где будет создана папка "output" с подпапками "data" ("Data") и/или "js", содержащими игровые файлы с переведённым текстом из .txt файлов."#,
 
-            shuffle_level_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
+            shuffle_level_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает \
+                                     все слова в строках перевода.",
             disable_processing_arg_desc: "Не обрабатывает указанные файлы.",
 
             romanize_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, '')"#,
 
             force_arg_desc: "Принудительно перезаписать все файлы. Не может быть использован с --append.",
-            append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-txt-rs обновляется, вы, наверное, должны перечитать файлы игры используя флаг --append, чтобы добавить любой нераспарсенный текст к имеющемуся без перезаписи прогресса. Не может быть использован с --force.",
+            append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-txt-rs обновляется, вы, \
+                              наверное, должны перечитать файлы игры используя флаг --append, чтобы добавить любой \
+                              нераспарсенный текст к имеющемуся без перезаписи прогресса. Не может быть использован с \
+                              --force.",
 
-            disable_custom_processing_desc: "Отключает использование индивидуальных способов обработки текста, имплементированных для некоторых игр. Этот флаг будет автоматически применён при записи, если текст игры был прочитан с его использованием.",
+            disable_custom_processing_desc: "Отключает использование индивидуальных способов обработки текста, \
+                                             имплементированных для некоторых игр. Этот флаг будет автоматически \
+                                             применён при записи, если текст игры был прочитан с его использованием.",
             language_arg_desc: "Устанавливает локализацию инструмента на выбранный язык.",
 
             log_arg_desc: "Включает логирование.",
@@ -265,19 +304,25 @@ impl<'a> ProgramLocalization<'a> {
             translation_dirs_missing: r#"Папки "translation/maps" и/или "translation/other" входной директории не существуют."#,
             file_written_msg: "Записан файл",
             file_parsed_msg: "Распарсен файл",
-            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
+            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, \
+                                      используйте флаг --force, или --append если вы хотите добавить новый текст в \
+                                      файлы.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             done_in_msg: "Выполнено за:",
-            force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, включая _trans-файлы. Введите Y, чтобы продолжить.",
-            custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. Используйте --disable-custom-processing, чтобы отключить её.",
-            enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста будет использована.",
-            disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная обработка текста будет выключена.",
+            force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, \
+                                 включая _trans-файлы. Введите Y, чтобы продолжить.",
+            custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. \
+                                            Используйте --disable-custom-processing, чтобы отключить её.",
+            enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста \
+                                             будет использована.",
+            disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная \
+                                                       обработка текста будет выключена.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
             default_value: "Значение по умолчанию:",
             when_reading: "При чтении:",
-            when_writing: "При записи:"
+            when_writing: "При записи:",
         }
     }
 }
@@ -682,14 +727,14 @@ fn main() {
             let system_obj: Object = from_str::<Object>(&read_to_string(&system_file_path).unwrap()).unwrap();
             system_obj["gameTitle"].as_str().unwrap().to_string()
         } else {
-            let ini_file_path: &Path = &original_path.join("Game.ini");
+            let ini_file_path: &Path = &input_dir.join("Game.ini");
             let ini_file_content: String = read_to_string(ini_file_path).unwrap();
 
             let mut game_title: Option<String> = None;
 
             for line in ini_file_content.lines() {
                 if line.to_lowercase().starts_with("title") {
-                    game_title = Some(line.splitn(2, "=").last().unwrap().trim().to_string())
+                    game_title = Some(line.splitn(2, "=").last().unwrap().trim().to_string());
                 }
             }
 
@@ -899,6 +944,7 @@ fn main() {
                 data_output_path,
                 romanize,
                 logging,
+                &engine_type,
                 localization.file_written_msg,
             )
         }

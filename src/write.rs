@@ -14,11 +14,37 @@ use std::{
     fs::{read, read_dir, read_to_string, write, DirEntry},
     hash::BuildHasherDefault,
     io::{Read, Write},
+    mem::take,
     path::Path,
     str::{from_utf8_unchecked, CharIndices, Chars},
     sync::Arc,
 };
 use xxhash_rust::xxh3::Xxh3;
+
+trait EachLine {
+    fn each_line(&self) -> Vec<String>;
+}
+
+impl EachLine for str {
+    fn each_line(&self) -> Vec<String> {
+        let mut result: Vec<String> = Vec::new();
+        let mut current_line: String = String::new();
+
+        for c in self.chars() {
+            current_line.push(c);
+
+            if c == '\n' {
+                result.push(take(&mut current_line));
+            }
+        }
+
+        if !current_line.is_empty() {
+            result.push(take(&mut current_line));
+        }
+
+        result
+    }
+}
 
 pub fn shuffle_words(string: &str) -> String {
     let mut words: Vec<&str> = SELECT_WORDS_RE.find_iter(string).map(|m: Match| m.as_str()).collect();
@@ -771,7 +797,12 @@ pub fn write_other(
     const ALLOWED_CODES: [u16; 7] = [102, 320, 324, 356, 401, 402, 405];
 
     other_obj_arr_vec.into_par_iter().for_each(|(filename, mut obj_arr)| {
-        let other_processed_filename: &str = &filename[..filename.len() - 5];
+        let other_processed_filename: &str = &filename[..filename.len()
+            - match engine_type {
+                EngineType::New => 5,
+                EngineType::VXAce => 8,
+                EngineType::VX | EngineType::XP => 7,
+            }];
 
         let other_original_text: Vec<String> =
             read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
@@ -1376,15 +1407,15 @@ pub fn write_plugins(
     }
 }
 
-fn is_escaped(index: usize, mut code_chars: CharIndices) -> bool {
+fn is_escaped(index: usize, string: &str) -> bool {
     let mut backslash_count: u8 = 0;
 
-    for i in (0..=index).rev() {
-        if code_chars.nth(i).unwrap().1 != '\\' {
+    for char in string[..index].chars().rev() {
+        if char == '\\' {
+            backslash_count += 1;
+        } else {
             break;
         }
-
-        backslash_count += 1;
     }
 
     backslash_count % 2 == 1
@@ -1396,63 +1427,60 @@ pub fn extract_strings(ruby_code: &str, mode: bool) -> (IndexSet<String>, Vec<us
     let mut inside_string: bool = false;
     let mut inside_multiline_comment: bool = false;
     let mut string_start_index: usize = 0;
-    let mut current_quote_type: Option<char> = None;
-
+    let mut current_quote_type: char = '\0';
     let mut global_index: usize = 0;
 
-    for line in ruby_code.lines() {
-        let mut chars: CharIndices = line.char_indices();
-        let chars_count: usize = chars.clone().count();
+    for line in ruby_code.each_line() {
+        let trimmed: &str = line.trim();
 
         if !inside_string {
-            if line.starts_with('#') {
-                global_index += chars_count;
+            if trimmed.starts_with('#') {
+                global_index += line.len();
                 continue;
             }
 
-            if line.starts_with("=begin") {
+            if trimmed.starts_with("=begin") {
                 inside_multiline_comment = true;
-            } else if line.starts_with("=end") {
+            } else if trimmed.starts_with("=end") {
                 inside_multiline_comment = false;
             }
         }
 
         if inside_multiline_comment {
-            global_index += chars_count;
+            global_index += line.len();
             continue;
         }
 
-        let mut index: usize = 0;
+        let char_indices: CharIndices = line.char_indices();
 
-        while index < chars_count {
-            let char: char = chars.nth(index).unwrap().1;
+        for (i, char) in char_indices {
+            if !inside_string && char == '#' {
+                break;
+            }
 
-            if !inside_string && ['\'', '"'].contains(&char) {
+            if !inside_string && (char == '"' || char == '\'') {
                 inside_string = true;
-                string_start_index = global_index + index;
-                current_quote_type = Some(char);
-            } else if inside_string
-                && current_quote_type.is_some_and(|quote_type: char| quote_type == char)
-                && is_escaped(index - 1, chars.clone())
-            {
-                let extracted_string: String = ruby_code
-                    [chars.nth(string_start_index + 1).unwrap().0..=chars.nth(global_index + index).unwrap().0]
-                    .replace("\r\n", r"\#");
+                string_start_index = global_index + i;
+                current_quote_type = char;
+            } else if inside_string && char == current_quote_type && !is_escaped(i, &line) {
+                let extracted_string: String = ruby_code[string_start_index + 1..global_index + i]
+                    .replace("\r\n", r"\#")
+                    .replace('\n', r"\#");
 
-                strings.insert(extracted_string.to_string());
+                if !strings.contains(&extracted_string) {
+                    strings.insert(extracted_string);
+                }
 
-                if !mode {
+                if mode {
                     indices.push(string_start_index + 1);
                 }
 
                 inside_string = false;
-                current_quote_type = None;
+                current_quote_type = '\0';
             }
-
-            index += 1;
         }
 
-        global_index += chars_count;
+        global_index += line.len();
     }
 
     (strings, indices)
@@ -1464,6 +1492,7 @@ pub fn write_scripts(
     output_path: &Path,
     romanize: bool,
     logging: bool,
+    engine_type: &EngineType,
     file_written_msg: &str,
 ) {
     let mut script_entries: Value = load(
@@ -1494,29 +1523,27 @@ pub fn write_scripts(
         encoding_rs::GB18030,
     ];
 
-    for (i, script) in script_entries.clone().as_array().unwrap().iter().enumerate() {
+    for script in script_entries.as_array_mut().unwrap().iter_mut() {
         let data: Vec<u8> = from_value(&script.as_array().unwrap()[2]["data"]).unwrap();
 
         let mut inflated: String = String::new();
         ZlibDecoder::new(&*data).read_to_string(&mut inflated).unwrap();
 
-        let mut code: String = String::new();
+        let mut code: String = String::with_capacity(16_777_216);
 
-        for encoding in encodings.iter() {
+        for encoding in encodings {
             let (result, _, had_errors) = encoding
                 .new_decoder()
                 .decode_to_string(inflated.as_bytes(), &mut code, true);
 
-            if result != CoderResult::InputEmpty || had_errors {
-                code.clear();
+            if result == CoderResult::InputEmpty && !had_errors {
+                break;
             }
         }
 
-        let (mut strings_array, indices_array) = extract_strings(&code, true);
+        let (strings_array, indices_array) = extract_strings(&code, true);
 
-        for i in 0..strings_array.len() {
-            let mut string: String = strings_array.pop().unwrap();
-
+        for (mut string, index) in strings_array.into_iter().zip(indices_array).rev() {
             if string.is_empty() || !scripts_translation_map.contains_key(&string) {
                 continue;
             }
@@ -1528,10 +1555,7 @@ pub fn write_scripts(
             let translated: Option<&String> = scripts_translation_map.get(&string);
 
             if let Some(translated) = translated {
-                let before: &str = &code[0..indices_array[i]];
-                let after: &str = &code[indices_array[i] + string.len()..];
-
-                code = before.to_owned() + translated + after;
+                code.replace_range(index..index + string.len(), translated);
             }
         }
 
@@ -1543,13 +1567,23 @@ pub fn write_scripts(
 
         let data: Array = Array::from(buf);
 
-        script_entries.as_array_mut().unwrap()[i].as_array_mut().unwrap()[2] =
-            json!({ "__type": "bytes", "data": data });
+        if let Some(arr) = script[2].as_array_mut() {
+            arr[2]["data"] = data.into()
+        };
     }
 
     if logging {
         println!("{file_written_msg} {}", scripts_file_path.display());
     }
 
-    write(output_path, dump(script_entries.clone(), None)).unwrap();
+    write(
+        output_path.join(match engine_type {
+            EngineType::VXAce => "Scripts.rvdata2",
+            EngineType::VX => "Scripts.rvdata",
+            EngineType::XP => "Scripts.rxdata",
+            EngineType::New => unreachable!(),
+        }),
+        dump(script_entries, None),
+    )
+    .unwrap();
 }
