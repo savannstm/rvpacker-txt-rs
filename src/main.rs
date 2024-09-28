@@ -1,9 +1,8 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
-use fastrand::seed;
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use regex::Regex;
-use sonic_rs::{from_str, JsonValueTrait, Object};
+use sonic_rs::{from_str, prelude::*, Object};
 use std::{
     env::args,
     fs::{create_dir_all, read_to_string, write},
@@ -17,9 +16,16 @@ use sys_locale::get_locale;
 mod read;
 mod write;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 enum GameType {
     Termina,
+    LisaRPG,
+}
+
+impl PartialEq<GameType> for &GameType {
+    fn eq(&self, other: &GameType) -> bool {
+        *self == other
+    }
 }
 
 #[derive(PartialEq)]
@@ -41,6 +47,26 @@ impl PartialEq<ProcessingMode> for &ProcessingMode {
     }
 }
 
+#[derive(PartialEq)]
+enum EngineType {
+    XP,
+    VX,
+    VXAce,
+    New,
+}
+
+impl AsRef<EngineType> for EngineType {
+    fn as_ref(&self) -> &EngineType {
+        self
+    }
+}
+
+impl PartialEq<EngineType> for &EngineType {
+    fn eq(&self, other: &EngineType) -> bool {
+        *self == other
+    }
+}
+
 enum Code {
     Dialogue, // also goes for credit
     Choice,
@@ -53,7 +79,7 @@ enum Language {
     Russian,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone, Copy)]
 enum Variable {
     Name,
     Nickname,
@@ -138,30 +164,47 @@ impl<'a> ProgramLocalization<'a> {
     fn load_english() -> Self {
         ProgramLocalization {
             // About message and templates
-            about_msg: cstr!("<bold>This tool allows to parse RPG Maker MV/MZ games text to .txt files and write them back to their initial form.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Usage:</> rvpacker-json-txt COMMAND [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"),
-            subcommand_help_template: cstr!("{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"),
+            about_msg: cstr!(
+                "<bold>This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them \
+                 back to their initial form.</bold>"
+            ),
+            help_template: cstr!(
+                "{about}\n\n<underline,bold>Usage:</> rvpacker-txt-rs COMMAND \
+                 [OPTIONS]\n\n<underline,bold>Commands:</>\n{subcommands}\n\n<underline,bold>Options:</>\n{options}"
+            ),
+            subcommand_help_template: cstr!(
+                "{about}\n\n<underline,bold>Usage:</> {usage}\n\n<underline,bold>Options:</>\n{options}"
+            ),
 
             // Command descriptions
-            read_command_desc: cstr!(r#"<bold>Parses files from "original" or "data" folders of input directory to "translation" folder of output directory.</bold>"#),
-            write_command_desc: cstr!(r#"<bold>Writes translated files using original files from "original" or "data" folders of input directory and writes results to "output" folder of output directory.</bold>"#),
+            read_command_desc: cstr!(
+                r#"<bold>Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output directory.</bold>"#
+            ),
+            write_command_desc: cstr!(
+                r#"<bold>Writes translated files using original files from "original" or "data" ("Data") folders of input directory and writes results to "output" folder of output directory.</bold>"#
+            ),
 
             // Argument descriptions
-            input_dir_arg_read_desc: r#"Input directory, containing folder "original" or "data" with original game files."#,
-            input_dir_arg_write_desc: r#"Input directory, containing folder "original" or "data" with original game files, and folder "translation" with translation .txt files."#,
+            input_dir_arg_read_desc: r#"Input directory, containing folder "original" or "data" ("Data") with original game files."#,
+            input_dir_arg_write_desc: r#"Input directory, containing folder "original" or "data" ("Data") with original game files, and folder "translation" with translation .txt files."#,
 
             output_dir_arg_read_desc: r#"Output directory, where a "translation" folder with translation .txt files will be created."#,
-            output_dir_arg_write_desc: r#"Output directory, where an "output" folder with "data" and "js" subfolders with game files with translated text from .txt files will be created."#,
+            output_dir_arg_write_desc: r#"Output directory, where an "output" folder with "data" ("Data") and/or "js" subfolders with game files with translated text from .txt files will be created."#,
 
-            shuffle_level_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words in translation lines.",
+            shuffle_level_arg_desc: "With value 1, shuffles all translation lines. With value 2, shuffles all words \
+                                     in translation lines.",
             disable_processing_arg_desc: "Skips processing specified files.",
 
-            romanize_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents (in this case, ""). This flag will automatically be used when writing if you parsed game text with it."#,
+            romanize_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents (in this case, ''). This flag will automatically be used when writing if you parsed game text with it."#,
 
             force_arg_desc: "Force rewrite all files. Cannot be used with --append.",
-            append_arg_desc: "When the game, which files you've parsed, or the rvpacker-json-txt updates, you probably should re-read game files using --append flag, to append any unparsed text to the existing without overwriting translation. Cannot be used with --force.",
+            append_arg_desc: "When the game, which files you've parsed, or the rvpacker-txt-rs updates, you probably \
+                              should re-read game files using --append flag, to append any unparsed text to the \
+                              existing without overwriting translation. Cannot be used with --force.",
 
-            disable_custom_processing_desc: "Disables built-in custom processing, implemented for some games. This flag will automatically be used when writing if you parsed game text with it.",
+            disable_custom_processing_desc: "Disables built-in custom processing, implemented for some games. This \
+                                             flag will automatically be used when writing if you parsed game text \
+                                             with it.",
             language_arg_desc: "Sets the localization of the tool to the selected language.",
 
             log_arg_desc: "Enables logging.",
@@ -177,51 +220,73 @@ impl<'a> ProgramLocalization<'a> {
             // Messages and warnings
             input_dir_not_exist: "Input directory does not exist.",
             output_dir_not_exist: "Output directory does not exist.",
-            original_dir_missing: r#"The "original" or "data" folder in the input directory does not exist."#,
+            original_dir_missing: r#"The "original" or "data" ("Data") folder in the input directory does not exist."#,
             translation_dirs_missing: r#"The "translation/maps" and/or "translation/other" folders in the input directory do not exist."#,
             file_written_msg: "Wrote file",
             file_parsed_msg: "Parsed file",
-            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force flag, or --append if you want append new text to already existing files.",
+            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force \
+                                      flag, or --append if you want append new text to already existing files.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             done_in_msg: "Done in:",
-            force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the folder, including _trans. Input 'Y' to continue.",
-            custom_processing_enabled_msg: "Custom processing for this game will be used. Use --disable-custom-processing to disable it.",
+            force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the \
+                                 folder, including _trans. Input 'Y' to continue.",
+            custom_processing_enabled_msg: "Custom processing for this game will be used. Use \
+                                            --disable-custom-processing to disable it.",
             enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
-            disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from previous read.",
+            disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from \
+                                                       previous read.",
 
             // Misc
             possible_values: "Allowed values:",
             example: "Example:",
             default_value: "Default value:",
             when_reading: "When reading:",
-            when_writing: "When writing:"
+            when_writing: "When writing:",
         }
     }
 
     fn load_russian() -> Self {
         ProgramLocalization {
-            about_msg: cstr!("<bold>Инструмент, позволяющий парсить текст .json файлов RPG Maker MV/MZ игр в .txt файлы, а затем записывать их обратно.</bold>"),
-            help_template: cstr!("{about}\n\n<underline,bold>Использование:</> rvpacker-json-txt КОМАНДА [ОПЦИИ]\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"),
-            subcommand_help_template: cstr!("{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"),
+            about_msg: cstr!(
+                "<bold>Инструмент, позволяющий парсить текст из файлов RPG Maker XP/VX/VXAce/MV/MZ игр в .txt файлы, \
+                 а затем записывать их обратно в совместимые файлы.</bold>"
+            ),
+            help_template: cstr!(
+                "{about}\n\n<underline,bold>Использование:</> rvpacker-txt-rs КОМАНДА \
+                 [ОПЦИИ]\n\n<underline,bold>Команды:</>\n{subcommands}\n\n<underline,bold>Опции:</>\n{options}"
+            ),
+            subcommand_help_template: cstr!(
+                "{about}\n\n<underline,bold>Использование:</> {usage}\n\n<underline,bold>Опции:</>\n{options}"
+            ),
 
-            read_command_desc: cstr!(r#"<bold>Парсит файлы из папки "original" или "data" входной директории в папку "translation" выходной директории.</bold>"#),
-            write_command_desc: cstr!(r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</bold>"#),
+            read_command_desc: cstr!(
+                r#"<bold>Парсит файлы из папки "original" или "data" ("Data") входной директории в папку "translation" выходной директории.</bold>"#
+            ),
+            write_command_desc: cstr!(
+                r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" ("Data") входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</bold>"#
+            ),
 
-            input_dir_arg_read_desc: r#"Входная директория, содержащая папку "original" или "data" с оригинальными файлами игры."#,
-            input_dir_arg_write_desc: r#"Входная директория, содержащая папку "original" или "data" с оригинальными файлами игры, а также папку "translation" с .txt файлами перевода."#,
+            input_dir_arg_read_desc: r#"Входная директория, содержащая папку "original" или "data" ("Data") с оригинальными файлами игры."#,
+            input_dir_arg_write_desc: r#"Входная директория, содержащая папку "original" или "data" ("Data") с оригинальными файлами игры, а также папку "translation" с .txt файлами перевода."#,
 
             output_dir_arg_read_desc: r#"Выходная директория, где будет создана папка "translation" с .txt файлами перевода."#,
-            output_dir_arg_write_desc: r#"Выходная директория, где будет создана папка "output" с подпапками "data" и "js", содержащими игровые файлы с переведённым текстом из .txt файлов."#,
+            output_dir_arg_write_desc: r#"Выходная директория, где будет создана папка "output" с подпапками "data" ("Data") и/или "js", содержащими игровые файлы с переведённым текстом из .txt файлов."#,
 
-            shuffle_level_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает все слова в строках перевода.",
+            shuffle_level_arg_desc: "При значении 1, перемешивает все строки перевода. При значении 2, перемешивает \
+                                     все слова в строках перевода.",
             disable_processing_arg_desc: "Не обрабатывает указанные файлы.",
 
-            romanize_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, "")"#,
+            romanize_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, '')"#,
 
             force_arg_desc: "Принудительно перезаписать все файлы. Не может быть использован с --append.",
-            append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-json-txt обновляется, вы, наверное, должны перечитать файлы игры используя флаг --append, чтобы добавить любой нераспарсенный текст к имеющемуся без перезаписи прогресса. Не может быть использован с --force.",
+            append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-txt-rs обновляется, вы, \
+                              наверное, должны перечитать файлы игры используя флаг --append, чтобы добавить любой \
+                              нераспарсенный текст к имеющемуся без перезаписи прогресса. Не может быть использован с \
+                              --force.",
 
-            disable_custom_processing_desc: "Отключает использование индивидуальных способов обработки текста, имплементированных для некоторых игр. Этот флаг будет автоматически применён при записи, если текст игры был прочитан с его использованием.",
+            disable_custom_processing_desc: "Отключает использование индивидуальных способов обработки текста, \
+                                             имплементированных для некоторых игр. Этот флаг будет автоматически \
+                                             применён при записи, если текст игры был прочитан с его использованием.",
             language_arg_desc: "Устанавливает локализацию инструмента на выбранный язык.",
 
             log_arg_desc: "Включает логирование.",
@@ -235,33 +300,47 @@ impl<'a> ProgramLocalization<'a> {
 
             input_dir_not_exist: "Входная директория не существует.",
             output_dir_not_exist: "Выходная директория не существует.",
-            original_dir_missing: r#"Папка "original" или "data" входной директории не существует."#,
+            original_dir_missing: r#"Папка "original" или "data" ("Data") входной директории не существует."#,
             translation_dirs_missing: r#"Папки "translation/maps" и/или "translation/other" входной директории не существуют."#,
             file_written_msg: "Записан файл",
             file_parsed_msg: "Распарсен файл",
-            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, используйте флаг --force, или --append если вы хотите добавить новый текст в файлы.",
+            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, \
+                                      используйте флаг --force, или --append если вы хотите добавить новый текст в \
+                                      файлы.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             done_in_msg: "Выполнено за:",
-            force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, включая _trans-файлы. Введите Y, чтобы продолжить.",
-            custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. Используйте --disable-custom-processing, чтобы отключить её.",
-            enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста будет использована.",
-            disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная обработка текста будет выключена.",
+            force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, \
+                                 включая _trans-файлы. Введите Y, чтобы продолжить.",
+            custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. \
+                                            Используйте --disable-custom-processing, чтобы отключить её.",
+            enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста \
+                                             будет использована.",
+            disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная \
+                                                       обработка текста будет выключена.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
             default_value: "Значение по умолчанию:",
             when_reading: "При чтении:",
-            when_writing: "При записи:"
+            when_writing: "При записи:",
         }
     }
 }
 
-lazy_static! {pub static ref STRING_IS_ONLY_SYMBOLS_RE: Regex = Regex::new(r#"^[.()+\-:;\[\]^~%&!№$@`*\/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s0-9]+$"#).unwrap();}
+pub static STRING_IS_ONLY_SYMBOLS_RE: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r#"^[.()+\-:;\[\]^~%&!№$@`*\/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s0-9]+$"#).unwrap()
+});
+pub static ENDS_WITH_IF_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r" if\(.*\)$").unwrap());
+pub static LISA_PREFIX_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(\\et\[[0-9]+\]|\\nbt)").unwrap());
+pub static INVALID_MULTILINE_VARIABLE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^#? ?<.*>.?$|^[a-z][0-9]$").unwrap());
+pub static INVALID_VARIABLE_RE: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^[+-]?[0-9]+$|^///|---|restrict eval").unwrap());
+pub static SELECT_WORDS_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\S+").unwrap());
 
 pub fn romanize_string<T>(string: T) -> String
 where
     T: AsRef<str>,
-    std::string::String: std::convert::From<T>,
+    String: From<T>,
 {
     let actual_string: String = String::from(string);
     let mut result: String = String::new();
@@ -285,8 +364,41 @@ where
             '？' => "?",
             '！' => "!",
             '：' => ":",
-            '※' => "*",
+            '※' => "·",
             '…' | '‥' => "...",
+            '　' => " ",
+            'Ⅰ' => "I",
+            'ⅰ' => "i",
+            'Ⅱ' => "II",
+            'ⅱ' => "ii",
+            'Ⅲ' => "III",
+            'ⅲ' => "iii",
+            'Ⅳ' => "IV",
+            'ⅳ' => "iv",
+            'Ⅴ' => "V",
+            'ⅴ' => "v",
+            'Ⅵ' => "VI",
+            'ⅵ' => "vi",
+            'Ⅶ' => "VII",
+            'ⅶ' => "vii",
+            'Ⅷ' => "VIII",
+            'ⅷ' => "viii",
+            'Ⅸ' => "IX",
+            'ⅸ' => "ix",
+            'Ⅹ' => "X",
+            'ⅹ' => "x",
+            'Ⅺ' => "XI",
+            'ⅺ' => "xi",
+            'Ⅻ' => "XII",
+            'ⅻ' => "xii",
+            'Ⅼ' => "L",
+            'ⅼ' => "l",
+            'Ⅽ' => "C",
+            'ⅽ' => "c",
+            'Ⅾ' => "D",
+            'ⅾ' => "d",
+            'Ⅿ' => "M",
+            'ⅿ' => "m",
             _ => {
                 result.push(char);
                 continue;
@@ -299,15 +411,16 @@ where
     result
 }
 
-fn get_game_type(system_file_path: &Path) -> Option<GameType> {
-    let system_obj: Object = from_str(&read_to_string(system_file_path).unwrap()).unwrap();
-    let game_title: String = system_obj["gameTitle"].as_str().unwrap().to_lowercase();
+fn get_game_type(game_title: String) -> Option<&'static GameType> {
+    let lowercased: String = game_title.to_lowercase();
 
-    if game_title.contains("termina") {
-        return Some(GameType::Termina);
+    if Regex::new(r"\btermina\b").unwrap().is_match(&lowercased) {
+        Some(&GameType::Termina)
+    } else if Regex::new(r"\blisa\b").unwrap().is_match(&lowercased) {
+        Some(&GameType::LisaRPG)
+    } else {
+        None
     }
-
-    None
 }
 
 // this function probably should be replaced by some clap-native equivalent
@@ -336,6 +449,25 @@ fn preparse_arguments() -> (Language, Option<String>) {
         "ru" | "uk" | "be" => (Language::Russian, subcommand),
         _ => (Language::English, subcommand),
     }
+}
+
+fn detect_engine_type(original_path: &Path) -> (EngineType, PathBuf, PathBuf) {
+    let engine_configs: [(EngineType, &str, &str); 4] = [
+        (EngineType::New, "System.json", "Scripts.rvdata2"),
+        (EngineType::VXAce, "System.rvdata2", "Scripts.rvdata2"),
+        (EngineType::VX, "System.rvdata", "Scripts.rvdata"),
+        (EngineType::XP, "System.rxdata", "Scripts.rxdata"),
+    ];
+
+    for (engine_type, system_file, scripts_file) in engine_configs.into_iter() {
+        let system_path: PathBuf = original_path.join(system_file);
+
+        if system_path.exists() {
+            return (engine_type, system_path, original_path.join(scripts_file));
+        }
+    }
+
+    panic!("Couldn't determine game engine");
 }
 
 fn main() {
@@ -561,36 +693,55 @@ fn main() {
         panic!("{}", localization.output_dir_not_exist)
     }
 
-    let mut original_path: PathBuf = input_dir.join("original");
+    let mut original_path: &Path = &input_dir.join("original");
+    let data_path: PathBuf = input_dir.join("data");
 
     if !original_path.exists() {
-        original_path = input_dir.join("data");
+        original_path = &data_path;
 
         if !original_path.exists() {
             panic!("{}", localization.original_dir_missing)
         }
     }
 
-    let (maps_path, other_path, metadata_file_path) = if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
+    let (maps_path, other_path, metadata_file_path) = if *output_dir.as_os_str() == *"./" {
         (
-            input_dir.join("translation/maps"),
-            input_dir.join("translation/other"),
-            input_dir.join("translation/.rvpacker-json-txt-metadata.json"),
+            &input_dir.join("translation/maps"),
+            &input_dir.join("translation/other"),
+            &input_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
         )
     } else {
         (
-            output_dir.join("translation/maps"),
-            output_dir.join("translation/other"),
-            output_dir.join("translation/.rvpacker-json-txt-metadata.json"),
+            &output_dir.join("translation/maps"),
+            &output_dir.join("translation/other"),
+            &output_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
         )
     };
 
-    let system_file_path: PathBuf = original_path.join("System.json");
+    let (engine_type, system_file_path, scripts_file_path) = detect_engine_type(original_path);
 
-    let mut game_type: Option<GameType> = if disable_custom_processing {
+    let mut game_type: Option<&GameType> = if disable_custom_processing {
         None
     } else {
-        get_game_type(&system_file_path)
+        let game_title: String = if engine_type == EngineType::New {
+            let system_obj: Object = from_str::<Object>(&read_to_string(&system_file_path).unwrap()).unwrap();
+            system_obj["gameTitle"].as_str().unwrap().to_string()
+        } else {
+            let ini_file_path: &Path = &input_dir.join("Game.ini");
+            let ini_file_content: String = read_to_string(ini_file_path).unwrap();
+
+            let mut game_title: Option<String> = None;
+
+            for line in ini_file_content.lines() {
+                if line.to_lowercase().starts_with("title") {
+                    game_title = Some(line.splitn(2, "=").last().unwrap().trim().to_string());
+                }
+            }
+
+            game_title.unwrap()
+        };
+
+        get_game_type(game_title)
     };
 
     if game_type.is_some() {
@@ -606,7 +757,7 @@ fn main() {
         let append: bool = subcommand_matches.get_flag("append");
         let silent: bool = subcommand_matches.get_flag("silent");
 
-        let processing_type: ProcessingMode = if force {
+        let processing_type: &ProcessingMode = &if force {
             if !silent {
                 let start_time: Instant = Instant::now();
                 println!("{}", localization.force_mode_warning);
@@ -628,8 +779,8 @@ fn main() {
             ProcessingMode::Default
         };
 
-        create_dir_all(&maps_path).unwrap();
-        create_dir_all(&other_path).unwrap();
+        create_dir_all(maps_path).unwrap();
+        create_dir_all(other_path).unwrap();
 
         write(
             metadata_file_path,
@@ -639,42 +790,55 @@ fn main() {
 
         if !disable_maps_processing {
             read_map(
-                &original_path,
-                &maps_path,
+                original_path,
+                maps_path,
                 romanize,
                 logging,
                 localization.file_parsed_msg,
                 localization.file_already_parsed_msg,
                 localization.file_is_not_parsed_msg,
-                &game_type,
-                &processing_type,
+                game_type,
+                processing_type,
+                &engine_type,
             );
         }
 
         if !disable_other_processing {
             read_other(
-                &original_path,
-                &other_path,
+                original_path,
+                other_path,
                 romanize,
                 logging,
                 localization.file_parsed_msg,
                 localization.file_already_parsed_msg,
                 localization.file_is_not_parsed_msg,
-                &game_type,
-                &processing_type,
+                game_type,
+                processing_type,
+                &engine_type,
             );
         }
 
         if !disable_system_processing {
             read_system(
                 &system_file_path,
-                &other_path,
+                other_path,
                 romanize,
                 logging,
                 localization.file_parsed_msg,
                 localization.file_already_parsed_msg,
                 localization.file_is_not_parsed_msg,
-                &processing_type,
+                processing_type,
+                &engine_type,
+            );
+        }
+
+        if !disable_plugins_processing && engine_type != EngineType::New {
+            read_scripts(
+                &scripts_file_path,
+                other_path,
+                romanize,
+                logging,
+                localization.file_parsed_msg,
             );
         }
     } else {
@@ -684,22 +848,22 @@ fn main() {
             panic!("{}", localization.translation_dirs_missing);
         }
 
-        let plugins_path: PathBuf = input_dir.join("translation/plugins");
+        let plugins_path: &Path = &input_dir.join("translation/plugins");
 
-        let (output_path, plugins_output_path) = if output_dir.as_os_str().as_encoded_bytes() == "./".as_bytes() {
-            (input_dir.join("output/data"), input_dir.join("output/js"))
+        let (data_output_path, plugins_output_path) = if *output_dir.as_os_str() == *"./" {
+            (&input_dir.join("output/data"), &input_dir.join("output/js"))
         } else {
-            (output_dir.join("output/data"), output_dir.join("output/js"))
+            (&output_dir.join("output/data"), &output_dir.join("output/js"))
         };
 
-        create_dir_all(&output_path).unwrap();
-        create_dir_all(&plugins_output_path).unwrap();
-
-        let shuffle_level: u8 = *subcommand_matches.get_one::<u8>("shuffle-level").unwrap();
-
-        if shuffle_level > 0 {
-            seed(69);
+        if engine_type == EngineType::New {
+            create_dir_all(data_output_path).unwrap();
+            create_dir_all(plugins_output_path).unwrap();
+        } else {
+            create_dir_all(output_dir.join("output/Data")).unwrap();
         }
+
+        let shuffle_level: u8 = *subcommand_matches.get_one("shuffle-level").unwrap();
 
         if metadata_file_path.exists() {
             let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
@@ -720,55 +884,69 @@ fn main() {
 
         if !disable_maps_processing {
             write_maps(
-                &maps_path,
-                &original_path,
-                &output_path,
+                maps_path,
+                original_path,
+                data_output_path,
                 romanize,
                 shuffle_level,
                 logging,
                 localization.file_written_msg,
-                &game_type,
+                game_type,
+                &engine_type,
             );
         }
 
         if !disable_other_processing {
             write_other(
-                &other_path,
-                &original_path,
-                &output_path,
+                other_path,
+                original_path,
+                data_output_path,
                 romanize,
                 shuffle_level,
                 logging,
                 localization.file_written_msg,
-                &game_type,
+                game_type,
+                &engine_type,
             );
         }
 
         if !disable_system_processing {
             write_system(
                 &system_file_path,
-                &other_path,
-                &output_path,
+                other_path,
+                data_output_path,
                 romanize,
+                shuffle_level,
+                logging,
+                localization.file_written_msg,
+                &engine_type,
+            );
+        }
+
+        if !disable_plugins_processing
+            && plugins_path.exists()
+            && game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina)
+        {
+            write_plugins(
+                &plugins_path.join("plugins.json"),
+                plugins_path,
+                plugins_output_path,
                 shuffle_level,
                 logging,
                 localization.file_written_msg,
             );
         }
 
-        if !disable_plugins_processing
-            && plugins_path.exists()
-            && game_type.is_some()
-            && game_type.unwrap() == GameType::Termina
-        {
-            write_plugins(
-                &plugins_path.join("plugins.json"),
-                &plugins_path,
-                &plugins_output_path,
-                shuffle_level,
+        if !disable_custom_processing && engine_type != EngineType::New {
+            write_scripts(
+                &scripts_file_path,
+                other_path,
+                data_output_path,
+                romanize,
                 logging,
+                &engine_type,
                 localization.file_written_msg,
-            );
+            )
         }
     }
 

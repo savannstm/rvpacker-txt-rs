@@ -1,16 +1,19 @@
 [package]
-name = "rvpacker-json-txt"
-version = "1.9.2"
+name = "rvpacker-txt-rs"
+version = "2.0.0"
 edition = "2021"
 
 [dependencies]
-rayon = "^1.10.0"
-indexmap = "^2.2.6"
-sys-locale = "^0.3.1"
-clap = { version = "^4.5.7", features = ["wrap_help"] }
-color-print = "^0.3.6"
-xxhash-rust = { version = "0.8.11", features = ["xxh3"] }
-sonic-rs = "0.3.8"
-fastrand = "2.1.0"
-lazy_static = "1.5.0"
-regex = "1.10.5"
+rayon = "1.10.0"
+indexmap = "2.5.0"
+sys-locale = "0.3.1"
+clap = { version = "4.5.18", features = ["wrap_help"] }
+color-print = "0.3.6"
+xxhash-rust = { version = "0.8.12", features = ["xxh3"] }
+sonic-rs = "0.3.13"
+fastrand = "2.1.1"
+regex = "1.10.6"
+once_cell = "1.19.0"
+marshal-rs = { version = "0.2.4", features = ["sonic"] }
+encoding_rs = "0.8.34"
+flate2 = "1.0.33"
