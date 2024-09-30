@@ -1516,13 +1516,13 @@ pub fn write_scripts(
     let scripts_translation_map: HashMap<String, String> =
         HashMap::from_iter(original_scripts_text.into_iter().zip(translated_scripts_text));
 
-    const UTF_8: &Encoding = encoding_rs::UTF_8;
-    const WINDOWS_1252: &Encoding = encoding_rs::WINDOWS_1252;
-    const WINDOWS_1251: &Encoding = encoding_rs::WINDOWS_1251;
-    const SHIFT_JIS: &Encoding = encoding_rs::SHIFT_JIS;
-    const GB18030: &Encoding = encoding_rs::GB18030;
-
-    const ENCODINGS: [&Encoding; 5] = [UTF_8, WINDOWS_1252, WINDOWS_1251, SHIFT_JIS, GB18030];
+    let encodings: [&Encoding; 5] = [
+        encoding_rs::UTF_8,
+        encoding_rs::WINDOWS_1252,
+        encoding_rs::WINDOWS_1251,
+        encoding_rs::SHIFT_JIS,
+        encoding_rs::GB18030,
+    ];
 
     for script in script_entries.as_array_mut().unwrap().iter_mut() {
         let data: Vec<u8> = from_value(&script.as_array().unwrap()[2]["data"]).unwrap();
@@ -1532,7 +1532,7 @@ pub fn write_scripts(
 
         let mut code: String = String::with_capacity(16_777_216);
 
-        for encoding in ENCODINGS {
+        for encoding in encodings {
             let (result, _, had_errors) = encoding
                 .new_decoder()
                 .decode_to_string(inflated.as_bytes(), &mut code, true);

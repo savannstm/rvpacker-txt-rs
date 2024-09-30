@@ -1271,13 +1271,13 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
 
     let scripts_entries: Value = load(&read(scripts_file_path).unwrap(), Some(StringMode::Binary), None).unwrap();
 
-    const UTF_8: &Encoding = encoding_rs::UTF_8;
-    const WINDOWS_1252: &Encoding = encoding_rs::WINDOWS_1252;
-    const WINDOWS_1251: &Encoding = encoding_rs::WINDOWS_1251;
-    const SHIFT_JIS: &Encoding = encoding_rs::SHIFT_JIS;
-    const GB18030: &Encoding = encoding_rs::GB18030;
-
-    const ENCODINGS: [&Encoding; 5] = [UTF_8, WINDOWS_1252, WINDOWS_1251, SHIFT_JIS, GB18030];
+    let encodings: [&Encoding; 5] = [
+        encoding_rs::UTF_8,
+        encoding_rs::WINDOWS_1252,
+        encoding_rs::WINDOWS_1251,
+        encoding_rs::SHIFT_JIS,
+        encoding_rs::GB18030,
+    ];
 
     let mut codes_content: Vec<String> = Vec::with_capacity(256);
 
@@ -1289,7 +1289,7 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
 
         let mut code_string: String = String::with_capacity(16_777_216);
 
-        for encoding in ENCODINGS {
+        for encoding in encodings {
             let (result, _, had_errors) = encoding
                 .new_decoder()
                 .decode_to_string(&inflated, &mut code_string, true);
