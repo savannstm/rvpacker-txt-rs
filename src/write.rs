@@ -571,7 +571,7 @@ pub fn write_maps(
                         let json: Value = if engine_type == EngineType::New {
                             from_str(&read_to_string(entry.path()).unwrap()).unwrap()
                         } else {
-                            load(&read(entry.path()).unwrap(), None, Some(""))
+                            load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                         };
 
                         Some((filename_str.to_string(), json))
@@ -776,7 +776,7 @@ pub fn write_other(
                         let json: Value = if engine_type == EngineType::New {
                             from_str(&read_to_string(entry.path()).unwrap()).unwrap()
                         } else {
-                            load(&read(entry.path()).unwrap(), None, Some(""))
+                            load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                         };
 
                         Some((filename.to_string(), json))
@@ -1016,7 +1016,7 @@ pub fn write_system(
     let mut system_obj: Value = if engine_type == EngineType::New {
         from_str(&read_to_string(system_file_path).unwrap()).unwrap()
     } else {
-        load(&read(system_file_path).unwrap(), None, Some(""))
+        load(&read(system_file_path).unwrap(), None, Some("")).unwrap()
     };
 
     let system_original_text: Vec<String> = read_to_string(other_path.join("system.txt"))
@@ -1499,7 +1499,8 @@ pub fn write_scripts(
         &read(scripts_file_path).unwrap(),
         Some(marshal_rs::load::StringMode::Binary),
         None,
-    );
+    )
+    .unwrap();
 
     let original_scripts_text: Vec<String> = read_to_string(other_path.join("scripts.txt"))
         .unwrap()
@@ -1515,13 +1516,13 @@ pub fn write_scripts(
     let scripts_translation_map: HashMap<String, String> =
         HashMap::from_iter(original_scripts_text.into_iter().zip(translated_scripts_text));
 
-    let encodings: [&Encoding; 5] = [
-        encoding_rs::UTF_8,
-        encoding_rs::WINDOWS_1252,
-        encoding_rs::WINDOWS_1251,
-        encoding_rs::SHIFT_JIS,
-        encoding_rs::GB18030,
-    ];
+    const UTF_8: &Encoding = encoding_rs::UTF_8;
+    const WINDOWS_1252: &Encoding = encoding_rs::WINDOWS_1252;
+    const WINDOWS_1251: &Encoding = encoding_rs::WINDOWS_1251;
+    const SHIFT_JIS: &Encoding = encoding_rs::SHIFT_JIS;
+    const GB18030: &Encoding = encoding_rs::GB18030;
+
+    const ENCODINGS: [&Encoding; 5] = [UTF_8, WINDOWS_1252, WINDOWS_1251, SHIFT_JIS, GB18030];
 
     for script in script_entries.as_array_mut().unwrap().iter_mut() {
         let data: Vec<u8> = from_value(&script.as_array().unwrap()[2]["data"]).unwrap();
@@ -1531,7 +1532,7 @@ pub fn write_scripts(
 
         let mut code: String = String::with_capacity(16_777_216);
 
-        for encoding in encodings {
+        for encoding in ENCODINGS {
             let (result, _, had_errors) = encoding
                 .new_decoder()
                 .decode_to_string(inflated.as_bytes(), &mut code, true);
