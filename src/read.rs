@@ -6,7 +6,7 @@ use crate::{
 use encoding_rs::{CoderResult, Encoding};
 use flate2::read::ZlibDecoder;
 use indexmap::{IndexMap, IndexSet};
-use marshal_rs::load::{load, StringMode};
+use marshal_rs::{load, load::StringMode};
 use rayon::prelude::*;
 use regex::Regex;
 use sonic_rs::{from_str, from_value, prelude::*, Array, Value};
@@ -29,7 +29,7 @@ impl<T: ToString + AsRef<str>, S: BuildHasher> Join for IndexSet<T, S> {
         let mut joined: String = String::new();
 
         if !self.is_empty() {
-            joined.push_str(self.get_index(0).unwrap().as_ref());
+            joined.push_str(unsafe { self.get_index(0).unwrap_unchecked() }.as_ref());
 
             for item in self.iter().skip(1) {
                 joined.push_str(delimiter);
@@ -508,6 +508,7 @@ pub fn read_map(
     maps_path: &Path,
     output_path: &Path,
     romanize: bool,
+    separate_maps: bool,
     logging: bool,
     file_parsed_msg: &str,
     file_already_parsed_msg: &str,
@@ -556,6 +557,8 @@ pub fn read_map(
 
     let mut maps_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
     let mut names_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+
+    let mut maps_lines_vec: Vec<String> = Vec::new();
 
     let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
     let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
@@ -611,6 +614,15 @@ pub fn read_map(
         };
 
     for (filename, obj) in maps_obj_vec {
+        let filename_comment: String = format!("<!-- {filename} -->");
+
+        if separate_maps {
+            maps_lines_vec.extend(maps_lines.drain(..));
+            maps_lines_vec.push(filename_comment);
+        } else {
+            maps_lines.insert(filename_comment);
+        }
+
         if let Some(display_name) = obj[display_name_label].as_str() {
             if !display_name.is_empty() {
                 let mut display_name_string: String = display_name.to_string();
@@ -640,12 +652,12 @@ pub fn read_map(
                 .collect()
         };
 
-        for event in events_arr.iter() {
+        for event in events_arr {
             if !event[pages_label].is_array() {
                 continue;
             }
 
-            for page in event[pages_label].as_array().unwrap().iter() {
+            for page in event[pages_label].as_array().unwrap() {
                 parse_list(
                     page[list_label].as_array().unwrap(),
                     &ALLOWED_CODES,
@@ -677,8 +689,16 @@ pub fn read_map(
             )
         } else {
             (
-                maps_lines.join("\n"),
-                "\n".repeat(maps_lines.len().saturating_sub(1)),
+                if separate_maps {
+                    maps_lines_vec.join("\n")
+                } else {
+                    maps_lines.join("\n")
+                },
+                "\n".repeat(if separate_maps {
+                    maps_lines_vec.len().saturating_sub(1)
+                } else {
+                    maps_lines.len().saturating_sub(1)
+                }),
                 names_lines.join("\n"),
                 "\n".repeat(names_lines.len().saturating_sub(1)),
             )
@@ -1305,17 +1325,19 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
     let extracted_strings: IndexSet<String> = extract_strings(&codes_content.join(""), false).0;
 
     let regexes: [Regex; 11] = [
-        Regex::new(r"(Graphics|Data|Audio|Movies|System)\/.*\/?").unwrap(),
-        Regex::new(r"r[xv]data2?$").unwrap(),
+        unsafe { Regex::new(r"(Graphics|Data|Audio|Movies|System)\/.*\/?").unwrap_unchecked() },
+        unsafe { Regex::new(r"r[xv]data2?$").unwrap_unchecked() },
         STRING_IS_ONLY_SYMBOLS_RE.to_owned(),
-        Regex::new(r"@window").unwrap(),
-        Regex::new(r"\$game").unwrap(),
-        Regex::new(r"_").unwrap(),
-        Regex::new(r"^\\e").unwrap(),
-        Regex::new(r".*\(").unwrap(),
-        Regex::new(r"^([d\d\p{P}+-]*|[d\p{P}+-]&*)$").unwrap(),
-        Regex::new(r"ALPHAC").unwrap(),
-        Regex::new(r"^(Actor<id>|ExtraDropItem|EquipLearnSkill|GameOver|Iconset|Window|true|false|MActor%d|[wr]b|\\f|\\n|\[[A-Z]*\])$").unwrap(),
+        unsafe { Regex::new(r"@window").unwrap_unchecked() },
+        unsafe { Regex::new(r"\$game").unwrap_unchecked() },
+        unsafe { Regex::new(r"_").unwrap_unchecked() },
+        unsafe { Regex::new(r"^\\e").unwrap_unchecked() },
+        unsafe { Regex::new(r".*\(").unwrap_unchecked() },
+        unsafe { Regex::new(r"^([d\d\p{P}+-]*|[d\p{P}+-]&*)$").unwrap_unchecked() },
+        unsafe { Regex::new(r"ALPHAC").unwrap_unchecked() },
+        unsafe {
+            Regex::new(r"^(Actor<id>|ExtraDropItem|EquipLearnSkill|GameOver|Iconset|Window|true|false|MActor%d|[wr]b|\\f|\\n|\[[A-Z]*\])$").unwrap_unchecked()
+        },
     ];
 
     'extracted: for mut extracted in extracted_strings {

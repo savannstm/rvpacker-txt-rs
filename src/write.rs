@@ -4,7 +4,7 @@ use encoding_rs::{CoderResult, Encoding};
 use fastrand::shuffle;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use indexmap::IndexSet;
-use marshal_rs::{dump::dump, load::load};
+use marshal_rs::{dump, load};
 use rayon::prelude::*;
 use regex::{Captures, Match};
 use sonic_rs::{from_str, from_value, json, prelude::*, to_string, Array, Object, Value};
@@ -30,10 +30,10 @@ impl EachLine for str {
         let mut result: Vec<String> = Vec::new();
         let mut current_line: String = String::new();
 
-        for c in self.chars() {
-            current_line.push(c);
+        for char in self.chars() {
+            current_line.push(char);
 
-            if c == '\n' {
+            if char == '\n' {
                 result.push(take(&mut current_line));
             }
         }
@@ -116,7 +116,7 @@ fn get_translated_parameter<'a>(
             return None;
         }
 
-        for (string, position) in remaining_strings.into_iter().zip(insert_positions.into_iter()) {
+        for (string, position) in remaining_strings.into_iter().zip(insert_positions) {
             match position {
                 false => translated = string + &translated,
                 true => translated += &string,
@@ -181,7 +181,7 @@ fn get_translated_variable(
                                 left = left.trim();
 
                                 if left.ends_with(['.', '%', '!', '"']) {
-                                    note_string = "\n".to_string() + left;
+                                    note_string = String::from("\n") + left;
                                 }
                             } else if note.ends_with(['.', '%', '!', '"']) {
                                 note_string = note.to_string();
@@ -248,12 +248,10 @@ fn get_translated_variable(
     let translated: Option<String> = hashmap.get(&variable_text).map(|translated: &String| {
         let mut result: String = translated.to_owned();
 
-        for (string, position) in remaining_strings.into_iter().zip(insert_positions.into_iter()) {
+        for (string, position) in remaining_strings.into_iter().zip(insert_positions) {
             match position {
-                true => {
-                    result.push_str(&string);
-                }
-                false => result = string.to_owned() + &result,
+                true => result.push_str(&string),
+                false => result = string + &result,
             }
         }
 
@@ -261,25 +259,22 @@ fn get_translated_variable(
             variable_type,
             Variable::Message1 | Variable::Message2 | Variable::Message3 | Variable::Message4
         ) {
-            result = " ".to_owned() + &result;
+            result = String::from(" ") + &result;
         }
 
         #[allow(clippy::collapsible_if, clippy::collapsible_match)]
         if let Some(game_type) = game_type {
             match game_type {
-                GameType::Termina => {
-                    match variable_type {
-                        Variable::Note => {
-                            if let Some(first_char) = result.chars().next() {
-                                if first_char != '\n' {
-                                    result = "\n".to_owned() + &result
-                                }
+                GameType::Termina => match variable_type {
+                    Variable::Note => {
+                        if let Some(first_char) = result.chars().next() {
+                            if first_char != '\n' {
+                                result = String::from("\n") + &result
                             }
                         }
-                        _ => {}
                     }
-                    if variable_type == Variable::Note {}
-                }
+                    _ => {}
+                },
                 _ => {}
             }
         }
@@ -308,8 +303,8 @@ fn write_list(
     let list_length: usize = list.len();
 
     let mut in_sequence: bool = false;
-    let mut line: Vec<String> = Vec::with_capacity(256);
-    let mut item_indices: Vec<usize> = Vec::with_capacity(256);
+    let mut line: Vec<String> = Vec::with_capacity(8);
+    let mut item_indices: Vec<usize> = Vec::with_capacity(8);
 
     for it in 0..list_length {
         let code: u16 = list[it][code_label].as_u64().unwrap() as u16;
@@ -354,7 +349,8 @@ fn write_list(
 
                     if split_length > line_length {
                         let remaining: String = split[line_length - 1..].join("\n");
-                        list[*item_indices.last().unwrap()][parameters_label][0] = Value::from(&remaining);
+                        list[*unsafe { item_indices.last().unwrap_unchecked() }][parameters_label][0] =
+                            Value::from(&remaining);
                     }
                 }
 
@@ -547,64 +543,90 @@ pub fn write_maps(
     output_path: &Path,
     romanize: bool,
     shuffle_level: u8,
+    separate_maps: bool,
     logging: bool,
     file_written_msg: &str,
     game_type: Option<&GameType>,
     engine_type: &EngineType,
 ) {
-    let maps_obj_vec =
-        read_dir(original_path)
-            .unwrap()
-            .par_bridge()
-            .filter_map(|entry: Result<DirEntry, std::io::Error>| {
-                if let Ok(entry) = entry {
-                    let filename: OsString = entry.file_name();
-                    let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
+    let maps_obj_iter = read_dir(original_path)
+        .unwrap()
+        .par_bridge()
+        .filter_map(|entry: Result<DirEntry, std::io::Error>| {
+            if let Ok(entry) = entry {
+                let filename: OsString = entry.file_name();
+                let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
 
-                    if filename_str.starts_with("Map")
-                        && unsafe { (*filename_str.as_bytes().get_unchecked(3) as char).is_ascii_digit() }
-                        && (filename_str.ends_with("json")
-                            || filename_str.ends_with("rvdata2")
-                            || filename_str.ends_with("rvdata")
-                            || filename_str.ends_with("rxdata"))
-                    {
-                        let json: Value = if engine_type == EngineType::New {
-                            from_str(&read_to_string(entry.path()).unwrap()).unwrap()
-                        } else {
-                            load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
-                        };
-
-                        Some((filename_str.to_string(), json))
+                if filename_str.starts_with("Map")
+                    && unsafe { (*filename_str.as_bytes().get_unchecked(3) as char).is_ascii_digit() }
+                    && (filename_str.ends_with("json")
+                        || filename_str.ends_with("rvdata2")
+                        || filename_str.ends_with("rvdata")
+                        || filename_str.ends_with("rxdata"))
+                {
+                    let json: Value = if engine_type == EngineType::New {
+                        from_str(&read_to_string(entry.path()).unwrap()).unwrap()
                     } else {
-                        None
-                    }
+                        load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
+                    };
+
+                    Some((filename_str.to_string(), json))
                 } else {
                     None
                 }
-            });
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .into_par_iter();
 
     let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
         .unwrap()
         .par_split('\n')
-        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") && (!separate_maps || !line.starts_with("<!-- Map")) {
+                None
+            } else {
+                Some(line.replace(r"\#", "\n").trim().to_string())
+            }
+        })
         .collect();
 
     let mut maps_translated_text_vec: Vec<String> = read_to_string(maps_path.join("maps_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") && (!separate_maps || !line.starts_with("<!-- Map")) {
+                None
+            } else {
+                Some(line.replace(r"\#", "\n").trim().to_string())
+            }
+        })
         .collect();
 
     let names_original_text_vec: Vec<String> = read_to_string(maps_path.join("names.txt"))
         .unwrap()
         .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.trim().to_string())
+            }
+        })
         .collect();
 
     let mut names_translated_text_vec: Vec<String> = read_to_string(maps_path.join("names_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.trim().to_string())
+            }
+        })
         .collect();
 
     if shuffle_level > 0 {
@@ -622,26 +644,29 @@ pub fn write_maps(
         }
     }
 
-    let maps_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = maps_original_text_vec
-        .into_par_iter()
-        .zip(maps_translated_text_vec.into_par_iter())
-        .fold(
-            HashMap::default,
-            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
-                map.insert(key, value);
-                map
-            },
-        )
-        .reduce(HashMap::default, |mut a, b| {
-            a.extend(b);
-            a
-        });
+    let maps_translation_vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = {
+        let mut vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = Vec::with_capacity(512);
+        let mut hashmap: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::default();
+
+        maps_original_text_vec
+            .into_iter()
+            .zip(maps_translated_text_vec)
+            .for_each(|(original, translated)| {
+                if original.starts_with("<!-- Map") && original.ends_with("-->") {
+                    vec.push(take(&mut hashmap))
+                } else {
+                    hashmap.insert(original, translated);
+                }
+            });
+
+        vec
+    };
 
     let names_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::from_iter(
         names_original_text_vec
             .into_iter()
             .zip(names_translated_text_vec)
-            .collect::<Vec<(String, String)>>(),
+            .collect::<Vec<_>>(),
     );
 
     // 401 - dialogue lines
@@ -665,7 +690,11 @@ pub fn write_maps(
             )
         };
 
-    maps_obj_vec.into_par_iter().for_each(|(filename, mut obj)| {
+    maps_obj_iter.enumerate().for_each(|(idx, (filename, mut obj))| {
+        let hashmap = maps_translation_vec
+            .get(idx)
+            .unwrap_or(unsafe { maps_translation_vec.get_unchecked(0) });
+
         if let Some(display_name) = obj[display_name_label].as_str() {
             let mut display_name: String = display_name.to_string();
 
@@ -712,7 +741,7 @@ pub fn write_maps(
                         romanize,
                         game_type,
                         engine_type,
-                        &maps_translation_map,
+                        hashmap,
                         (code_label, parameters_label),
                     );
                 });
@@ -759,9 +788,9 @@ pub fn write_other(
             .par_bridge()
             .filter_map(|entry: Result<DirEntry, std::io::Error>| {
                 if let Ok(entry) = entry {
-                    let filename_os_string: OsString = entry.file_name();
-                    let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
-                    let (real_name, extension) = filename.split_once('.').unwrap();
+                    let filename: OsString = entry.file_name();
+                    let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
+                    let (real_name, extension) = filename_str.split_once('.').unwrap();
 
                     if !real_name.starts_with("Map")
                         && !matches!(real_name, "Tilesets" | "Animations" | "System" | "Scripts")
@@ -779,7 +808,7 @@ pub fn write_other(
                             load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                         };
 
-                        Some((filename.to_string(), json))
+                        Some((filename_str.to_string(), json))
                     } else {
                         None
                     }
@@ -808,14 +837,26 @@ pub fn write_other(
             read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
                 .unwrap()
                 .par_split('\n')
-                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+                .filter_map(|line: &str| {
+                    if line.starts_with("<!--") && line.ends_with("-->") {
+                        None
+                    } else {
+                        Some(line.replace(r"\#", "\n").trim().to_string())
+                    }
+                })
                 .collect();
 
         let mut other_translated_text: Vec<String> =
             read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
                 .unwrap()
                 .par_split('\n')
-                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
+                .filter_map(|line: &str| {
+                    if line.starts_with("<!--") && line.ends_with("-->") {
+                        None
+                    } else {
+                        Some(line.replace(r"\#", "\n").trim().to_string())
+                    }
+                })
                 .collect();
 
         if shuffle_level > 0 {
@@ -830,7 +871,7 @@ pub fn write_other(
 
         let other_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = other_original_text
             .into_par_iter()
-            .zip(other_translated_text.into_par_iter())
+            .zip(other_translated_text)
             .fold(
                 HashMap::default,
                 |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
@@ -891,7 +932,7 @@ pub fn write_other(
 
                                 variable_string = variable_string
                                     .split('\n')
-                                    .map(|line: &str| line.trim())
+                                    .map(str::trim)
                                     .collect::<Vec<_>>()
                                     .join("\n");
 
@@ -1022,7 +1063,13 @@ pub fn write_system(
     let system_original_text: Vec<String> = read_to_string(other_path.join("system.txt"))
         .unwrap()
         .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.trim().to_string())
+            }
+        })
         .collect();
 
     let system_translated_text: (String, String) = read_to_string(other_path.join("system_trans.txt"))
@@ -1036,7 +1083,13 @@ pub fn write_system(
     let mut system_translated_text: Vec<String> = system_translated_text
         .0
         .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.trim().to_string())
+            }
+        })
         .collect();
 
     if shuffle_level > 0 {
@@ -1299,13 +1352,25 @@ pub fn write_plugins(
     let plugins_original_text: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))
         .unwrap()
         .par_split('\n')
-        .map(str::to_string)
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.to_string())
+            }
+        })
         .collect();
 
     let mut plugins_translated_text: Vec<String> = read_to_string(plugins_path.join("plugins_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .map(str::to_string)
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.to_string())
+            }
+        })
         .collect();
 
     if shuffle_level > 0 {
@@ -1320,7 +1385,7 @@ pub fn write_plugins(
 
     let plugins_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = plugins_original_text
         .into_par_iter()
-        .zip(plugins_translated_text.into_par_iter())
+        .zip(plugins_translated_text)
         .fold(
             HashMap::default,
             |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
@@ -1374,7 +1439,7 @@ pub fn write_plugins(
 
                             *value = Value::from(string.as_str());
                         } else if let Some(translated) = plugins_translation_map.get(&string) {
-                            *value = Value::from(translated.as_str());
+                            *value = Value::from(translated);
                         }
                     });
             }
@@ -1388,7 +1453,7 @@ pub fn write_plugins(
                     .for_each(|(_, value)| {
                         if let Some(str) = value.as_str() {
                             if let Some(translated) = plugins_translation_map.get(str) {
-                                *value = Value::from(translated.as_str());
+                                *value = Value::from(translated);
                             }
                         }
                     });
@@ -1505,12 +1570,24 @@ pub fn write_scripts(
     let original_scripts_text: Vec<String> = read_to_string(other_path.join("scripts.txt"))
         .unwrap()
         .split('\n')
-        .map(str::to_string)
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.to_string())
+            }
+        })
         .collect();
     let translated_scripts_text: Vec<String> = read_to_string(other_path.join("scripts_trans.txt"))
         .unwrap()
         .split('\n')
-        .map(str::to_string)
+        .filter_map(|line: &str| {
+            if line.starts_with("<!--") && line.ends_with("-->") {
+                None
+            } else {
+                Some(line.to_string())
+            }
+        })
         .collect();
 
     let scripts_translation_map: HashMap<String, String> =
