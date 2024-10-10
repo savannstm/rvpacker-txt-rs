@@ -1,16 +1,18 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable, ENDS_WITH_IF_RE,
-    INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE, STRING_IS_ONLY_SYMBOLS_RE,
+    get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable,
+    ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE,
+    STRING_IS_ONLY_SYMBOLS_RE,
 };
 use encoding_rs::{CoderResult, Encoding};
 use flate2::read::ZlibDecoder;
 use indexmap::{IndexMap, IndexSet};
-use marshal_rs::{load, load::StringMode};
+use marshal_rs::{load, StringMode};
 use rayon::prelude::*;
 use regex::Regex;
 use sonic_rs::{from_str, from_value, prelude::*, Array, Value};
 use std::{
+    cell::UnsafeCell,
     ffi::OsString,
     fs::{read, read_dir, read_to_string, write, DirEntry},
     hash::{BuildHasher, BuildHasherDefault},
@@ -19,6 +21,9 @@ use std::{
     str::{from_utf8_unchecked, Chars},
 };
 use xxhash_rust::xxh3::Xxh3;
+
+type Xxh3IndexSet = IndexSet<String, BuildHasherDefault<Xxh3>>;
+type Xxh3IndexMap<'a, 'b> = IndexMap<&'a str, &'b str, BuildHasherDefault<Xxh3>>;
 
 trait Join {
     fn join(&self, delimiter: &str) -> String;
@@ -109,8 +114,6 @@ fn parse_variable(
         return None;
     }
 
-    let mut is_continuation_of_description: bool = false;
-
     if engine_type != EngineType::New {
         if variable_text
             .split('\n')
@@ -122,6 +125,8 @@ fn parse_variable(
 
         variable_text = variable_text.replace("\r\n", "\n");
     }
+
+    let mut is_continuation_of_description: bool = false;
 
     #[allow(clippy::collapsible_match)]
     if let Some(game_type) = game_type {
@@ -281,7 +286,7 @@ fn parse_variable(
     Some((variable_text, is_continuation_of_description))
 }
 
-fn parse_list<T: BuildHasher>(
+fn parse_list<'a, T: BuildHasher + 'static>(
     list: &Array,
     allowed_codes: &[u16],
     romanize: bool,
@@ -289,11 +294,14 @@ fn parse_list<T: BuildHasher>(
     engine_type: &EngineType,
     processing_mode: &ProcessingMode,
     (code_label, parameters_label): (&str, &str),
-    set: &mut IndexSet<String, T>,
-    map: &mut IndexMap<String, String, T>,
+    set: &'a UnsafeCell<IndexSet<String, T>>,
+    map: &'a mut IndexMap<&str, &str, T>,
 ) {
     let mut in_sequence: bool = false;
-    let mut line: Vec<String> = Vec::with_capacity(256);
+    let mut line: Vec<String> = Vec::with_capacity(8);
+
+    let set_mut_ref: &mut IndexSet<String, T> = unsafe { &mut *set.get() };
+    let set_ref: &IndexSet<String, T> = unsafe { &*set.get() };
 
     for item in list {
         let code: u16 = item[code_label].as_u64().unwrap() as u16;
@@ -309,11 +317,12 @@ fn parse_list<T: BuildHasher>(
                 let parsed: Option<String> = parse_parameter(Code::Dialogue, &joined, game_type, engine_type);
 
                 if let Some(parsed) = parsed {
-                    if processing_mode == ProcessingMode::Append && !map.contains_key(&joined) {
-                        map.shift_insert(set.len(), parsed.clone(), String::new());
-                    }
+                    set_mut_ref.insert(parsed);
+                    let string_ref: &str = unsafe { set_ref.last().unwrap_unchecked() }.as_str();
 
-                    set.insert(parsed);
+                    if processing_mode == ProcessingMode::Append && !map.contains_key(string_ref) {
+                        map.shift_insert(set_ref.len() - 1, string_ref, "");
+                    }
                 }
 
                 line.clear();
@@ -335,18 +344,7 @@ fn parse_list<T: BuildHasher>(
                     .map(str::to_string)
                     .unwrap_or_else(|| {
                         if let Some(parameter_obj) = parameters[0].as_object() {
-                            match parameter_obj.get(&"__type") {
-                                Some(object_type) => {
-                                    if object_type.as_str().unwrap() != "bytes" {
-                                        String::new()
-                                    } else {
-                                        unsafe {
-                                            String::from_utf8_unchecked(from_value(&parameter_obj["data"]).unwrap())
-                                        }
-                                    }
-                                }
-                                None => String::new(),
-                            }
+                            get_object_data(parameter_obj)
                         } else {
                             String::new()
                         }
@@ -366,18 +364,7 @@ fn parse_list<T: BuildHasher>(
                         .map(str::to_string)
                         .unwrap_or_else(|| {
                             if let Some(parameter_obj) = parameters[0].as_object() {
-                                match parameter_obj.get(&"__type") {
-                                    Some(object_type) => {
-                                        if object_type.as_str().unwrap() != "bytes" {
-                                            String::new()
-                                        } else {
-                                            unsafe {
-                                                String::from_utf8_unchecked(from_value(&parameter_obj["data"]).unwrap())
-                                            }
-                                        }
-                                    }
-                                    None => String::new(),
-                                }
+                                get_object_data(parameter_obj)
                             } else {
                                 String::new()
                             }
@@ -394,11 +381,12 @@ fn parse_list<T: BuildHasher>(
                                 parsed = romanize_string(parsed);
                             }
 
-                            if processing_mode == ProcessingMode::Append && !map.contains_key(&parsed) {
-                                map.shift_insert(set.len(), parsed.clone(), String::new());
-                            }
+                            set_mut_ref.insert(parsed);
+                            let string_ref: &str = unsafe { set_ref.last().unwrap_unchecked() }.as_str();
 
-                            set.insert(parsed);
+                            if processing_mode == ProcessingMode::Append && !map.contains_key(string_ref) {
+                                map.shift_insert(set_ref.len() - 1, string_ref, "");
+                            }
                         }
                     }
                 }
@@ -409,18 +397,7 @@ fn parse_list<T: BuildHasher>(
                     .map(str::to_string)
                     .unwrap_or_else(|| {
                         if let Some(parameter_obj) = parameters[0].as_object() {
-                            match parameter_obj.get(&"__type") {
-                                Some(object_type) => {
-                                    if object_type.as_str().unwrap() != "bytes" {
-                                        String::new()
-                                    } else {
-                                        unsafe {
-                                            String::from_utf8_unchecked(from_value(&parameter_obj["data"]).unwrap())
-                                        }
-                                    }
-                                }
-                                None => String::new(),
-                            }
+                            get_object_data(parameter_obj)
                         } else {
                             String::new()
                         }
@@ -437,11 +414,12 @@ fn parse_list<T: BuildHasher>(
                             parsed = romanize_string(parsed);
                         }
 
-                        if processing_mode == ProcessingMode::Append && !map.contains_key(&parsed) {
-                            map.shift_insert(set.len(), parsed.clone(), String::new());
-                        }
+                        set_mut_ref.insert(parsed);
+                        let string_ref: &str = unsafe { set_ref.last().unwrap_unchecked() }.as_str();
 
-                        set.insert(parsed);
+                        if processing_mode == ProcessingMode::Append && !map.contains_key(string_ref) {
+                            map.shift_insert(set_ref.len() - 1, string_ref, "");
+                        }
                     }
                 }
             }
@@ -451,18 +429,7 @@ fn parse_list<T: BuildHasher>(
                     .map(str::to_string)
                     .unwrap_or_else(|| {
                         if let Some(parameter_obj) = parameters[1].as_object() {
-                            match parameter_obj.get(&"__type") {
-                                Some(object_type) => {
-                                    if object_type.as_str().unwrap() != "bytes" {
-                                        String::new()
-                                    } else {
-                                        unsafe {
-                                            String::from_utf8_unchecked(from_value(&parameter_obj["data"]).unwrap())
-                                        }
-                                    }
-                                }
-                                None => String::new(),
-                            }
+                            get_object_data(parameter_obj)
                         } else {
                             String::new()
                         }
@@ -479,12 +446,13 @@ fn parse_list<T: BuildHasher>(
                             parsed = romanize_string(parsed);
                         }
 
-                        if processing_mode == ProcessingMode::Append && !map.contains_key(&parsed) {
-                            map.shift_insert(set.len(), parsed.clone(), String::new());
-                        }
+                        set_mut_ref.insert(parsed);
+                        let string_ref: &str = unsafe { set_ref.last().unwrap_unchecked() }.as_str();
 
-                        set.insert(parsed);
-                    }
+                        if processing_mode == ProcessingMode::Append && !map.contains_key(string_ref) {
+                            map.shift_insert(set_ref.len() - 1, string_ref, "");
+                        }
+                    };
                 }
             }
             _ => unreachable!(),
@@ -498,24 +466,24 @@ fn parse_list<T: BuildHasher>(
 /// * `maps_path` - path to directory than contains game files
 /// * `output_path` - path to output directory
 /// * `romanize` - whether to romanize text
+/// * `separate_maps` - whether to reset text hashset after each processed map
 /// * `logging` - whether to log
+/// * `game_type` - game type for custom parsing
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
+/// * `engine_type` - which engine's files are we processing, essential for the right processing
 /// * `file_parsed_msg` - message to log when file is parsed
 /// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
 /// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
-/// * `game_type` - game type for custom parsing
-/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_map(
-    maps_path: &Path,
+    original_path: &Path,
     output_path: &Path,
-    romanize: bool,
     separate_maps: bool,
+    romanize: bool,
     logging: bool,
-    file_parsed_msg: &str,
-    file_already_parsed_msg: &str,
-    file_is_not_parsed_msg: &str,
     game_type: Option<&GameType>,
-    mut processing_mode: &ProcessingMode,
     engine_type: &EngineType,
+    mut processing_mode: &ProcessingMode,
+    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
     let maps_output_path: &Path = &output_path.join("maps.txt");
     let maps_trans_output_path: &Path = &output_path.join("maps_trans.txt");
@@ -527,69 +495,75 @@ pub fn read_map(
         return;
     }
 
-    let maps_obj_vec = read_dir(maps_path)
-        .unwrap()
-        .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
-            Ok(entry) => {
-                let filename: OsString = entry.file_name();
-                let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
+    let maps_obj_vec =
+        read_dir(original_path)
+            .unwrap()
+            .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
+                Ok(entry) => {
+                    let filename: OsString = entry.file_name();
+                    let filename_str: &str = unsafe { from_utf8_unchecked(filename.as_encoded_bytes()) };
 
-                if filename_str.starts_with("Map")
-                    && unsafe { (*filename_str.as_bytes().get_unchecked(3) as char).is_ascii_digit() }
-                    && (filename_str.ends_with("json")
-                        || filename_str.ends_with("rvdata2")
-                        || filename_str.ends_with("rvdata")
-                        || filename_str.ends_with("rxdata"))
-                {
-                    let json: Value = if engine_type == EngineType::New {
-                        from_str(&read_to_string(entry.path()).unwrap()).unwrap()
+                    if filename_str.starts_with("Map")
+                        && unsafe { (*filename_str.as_bytes().get_unchecked(3) as char).is_ascii_digit() }
+                        && filename_str.ends_with(unsafe { EXTENSION })
+                    {
+                        let json: Value = if engine_type == EngineType::New {
+                            from_str(&read_to_string(entry.path()).unwrap()).unwrap()
+                        } else {
+                            load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
+                        };
+
+                        Some((filename_str.to_string(), json))
                     } else {
-                        load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
-                    };
-
-                    Some((filename_str.to_string(), json))
-                } else {
-                    None
+                        None
+                    }
                 }
-            }
-            Err(_) => None,
-        });
-
-    let mut maps_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
-    let mut names_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+                Err(_) => None,
+            });
 
     let mut maps_lines_vec: Vec<String> = Vec::new();
 
-    let mut maps_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
-    let mut names_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
+    let maps_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+    let maps_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *maps_lines.get() };
+    let maps_lines_ref: &Xxh3IndexSet = unsafe { &*maps_lines.get() };
 
-    if processing_mode == ProcessingMode::Append {
-        if maps_trans_output_path.exists() {
-            for (original, translated) in read_to_string(maps_output_path)
-                .unwrap()
-                .par_split('\n')
-                .collect::<Vec<_>>()
-                .into_iter()
-                .zip(
-                    read_to_string(maps_trans_output_path)
-                        .unwrap()
-                        .par_split('\n')
-                        .collect::<Vec<_>>(),
+    let names_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+    let names_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *names_lines.get() };
+    let names_lines_ref: &Xxh3IndexSet = unsafe { &*names_lines.get() };
+
+    let mut maps_translation_map: Xxh3IndexMap = IndexMap::default();
+    let mut names_translation_map: Xxh3IndexMap = IndexMap::default();
+
+    let (maps_original_text, maps_translated_text, names_original_text, names_translated_text) =
+        if processing_mode == ProcessingMode::Append {
+            if maps_trans_output_path.exists() && names_trans_output_path.exists() {
+                (
+                    read_to_string(maps_output_path).unwrap(),
+                    read_to_string(maps_trans_output_path).unwrap(),
+                    read_to_string(names_output_path).unwrap(),
+                    read_to_string(names_trans_output_path).unwrap(),
                 )
-            {
-                maps_translation_map.insert(original.to_string(), translated.to_string());
-            }
-
-            for (original, translated) in read_to_string(names_output_path)
-                .unwrap()
-                .split('\n')
-                .zip(read_to_string(names_trans_output_path).unwrap().split('\n'))
-            {
-                names_translation_map.insert(original.to_string(), translated.to_string());
+            } else {
+                println!("{file_is_not_parsed_msg}");
+                processing_mode = &ProcessingMode::Default;
+                (String::new(), String::new(), String::new(), String::new())
             }
         } else {
-            println!("{file_is_not_parsed_msg}");
-            processing_mode = &ProcessingMode::Default;
+            (String::new(), String::new(), String::new(), String::new())
+        };
+
+    if processing_mode == ProcessingMode::Append {
+        for (original, translated) in maps_original_text
+            .par_split('\n')
+            .collect::<Vec<_>>()
+            .into_iter()
+            .zip(maps_translated_text.par_split('\n').collect::<Vec<_>>())
+        {
+            maps_translation_map.insert(original, translated);
+        }
+
+        for (original, translated) in names_original_text.split('\n').zip(names_translated_text.split('\n')) {
+            names_translation_map.insert(original, translated);
         }
     }
 
@@ -614,14 +588,7 @@ pub fn read_map(
         };
 
     for (filename, obj) in maps_obj_vec {
-        let filename_comment: String = format!("<!-- {filename} -->");
-
-        if separate_maps {
-            maps_lines_vec.extend(maps_lines.drain(..));
-            maps_lines_vec.push(filename_comment);
-        } else {
-            maps_lines.insert(filename_comment);
-        }
+        let mut filename_comment: String = format!("<!-- {filename} -->");
 
         if let Some(display_name) = obj[display_name_label].as_str() {
             if !display_name.is_empty() {
@@ -631,13 +598,38 @@ pub fn read_map(
                     display_name_string = romanize_string(display_name_string);
                 }
 
-                if processing_mode == ProcessingMode::Append
-                    && !names_translation_map.contains_key(&display_name_string)
-                {
-                    names_translation_map.shift_insert(names_lines.len(), display_name_string.clone(), String::new());
-                }
+                names_lines_mut_ref.insert(display_name_string);
+                let string_ref: &str = unsafe { names_lines_ref.last().unwrap_unchecked() }.as_str();
 
-                names_lines.insert(display_name_string);
+                filename_comment.insert(filename_comment.len() - 3, ' ');
+                filename_comment.insert_str(filename_comment.len() - 4, string_ref);
+
+                if processing_mode == ProcessingMode::Append && !names_translation_map.contains_key(string_ref) {
+                    names_translation_map.shift_insert(names_lines_ref.len() - 1, string_ref, "");
+                }
+            }
+        }
+
+        if separate_maps {
+            maps_lines_vec.extend(maps_lines_mut_ref.drain(..));
+            maps_lines_vec.push(filename_comment);
+
+            if processing_mode == ProcessingMode::Append {
+                maps_translation_map.shift_insert(
+                    maps_lines_ref.len() - 1,
+                    unsafe { maps_lines_ref.last().unwrap_unchecked() },
+                    "",
+                );
+            }
+        } else {
+            maps_lines_mut_ref.insert(filename_comment);
+
+            if processing_mode == ProcessingMode::Append {
+                maps_translation_map.shift_insert(
+                    maps_lines_ref.len() - 1,
+                    unsafe { maps_lines_ref.last().unwrap_unchecked() },
+                    "",
+                );
             }
         }
 
@@ -666,7 +658,7 @@ pub fn read_map(
                     engine_type,
                     processing_mode,
                     (code_label, parameters_label),
-                    &mut maps_lines,
+                    &maps_lines,
                     &mut maps_translation_map,
                 );
             }
@@ -679,8 +671,9 @@ pub fn read_map(
 
     let (maps_original_content, maps_translated_content, names_original_content, names_translated_content) =
         if processing_mode == ProcessingMode::Append {
-            let maps_collected: (Vec<String>, Vec<String>) = maps_translation_map.into_iter().unzip();
-            let names_collected: (Vec<String>, Vec<String>) = names_translation_map.into_iter().unzip();
+            let maps_collected: (Vec<&str>, Vec<&str>) = maps_translation_map.into_iter().unzip();
+            let names_collected: (Vec<&str>, Vec<&str>) = names_translation_map.into_iter().unzip();
+
             (
                 maps_collected.0.join("\n"),
                 maps_collected.1.join("\n"),
@@ -692,15 +685,15 @@ pub fn read_map(
                 if separate_maps {
                     maps_lines_vec.join("\n")
                 } else {
-                    maps_lines.join("\n")
+                    maps_lines_ref.join("\n")
                 },
                 "\n".repeat(if separate_maps {
                     maps_lines_vec.len().saturating_sub(1)
                 } else {
-                    maps_lines.len().saturating_sub(1)
+                    maps_lines_ref.len().saturating_sub(1)
                 }),
-                names_lines.join("\n"),
-                "\n".repeat(names_lines.len().saturating_sub(1)),
+                names_lines_ref.join("\n"),
+                "\n".repeat(names_lines_ref.len().saturating_sub(1)),
             )
         };
 
@@ -711,43 +704,41 @@ pub fn read_map(
 }
 
 // ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
-/// Reads all other files of other_path and parses them into .txt files in output_path.
+/// Reads all other files of original_path and parses them into .txt files in output_path.
 /// # Parameters
-/// * `other_path` - path to directory than contains game files
+/// * `original_path` - path to directory than contains game files
 /// * `output_path` - path to output directory
 /// * `romanize` - whether to romanize text
 /// * `logging` - whether to log
+/// * `game_type` - game type for custom parsing
+/// * `engine_type` - which engine's files are we processing, essential for the right processing
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 /// * `file_parsed_msg` - message to log when file is parsed
 /// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
 /// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
-/// * `game_type` - game type for custom parsing
-/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_other(
-    other_path: &Path,
+    original_path: &Path,
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    file_parsed_msg: &str,
-    file_already_parsed_msg: &str,
-    file_is_not_parsed_msg: &str,
     game_type: Option<&GameType>,
     processing_mode: &ProcessingMode,
     engine_type: &EngineType,
+    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
-    let other_obj_arr_iter = read_dir(other_path)
+    let other_obj_arr_iter = read_dir(original_path)
         .unwrap()
         .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
             Ok(entry) => {
                 let filename_os_string: OsString = entry.file_name();
                 let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
-                let (real_name, extension) = filename.split_once('.').unwrap();
+                let (name, _) = filename.split_once('.').unwrap();
 
-                if !real_name.starts_with("Map")
-                    && !matches!(real_name, "Tilesets" | "Animations" | "System")
-                    && ["json", "rvdata2", "rvdata", "rxdata"].contains(&extension)
+                if !name.starts_with("Map")
+                    && !matches!(name, "Tilesets" | "Animations" | "System")
+                    && filename.ends_with(unsafe { EXTENSION })
                 {
-                    if game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina)
-                        && real_name == "States"
+                    if game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina) && name == "States"
                     {
                         return None;
                     }
@@ -831,28 +822,35 @@ pub fn read_other(
             continue;
         }
 
-        let mut other_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
-        let mut other_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
+        let other_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+        let other_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *other_lines.get() };
+        let other_lines_ref: &Xxh3IndexSet = unsafe { &*other_lines.get() };
 
-        if processing_mode == ProcessingMode::Append {
+        let mut other_translation_map: Xxh3IndexMap = IndexMap::default();
+
+        let (original_other_text, translated_other_text) = if processing_mode == ProcessingMode::Append {
             if other_trans_output_path.exists() {
-                for (original, translated) in read_to_string(other_output_path)
-                    .unwrap()
-                    .par_split('\n')
-                    .collect::<Vec<_>>()
-                    .into_iter()
-                    .zip(
-                        read_to_string(other_trans_output_path)
-                            .unwrap()
-                            .par_split('\n')
-                            .collect::<Vec<_>>(),
-                    )
-                {
-                    other_translation_map.insert(original.to_string(), translated.to_string());
-                }
+                (
+                    read_to_string(other_output_path).unwrap(),
+                    read_to_string(other_trans_output_path).unwrap(),
+                )
             } else {
                 println!("{file_is_not_parsed_msg}");
                 inner_processing_mode = &ProcessingMode::Default;
+                (String::new(), String::new())
+            }
+        } else {
+            (String::new(), String::new())
+        };
+
+        if processing_mode == ProcessingMode::Append {
+            for (original, translated) in original_other_text
+                .par_split('\n')
+                .collect::<Vec<_>>()
+                .into_iter()
+                .zip(translated_other_text.par_split('\n').collect::<Vec<_>>())
+            {
+                other_translation_map.insert(original, translated);
             }
         }
 
@@ -868,7 +866,7 @@ pub fn read_other(
                     "<Menu Category: Healing>",
                     "<Menu Category: Body bag>",
                 ] {
-                    other_lines.insert(string.to_string());
+                    other_lines_mut_ref.insert(string.to_string());
                 }
             }
 
@@ -903,16 +901,18 @@ pub fn read_other(
                                         continue;
                                     }
 
-                                    if let Some(last) = other_lines.pop() {
-                                        other_lines.insert(last + &parsed);
-                                    }
+                                    if let Some(last) = other_lines_mut_ref.pop() {
+                                        other_lines_mut_ref.insert(last.trim().to_string() + &parsed);
+                                        let string_ref: &str =
+                                            unsafe { other_lines_ref.last().unwrap_unchecked() }.as_str();
 
-                                    if inner_processing_mode == ProcessingMode::Append {
-                                        if let Some((key, value)) = other_translation_map.pop() {
-                                            other_translation_map.insert(key, value + &parsed);
+                                        // TODO: this shit rewrites the translation line but inserts RIGHT original line
+                                        if inner_processing_mode == ProcessingMode::Append {
+                                            let (idx, _, value) =
+                                                other_translation_map.shift_remove_full(last.as_str()).unwrap();
+                                            other_translation_map.shift_insert(idx, string_ref, value);
                                         }
                                     }
-
                                     continue;
                                 }
 
@@ -922,20 +922,22 @@ pub fn read_other(
                                     parsed = romanize_string(parsed);
                                 }
 
-                                let replaced: String =
-                                    parsed.split('\n').map(str::trim).collect::<Vec<_>>().join(r"\#");
+                                let replaced: String = parsed
+                                    .split('\n')
+                                    .map(str::trim)
+                                    .collect::<Vec<_>>()
+                                    .join(r"\#")
+                                    .trim()
+                                    .to_string();
+
+                                other_lines_mut_ref.insert(replaced);
+                                let string_ref: &str = unsafe { other_lines_ref.last().unwrap_unchecked() }.as_str();
 
                                 if inner_processing_mode == ProcessingMode::Append
-                                    && !other_translation_map.contains_key(&replaced)
+                                    && !other_translation_map.contains_key(string_ref)
                                 {
-                                    other_translation_map.shift_insert(
-                                        other_lines.len(),
-                                        replaced.clone(),
-                                        String::new(),
-                                    );
+                                    other_translation_map.shift_insert(other_lines_ref.len() - 1, string_ref, "");
                                 }
-
-                                other_lines.insert(replaced);
                             } else if variable_type == Variable::Name {
                                 continue 'obj;
                             }
@@ -974,7 +976,7 @@ pub fn read_other(
                         engine_type,
                         processing_mode,
                         (code_label, parameters_label),
-                        &mut other_lines,
+                        &other_lines,
                         &mut other_translation_map,
                     );
                 }
@@ -982,10 +984,13 @@ pub fn read_other(
         }
 
         let (original_content, translation_content) = if processing_mode == ProcessingMode::Append {
-            let collected: (Vec<String>, Vec<String>) = other_translation_map.into_iter().unzip();
+            let collected: (Vec<&str>, Vec<&str>) = other_translation_map.into_iter().unzip();
             (collected.0.join("\n"), collected.1.join("\n"))
         } else {
-            (other_lines.join("\n"), "\n".repeat(other_lines.len().saturating_sub(1)))
+            (
+                other_lines_mut_ref.join("\n"),
+                "\n".repeat(other_lines_ref.len().saturating_sub(1)),
+            )
         };
 
         write(other_output_path, original_content).unwrap();
@@ -1004,20 +1009,19 @@ pub fn read_other(
 /// * `output_path` - path to output directory
 /// * `romanize` - whether to romanize text
 /// * `logging` - whether to log
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
+/// * `engine_type` - which engine's files are we processing, essential for the right processing
 /// * `file_parsed_msg` - message to log when file is parsed
 /// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
 /// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
-/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 pub fn read_system(
     system_file_path: &Path,
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    file_parsed_msg: &str,
-    file_already_parsed_msg: &str,
-    file_is_not_parsed_msg: &str,
     mut processing_mode: &ProcessingMode,
     engine_type: &EngineType,
+    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
     let system_output_path: &Path = &output_path.join("system.txt");
     let system_trans_output_path: &Path = &output_path.join("system_trans.txt");
@@ -1033,24 +1037,24 @@ pub fn read_system(
         load(&read(system_file_path).unwrap(), None, Some("")).unwrap()
     };
 
-    let mut system_lines: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
-    let mut system_translation_map: IndexMap<String, String, BuildHasherDefault<Xxh3>> = IndexMap::default();
+    let system_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+    let system_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *system_lines.get() };
+    let system_lines_ref: &Xxh3IndexSet = unsafe { &*system_lines.get() };
+
+    let mut system_translation_map: Xxh3IndexMap = IndexMap::default();
+
+    let system_original_text: String = read_to_string(system_output_path).unwrap();
+    let system_translated_text: String = read_to_string(system_trans_output_path).unwrap();
 
     if processing_mode == ProcessingMode::Append {
         if system_trans_output_path.exists() {
-            for (original, translated) in read_to_string(system_output_path)
-                .unwrap()
+            for (original, translated) in system_original_text
                 .par_split('\n')
                 .collect::<Vec<_>>()
                 .into_iter()
-                .zip(
-                    read_to_string(system_trans_output_path)
-                        .unwrap()
-                        .par_split('\n')
-                        .collect::<Vec<_>>(),
-                )
+                .zip(system_translated_text.par_split('\n').collect::<Vec<_>>())
             {
-                system_translation_map.insert(original.to_string(), translated.to_string());
+                system_translation_map.insert(original, translated);
             }
         } else {
             println!("{file_is_not_parsed_msg}");
@@ -1068,11 +1072,12 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-            }
+            system_lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-            system_lines.insert(string);
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            }
         }
     }
 
@@ -1113,11 +1118,12 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-            }
+            system_lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-            system_lines.insert(string);
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            }
         }
     }
 
@@ -1133,11 +1139,12 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-            }
+            system_lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-            system_lines.insert(string);
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            }
         }
     }
 
@@ -1153,11 +1160,12 @@ pub fn read_system(
                     string = romanize_string(string)
                 }
 
-                if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                    system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-                }
+                system_lines_mut_ref.insert(string);
+                let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-                system_lines.insert(string);
+                if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                    system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                }
             }
         }
     }
@@ -1173,11 +1181,12 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-            }
+            system_lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-            system_lines.insert(string);
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            }
         }
     }
 
@@ -1199,11 +1208,13 @@ pub fn read_system(
                             string = romanize_string(string)
                         }
 
-                        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                            system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-                        }
+                        system_lines_mut_ref.insert(string);
+                        let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-                        system_lines.insert(string);
+                        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref)
+                        {
+                            system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                        }
                     }
                 }
             }
@@ -1222,11 +1233,12 @@ pub fn read_system(
                         string = romanize_string(string)
                     }
 
-                    if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                        system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-                    }
+                    system_lines_mut_ref.insert(string);
+                    let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-                    system_lines.insert(string);
+                    if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                        system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                    }
                 }
             }
         }
@@ -1244,11 +1256,12 @@ pub fn read_system(
                 string = romanize_string(string)
             }
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&string) {
-                system_translation_map.shift_insert(system_lines.len(), string.clone(), String::new());
-            }
+            system_lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-            system_lines.insert(string);
+            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            }
         }
     }
 
@@ -1261,20 +1274,21 @@ pub fn read_system(
             game_title_string = romanize_string(game_title_string)
         }
 
-        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(&game_title_string) {
-            system_translation_map.shift_insert(system_lines.len(), game_title_string.clone(), String::new());
-        }
+        system_lines_mut_ref.insert(game_title_string);
+        let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
 
-        system_lines.insert(game_title_string);
+        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
+            system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+        }
     }
 
     let (original_content, translated_content) = if processing_mode == ProcessingMode::Append {
-        let collected: (Vec<String>, Vec<String>) = system_translation_map.into_iter().unzip();
+        let collected: (Vec<&str>, Vec<&str>) = system_translation_map.into_iter().unzip();
         (collected.0.join("\n"), collected.1.join("\n"))
     } else {
         (
-            system_lines.join("\n"),
-            "\n".repeat(system_lines.len().saturating_sub(1)),
+            system_lines_ref.join("\n"),
+            "\n".repeat(system_lines_ref.len().saturating_sub(1)),
         )
     };
 

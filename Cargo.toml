@@ -7,7 +7,7 @@ edition = "2021"
 rayon = "1.10.0"
 indexmap = "2.6.0"
 sys-locale = "0.3.1"
-clap = { version = "4.5.19", features = ["wrap_help"] }
+clap = { version = "4.5.20", features = ["wrap_help"] }
 color-print = "0.3.6"
 xxhash-rust = { version = "0.8.12", features = ["xxh3"] }
 sonic-rs = "0.3.13"
