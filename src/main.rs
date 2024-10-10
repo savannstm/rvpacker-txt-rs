@@ -1,6 +1,5 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
-use encoding_rs::CoderResult;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sonic_rs::{from_str, from_value, json, prelude::*, to_string, Object};
@@ -438,19 +437,6 @@ pub fn get_object_data(object: &Object) -> String {
             }
         }
         None => String::new(),
-    }
-}
-
-pub fn decode_string(decoder: &mut encoding_rs::Decoder, bytes: &[u8], dst: &mut String) {
-    let (result, _, _) = decoder.decode_to_string(bytes, dst, true);
-
-    match result {
-        CoderResult::InputEmpty => {}
-        CoderResult::OutputFull => {
-            dst.clear();
-            dst.reserve(dst.capacity() * 2);
-            decode_string(decoder, bytes, dst);
-        }
     }
 }
 

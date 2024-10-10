@@ -1,10 +1,10 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    decode_string, get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType,
-    ProcessingMode, Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE,
-    LISA_PREFIX_RE, STRING_IS_ONLY_SYMBOLS_RE,
+    get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable,
+    ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE,
+    STRING_IS_ONLY_SYMBOLS_RE,
 };
-use encoding_rs::{Decoder, Encoding};
+use encoding_rs::Encoding;
 use flate2::read::ZlibDecoder;
 use indexmap::{IndexMap, IndexSet};
 use marshal_rs::{load, StringMode};
@@ -1321,11 +1321,15 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         let mut inflated: Vec<u8> = Vec::new();
         ZlibDecoder::new(&*bytes_stream).read_to_end(&mut inflated).unwrap();
 
-        let mut code: String = String::with_capacity(4);
+        let mut code: String = String::new();
 
         for encoding in encodings {
-            let mut decoder: Decoder = encoding.new_decoder();
-            decode_string(&mut decoder, &inflated, &mut code);
+            let (cow, _, had_errors) = encoding.decode(&inflated);
+
+            if !had_errors {
+                code = cow.into_owned();
+                break;
+            }
         }
 
         codes_content.push(code);

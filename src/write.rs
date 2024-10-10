@@ -1,9 +1,9 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    decode_string, get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE, EXTENSION,
-    LISA_PREFIX_RE, SELECT_WORDS_RE,
+    get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE, EXTENSION, LISA_PREFIX_RE,
+    SELECT_WORDS_RE,
 };
-use encoding_rs::{Decoder, Encoding};
+use encoding_rs::Encoding;
 use fastrand::shuffle;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use indexmap::IndexSet;
@@ -1568,14 +1568,18 @@ pub fn write_scripts(
     for script in script_entries.as_array_mut().unwrap().iter_mut() {
         let data: Vec<u8> = from_value(&script.as_array().unwrap()[2]["data"]).unwrap();
 
-        let mut inflated: String = String::new();
-        ZlibDecoder::new(&*data).read_to_string(&mut inflated).unwrap();
+        let mut inflated: Vec<u8> = Vec::new();
+        ZlibDecoder::new(&*data).read_to_end(&mut inflated).unwrap();
 
         let mut code: String = String::with_capacity(4);
 
         for encoding in encodings {
-            let mut decoder: Decoder = encoding.new_decoder();
-            decode_string(&mut decoder, inflated.as_bytes(), &mut code);
+            let (cow, _, had_errors) = encoding.decode(&inflated);
+
+            if !had_errors {
+                code = cow.into_owned();
+                break;
+            }
         }
 
         let (strings_array, indices_array) = extract_strings(&code, true);
