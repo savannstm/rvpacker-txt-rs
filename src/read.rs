@@ -1,10 +1,10 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable,
-    ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE,
-    STRING_IS_ONLY_SYMBOLS_RE,
+    decode_string, get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType,
+    ProcessingMode, Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE,
+    LISA_PREFIX_RE, STRING_IS_ONLY_SYMBOLS_RE,
 };
-use encoding_rs::{CoderResult, Encoding};
+use encoding_rs::{Decoder, Encoding};
 use flate2::read::ZlibDecoder;
 use indexmap::{IndexMap, IndexSet};
 use marshal_rs::{load, StringMode};
@@ -1321,19 +1321,14 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         let mut inflated: Vec<u8> = Vec::new();
         ZlibDecoder::new(&*bytes_stream).read_to_end(&mut inflated).unwrap();
 
-        let mut code_string: String = String::with_capacity(16_777_216);
+        let mut code: String = String::with_capacity(4);
 
         for encoding in encodings {
-            let (result, _, had_errors) = encoding
-                .new_decoder()
-                .decode_to_string(&inflated, &mut code_string, true);
-
-            if result == CoderResult::InputEmpty && !had_errors {
-                break;
-            }
+            let mut decoder: Decoder = encoding.new_decoder();
+            decode_string(&mut decoder, &inflated, &mut code);
         }
 
-        codes_content.push(code_string);
+        codes_content.push(code);
     }
 
     let extracted_strings: IndexSet<String> = extract_strings(&codes_content.join(""), false).0;

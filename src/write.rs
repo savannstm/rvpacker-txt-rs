@@ -1,9 +1,9 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE, EXTENSION, LISA_PREFIX_RE,
-    SELECT_WORDS_RE,
+    decode_string, get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE, EXTENSION,
+    LISA_PREFIX_RE, SELECT_WORDS_RE,
 };
-use encoding_rs::{CoderResult, Encoding};
+use encoding_rs::{Decoder, Encoding};
 use fastrand::shuffle;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use indexmap::IndexSet;
@@ -28,6 +28,7 @@ trait EachLine {
     fn each_line(&self) -> Vec<String>;
 }
 
+// Return a Vec of strings splitted by lines (inclusive), akin to each_line in Ruby
 impl EachLine for str {
     fn each_line(&self) -> Vec<String> {
         let mut result: Vec<String> = Vec::new();
@@ -541,7 +542,7 @@ pub fn write_maps(
         .collect::<Vec<_>>()
         .into_par_iter();
 
-    let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
+    let mut maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
         .unwrap()
         .par_split('\n')
         .filter_map(|line: &str| {
@@ -557,7 +558,7 @@ pub fn write_maps(
         .unwrap()
         .par_split('\n')
         .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") && (!separate_maps || !line.starts_with("<!-- Map")) {
+            if line.starts_with("<!--") && line.ends_with("-->") {
                 None
             } else {
                 Some(line.replace(r"\#", "\n").trim().to_string())
@@ -608,16 +609,25 @@ pub fn write_maps(
         let mut vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = Vec::with_capacity(512);
         let mut hashmap: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::default();
 
-        maps_original_text_vec
-            .into_iter()
-            .zip(maps_translated_text_vec)
-            .for_each(|(original, translated)| {
-                if original.starts_with("<!-- Map") && original.ends_with("-->") {
-                    vec.push(take(&mut hashmap))
-                } else {
-                    hashmap.insert(original, translated);
-                }
-            });
+        let mut indices: Vec<usize> = Vec::new();
+
+        for (idx, string) in maps_original_text_vec.iter().enumerate() {
+            if string.starts_with("<!-- Map") && string.ends_with("-->") {
+                indices.push(idx);
+            }
+        }
+
+        for index in indices {
+            let original_vec: Vec<String> = maps_original_text_vec.split_off(index);
+            let translated_vec: Vec<String> = maps_translated_text_vec.split_off(index);
+
+            for (original, translated) in original_vec.into_iter().zip(translated_vec) {
+                hashmap.insert(original, translated);
+            }
+
+            vec.push(take(&mut hashmap));
+            hashmap.clear();
+        }
 
         if vec.is_empty() {
             vec.push(hashmap);
@@ -1561,16 +1571,11 @@ pub fn write_scripts(
         let mut inflated: String = String::new();
         ZlibDecoder::new(&*data).read_to_string(&mut inflated).unwrap();
 
-        let mut code: String = String::with_capacity(16_777_216);
+        let mut code: String = String::with_capacity(4);
 
         for encoding in encodings {
-            let (result, _, had_errors) = encoding
-                .new_decoder()
-                .decode_to_string(inflated.as_bytes(), &mut code, true);
-
-            if result == CoderResult::InputEmpty && !had_errors {
-                break;
-            }
+            let mut decoder: Decoder = encoding.new_decoder();
+            decode_string(&mut decoder, inflated.as_bytes(), &mut code);
         }
 
         let (strings_array, indices_array) = extract_strings(&code, true);
