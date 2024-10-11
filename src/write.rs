@@ -313,7 +313,7 @@ fn write_list(
     for it in 0..list_length {
         let code: u16 = list[it][code_label].as_u64().unwrap() as u16;
 
-        let string_type: bool = if engine_type != EngineType::New {
+        let write_string_literally: bool = if engine_type != EngineType::New {
             !match code {
                 320 | 324 | 356 | 401 | 405 => list[it][parameters_label][0].is_object(),
                 102 => list[it][parameters_label][0][0].is_object(),
@@ -321,7 +321,7 @@ fn write_list(
                 _ => false,
             }
         } else {
-            false
+            true
         };
 
         if in_sequence && ![401, 405].contains(&code) {
@@ -342,7 +342,7 @@ fn write_list(
 
                     for (i, &index) in item_indices.iter().enumerate() {
                         if i < split_length {
-                            list[index][parameters_label][0] = if !string_type {
+                            list[index][parameters_label][0] = if !write_string_literally {
                                 json!({
                                     "__type": "bytes",
                                     "data": Array::from(split_vec[i].as_bytes())
@@ -542,52 +542,28 @@ pub fn write_maps(
         .collect::<Vec<_>>()
         .into_par_iter();
 
-    let mut maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
+    let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") && (!separate_maps || !line.starts_with("<!-- Map")) {
-                None
-            } else {
-                Some(line.replace(r"\#", "\n").trim().to_string())
-            }
-        })
+        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
         .collect();
 
     let mut maps_translated_text_vec: Vec<String> = read_to_string(maps_path.join("maps_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.replace(r"\#", "\n").trim().to_string())
-            }
-        })
+        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
         .collect();
 
     let names_original_text_vec: Vec<String> = read_to_string(maps_path.join("names.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.trim().to_string())
-            }
-        })
+        .map(|line: &str| line.trim().to_string())
         .collect();
 
     let mut names_translated_text_vec: Vec<String> = read_to_string(maps_path.join("names_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.trim().to_string())
-            }
-        })
+        .map(|line: &str| line.trim().to_string())
         .collect();
 
     if shuffle_level > 0 {
@@ -609,24 +585,12 @@ pub fn write_maps(
         let mut vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = Vec::with_capacity(512);
         let mut hashmap: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::default();
 
-        let mut indices: Vec<usize> = Vec::new();
-
-        for (idx, string) in maps_original_text_vec.iter().enumerate() {
-            if string.starts_with("<!-- Map") && string.ends_with("-->") {
-                indices.push(idx);
-            }
-        }
-
-        for index in indices {
-            let original_vec: Vec<String> = maps_original_text_vec.split_off(index);
-            let translated_vec: Vec<String> = maps_translated_text_vec.split_off(index);
-
-            for (original, translated) in original_vec.into_iter().zip(translated_vec) {
+        for (original, translated) in maps_original_text_vec.into_iter().zip(maps_translated_text_vec) {
+            if separate_maps && original.starts_with("<!-- Map") {
+                vec.push(take(&mut hashmap));
+            } else {
                 hashmap.insert(original, translated);
             }
-
-            vec.push(take(&mut hashmap));
-            hashmap.clear();
         }
 
         if vec.is_empty() {
@@ -846,26 +810,14 @@ pub fn write_other(
             read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
                 .unwrap()
                 .par_split('\n')
-                .filter_map(|line: &str| {
-                    if line.starts_with("<!--") && line.ends_with("-->") {
-                        None
-                    } else {
-                        Some(line.replace(r"\#", "\n").trim().to_string())
-                    }
-                })
+                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                 .collect();
 
         let mut other_translated_text: Vec<String> =
             read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
                 .unwrap()
                 .par_split('\n')
-                .filter_map(|line: &str| {
-                    if line.starts_with("<!--") && line.ends_with("-->") {
-                        None
-                    } else {
-                        Some(line.replace(r"\#", "\n").trim().to_string())
-                    }
-                })
+                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
                 .collect();
 
         if shuffle_level > 0 {
@@ -1033,13 +985,7 @@ pub fn write_system(
     let system_original_text: Vec<String> = read_to_string(other_path.join("system.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.trim().to_string())
-            }
-        })
+        .map(|line: &str| line.trim().to_string())
         .collect();
 
     let system_translated_text: (String, String) = read_to_string(other_path.join("system_trans.txt"))
@@ -1053,13 +999,7 @@ pub fn write_system(
     let mut system_translated_text: Vec<String> = system_translated_text
         .0
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.trim().to_string())
-            }
-        })
+        .map(|line: &str| line.trim().to_string())
         .collect();
 
     if shuffle_level > 0 {
@@ -1322,25 +1262,13 @@ pub fn write_plugins(
     let plugins_original_text: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.to_string())
-            }
-        })
+        .map(|line: &str| line.to_string())
         .collect();
 
     let mut plugins_translated_text: Vec<String> = read_to_string(plugins_path.join("plugins_trans.txt"))
         .unwrap()
         .par_split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.to_string())
-            }
-        })
+        .map(|line: &str| line.to_string())
         .collect();
 
     if shuffle_level > 0 {
@@ -1534,24 +1462,12 @@ pub fn write_scripts(
     let original_scripts_text: Vec<String> = read_to_string(other_path.join("scripts.txt"))
         .unwrap()
         .split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.to_string())
-            }
-        })
+        .map(|line: &str| line.to_string())
         .collect();
     let translated_scripts_text: Vec<String> = read_to_string(other_path.join("scripts_trans.txt"))
         .unwrap()
         .split('\n')
-        .filter_map(|line: &str| {
-            if line.starts_with("<!--") && line.ends_with("-->") {
-                None
-            } else {
-                Some(line.to_string())
-            }
-        })
+        .map(|line: &str| line.to_string())
         .collect();
 
     let scripts_translation_map: HashMap<String, String> =
