@@ -2,9 +2,8 @@ use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
 use once_cell::sync::Lazy;
 use regex::Regex;
-use sonic_rs::{from_str, prelude::*, Object};
+use sonic_rs::{from_str, from_value, json, prelude::*, to_string, Object};
 use std::{
-    env::args,
     fs::{create_dir_all, read_to_string, write},
     io::stdin,
     path::{Path, PathBuf},
@@ -49,10 +48,10 @@ impl PartialEq<ProcessingMode> for &ProcessingMode {
 
 #[derive(PartialEq)]
 enum EngineType {
-    XP,
-    VX,
-    VXAce,
     New,
+    VXAce,
+    VX,
+    XP,
 }
 
 impl AsRef<EngineType> for EngineType {
@@ -91,7 +90,7 @@ enum Variable {
     Note,
 }
 
-struct ProgramLocalization<'a> {
+struct Localization<'a> {
     // About message and templates
     about_msg: &'a str,
     help_template: &'a str,
@@ -123,6 +122,8 @@ struct ProgramLocalization<'a> {
     log_arg_desc: &'a str,
     help_arg_desc: &'a str,
 
+    separate_maps_flag_desc: &'a str,
+
     // Argument types
     input_dir_arg_type: &'a str,
     output_dir_arg_type: &'a str,
@@ -144,6 +145,9 @@ struct ProgramLocalization<'a> {
     custom_processing_enabled_msg: &'a str,
     enabling_romanize_metadata_msg: &'a str,
     disabling_custom_processing_metadata_msg: &'a str,
+    no_subcommand_specified_msg: &'a str,
+    could_not_determine_game_engine_msg: &'a str,
+    game_ini_file_not_found_msg: &'a str,
 
     // Misc
     possible_values: &'a str,
@@ -153,7 +157,7 @@ struct ProgramLocalization<'a> {
     when_writing: &'a str,
 }
 
-impl<'a> ProgramLocalization<'a> {
+impl Localization<'_> {
     fn new(language: Language) -> Self {
         match language {
             Language::English => Self::load_english(),
@@ -162,7 +166,7 @@ impl<'a> ProgramLocalization<'a> {
     }
 
     fn load_english() -> Self {
-        ProgramLocalization {
+        Localization {
             // About message and templates
             about_msg: cstr!(
                 "<bold>This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them \
@@ -210,6 +214,10 @@ impl<'a> ProgramLocalization<'a> {
             log_arg_desc: "Enables logging.",
             help_arg_desc: "Prints the program's help message or for the entered subcommand.",
 
+            separate_maps_flag_desc: "Separates different Maps files's text to dedicated blocks. Note: This argument \
+                                     doesn't create multiple Maps txt files. It puts all text in one maps.txt file, \
+                                     but separates different files's text by <!-- MapXXX --> lines.",
+
             // Argument types
             input_dir_arg_type: "INPUT_PATH",
             output_dir_arg_type: "OUTPUT_PATH",
@@ -235,6 +243,9 @@ impl<'a> ProgramLocalization<'a> {
             enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
             disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from \
                                                        previous read.",
+            no_subcommand_specified_msg: "No command was specified. Call rvpacker-txt-rs -h for help.",
+            could_not_determine_game_engine_msg: "Couldn't determine game engine. Check the existence of System file inside your data/original directory.",
+            game_ini_file_not_found_msg: "Game.ini file not found.",
 
             // Misc
             possible_values: "Allowed values:",
@@ -246,7 +257,7 @@ impl<'a> ProgramLocalization<'a> {
     }
 
     fn load_russian() -> Self {
-        ProgramLocalization {
+        Localization {
             about_msg: cstr!(
                 "<bold>Инструмент, позволяющий парсить текст из файлов RPG Maker XP/VX/VXAce/MV/MZ игр в .txt файлы, \
                  а затем записывать их обратно в совместимые файлы.</bold>"
@@ -276,7 +287,7 @@ impl<'a> ProgramLocalization<'a> {
                                      все слова в строках перевода.",
             disable_processing_arg_desc: "Не обрабатывает указанные файлы.",
 
-            romanize_desc: r#"Если вы парсите текст из японскной игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, '')"#,
+            romanize_desc: r#"Если вы парсите текст из японской игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, '')"#,
 
             force_arg_desc: "Принудительно перезаписать все файлы. Не может быть использован с --append.",
             append_arg_desc: "Когда игра, файлы которой вы распарсили, либо же rvpacker-txt-rs обновляется, вы, \
@@ -291,6 +302,10 @@ impl<'a> ProgramLocalization<'a> {
 
             log_arg_desc: "Включает логирование.",
             help_arg_desc: "Выводит справочную информацию по программе либо по введёной команде.",
+
+            separate_maps_flag_desc: "Разделяет текст из разных файлов Maps на отдельные блоки. Примечание: Этот \
+                                     аргумент не создает несколько файлов Maps.txt. Он помещает весь текст в один \
+                                     файл maps.txt, но разделяет текст из разных файлов строками <!-- MapXXX -->.",
 
             input_dir_arg_type: "ВХОДНОЙ_ПУТЬ",
             output_dir_arg_type: "ВЫХОДНОЙ_ПУТЬ",
@@ -317,6 +332,10 @@ impl<'a> ProgramLocalization<'a> {
                                              будет использована.",
             disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная \
                                                        обработка текста будет выключена.",
+            no_subcommand_specified_msg: "Команда не была указана. Вызовите rvpacker-txt-rs -h для помощи.",
+            could_not_determine_game_engine_msg:
+                "Не удалось определить движок игры. Убедитесь, что файл System существует.",
+            game_ini_file_not_found_msg: "Файл Game.ini не был обнаружен.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
@@ -327,25 +346,22 @@ impl<'a> ProgramLocalization<'a> {
     }
 }
 
-pub static STRING_IS_ONLY_SYMBOLS_RE: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"^[.()+\-:;\[\]^~%&!№$@`*\/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\\#'"<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s0-9]+$"#).unwrap()
+pub static STRING_IS_ONLY_SYMBOLS_RE: Lazy<Regex> = Lazy::new(|| unsafe {
+    Regex::new(r#"^[.()+\-:;\[\]^~%&!№$@`*\/→×？?ｘ％▼|♥♪！：〜『』「」〽。…‥＝゠、，【】［］｛｝（）〔〕｟｠〘〙〈〉《》・\\#<>=_ー※▶ⅠⅰⅡⅱⅢⅲⅣⅳⅤⅴⅥⅵⅦⅶⅧⅷⅨⅸⅩⅹⅪⅺⅫⅻⅬⅼⅭⅽⅮⅾⅯⅿ\s0-9]+$"#).unwrap_unchecked()
 });
-pub static ENDS_WITH_IF_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r" if\(.*\)$").unwrap());
-pub static LISA_PREFIX_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^(\\et\[[0-9]+\]|\\nbt)").unwrap());
-pub static INVALID_MULTILINE_VARIABLE_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^#? ?<.*>.?$|^[a-z][0-9]$").unwrap());
+pub static ENDS_WITH_IF_RE: Lazy<Regex> = Lazy::new(|| unsafe { Regex::new(r" if\(.*\)$").unwrap_unchecked() });
+pub static LISA_PREFIX_RE: Lazy<Regex> =
+    Lazy::new(|| unsafe { Regex::new(r"^(\\et\[[0-9]+\]|\\nbt)").unwrap_unchecked() });
+pub static INVALID_MULTILINE_VARIABLE_RE: Lazy<Regex> =
+    Lazy::new(|| unsafe { Regex::new(r"^#? ?<.*>.?$|^[a-z][0-9]$").unwrap_unchecked() });
 pub static INVALID_VARIABLE_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^[+-]?[0-9]+$|^///|---|restrict eval").unwrap());
-pub static SELECT_WORDS_RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"\S+").unwrap());
+    Lazy::new(|| unsafe { Regex::new(r"^[+-]?[0-9]+$|^///|---|restrict eval").unwrap_unchecked() });
+pub static SELECT_WORDS_RE: Lazy<Regex> = Lazy::new(|| unsafe { Regex::new(r"\S+").unwrap_unchecked() });
 
-pub fn romanize_string<T>(string: T) -> String
-where
-    T: AsRef<str>,
-    String: From<T>,
-{
-    let actual_string: String = String::from(string);
-    let mut result: String = String::new();
+pub fn romanize_string(string: String) -> String {
+    let mut result: String = String::with_capacity(string.capacity());
 
-    for char in actual_string.chars() {
+    for char in string.chars() {
         let replacement: &str = match char {
             '。' => ".",
             '、' | '，' => ",",
@@ -411,70 +427,68 @@ where
     result
 }
 
-fn get_game_type(game_title: String) -> Option<&'static GameType> {
-    let lowercased: String = game_title.to_lowercase();
+pub fn get_object_data(object: &Object) -> String {
+    match object.get(&"__type") {
+        Some(object_type) => {
+            if object_type.as_str().is_some_and(|_type: &str| _type == "bytes") {
+                unsafe { String::from_utf8_unchecked(from_value(&object["data"]).unwrap_unchecked()) }
+            } else {
+                String::new()
+            }
+        }
+        None => String::new(),
+    }
+}
 
-    if Regex::new(r"\btermina\b").unwrap().is_match(&lowercased) {
+fn get_game_type(game_title: String) -> Option<&'static GameType> {
+    let lowercased: &str = &game_title.to_lowercase();
+
+    let termina_re: Regex = unsafe { Regex::new(r"\btermina\b").unwrap_unchecked() };
+    let lisarpg_re: Regex = unsafe { Regex::new(r"\blisa\b").unwrap_unchecked() };
+
+    if termina_re.is_match(lowercased) {
         Some(&GameType::Termina)
-    } else if Regex::new(r"\blisa\b").unwrap().is_match(&lowercased) {
+    } else if lisarpg_re.is_match(lowercased) {
         Some(&GameType::LisaRPG)
     } else {
         None
     }
 }
 
-// this function probably should be replaced by some clap-native equivalent
-fn preparse_arguments() -> (Language, Option<String>) {
-    let mut locale: String = get_locale().unwrap_or_else(|| String::from("en_US"));
-
-    let args_vec: Vec<String> = args().collect();
-
-    let subcommand: Option<String> = if ["read", "write"].contains(&args_vec[1].as_str()) {
-        Some(args_vec[1].clone())
-    } else {
-        None
-    };
-
-    for (i, arg) in args_vec.iter().enumerate() {
-        if arg == "-l" || arg == "--language" {
-            locale = args_vec[i + 1].to_string();
-        }
-    }
-
-    if let Some((first, _)) = locale.split_once('_') {
-        locale = first.to_string()
-    }
-
-    match locale.as_str() {
-        "ru" | "uk" | "be" => (Language::Russian, subcommand),
-        _ => (Language::English, subcommand),
-    }
-}
-
-fn detect_engine_type(original_path: &Path) -> (EngineType, PathBuf, PathBuf) {
-    let engine_configs: [(EngineType, &str, &str); 4] = [
-        (EngineType::New, "System.json", "Scripts.rvdata2"),
-        (EngineType::VXAce, "System.rvdata2", "Scripts.rvdata2"),
-        (EngineType::VX, "System.rvdata", "Scripts.rvdata"),
-        (EngineType::XP, "System.rxdata", "Scripts.rxdata"),
-    ];
-
-    for (engine_type, system_file, scripts_file) in engine_configs.into_iter() {
-        let system_path: PathBuf = original_path.join(system_file);
-
-        if system_path.exists() {
-            return (engine_type, system_path, original_path.join(scripts_file));
-        }
-    }
-
-    panic!("Couldn't determine game engine");
-}
+static mut EXTENSION: &str = "";
 
 fn main() {
     let start_time: Instant = Instant::now();
 
-    let (language, subcommand): (Language, Option<String>) = preparse_arguments();
-    let localization: ProgramLocalization = ProgramLocalization::new(language);
+    let (language, subcommand) = {
+        let preparse: Command = Command::new("preparse")
+            .disable_help_flag(true)
+            .disable_help_subcommand(true)
+            .ignore_errors(true)
+            .subcommands([Command::new("read"), Command::new("write")])
+            .args([Arg::new("language")
+                .short('l')
+                .long("language")
+                .global(true)
+                .value_parser(["ru", "en"])]);
+        let preparse_matches: ArgMatches = preparse.get_matches();
+
+        let subcommand: Option<String> = preparse_matches.subcommand_name().map(|name: &str| name.to_string());
+        let language_arg: Option<&String> = preparse_matches.get_one::<String>("language");
+
+        let language: String = language_arg
+            .map(String::to_owned)
+            .unwrap_or(get_locale().unwrap_or(String::from("en_US")));
+
+        let language: Language = match language.as_str() {
+            "ru" | "be" | "uk" => Language::Russian,
+            _ => Language::English,
+        };
+
+        (language, subcommand)
+    };
+
+    let localization: Localization = Localization::new(language);
 
     let (input_dir_arg_desc, output_dir_arg_desc) = if let Some(subcommand) = subcommand {
         match subcommand.as_str() {
@@ -548,6 +562,7 @@ fn main() {
 
     let disable_processing_arg: Arg = Arg::new("disable-processing")
         .long("disable-processing")
+        .alias("no")
         .value_delimiter(',')
         .value_name(localization.disable_processing_arg_type)
         .help(cformat!(
@@ -568,6 +583,21 @@ fn main() {
         .help(localization.romanize_desc)
         .display_order(4);
 
+    let separate_maps_flag: Arg = Arg::new("separate-maps")
+        .long("separate-maps")
+        .alias("sep")
+        .help(localization.separate_maps_flag_desc)
+        .global(true)
+        .action(ArgAction::SetTrue);
+
+    // TODO: implement preserve_duplicates flag to parse ALL text from files
+    // without eliminating any duplicates
+    let _preserve_duplicates_flag = Arg::new("preserve-duplicates")
+        .short('p')
+        .long("preserve-duplicates")
+        .action(ArgAction::SetTrue)
+        .help("");
+
     let force_flag: Arg = Arg::new("force")
         .short('f')
         .long("force")
@@ -585,6 +615,7 @@ fn main() {
 
     let disable_custom_processing_flag: Arg = Arg::new("disable-custom-processing")
         .long("disable-custom-processing")
+        .alias("no-custom")
         .action(ArgAction::SetTrue)
         .global(true)
         .help(localization.disable_custom_processing_desc)
@@ -631,7 +662,7 @@ fn main() {
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.write_command_desc)
-        .args([shuffle_level_arg])
+        .arg(shuffle_level_arg)
         .arg(&help_flag);
 
     let cli: Command = Command::new("")
@@ -650,13 +681,17 @@ fn main() {
             romanize_arg,
             language_arg,
             disable_custom_processing_flag,
+            separate_maps_flag,
             log_flag,
             help_flag,
         ])
         .hide_possible_values(true);
 
     let matches: ArgMatches = cli.get_matches();
-    let (subcommand, subcommand_matches): (&str, &ArgMatches) = matches.subcommand().unwrap();
+    let (subcommand, subcommand_matches): (&str, &ArgMatches) = matches.subcommand().unwrap_or_else(|| {
+        println!("{}", localization.no_subcommand_specified_msg);
+        exit(0);
+    });
 
     let (disable_maps_processing, disable_other_processing, disable_system_processing, disable_plugins_processing) =
         matches
@@ -676,10 +711,6 @@ fn main() {
                 flags
             })
             .unwrap_or((false, false, false, false));
-
-    let logging: bool = matches.get_flag("log");
-    let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
-    let mut romanize: bool = matches.get_flag("romanize");
 
     let input_dir: &Path = matches.get_one::<PathBuf>("input-dir").unwrap();
 
@@ -704,23 +735,60 @@ fn main() {
         }
     }
 
-    let (maps_path, other_path, metadata_file_path) = if *output_dir.as_os_str() == *"./" {
-        (
-            &input_dir.join("translation/maps"),
-            &input_dir.join("translation/other"),
-            &input_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
-        )
+    let root_dir: &Path = if *output_dir.as_os_str() == *"./" {
+        input_dir
     } else {
-        (
-            &output_dir.join("translation/maps"),
-            &output_dir.join("translation/other"),
-            &output_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
-        )
+        output_dir
     };
 
-    let (engine_type, system_file_path, scripts_file_path) = detect_engine_type(original_path);
+    let (maps_path, other_path, metadata_file_path) = (
+        &root_dir.join("translation/maps"),
+        &root_dir.join("translation/other"),
+        &root_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
+    );
 
-    let mut game_type: Option<&GameType> = if disable_custom_processing {
+    let logging_flag: bool = matches.get_flag("log");
+    let disable_custom_processing_flag: bool = matches.get_flag("disable-custom-processing");
+    let separate_maps_flag: bool = matches.get_flag("separate-maps");
+    let mut romanize_flag: bool = matches.get_flag("romanize");
+
+    let (engine_type, system_file_path, scripts_file_path): (&EngineType, PathBuf, Option<PathBuf>) = {
+        let mut system_path: PathBuf = original_path.join("System.json");
+
+        if system_path.exists() {
+            unsafe { EXTENSION = ".json" }
+            (&EngineType::New, system_path, None)
+        } else {
+            system_path = original_path.join("System.rvdata2");
+
+            if system_path.exists() {
+                unsafe { EXTENSION = ".rvdata2" }
+                (
+                    &EngineType::VXAce,
+                    system_path,
+                    Some(original_path.join("Scripts.rvdata2")),
+                )
+            } else {
+                system_path = original_path.join("System.rvdata");
+
+                if system_path.exists() {
+                    unsafe { EXTENSION = ".rvdata" }
+                    (&EngineType::VX, system_path, Some(original_path.join("Scripts.rvdata")))
+                } else {
+                    system_path = original_path.join("System.rxdata");
+
+                    if system_path.exists() {
+                        unsafe { EXTENSION = ".rxdata" }
+                        (&EngineType::XP, system_path, Some(original_path.join("Scripts.rxdata")))
+                    } else {
+                        panic!("{}", localization.could_not_determine_game_engine_msg)
+                    }
+                }
+            }
+        }
+    };
+
+    let mut game_type: Option<&GameType> = if disable_custom_processing_flag {
         None
     } else {
         let game_title: String = if engine_type == EngineType::New {
@@ -728,17 +796,20 @@ fn main() {
             system_obj["gameTitle"].as_str().unwrap().to_string()
         } else {
             let ini_file_path: &Path = &input_dir.join("Game.ini");
-            let ini_file_content: String = read_to_string(ini_file_path).unwrap();
 
-            let mut game_title: Option<String> = None;
+            if let Ok(ini_file_content) = read_to_string(ini_file_path) {
+                let mut game_title: Option<String> = None;
 
-            for line in ini_file_content.lines() {
-                if line.to_lowercase().starts_with("title") {
-                    game_title = Some(line.splitn(2, "=").last().unwrap().trim().to_string());
+                for line in ini_file_content.lines() {
+                    if line.to_lowercase().starts_with("title") {
+                        game_title = Some(line.split_once('=').unwrap().1.trim().to_string());
+                    }
                 }
-            }
 
-            game_title.unwrap()
+                game_title.unwrap()
+            } else {
+                panic!("{}", localization.game_ini_file_not_found_msg)
+            }
         };
 
         get_game_type(game_title)
@@ -753,16 +824,16 @@ fn main() {
     if subcommand == "read" {
         use read::*;
 
-        let force: bool = subcommand_matches.get_flag("force");
-        let append: bool = subcommand_matches.get_flag("append");
-        let silent: bool = subcommand_matches.get_flag("silent");
+        let force_flag: bool = subcommand_matches.get_flag("force");
+        let append_flag: bool = subcommand_matches.get_flag("append");
+        let silent_flag: bool = subcommand_matches.get_flag("silent");
 
-        let processing_type: &ProcessingMode = &if force {
-            if !silent {
+        let processing_mode: &ProcessingMode = &if force_flag {
+            if !silent_flag {
                 let start_time: Instant = Instant::now();
                 println!("{}", localization.force_mode_warning);
 
-                let mut buf: String = String::new();
+                let mut buf: String = String::with_capacity(4);
                 stdin().read_line(&mut buf).unwrap();
 
                 if buf.trim_end() != "Y" {
@@ -773,7 +844,7 @@ fn main() {
             }
 
             ProcessingMode::Force
-        } else if append {
+        } else if append_flag {
             ProcessingMode::Append
         } else {
             ProcessingMode::Default
@@ -784,7 +855,7 @@ fn main() {
 
         write(
             metadata_file_path,
-            format!(r#"{{"romanize":{romanize},"disableCustomProcessing":{disable_custom_processing}}}"#),
+            to_string(&json!({"romanize": romanize_flag, "disableCustomProcessing": disable_custom_processing_flag, "separateMaps": separate_maps_flag})).unwrap(),
         )
         .unwrap();
 
@@ -792,14 +863,17 @@ fn main() {
             read_map(
                 original_path,
                 maps_path,
-                romanize,
-                logging,
-                localization.file_parsed_msg,
-                localization.file_already_parsed_msg,
-                localization.file_is_not_parsed_msg,
+                separate_maps_flag,
+                romanize_flag,
+                logging_flag,
                 game_type,
-                processing_type,
-                &engine_type,
+                engine_type,
+                processing_mode,
+                (
+                    localization.file_parsed_msg,
+                    localization.file_already_parsed_msg,
+                    localization.file_is_not_parsed_msg,
+                ),
             );
         }
 
@@ -807,14 +881,16 @@ fn main() {
             read_other(
                 original_path,
                 other_path,
-                romanize,
-                logging,
-                localization.file_parsed_msg,
-                localization.file_already_parsed_msg,
-                localization.file_is_not_parsed_msg,
+                romanize_flag,
+                logging_flag,
                 game_type,
-                processing_type,
-                &engine_type,
+                processing_mode,
+                engine_type,
+                (
+                    localization.file_parsed_msg,
+                    localization.file_already_parsed_msg,
+                    localization.file_is_not_parsed_msg,
+                ),
             );
         }
 
@@ -822,22 +898,24 @@ fn main() {
             read_system(
                 &system_file_path,
                 other_path,
-                romanize,
-                logging,
-                localization.file_parsed_msg,
-                localization.file_already_parsed_msg,
-                localization.file_is_not_parsed_msg,
-                processing_type,
-                &engine_type,
+                romanize_flag,
+                logging_flag,
+                processing_mode,
+                engine_type,
+                (
+                    localization.file_parsed_msg,
+                    localization.file_already_parsed_msg,
+                    localization.file_is_not_parsed_msg,
+                ),
             );
         }
 
         if !disable_plugins_processing && engine_type != EngineType::New {
             read_scripts(
-                &scripts_file_path,
+                &unsafe { scripts_file_path.unwrap_unchecked() },
                 other_path,
-                romanize,
-                logging,
+                romanize_flag,
+                logging_flag,
                 localization.file_parsed_msg,
             );
         }
@@ -848,20 +926,19 @@ fn main() {
             panic!("{}", localization.translation_dirs_missing);
         }
 
-        let plugins_path: &Path = &input_dir.join("translation/plugins");
-
-        let (data_output_path, plugins_output_path) = if *output_dir.as_os_str() == *"./" {
-            (&input_dir.join("output/data"), &input_dir.join("output/js"))
+        let (data_output_path, plugins_path, plugins_output_path) = if engine_type == EngineType::New {
+            let plugins_output_path = root_dir.join("output/js");
+            create_dir_all(&plugins_output_path).unwrap();
+            (
+                &root_dir.join("output/data"),
+                Some(input_dir.join("translation/plugins")),
+                Some(plugins_output_path),
+            )
         } else {
-            (&output_dir.join("output/data"), &output_dir.join("output/js"))
+            (&root_dir.join("output/Data"), None, None)
         };
 
-        if engine_type == EngineType::New {
-            create_dir_all(data_output_path).unwrap();
-            create_dir_all(plugins_output_path).unwrap();
-        } else {
-            create_dir_all(output_dir.join("output/Data")).unwrap();
-        }
+        create_dir_all(data_output_path).unwrap();
 
         let shuffle_level: u8 = *subcommand_matches.get_one("shuffle-level").unwrap();
 
@@ -873,7 +950,7 @@ fn main() {
 
             if romanize_bool {
                 println!("{}", localization.enabling_romanize_metadata_msg);
-                romanize = romanize_bool;
+                romanize_flag = romanize_bool;
             }
 
             if disable_custom_processing_bool && game_type.is_some() {
@@ -887,12 +964,13 @@ fn main() {
                 maps_path,
                 original_path,
                 data_output_path,
-                romanize,
+                romanize_flag,
                 shuffle_level,
-                logging,
+                separate_maps_flag,
+                logging_flag,
                 localization.file_written_msg,
                 game_type,
-                &engine_type,
+                engine_type,
             );
         }
 
@@ -901,12 +979,12 @@ fn main() {
                 other_path,
                 original_path,
                 data_output_path,
-                romanize,
+                romanize_flag,
                 shuffle_level,
-                logging,
+                logging_flag,
                 localization.file_written_msg,
                 game_type,
-                &engine_type,
+                engine_type,
             );
         }
 
@@ -915,36 +993,36 @@ fn main() {
                 &system_file_path,
                 other_path,
                 data_output_path,
-                romanize,
+                romanize_flag,
                 shuffle_level,
-                logging,
+                logging_flag,
                 localization.file_written_msg,
-                &engine_type,
+                engine_type,
             );
         }
 
-        if !disable_plugins_processing
-            && plugins_path.exists()
-            && game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina)
-        {
-            write_plugins(
-                &plugins_path.join("plugins.json"),
-                plugins_path,
-                plugins_output_path,
-                shuffle_level,
-                logging,
-                localization.file_written_msg,
-            );
+        if !disable_plugins_processing && game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina) {
+            let plugins_path: PathBuf = unsafe { plugins_path.unwrap_unchecked() };
+
+            if plugins_path.exists() {
+                write_plugins(
+                    &plugins_path.join("plugins.json"),
+                    &plugins_path,
+                    &unsafe { plugins_output_path.unwrap_unchecked() },
+                    shuffle_level,
+                    logging_flag,
+                    localization.file_written_msg,
+                );
+            }
         }
 
-        if !disable_custom_processing && engine_type != EngineType::New {
+        if !disable_plugins_processing && engine_type != EngineType::New {
             write_scripts(
-                &scripts_file_path,
+                &unsafe { scripts_file_path.unwrap_unchecked() },
                 other_path,
                 data_output_path,
-                romanize,
-                logging,
-                &engine_type,
+                romanize_flag,
+                logging_flag,
                 localization.file_written_msg,
             )
         }
