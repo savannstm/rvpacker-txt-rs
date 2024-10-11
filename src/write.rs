@@ -24,6 +24,8 @@ use std::{
 };
 use xxhash_rust::xxh3::Xxh3;
 
+type StringHashMap = HashMap<String, String, BuildHasherDefault<Xxh3>>;
+
 trait EachLine {
     fn each_line(&self) -> Vec<String>;
 }
@@ -64,7 +66,7 @@ pub fn shuffle_words(string: &str) -> String {
 fn get_translated_parameter<'a>(
     code: Code,
     mut parameter: &'a str,
-    hashmap: &'a HashMap<String, String, BuildHasherDefault<Xxh3>>,
+    hashmap: &'a StringHashMap,
     game_type: Option<&GameType>,
     engine_type: &EngineType,
 ) -> Option<String> {
@@ -139,7 +141,7 @@ fn get_translated_variable(
     note_text: Option<&str>, // note_text is some only when getting description
     variable_type: Variable,
     filename: &str,
-    hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
+    hashmap: &StringHashMap,
     game_type: Option<&GameType>,
     engine_type: &EngineType,
 ) -> Option<String> {
@@ -301,7 +303,7 @@ fn write_list(
     romanize: bool,
     game_type: Option<&GameType>,
     engine_type: &EngineType,
-    hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>>,
+    hashmap: &StringHashMap,
     (code_label, parameters_label): (&str, &str),
 ) {
     let list_length: usize = list.len();
@@ -378,12 +380,9 @@ fn write_list(
                 let parameter_string: String = list[it][parameters_label][0]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = list[it][parameters_label][0].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match list[it][parameters_label][0].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -399,12 +398,9 @@ fn write_list(
                     let mut subparameter_string: String = list[it][parameters_label][0][i]
                         .as_str()
                         .map(str::to_string)
-                        .unwrap_or_else(|| {
-                            if let Some(parameter_obj) = list[it][parameters_label][0][i].as_object() {
-                                get_object_data(parameter_obj)
-                            } else {
-                                String::new()
-                            }
+                        .unwrap_or(match list[it][parameters_label][0][i].as_object() {
+                            Some(obj) => get_object_data(obj),
+                            None => String::new(),
                         })
                         .trim()
                         .to_string();
@@ -430,12 +426,9 @@ fn write_list(
                 let mut parameter_string: String = list[it][parameters_label][0]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = list[it][parameters_label][0].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match list[it][parameters_label][0].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -460,12 +453,9 @@ fn write_list(
                 let mut parameter_string: String = list[it][parameters_label][1]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = list[it][parameters_label][1].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match list[it][parameters_label][1].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -581,9 +571,9 @@ pub fn write_maps(
         }
     }
 
-    let maps_translation_vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = {
-        let mut vec: Vec<HashMap<String, String, BuildHasherDefault<Xxh3>>> = Vec::with_capacity(512);
-        let mut hashmap: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::default();
+    let maps_translation_vec: Vec<StringHashMap> = {
+        let mut vec: Vec<StringHashMap> = Vec::with_capacity(512);
+        let mut hashmap: StringHashMap = HashMap::default();
 
         for (original, translated) in maps_original_text_vec.into_iter().zip(maps_translated_text_vec) {
             if separate_maps && original.starts_with("<!-- Map") {
@@ -600,7 +590,7 @@ pub fn write_maps(
         vec
     };
 
-    let names_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = HashMap::from_iter(
+    let names_translation_map: StringHashMap = HashMap::from_iter(
         names_original_text_vec
             .into_iter()
             .zip(names_translated_text_vec)
@@ -629,7 +619,7 @@ pub fn write_maps(
         };
 
     maps_obj_iter.enumerate().for_each(|(idx, (filename, mut obj))| {
-        let hashmap: &HashMap<String, String, BuildHasherDefault<Xxh3>> = maps_translation_vec
+        let hashmap: &StringHashMap = maps_translation_vec
             .get(idx)
             .unwrap_or(unsafe { maps_translation_vec.get_unchecked(0) });
 
@@ -830,12 +820,12 @@ pub fn write_other(
             }
         }
 
-        let other_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = other_original_text
+        let other_translation_map: StringHashMap = other_original_text
             .into_par_iter()
             .zip(other_translated_text)
             .fold(
                 HashMap::default,
-                |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+                |mut map: StringHashMap, (key, value): (String, String)| {
                     map.insert(key, value);
                     map
                 },
@@ -1012,12 +1002,12 @@ pub fn write_system(
         }
     }
 
-    let system_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = system_original_text
+    let system_translation_map: StringHashMap = system_original_text
         .into_par_iter()
         .zip(system_translated_text)
         .fold(
             HashMap::default,
-            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+            |mut map: StringHashMap, (key, value): (String, String)| {
                 map.insert(key, value);
                 map
             },
@@ -1281,12 +1271,12 @@ pub fn write_plugins(
         }
     }
 
-    let plugins_translation_map: HashMap<String, String, BuildHasherDefault<Xxh3>> = plugins_original_text
+    let plugins_translation_map: StringHashMap = plugins_original_text
         .into_par_iter()
         .zip(plugins_translated_text)
         .fold(
             HashMap::default,
-            |mut map: HashMap<String, String, BuildHasherDefault<Xxh3>>, (key, value): (String, String)| {
+            |mut map: StringHashMap, (key, value): (String, String)| {
                 map.insert(key, value);
                 map
             },

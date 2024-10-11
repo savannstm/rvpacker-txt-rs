@@ -286,7 +286,7 @@ fn parse_variable(
     Some((variable_text, is_continuation_of_description))
 }
 
-fn parse_list<'a, T: BuildHasher + 'static>(
+fn parse_list<'a>(
     list: &Array,
     allowed_codes: &[u16],
     romanize: bool,
@@ -294,14 +294,14 @@ fn parse_list<'a, T: BuildHasher + 'static>(
     engine_type: &EngineType,
     processing_mode: &ProcessingMode,
     (code_label, parameters_label): (&str, &str),
-    set: &'a UnsafeCell<IndexSet<String, T>>,
-    map: &'a mut IndexMap<&str, &str, T>,
+    set: &'a UnsafeCell<Xxh3IndexSet>,
+    map: &'a mut Xxh3IndexMap,
 ) {
     let mut in_sequence: bool = false;
     let mut line: Vec<String> = Vec::with_capacity(8);
 
-    let set_mut_ref: &mut IndexSet<String, T> = unsafe { &mut *set.get() };
-    let set_ref: &IndexSet<String, T> = unsafe { &*set.get() };
+    let set_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *set.get() };
+    let set_ref: &Xxh3IndexSet = unsafe { &*set.get() };
 
     for item in list {
         let code: u16 = item[code_label].as_u64().unwrap() as u16;
@@ -342,12 +342,9 @@ fn parse_list<'a, T: BuildHasher + 'static>(
                 let parameter_string: String = parameters[0]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = parameters[0].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match parameters[0].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -362,12 +359,9 @@ fn parse_list<'a, T: BuildHasher + 'static>(
                     let subparameter_string: String = parameters[0][i]
                         .as_str()
                         .map(str::to_string)
-                        .unwrap_or_else(|| {
-                            if let Some(parameter_obj) = parameters[0].as_object() {
-                                get_object_data(parameter_obj)
-                            } else {
-                                String::new()
-                            }
+                        .unwrap_or(match parameters[0][i].as_object() {
+                            Some(obj) => get_object_data(obj),
+                            None => String::new(),
                         })
                         .trim()
                         .to_string();
@@ -395,12 +389,9 @@ fn parse_list<'a, T: BuildHasher + 'static>(
                 let parameter_string: String = parameters[0]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = parameters[0].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match parameters[0].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -423,16 +414,13 @@ fn parse_list<'a, T: BuildHasher + 'static>(
                     }
                 }
             }
-            324 | 320 => {
+            320 | 324 => {
                 let parameter_string: String = parameters[1]
                     .as_str()
                     .map(str::to_string)
-                    .unwrap_or_else(|| {
-                        if let Some(parameter_obj) = parameters[1].as_object() {
-                            get_object_data(parameter_obj)
-                        } else {
-                            String::new()
-                        }
+                    .unwrap_or(match parameters[1].as_object() {
+                        Some(obj) => get_object_data(obj),
+                        None => String::new(),
                     })
                     .trim()
                     .to_string();
@@ -452,7 +440,7 @@ fn parse_list<'a, T: BuildHasher + 'static>(
                         if processing_mode == ProcessingMode::Append && !map.contains_key(string_ref) {
                             map.shift_insert(set_ref.len() - 1, string_ref, "");
                         }
-                    };
+                    }
                 }
             }
             _ => unreachable!(),
