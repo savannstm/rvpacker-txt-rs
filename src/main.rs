@@ -590,6 +590,14 @@ fn main() {
         .global(true)
         .action(ArgAction::SetTrue);
 
+    // TODO: implement preserve_duplicates flag to parse ALL text from files
+    // without eliminating any duplicates
+    let _preserve_duplicates_flag = Arg::new("preserve-duplicates")
+        .short('p')
+        .long("preserve-duplicates")
+        .action(ArgAction::SetTrue)
+        .help("");
+
     let force_flag: Arg = Arg::new("force")
         .short('f')
         .long("force")
