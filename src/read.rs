@@ -735,7 +735,7 @@ pub fn read_other(
                 let (name, _) = filename.split_once('.').unwrap();
 
                 if !name.starts_with("Map")
-                    && !matches!(name, "Tilesets" | "Animations" | "System")
+                    && !matches!(name, "Tilesets" | "Animations" | "System" | "Scripts")
                     && filename.ends_with(unsafe { EXTENSION })
                 {
                     if game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina) && name == "States"
