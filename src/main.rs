@@ -588,9 +588,15 @@ fn main() {
         let subcommand: Option<String> = preparse_matches.subcommand_name().map(str::to_owned);
         let language_arg: Option<&String> = preparse_matches.get_one::<String>("language");
 
-        let language: String = language_arg
-            .map(String::to_owned)
-            .unwrap_or(get_locale().unwrap_or(String::from("en_US")));
+        let language: String = language_arg.map(String::to_owned).unwrap_or_else(|| {
+            let locale: String = get_locale().unwrap_or(String::from("en_US"));
+
+            if let Some((lang, _)) = locale.split_once('_') {
+                lang.to_owned()
+            } else {
+                locale
+            }
+        });
 
         let language: Language = match language.as_str() {
             "ru" | "be" | "uk" => Language::Russian,
