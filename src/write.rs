@@ -1,12 +1,11 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE, EXTENSION, LISA_PREFIX_RE,
-    SELECT_WORDS_RE,
+    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, Variable, ENDS_WITH_IF_RE,
+    EXTENSION, LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, SELECT_WORDS_RE,
 };
 use encoding_rs::Encoding;
 use fastrand::shuffle;
 use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
-use indexmap::IndexSet;
 use marshal_rs::{dump, load, StringMode};
 use rayon::prelude::*;
 use regex::{Captures, Match};
@@ -19,40 +18,14 @@ use std::{
     io::{Read, Write},
     mem::take,
     path::Path,
-    str::{from_utf8_unchecked, CharIndices, Chars},
+    str::{from_utf8_unchecked, Chars},
     sync::Arc,
 };
 use xxhash_rust::xxh3::Xxh3;
 
 type StringHashMap = HashMap<String, String, BuildHasherDefault<Xxh3>>;
 
-trait EachLine {
-    fn each_line(&self) -> Vec<String>;
-}
-
-// Return a Vec of strings splitted by lines (inclusive), akin to each_line in Ruby
-impl EachLine for str {
-    fn each_line(&self) -> Vec<String> {
-        let mut result: Vec<String> = Vec::new();
-        let mut current_line: String = String::new();
-
-        for char in self.chars() {
-            current_line.push(char);
-
-            if char == '\n' {
-                result.push(take(&mut current_line));
-            }
-        }
-
-        if !current_line.is_empty() {
-            result.push(take(&mut current_line));
-        }
-
-        result
-    }
-}
-
-pub fn shuffle_words(string: &str) -> String {
+fn _shuffle_words(string: &str) -> String {
     let mut words: Vec<&str> = SELECT_WORDS_RE.find_iter(string).map(|m: Match| m.as_str()).collect();
 
     shuffle(&mut words);
@@ -94,7 +67,7 @@ fn get_translated_parameter<'a>(
                 Code::Dialogue => {
                     if let Some(re_match) = LISA_PREFIX_RE.find(parameter) {
                         parameter = &parameter[re_match.end()..];
-                        remaining_strings.push(re_match.as_str().to_string());
+                        remaining_strings.push(re_match.as_str().to_owned());
                         insert_positions.push(false);
                     }
                 }
@@ -107,7 +80,7 @@ fn get_translated_parameter<'a>(
     if engine_type != EngineType::New {
         if let Some(re_match) = ENDS_WITH_IF_RE.find(parameter) {
             parameter = &parameter[re_match.start()..];
-            remaining_strings.push(re_match.as_str().to_string());
+            remaining_strings.push(re_match.as_str().to_owned());
             insert_positions.push(true);
         }
     }
@@ -190,7 +163,7 @@ fn get_translated_variable(
                                     note_string = String::from("\n") + left;
                                 }
                             } else if note.ends_with(['.', '%', '!', '"']) {
-                                note_string = note.to_string();
+                                note_string = note.to_owned();
                             }
 
                             if !note_string.is_empty() {
@@ -236,7 +209,7 @@ fn get_translated_variable(
 
                         if is_continuation_of_description {
                             if let Some((_, right)) = variable_text.trim_start().split_once('\n') {
-                                return Some(right.to_string());
+                                return Some(right.to_owned());
                             } else {
                                 return Some(String::new());
                             }
@@ -328,7 +301,7 @@ fn write_list(
 
         if in_sequence && ![401, 405].contains(&code) {
             if !line.is_empty() {
-                let mut joined: String = line.join("\n").trim().to_string();
+                let mut joined: String = line.join("\n").trim().to_owned();
 
                 if romanize {
                     joined = romanize_string(joined)
@@ -379,13 +352,13 @@ fn write_list(
             401 | 405 => {
                 let parameter_string: String = list[it][parameters_label][0]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match list[it][parameters_label][0].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if !parameter_string.is_empty() {
                     line.push(parameter_string);
@@ -397,13 +370,13 @@ fn write_list(
                 for i in 0..list[it][parameters_label][0].as_array().unwrap().len() {
                     let mut subparameter_string: String = list[it][parameters_label][0][i]
                         .as_str()
-                        .map(str::to_string)
+                        .map(str::to_owned)
                         .unwrap_or(match list[it][parameters_label][0][i].as_object() {
                             Some(obj) => get_object_data(obj),
                             None => String::new(),
                         })
                         .trim()
-                        .to_string();
+                        .to_owned();
 
                     if romanize {
                         subparameter_string = romanize_string(subparameter_string);
@@ -425,13 +398,13 @@ fn write_list(
             356 => {
                 let mut parameter_string: String = list[it][parameters_label][0]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match list[it][parameters_label][0].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if romanize {
                     parameter_string = romanize_string(parameter_string);
@@ -452,13 +425,13 @@ fn write_list(
             320 | 324 | 402 => {
                 let mut parameter_string: String = list[it][parameters_label][1]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match list[it][parameters_label][1].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if romanize {
                     parameter_string = romanize_string(parameter_string);
@@ -496,7 +469,6 @@ pub fn write_maps(
     original_path: &Path,
     output_path: &Path,
     romanize: bool,
-    shuffle_level: u8,
     separate_maps: bool,
     logging: bool,
     file_written_msg: &str,
@@ -521,7 +493,7 @@ pub fn write_maps(
                         load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                     };
 
-                    Some((filename_str.to_string(), json))
+                    Some((filename_str.to_owned(), json))
                 } else {
                     None
                 }
@@ -532,54 +504,36 @@ pub fn write_maps(
         .collect::<Vec<_>>()
         .into_par_iter();
 
-    let maps_original_text_vec: Vec<String> = read_to_string(maps_path.join("maps.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-        .collect();
+    let original_content: String = read_to_string(maps_path.join("maps.txt")).unwrap();
 
-    let mut maps_translated_text_vec: Vec<String> = read_to_string(maps_path.join("maps_trans.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-        .collect();
-
-    let names_original_text_vec: Vec<String> = read_to_string(maps_path.join("names.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
-        .collect();
-
-    let mut names_translated_text_vec: Vec<String> = read_to_string(maps_path.join("names_trans.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
-        .collect();
-
-    if shuffle_level > 0 {
-        shuffle(&mut maps_translated_text_vec);
-        shuffle(&mut names_translated_text_vec);
-
-        if shuffle_level == 2 {
-            for (translated_text, translated_name_text) in maps_translated_text_vec
-                .iter_mut()
-                .zip(names_translated_text_vec.iter_mut())
-            {
-                *translated_text = shuffle_words(translated_text);
-                *translated_name_text = shuffle_words(translated_name_text);
-            }
-        }
-    }
-
-    let maps_translation_vec: Vec<StringHashMap> = {
+    let mut names_lines_map: StringHashMap = StringHashMap::default();
+    let lines_maps_vec: Vec<StringHashMap> = {
         let mut vec: Vec<StringHashMap> = Vec::with_capacity(512);
         let mut hashmap: StringHashMap = HashMap::default();
 
-        for (original, translated) in maps_original_text_vec.into_iter().zip(maps_translated_text_vec) {
-            if separate_maps && original.starts_with("<!-- Map") {
-                vec.push(take(&mut hashmap));
+        for line in original_content.par_split('\n').collect::<Vec<_>>() {
+            if line.starts_with("<!-- Map") {
+                let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+
+                if original.len() > 20 {
+                    let without_prefix: &str = &original[..17];
+                    let original_name: &str = &without_prefix[..without_prefix.len() - 4];
+                    names_lines_map.insert(original_name.trim().to_owned(), translated.trim().to_owned());
+                }
+
+                if separate_maps {
+                    vec.push(take(&mut hashmap));
+                }
             } else {
-                hashmap.insert(original, translated);
+                if line.starts_with("<!--") {
+                    continue;
+                }
+
+                let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                hashmap.insert(
+                    original.replace(NEW_LINE, "\n").trim().to_owned().to_owned(),
+                    translated.replace(NEW_LINE, "\n").trim().to_owned().to_owned(),
+                );
             }
         }
 
@@ -589,13 +543,6 @@ pub fn write_maps(
 
         vec
     };
-
-    let names_translation_map: StringHashMap = HashMap::from_iter(
-        names_original_text_vec
-            .into_iter()
-            .zip(names_translated_text_vec)
-            .collect::<Vec<_>>(),
-    );
 
     // 401 - dialogue lines
     // 102 - dialogue choices array
@@ -619,18 +566,18 @@ pub fn write_maps(
         };
 
     maps_obj_iter.enumerate().for_each(|(idx, (filename, mut obj))| {
-        let hashmap: &StringHashMap = maps_translation_vec
+        let hashmap: &StringHashMap = lines_maps_vec
             .get(idx)
-            .unwrap_or(unsafe { maps_translation_vec.get_unchecked(0) });
+            .unwrap_or(unsafe { lines_maps_vec.get_unchecked(0) });
 
         if let Some(display_name) = obj[display_name_label].as_str() {
-            let mut display_name: String = display_name.to_string();
+            let mut display_name: String = display_name.to_owned();
 
             if romanize {
                 display_name = romanize_string(display_name)
             }
 
-            if let Some(location_name) = names_translation_map.get(&display_name) {
+            if let Some(location_name) = names_lines_map.get(&display_name) {
                 obj[display_name_label] = Value::from(location_name);
             }
         }
@@ -704,7 +651,6 @@ pub fn write_other(
     original_path: &Path,
     output_path: &Path,
     romanize: bool,
-    shuffle_level: u8,
     logging: bool,
     file_written_msg: &str,
     game_type: Option<&GameType>,
@@ -736,7 +682,7 @@ pub fn write_other(
                             load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                         };
 
-                        Some((filename_str.to_string(), json))
+                        Some((filename_str.to_owned(), json))
                     } else {
                         None
                     }
@@ -789,48 +735,23 @@ pub fn write_other(
     };
 
     other_obj_arr_vec.into_par_iter().for_each(|(filename, mut obj_arr)| {
-        let other_processed_filename: &str = &filename[..filename.len()
-            - match engine_type {
-                EngineType::New => 5,
-                EngineType::VXAce => 8,
-                EngineType::VX | EngineType::XP => 7,
-            }];
+        let content_path: &Path =
+            &other_path.join(filename[..filename.len() - unsafe { EXTENSION.len() }].to_owned() + ".txt");
 
-        let other_original_text: Vec<String> =
-            read_to_string(other_path.join(format!("{other_processed_filename}.txt")))
-                .unwrap()
-                .par_split('\n')
-                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-                .collect();
+        let original_content: String = read_to_string(content_path).unwrap();
 
-        let mut other_translated_text: Vec<String> =
-            read_to_string(other_path.join(format!("{other_processed_filename}_trans.txt")))
-                .unwrap()
-                .par_split('\n')
-                .map(|line: &str| line.replace(r"\#", "\n").trim().to_string())
-                .collect();
-
-        if shuffle_level > 0 {
-            shuffle(&mut other_translated_text);
-
-            if shuffle_level == 2 {
-                for translated_text in other_translated_text.iter_mut() {
-                    *translated_text = shuffle_words(translated_text);
-                }
-            }
-        }
-
-        let other_translation_map: StringHashMap = other_original_text
-            .into_par_iter()
-            .zip(other_translated_text)
-            .fold(
-                HashMap::default,
-                |mut map: StringHashMap, (key, value): (String, String)| {
-                    map.insert(key, value);
-                    map
-                },
-            )
-            .reduce(HashMap::default, |mut a, b| {
+        let lines_map: StringHashMap = original_content
+            .par_split('\n') // parallel iterator over lines
+            .filter(|line: &&str| !line.starts_with("<!--")) // filter out comments
+            .fold(HashMap::default, |mut map: StringHashMap, line: &str| {
+                let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                map.insert(
+                    original.replace(r"\#", "\n").trim().to_owned(),
+                    translated.replace(r"\#", "\n").trim().to_owned(),
+                );
+                map
+            })
+            .reduce(HashMap::default, |mut a: StringHashMap, b: StringHashMap| {
                 a.extend(b);
                 a
             });
@@ -847,9 +768,9 @@ pub fn write_other(
                     for (variable_label, variable_type) in variable_tuples.into_iter() {
                         if let Some(variable_str) = obj[variable_label].as_str() {
                             let mut variable_string: String = if variable_type != Variable::Note {
-                                variable_str.trim().to_string()
+                                variable_str.trim().to_owned()
                             } else {
-                                variable_str.to_string()
+                                variable_str.to_owned()
                             };
 
                             if !variable_string.is_empty() {
@@ -880,7 +801,7 @@ pub fn write_other(
                                     note_text,
                                     variable_type,
                                     &filename,
-                                    &other_translation_map,
+                                    &lines_map,
                                     game_type,
                                     engine_type,
                                 );
@@ -923,7 +844,7 @@ pub fn write_other(
                                 romanize,
                                 game_type,
                                 engine_type,
-                                &other_translation_map,
+                                &lines_map,
                                 (code_label, parameters_label),
                             );
                         }
@@ -961,61 +882,34 @@ pub fn write_system(
     other_path: &Path,
     output_path: &Path,
     romanize: bool,
-    shuffle_level: u8,
     logging: bool,
     file_written_msg: &str,
     engine_type: &EngineType,
 ) {
-    let mut system_obj: Value = if engine_type == EngineType::New {
+    let mut obj: Value = if engine_type == EngineType::New {
         from_str(&read_to_string(system_file_path).unwrap()).unwrap()
     } else {
         load(&read(system_file_path).unwrap(), None, Some("")).unwrap()
     };
 
-    let system_original_text: Vec<String> = read_to_string(other_path.join("system.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
-        .collect();
+    let original_content: String = read_to_string(other_path.join("system.txt")).unwrap();
 
-    let system_translated_text: (String, String) = read_to_string(other_path.join("system_trans.txt"))
-        .unwrap()
-        .rsplit_once('\n')
-        .map(|(left, right)| (left.to_string(), right.to_string()))
-        .unwrap();
+    let game_title: String;
+    let lines_map: StringHashMap = {
+        let mut hashmap: StringHashMap = HashMap::default();
 
-    let game_title: String = system_translated_text.1;
-
-    let mut system_translated_text: Vec<String> = system_translated_text
-        .0
-        .par_split('\n')
-        .map(|line: &str| line.trim().to_string())
-        .collect();
-
-    if shuffle_level > 0 {
-        shuffle(&mut system_translated_text);
-
-        if shuffle_level == 2 {
-            for translated_text in system_translated_text.iter_mut() {
-                *translated_text = shuffle_words(translated_text);
+        for line in original_content.split('\n') {
+            if line.starts_with("<!--") {
+                continue;
             }
-        }
-    }
 
-    let system_translation_map: StringHashMap = system_original_text
-        .into_par_iter()
-        .zip(system_translated_text)
-        .fold(
-            HashMap::default,
-            |mut map: StringHashMap, (key, value): (String, String)| {
-                map.insert(key, value);
-                map
-            },
-        )
-        .reduce(HashMap::default, |mut a, b| {
-            a.extend(b);
-            a
-        });
+            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+            hashmap.insert(original.trim().to_owned(), translated.trim().to_owned());
+        }
+
+        game_title = original_content.rsplit_once(LINES_SEPARATOR).unwrap().1.to_owned();
+        hashmap
+    };
 
     let (armor_types_label, elements_label, skill_types_label, terms_label, weapon_types_label, game_title_label) =
         if engine_type == EngineType::New {
@@ -1043,35 +937,31 @@ pub fn write_system(
         };
 
     if engine_type != EngineType::New {
-        let mut string: String = system_obj["__symbol__currency_unit"]
-            .as_str()
-            .unwrap()
-            .trim()
-            .to_string();
+        let mut string: String = obj["__symbol__currency_unit"].as_str().unwrap().trim().to_owned();
 
         if romanize {
             string = romanize_string(string);
         }
 
-        if let Some(translated) = system_translation_map.get(&string) {
+        if let Some(translated) = lines_map.get(&string) {
             if !translated.is_empty() {
-                system_obj["__symbol__currency_unit"] = Value::from(translated);
+                obj["__symbol__currency_unit"] = Value::from(translated);
             }
         }
     }
 
-    system_obj[armor_types_label]
+    obj[armor_types_label]
         .as_array_mut()
         .unwrap()
         .iter_mut()
         .for_each(|value: &mut Value| {
-            let mut string: String = value.as_str().unwrap().trim().to_string();
+            let mut string: String = value.as_str().unwrap().trim().to_owned();
 
             if romanize {
                 string = romanize_string(string);
             }
 
-            if let Some(translated) = system_translation_map.get(&string) {
+            if let Some(translated) = lines_map.get(&string) {
                 if translated.is_empty() {
                     return;
                 }
@@ -1080,18 +970,18 @@ pub fn write_system(
             }
         });
 
-    system_obj[elements_label]
+    obj[elements_label]
         .as_array_mut()
         .unwrap()
         .iter_mut()
         .for_each(|value: &mut Value| {
-            let mut string: String = value.as_str().unwrap().trim().to_string();
+            let mut string: String = value.as_str().unwrap().trim().to_owned();
 
             if romanize {
                 string = romanize_string(string);
             }
 
-            if let Some(translated) = system_translation_map.get(&string) {
+            if let Some(translated) = lines_map.get(&string) {
                 if translated.is_empty() {
                     return;
                 }
@@ -1101,18 +991,18 @@ pub fn write_system(
         });
 
     if engine_type == EngineType::New {
-        system_obj["equipTypes"]
+        obj["equipTypes"]
             .as_array_mut()
             .unwrap()
             .iter_mut()
             .for_each(|value: &mut Value| {
-                let mut string: String = value.as_str().unwrap().trim().to_string();
+                let mut string: String = value.as_str().unwrap().trim().to_owned();
 
                 if romanize {
                     string = romanize_string(string);
                 }
 
-                if let Some(translated) = system_translation_map.get(&string) {
+                if let Some(translated) = lines_map.get(&string) {
                     if translated.is_empty() {
                         return;
                     }
@@ -1122,18 +1012,18 @@ pub fn write_system(
             });
     }
 
-    system_obj[skill_types_label]
+    obj[skill_types_label]
         .as_array_mut()
         .unwrap()
         .par_iter_mut()
         .for_each(|value: &mut Value| {
-            let mut string: String = value.as_str().unwrap().trim().to_string();
+            let mut string: String = value.as_str().unwrap().trim().to_owned();
 
             if romanize {
                 string = romanize_string(string);
             }
 
-            if let Some(translated) = system_translation_map.get(&string) {
+            if let Some(translated) = lines_map.get(&string) {
                 if translated.is_empty() {
                     return;
                 }
@@ -1142,7 +1032,7 @@ pub fn write_system(
             }
         });
 
-    system_obj[terms_label]
+    obj[terms_label]
         .as_object_mut()
         .unwrap()
         .iter_mut()
@@ -1158,13 +1048,13 @@ pub fn write_system(
                     .par_iter_mut()
                     .for_each(|subvalue: &mut Value| {
                         if let Some(str) = subvalue.as_str() {
-                            let mut string: String = str.trim().to_string();
+                            let mut string: String = str.trim().to_owned();
 
                             if romanize {
                                 string = romanize_string(string);
                             }
 
-                            if let Some(translated) = system_translation_map.get(&string) {
+                            if let Some(translated) = lines_map.get(&string) {
                                 if translated.is_empty() {
                                     return;
                                 }
@@ -1179,13 +1069,13 @@ pub fn write_system(
                 }
 
                 value.as_object_mut().unwrap().iter_mut().for_each(|(_, value)| {
-                    let mut string: String = value.as_str().unwrap().trim().to_string();
+                    let mut string: String = value.as_str().unwrap().trim().to_owned();
 
                     if romanize {
                         string = romanize_string(string)
                     }
 
-                    if let Some(translated) = system_translation_map.get(&string) {
+                    if let Some(translated) = lines_map.get(&string) {
                         if translated.is_empty() {
                             return;
                         }
@@ -1196,18 +1086,18 @@ pub fn write_system(
             }
         });
 
-    system_obj[weapon_types_label]
+    obj[weapon_types_label]
         .as_array_mut()
         .unwrap()
         .iter_mut()
         .for_each(|value: &mut Value| {
-            let mut string: String = value.as_str().unwrap().trim().to_string();
+            let mut string: String = value.as_str().unwrap().trim().to_owned();
 
             if romanize {
                 string = romanize_string(string);
             }
 
-            if let Some(translated) = system_translation_map.get(&string) {
+            if let Some(translated) = lines_map.get(&string) {
                 if translated.is_empty() {
                     return;
                 }
@@ -1216,12 +1106,12 @@ pub fn write_system(
             }
         });
 
-    system_obj[game_title_label] = Value::from(&game_title);
+    obj[game_title_label] = Value::from(&game_title);
 
     let output_data: Vec<u8> = if engine_type == EngineType::New {
-        to_string(&system_obj).unwrap().into_bytes()
+        to_string(&obj).unwrap().into_bytes()
     } else {
-        dump(system_obj, Some(""))
+        dump(obj, Some(""))
     };
 
     if logging {
@@ -1243,48 +1133,27 @@ pub fn write_plugins(
     pluigns_file_path: &Path,
     plugins_path: &Path,
     output_path: &Path,
-    shuffle_level: u8,
     logging: bool,
     file_written_msg: &str,
 ) {
     let mut obj_arr: Vec<Object> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
-    let plugins_original_text: Vec<String> = read_to_string(plugins_path.join("plugins.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.to_string())
-        .collect();
+    let original_content: String = read_to_string(plugins_path.join("plugins.txt")).unwrap();
 
-    let mut plugins_translated_text: Vec<String> = read_to_string(plugins_path.join("plugins_trans.txt"))
-        .unwrap()
-        .par_split('\n')
-        .map(|line: &str| line.to_string())
-        .collect();
+    let lines_map: StringHashMap = {
+        let mut hashmap: StringHashMap = HashMap::default();
 
-    if shuffle_level > 0 {
-        shuffle(&mut plugins_translated_text);
-
-        if shuffle_level == 2 {
-            for translated_text in plugins_translated_text.iter_mut() {
-                *translated_text = shuffle_words(translated_text);
+        for line in original_content.split('\n') {
+            if line.starts_with("<!--") {
+                continue;
             }
-        }
-    }
 
-    let plugins_translation_map: StringHashMap = plugins_original_text
-        .into_par_iter()
-        .zip(plugins_translated_text)
-        .fold(
-            HashMap::default,
-            |mut map: StringHashMap, (key, value): (String, String)| {
-                map.insert(key, value);
-                map
-            },
-        )
-        .reduce(HashMap::default, |mut a, b| {
-            a.extend(b);
-            a
-        });
+            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+            hashmap.insert(original.trim().to_owned(), translated.trim().to_owned());
+        }
+
+        hashmap
+    };
 
     obj_arr.par_iter_mut().for_each(|obj: &mut Object| {
         // For now, plugins writing only implemented for Fear & Hunger: Termina, so you should manually translate the plugins.js file if it's not Termina
@@ -1316,17 +1185,15 @@ pub fn write_plugins(
                     .iter_mut()
                     .par_bridge()
                     .for_each(|(key, value): (&str, &mut Value)| {
-                        let mut string: String = value.as_str().unwrap().to_string();
+                        let mut string: String = value.as_str().unwrap().to_owned();
 
                         if key == "OptionsCategories" {
-                            for (text, translated) in
-                                plugins_translation_map.keys().zip(plugins_translation_map.values())
-                            {
+                            for (text, translated) in lines_map.keys().zip(lines_map.values()) {
                                 string = string.replacen(text, translated, 1);
                             }
 
                             *value = Value::from(string.as_str());
-                        } else if let Some(translated) = plugins_translation_map.get(&string) {
+                        } else if let Some(translated) = lines_map.get(&string) {
                             *value = Value::from(translated);
                         }
                     });
@@ -1340,7 +1207,7 @@ pub fn write_plugins(
                     .par_bridge()
                     .for_each(|(_, value)| {
                         if let Some(str) = value.as_str() {
-                            if let Some(translated) = plugins_translation_map.get(str) {
+                            if let Some(translated) = lines_map.get(str) {
                                 *value = Value::from(translated);
                             }
                         }
@@ -1360,85 +1227,6 @@ pub fn write_plugins(
     }
 }
 
-fn is_escaped(index: usize, string: &str) -> bool {
-    let mut backslash_count: u8 = 0;
-
-    for char in string[..index].chars().rev() {
-        if char == '\\' {
-            backslash_count += 1;
-        } else {
-            break;
-        }
-    }
-
-    backslash_count % 2 == 1
-}
-
-pub fn extract_strings(ruby_code: &str, mode: bool) -> (IndexSet<String>, Vec<usize>) {
-    let mut strings: IndexSet<String> = IndexSet::new();
-    let mut indices: Vec<usize> = Vec::new();
-    let mut inside_string: bool = false;
-    let mut inside_multiline_comment: bool = false;
-    let mut string_start_index: usize = 0;
-    let mut current_quote_type: char = '\0';
-    let mut global_index: usize = 0;
-
-    for line in ruby_code.each_line() {
-        let trimmed: &str = line.trim();
-
-        if !inside_string {
-            if trimmed.starts_with('#') {
-                global_index += line.len();
-                continue;
-            }
-
-            if trimmed.starts_with("=begin") {
-                inside_multiline_comment = true;
-            } else if trimmed.starts_with("=end") {
-                inside_multiline_comment = false;
-            }
-        }
-
-        if inside_multiline_comment {
-            global_index += line.len();
-            continue;
-        }
-
-        let char_indices: CharIndices = line.char_indices();
-
-        for (i, char) in char_indices {
-            if !inside_string && char == '#' {
-                break;
-            }
-
-            if !inside_string && (char == '"' || char == '\'') {
-                inside_string = true;
-                string_start_index = global_index + i;
-                current_quote_type = char;
-            } else if inside_string && char == current_quote_type && !is_escaped(i, &line) {
-                let extracted_string: String = ruby_code[string_start_index + 1..global_index + i]
-                    .replace("\r\n", r"\#")
-                    .replace('\n', r"\#");
-
-                if !strings.contains(&extracted_string) {
-                    strings.insert(extracted_string);
-                }
-
-                if mode {
-                    indices.push(string_start_index + 1);
-                }
-
-                inside_string = false;
-                current_quote_type = '\0';
-            }
-        }
-
-        global_index += line.len();
-    }
-
-    (strings, indices)
-}
-
 pub fn write_scripts(
     scripts_file_path: &Path,
     other_path: &Path,
@@ -1449,19 +1237,22 @@ pub fn write_scripts(
 ) {
     let mut script_entries: Value = load(&read(scripts_file_path).unwrap(), Some(StringMode::Binary), None).unwrap();
 
-    let original_scripts_text: Vec<String> = read_to_string(other_path.join("scripts.txt"))
-        .unwrap()
-        .split('\n')
-        .map(|line: &str| line.to_string())
-        .collect();
-    let translated_scripts_text: Vec<String> = read_to_string(other_path.join("scripts_trans.txt"))
-        .unwrap()
-        .split('\n')
-        .map(|line: &str| line.to_string())
-        .collect();
+    let original_content: String = read_to_string(other_path.join("scripts.txt")).unwrap();
 
-    let scripts_translation_map: HashMap<String, String> =
-        HashMap::from_iter(original_scripts_text.into_iter().zip(translated_scripts_text));
+    let lines_map: StringHashMap = {
+        let mut hashmap: StringHashMap = HashMap::default();
+
+        for line in original_content.split('\n') {
+            if line.starts_with("<!--") {
+                continue;
+            }
+
+            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+            hashmap.insert(original.trim().to_owned(), translated.trim().to_owned());
+        }
+
+        hashmap
+    };
 
     let encodings: [&Encoding; 5] = [
         encoding_rs::UTF_8,
@@ -1491,7 +1282,7 @@ pub fn write_scripts(
         let (strings_array, indices_array) = extract_strings(&code, true);
 
         for (mut string, index) in strings_array.into_iter().zip(indices_array).rev() {
-            if string.is_empty() || !scripts_translation_map.contains_key(&string) {
+            if string.is_empty() || !lines_map.contains_key(&string) {
                 continue;
             }
 
@@ -1499,7 +1290,7 @@ pub fn write_scripts(
                 string = romanize_string(string);
             }
 
-            let translated: Option<&String> = scripts_translation_map.get(&string);
+            let translated: Option<&String> = lines_map.get(&string);
 
             if let Some(translated) = translated {
                 code.replace_range(index..index + string.len(), translated);

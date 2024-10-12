@@ -1,16 +1,21 @@
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::{cformat, cstr};
+use indexmap::IndexSet;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use sonic_rs::{from_str, from_value, json, prelude::*, to_string, Object};
 use std::{
     fs::{create_dir_all, read_to_string, write},
+    hash::BuildHasherDefault,
     io::stdin,
+    mem::take,
     path::{Path, PathBuf},
     process::exit,
+    str::CharIndices,
     time::Instant,
 };
 use sys_locale::get_locale;
+use xxhash_rust::xxh3::Xxh3;
 
 mod read;
 mod write;
@@ -440,6 +445,111 @@ pub fn get_object_data(object: &Object) -> String {
     }
 }
 
+trait EachLine {
+    fn each_line(&self) -> Vec<String>;
+}
+
+// Return a Vec of strings splitted by lines (inclusive), akin to each_line in Ruby
+impl EachLine for str {
+    fn each_line(&self) -> Vec<String> {
+        let mut result: Vec<String> = Vec::new();
+        let mut current_line: String = String::new();
+
+        for char in self.chars() {
+            current_line.push(char);
+
+            if char == '\n' {
+                result.push(take(&mut current_line));
+            }
+        }
+
+        if !current_line.is_empty() {
+            result.push(take(&mut current_line));
+        }
+
+        result
+    }
+}
+
+pub fn extract_strings(ruby_code: &str, mode: bool) -> (IndexSet<String, BuildHasherDefault<Xxh3>>, Vec<usize>) {
+    fn is_escaped(index: usize, string: &str) -> bool {
+        let mut backslash_count: u8 = 0;
+
+        for char in string[..index].chars().rev() {
+            if char == '\\' {
+                backslash_count += 1;
+            } else {
+                break;
+            }
+        }
+
+        backslash_count % 2 == 1
+    }
+
+    let mut strings: IndexSet<String, BuildHasherDefault<Xxh3>> = IndexSet::default();
+    let mut indices: Vec<usize> = Vec::new();
+    let mut inside_string: bool = false;
+    let mut inside_multiline_comment: bool = false;
+    let mut string_start_index: usize = 0;
+    let mut current_quote_type: char = '\0';
+    let mut global_index: usize = 0;
+
+    for line in ruby_code.each_line() {
+        let trimmed: &str = line.trim();
+
+        if !inside_string {
+            if trimmed.starts_with('#') {
+                global_index += line.len();
+                continue;
+            }
+
+            if trimmed.starts_with("=begin") {
+                inside_multiline_comment = true;
+            } else if trimmed.starts_with("=end") {
+                inside_multiline_comment = false;
+            }
+        }
+
+        if inside_multiline_comment {
+            global_index += line.len();
+            continue;
+        }
+
+        let char_indices: CharIndices = line.char_indices();
+
+        for (i, char) in char_indices {
+            if !inside_string && char == '#' {
+                break;
+            }
+
+            if !inside_string && (char == '"' || char == '\'') {
+                inside_string = true;
+                string_start_index = global_index + i;
+                current_quote_type = char;
+            } else if inside_string && char == current_quote_type && !is_escaped(i, &line) {
+                let extracted_string: String = ruby_code[string_start_index + 1..global_index + i]
+                    .replace("\r\n", NEW_LINE)
+                    .replace('\n', NEW_LINE);
+
+                if !strings.contains(&extracted_string) {
+                    strings.insert(extracted_string);
+                }
+
+                if mode {
+                    indices.push(string_start_index + 1);
+                }
+
+                inside_string = false;
+                current_quote_type = '\0';
+            }
+        }
+
+        global_index += line.len();
+    }
+
+    (strings, indices)
+}
+
 fn get_game_type(game_title: String) -> Option<&'static GameType> {
     let lowercased: &str = &game_title.to_lowercase();
 
@@ -455,6 +565,8 @@ fn get_game_type(game_title: String) -> Option<&'static GameType> {
     }
 }
 
+static NEW_LINE: &str = r"\#";
+static LINES_SEPARATOR: &str = "<#>";
 static mut EXTENSION: &str = "";
 
 fn main() {
@@ -473,7 +585,7 @@ fn main() {
                 .value_parser(["ru", "en"])]);
         let preparse_matches: ArgMatches = preparse.get_matches();
 
-        let subcommand: Option<String> = preparse_matches.subcommand_name().map(|name: &str| name.to_string());
+        let subcommand: Option<String> = preparse_matches.subcommand_name().map(str::to_owned);
         let language_arg: Option<&String> = preparse_matches.get_one::<String>("language");
 
         let language: String = language_arg
@@ -493,12 +605,12 @@ fn main() {
     let (input_dir_arg_desc, output_dir_arg_desc) = if let Some(subcommand) = subcommand {
         match subcommand.as_str() {
             "read" => (
-                localization.input_dir_arg_read_desc.to_string(),
-                localization.output_dir_arg_read_desc.to_string(),
+                localization.input_dir_arg_read_desc.to_owned(),
+                localization.output_dir_arg_read_desc.to_owned(),
             ),
             "write" => (
-                localization.input_dir_arg_write_desc.to_string(),
-                localization.output_dir_arg_write_desc.to_string(),
+                localization.input_dir_arg_write_desc.to_owned(),
+                localization.output_dir_arg_write_desc.to_owned(),
             ),
             _ => unreachable!(),
         }
@@ -543,7 +655,8 @@ fn main() {
         .hide_default_value(true)
         .display_order(1);
 
-    let shuffle_level_arg: Arg = Arg::new("shuffle-level")
+    // TODO: Reimplement shuffle_level arg
+    let _shuffle_level_arg: Arg = Arg::new("shuffle-level")
         .short('s')
         .long("shuffle-level")
         .action(ArgAction::Set)
@@ -662,8 +775,9 @@ fn main() {
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.write_command_desc)
-        .arg(shuffle_level_arg)
         .arg(&help_flag);
+
+    let migrate_subcommand: Command = Command::new("migrate").disable_help_flag(true);
 
     let cli: Command = Command::new("")
         .disable_version_flag(true)
@@ -673,7 +787,7 @@ fn main() {
         .term_width(120)
         .about(localization.about_msg)
         .help_template(localization.help_template)
-        .subcommands([read_subcommand, write_subcommand])
+        .subcommands([read_subcommand, write_subcommand, migrate_subcommand])
         .args([
             input_dir_arg,
             output_dir_arg,
@@ -741,9 +855,8 @@ fn main() {
         output_dir
     };
 
-    let (maps_path, other_path, metadata_file_path) = (
-        &root_dir.join("translation/maps"),
-        &root_dir.join("translation/other"),
+    let (output_path, metadata_file_path) = (
+        &root_dir.join("translation"),
         &root_dir.join("translation/.rvpacker-txt-rs-metadata.json"),
     );
 
@@ -793,7 +906,7 @@ fn main() {
     } else {
         let game_title: String = if engine_type == EngineType::New {
             let system_obj: Object = from_str::<Object>(&read_to_string(&system_file_path).unwrap()).unwrap();
-            system_obj["gameTitle"].as_str().unwrap().to_string()
+            system_obj["gameTitle"].as_str().unwrap().to_owned()
         } else {
             let ini_file_path: &Path = &input_dir.join("Game.ini");
 
@@ -802,7 +915,7 @@ fn main() {
 
                 for line in ini_file_content.lines() {
                     if line.to_lowercase().starts_with("title") {
-                        game_title = Some(line.split_once('=').unwrap().1.trim().to_string());
+                        game_title = Some(line.split_once('=').unwrap().1.trim().to_owned());
                     }
                 }
 
@@ -850,8 +963,8 @@ fn main() {
             ProcessingMode::Default
         };
 
-        create_dir_all(maps_path).unwrap();
-        create_dir_all(other_path).unwrap();
+        create_dir_all(output_path).unwrap();
+        create_dir_all(output_path).unwrap();
 
         write(
             metadata_file_path,
@@ -862,7 +975,7 @@ fn main() {
         if !disable_maps_processing {
             read_map(
                 original_path,
-                maps_path,
+                output_path,
                 separate_maps_flag,
                 romanize_flag,
                 logging_flag,
@@ -880,7 +993,7 @@ fn main() {
         if !disable_other_processing {
             read_other(
                 original_path,
-                other_path,
+                output_path,
                 romanize_flag,
                 logging_flag,
                 game_type,
@@ -897,7 +1010,7 @@ fn main() {
         if !disable_system_processing {
             read_system(
                 &system_file_path,
-                other_path,
+                output_path,
                 romanize_flag,
                 logging_flag,
                 processing_mode,
@@ -913,34 +1026,29 @@ fn main() {
         if !disable_plugins_processing && engine_type != EngineType::New {
             read_scripts(
                 &unsafe { scripts_file_path.unwrap_unchecked() },
-                other_path,
+                output_path,
                 romanize_flag,
                 logging_flag,
                 localization.file_parsed_msg,
             );
         }
-    } else {
+    } else if subcommand == "write" {
         use write::*;
 
-        if !maps_path.exists() || !other_path.exists() {
+        if !output_path.exists() {
             panic!("{}", localization.translation_dirs_missing);
         }
 
-        let (data_output_path, plugins_path, plugins_output_path) = if engine_type == EngineType::New {
-            let plugins_output_path = root_dir.join("output/js");
+        let (data_output_path, plugins_output_path) = if engine_type == EngineType::New {
+            let plugins_output_path: PathBuf = root_dir.join("output/js");
             create_dir_all(&plugins_output_path).unwrap();
-            (
-                &root_dir.join("output/data"),
-                Some(input_dir.join("translation/plugins")),
-                Some(plugins_output_path),
-            )
+
+            (&root_dir.join("output/data"), Some(plugins_output_path))
         } else {
-            (&root_dir.join("output/Data"), None, None)
+            (&root_dir.join("output/Data"), None)
         };
 
         create_dir_all(data_output_path).unwrap();
-
-        let shuffle_level: u8 = *subcommand_matches.get_one("shuffle-level").unwrap();
 
         if metadata_file_path.exists() {
             let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
@@ -961,11 +1069,10 @@ fn main() {
 
         if !disable_maps_processing {
             write_maps(
-                maps_path,
+                output_path,
                 original_path,
                 data_output_path,
                 romanize_flag,
-                shuffle_level,
                 separate_maps_flag,
                 logging_flag,
                 localization.file_written_msg,
@@ -976,11 +1083,10 @@ fn main() {
 
         if !disable_other_processing {
             write_other(
-                other_path,
+                output_path,
                 original_path,
                 data_output_path,
                 romanize_flag,
-                shuffle_level,
                 logging_flag,
                 localization.file_written_msg,
                 game_type,
@@ -991,10 +1097,9 @@ fn main() {
         if !disable_system_processing {
             write_system(
                 &system_file_path,
-                other_path,
+                output_path,
                 data_output_path,
                 romanize_flag,
-                shuffle_level,
                 logging_flag,
                 localization.file_written_msg,
                 engine_type,
@@ -1002,29 +1107,58 @@ fn main() {
         }
 
         if !disable_plugins_processing && game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina) {
-            let plugins_path: PathBuf = unsafe { plugins_path.unwrap_unchecked() };
-
-            if plugins_path.exists() {
-                write_plugins(
-                    &plugins_path.join("plugins.json"),
-                    &plugins_path,
-                    &unsafe { plugins_output_path.unwrap_unchecked() },
-                    shuffle_level,
-                    logging_flag,
-                    localization.file_written_msg,
-                );
-            }
+            write_plugins(
+                &output_path.join("plugins.json"),
+                output_path,
+                &unsafe { plugins_output_path.unwrap_unchecked() },
+                logging_flag,
+                localization.file_written_msg,
+            );
         }
 
         if !disable_plugins_processing && engine_type != EngineType::New {
             write_scripts(
                 &unsafe { scripts_file_path.unwrap_unchecked() },
-                other_path,
+                output_path,
                 data_output_path,
                 romanize_flag,
                 logging_flag,
                 localization.file_written_msg,
             )
+        }
+    } else if subcommand == "migrate" {
+        let maps_path: PathBuf = output_path.join("maps");
+        let other_path: PathBuf = output_path.join("other");
+        let plugins_path: PathBuf = output_path.join("plugins");
+
+        let mut original_content: String = String::new();
+        let mut translated_content: String;
+        let mut original_filename: String = String::new();
+
+        for path in [maps_path, other_path, plugins_path] {
+            let entries = std::fs::read_dir(path).unwrap().flatten();
+
+            for entry in entries {
+                if !entry.file_name().to_str().unwrap().contains("trans") {
+                    original_content = read_to_string(entry.path()).unwrap();
+                    original_filename = entry.file_name().to_str().unwrap().to_owned();
+                } else {
+                    translated_content = read_to_string(entry.path()).unwrap();
+
+                    let original_content_split = original_content.split('\n');
+                    let translated_content_split = translated_content.split('\n');
+
+                    std::fs::write(
+                        output_path.join(original_filename.as_str()),
+                        original_content_split
+                            .zip(translated_content_split)
+                            .map(|(original, translated)| format!("{original}{LINES_SEPARATOR}{translated}"))
+                            .collect::<Vec<_>>()
+                            .join("\n"),
+                    )
+                    .unwrap();
+                }
+            }
         }
     }
 
