@@ -35,6 +35,10 @@ Commands:
   write
           Writes translated files using original files from "original" or "data" ("Data") folders of input directory and
           writes results to "output" folder of output directory.
+  migrate
+          Migrates v1/v2 projects to v3 format. Note: maps names are implemented differently in v3, so you should do
+          read --append after migrate, and then insert translated maps names next to Mapxxx.json comments that contain
+          an original map name.
 
 Options:
   -i, --input-dir <INPUT_PATH>
@@ -45,20 +49,30 @@ Options:
           When reading: Output directory, where a "translation" folder with translation .txt files will be created.
           When writing: Output directory, where an "output" folder with "data" ("Data") and/or "js" subfolders with game
           files with translated text from .txt files will be created.
-      --disable-processing <FILENAMES>
+      --disable-processing <FILES>
           Skips processing specified files.
-          Example: --disable-processing=maps,other,system.
+          Example: --disable-processing=maps,other,system
           [Allowed values: maps, other, system, plugins]
+          [Aliases: no]
   -r, --romanize
           If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation
           marks, it automatically replaces these symbols by their roman equivalents (in this case, ''). This flag will
           automatically be used when writing if you parsed game text with it.
+      --maps-processing-mode <MODE>
+          How to process maps.
+          default - Ignore all previously encountered text duplicates
+          separate - For each new map, reset the set of previously encountered text duplicates
+          preserve - Allow all text duplicates.
+          [Allowed values: default, separate, preserve]
+          [Default value: default]
+          [Aliases: maps-mode]
       --disable-custom-processing
           Disables built-in custom processing, implemented for some games. This flag will automatically be used when
           writing if you parsed game text with it.
+          [Aliases: no-custom]
   -l, --language <LANGUAGE>
           Sets the localization of the tool to the selected language.
-          Example: --language en.
+          Example: --language en
           [Allowed values: en, ru]
       --log
           Enables logging.
