@@ -104,6 +104,7 @@ struct Localization<'a> {
     maps_processing_mode_arg_desc: &'a str,
 
     // Argument types
+    mode_arg_type: &'a str,
     input_path_arg_type: &'a str,
     output_path_arg_type: &'a str,
     disable_processing_arg_type: &'a str,
@@ -134,6 +135,7 @@ struct Localization<'a> {
     default_value: &'a str,
     when_reading: &'a str,
     when_writing: &'a str,
+    aliases: &'a str,
 }
 
 trait EachLine {
@@ -220,6 +222,7 @@ impl Localization<'_> {
             maps_processing_mode_arg_desc: "How to process maps.\ndefault - Ignore all previously encountered text duplicates\nseparate - For each new map, reset the set of previously encountered text duplicates\npreserve - Allow all text duplicates.",
 
             // Argument types
+            mode_arg_type: "MODE",
             input_path_arg_type: "INPUT_PATH",
             output_path_arg_type: "OUTPUT_PATH",
             disable_processing_arg_type: "FILES",
@@ -255,6 +258,7 @@ impl Localization<'_> {
             default_value: "Default value:",
             when_reading: "When reading:",
             when_writing: "When writing:",
+            aliases: "Aliases:"
         }
     }
 
@@ -300,9 +304,10 @@ impl Localization<'_> {
             log_arg_desc: "Включает логирование.",
             help_arg_desc: "Выводит справочную информацию по программе либо по введёной команде.",
 
-            processing_mode_arg_desc: "Как обрабатывать файлы. default - Стандартный режим. Прекращает обработку, если .txt файлы перевода уже существуют.\nappend - Режим добавления. Например, если переводимая вами игра обновится, вы можете использовать этот аргумент чтобы добавить любой новый текст в существующие файлы, сохраняя порядок линий.\nforce - Принудительный режим. Принудительный режим перезаписывает существующие .txt файлы.",
+            processing_mode_arg_desc: "Как обрабатывать файлы.\ndefault - Стандартный режим. Прекращает обработку, если .txt файлы перевода уже существуют.\nappend - Режим добавления. Например, если переводимая вами игра обновится, вы можете использовать этот аргумент чтобы добавить любой новый текст в существующие файлы, сохраняя порядок линий.\nforce - Принудительный режим. Принудительный режим перезаписывает существующие .txt файлы.",
             maps_processing_mode_arg_desc: "Как обрабатывать карты.\ndefault - Игнорировать дубликаты всего ранее встреченного текста.\nseparate - Для каждой новой карты, обновлять список ранее встреченного текста.\npreserve - Разрешить все дубликаты текста.",
 
+            mode_arg_type: "РЕЖИМ",
             input_path_arg_type: "ВХОДНОЙ_ПУТЬ",
             output_path_arg_type: "ВЫХОДНОЙ_ПУТЬ",
             disable_processing_arg_type: "ИМЕНА_ФАЙЛОВ",
@@ -338,6 +343,7 @@ impl Localization<'_> {
             default_value: "Значение по умолчанию:",
             when_reading: "При чтении:",
             when_writing: "При записи:",
+            aliases: "Также:"
         }
     }
 }
@@ -639,10 +645,11 @@ fn main() {
         .value_delimiter(',')
         .value_name(localization.disable_processing_arg_type)
         .help(cformat!(
-            "{}\n{} --disable-processing=maps,other,system\n<bold>[{} maps, other, system, plugins]</>",
+            "{}\n{} --disable-processing=maps,other,system\n<bold>[{} maps, other, system, plugins]\n[{} no]</>",
             localization.disable_processing_arg_desc,
             localization.example,
             localization.possible_values,
+            localization.aliases
         ))
         .global(true)
         .value_parser(["maps", "other", "system", "plugins"])
@@ -659,13 +666,17 @@ fn main() {
     let processing_mode_arg: Arg = Arg::new("processing-mode")
         .short('p')
         .long("processing-mode")
+        .alias("mode")
         .value_parser(["default", "append", "force"])
+        .hide_default_value(true)
         .default_value("default")
+        .value_name(localization.mode_arg_type)
         .help(cformat!(
-            "{}\n<bold>[{} default, append, force] [{} default]</>",
+            "{}\n<bold>[{} default, append, force]\n[{} default]\n[{} mode]</>",
             localization.processing_mode_arg_desc,
             localization.possible_values,
-            localization.default_value
+            localization.default_value,
+            localization.aliases
         ));
 
     let disable_custom_processing_flag: Arg = Arg::new("disable-custom-processing")
@@ -673,7 +684,11 @@ fn main() {
         .alias("no-custom")
         .action(ArgAction::SetTrue)
         .global(true)
-        .help(localization.disable_custom_processing_desc)
+        .help(cformat!(
+            "{}\n<bold>[{} no-custom]</>",
+            localization.disable_custom_processing_desc,
+            localization.aliases
+        ))
         .display_order(97);
 
     let language_arg: Arg = Arg::new("language")
@@ -708,11 +723,14 @@ fn main() {
         .long("maps-processing-mode")
         .alias("maps-mode")
         .help(cformat!(
-            "{}\n<bold>[{} default, separate, preserve] [{} default]</>",
+            "{}\n<bold>[{} default, separate, preserve]\n[{} default]\n[{} maps-mode]</>",
             localization.maps_processing_mode_arg_desc,
             localization.possible_values,
-            localization.default_value
+            localization.default_value,
+            localization.aliases
         ))
+        .value_name(localization.mode_arg_type)
+        .hide_default_value(true)
         .value_parser(["default", "separate", "preserve"])
         .default_value("default")
         .global(true);
