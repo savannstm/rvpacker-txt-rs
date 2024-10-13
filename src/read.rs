@@ -1,8 +1,8 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    get_object_data, romanize_string, write::extract_strings, Code, EngineType, GameType, ProcessingMode, Variable,
-    ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LISA_PREFIX_RE,
-    STRING_IS_ONLY_SYMBOLS_RE,
+    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, MapsProcessingMode, ProcessingMode,
+    Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LINES_SEPARATOR,
+    LISA_PREFIX_RE, NEW_LINE, STRING_IS_ONLY_SYMBOLS_RE,
 };
 use encoding_rs::Encoding;
 use flate2::read::ZlibDecoder;
@@ -13,9 +13,10 @@ use regex::Regex;
 use sonic_rs::{from_str, from_value, prelude::*, Array, Value};
 use std::{
     cell::UnsafeCell,
+    collections::VecDeque,
     ffi::OsString,
     fs::{read, read_dir, read_to_string, write, DirEntry},
-    hash::{BuildHasher, BuildHasherDefault},
+    hash::BuildHasherDefault,
     io::Read,
     path::Path,
     str::{from_utf8_unchecked, Chars},
@@ -25,33 +26,12 @@ use xxhash_rust::xxh3::Xxh3;
 type Xxh3IndexSet = IndexSet<String, BuildHasherDefault<Xxh3>>;
 type Xxh3IndexMap<'a, 'b> = IndexMap<&'a str, &'b str, BuildHasherDefault<Xxh3>>;
 
-trait Join {
-    fn join(&self, delimiter: &str) -> String;
-}
-
-impl<T: ToString + AsRef<str>, S: BuildHasher> Join for IndexSet<T, S> {
-    fn join(&self, delimiter: &str) -> String {
-        let mut joined: String = String::new();
-
-        if !self.is_empty() {
-            joined.push_str(unsafe { self.get_index(0).unwrap_unchecked() }.as_ref());
-
-            for item in self.iter().skip(1) {
-                joined.push_str(delimiter);
-                joined.push_str(item.as_ref());
-            }
-        }
-
-        joined
-    }
-}
-
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
 fn parse_parameter(
     code: Code,
     mut parameter: &str,
-    game_type: Option<&GameType>,
-    engine_type: &EngineType,
+    game_type: Option<GameType>,
+    engine_type: EngineType,
 ) -> Option<String> {
     if STRING_IS_ONLY_SYMBOLS_RE.is_match(parameter) {
         return None;
@@ -99,7 +79,7 @@ fn parse_parameter(
         }
     }
 
-    Some(parameter.to_string())
+    Some(parameter.to_owned())
 }
 
 #[allow(clippy::single_match, clippy::match_single_binding, unused_mut)]
@@ -107,8 +87,8 @@ fn parse_variable(
     mut variable_text: String,
     variable_type: &Variable,
     filename: &str,
-    game_type: Option<&GameType>,
-    engine_type: &EngineType,
+    game_type: Option<GameType>,
+    engine_type: EngineType,
 ) -> Option<(String, bool)> {
     if STRING_IS_ONLY_SYMBOLS_RE.is_match(&variable_text) {
         return None;
@@ -263,13 +243,13 @@ fn parse_variable(
                                         return None;
                                     }
 
-                                    variable_text = r"\#".to_string() + left;
+                                    variable_text = NEW_LINE.to_owned() + left;
                                 } else {
                                     if !variable_text.ends_with(['.', '%', '!', '"']) {
                                         return None;
                                     }
 
-                                    variable_text = r"\#".to_string() + &variable_text
+                                    variable_text = NEW_LINE.to_owned() + &variable_text
                                 }
                             } else {
                                 return None;
@@ -290,9 +270,9 @@ fn parse_list<'a>(
     list: &Array,
     allowed_codes: &[u16],
     romanize: bool,
-    game_type: Option<&GameType>,
-    engine_type: &EngineType,
-    processing_mode: &ProcessingMode,
+    game_type: Option<GameType>,
+    engine_type: EngineType,
+    processing_mode: ProcessingMode,
     (code_label, parameters_label): (&str, &str),
     set: &'a UnsafeCell<Xxh3IndexSet>,
     map: &'a mut Xxh3IndexMap,
@@ -308,7 +288,7 @@ fn parse_list<'a>(
 
         if in_sequence && ![401, 405].contains(&code) {
             if !line.is_empty() {
-                let mut joined: String = line.join("\n").trim().replace('\n', r"\#");
+                let mut joined: String = line.join("\n").trim().replace('\n', NEW_LINE);
 
                 if romanize {
                     joined = romanize_string(joined);
@@ -341,13 +321,13 @@ fn parse_list<'a>(
             401 | 405 => {
                 let parameter_string: String = parameters[0]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match parameters[0].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if !parameter_string.is_empty() {
                     in_sequence = true;
@@ -358,13 +338,13 @@ fn parse_list<'a>(
                 for i in 0..parameters[0].as_array().unwrap().len() {
                     let subparameter_string: String = parameters[0][i]
                         .as_str()
-                        .map(str::to_string)
+                        .map(str::to_owned)
                         .unwrap_or(match parameters[0][i].as_object() {
                             Some(obj) => get_object_data(obj),
                             None => String::new(),
                         })
                         .trim()
-                        .to_string();
+                        .to_owned();
 
                     if !subparameter_string.is_empty() {
                         let parsed: Option<String> =
@@ -388,13 +368,13 @@ fn parse_list<'a>(
             356 => {
                 let parameter_string: String = parameters[0]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match parameters[0].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if !parameter_string.is_empty() {
                     let parsed: Option<String> =
@@ -417,17 +397,16 @@ fn parse_list<'a>(
             320 | 324 => {
                 let parameter_string: String = parameters[1]
                     .as_str()
-                    .map(str::to_string)
+                    .map(str::to_owned)
                     .unwrap_or(match parameters[1].as_object() {
                         Some(obj) => get_object_data(obj),
                         None => String::new(),
                     })
                     .trim()
-                    .to_string();
+                    .to_owned();
 
                 if !parameter_string.is_empty() {
-                    let parsed: Option<String> =
-                        parse_parameter(Code::Unknown, &parameter_string, game_type, engine_type);
+                    let parsed: Option<String> = parse_parameter(Code::Misc, &parameter_string, game_type, engine_type);
 
                     if let Some(mut parsed) = parsed {
                         if romanize {
@@ -448,42 +427,38 @@ fn parse_list<'a>(
     }
 }
 
-// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all Map files of maps_path and parses them into .txt files in output_path.
 /// # Parameters
 /// * `maps_path` - path to directory than contains game files
 /// * `output_path` - path to output directory
+/// * `maps_processing_mode` - how to deal with lines duplicates in maps
 /// * `romanize` - whether to romanize text
-/// * `separate_maps` - whether to reset text hashset after each processed map
 /// * `logging` - whether to log
 /// * `game_type` - game type for custom parsing
-/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 /// * `engine_type` - which engine's files are we processing, essential for the right processing
+/// * `processing_mode` - whether to read in default mode, force rewrite or append new text to existing files
 /// * `file_parsed_msg` - message to log when file is parsed
 /// * `file_already_parsed_msg` - message to log when file that's about to be parsed already exists (default processing mode)
 /// * `file_is_not_parsed_msg` - message to log when file that's about to be parsed not exist (append processing mode)
 pub fn read_map(
     original_path: &Path,
     output_path: &Path,
-    separate_maps: bool,
+    maps_processing_mode: MapsProcessingMode,
     romanize: bool,
     logging: bool,
-    game_type: Option<&GameType>,
-    engine_type: &EngineType,
-    mut processing_mode: &ProcessingMode,
+    game_type: Option<GameType>,
+    engine_type: EngineType,
+    mut processing_mode: ProcessingMode,
     (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
-    let maps_output_path: &Path = &output_path.join("maps.txt");
-    let maps_trans_output_path: &Path = &output_path.join("maps_trans.txt");
-    let names_output_path: &Path = &output_path.join("names.txt");
-    let names_trans_output_path: &Path = &output_path.join("names_trans.txt");
+    let output_path: &Path = &output_path.join("maps.txt");
 
-    if processing_mode == ProcessingMode::Default && maps_trans_output_path.exists() {
+    if processing_mode == ProcessingMode::Default && output_path.exists() {
         println!("maps_trans.txt {file_already_parsed_msg}");
         return;
     }
 
-    let maps_obj_vec =
+    let obj_vec_iter =
         read_dir(original_path)
             .unwrap()
             .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
@@ -501,7 +476,7 @@ pub fn read_map(
                             load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
                         };
 
-                        Some((filename_str.to_string(), json))
+                        Some((filename_str.to_owned(), json))
                     } else {
                         None
                     }
@@ -509,189 +484,434 @@ pub fn read_map(
                 Err(_) => None,
             });
 
-    let mut maps_lines_vec: Vec<String> = Vec::new();
+    if maps_processing_mode != MapsProcessingMode::Preserve {
+        let mut lines_vec: Vec<String> = Vec::new();
 
-    let maps_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
-    let maps_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *maps_lines.get() };
-    let maps_lines_ref: &Xxh3IndexSet = unsafe { &*maps_lines.get() };
+        let lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+        let lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *lines.get() };
+        let lines_ref: &Xxh3IndexSet = unsafe { &*lines.get() };
 
-    let names_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
-    let names_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *names_lines.get() };
-    let names_lines_ref: &Xxh3IndexSet = unsafe { &*names_lines.get() };
+        let mut lines_map: Xxh3IndexMap = IndexMap::default();
 
-    let mut maps_translation_map: Xxh3IndexMap = IndexMap::default();
-    let mut names_translation_map: Xxh3IndexMap = IndexMap::default();
+        let original_content: String = if processing_mode == ProcessingMode::Append {
+            read_to_string(output_path).unwrap()
+        } else {
+            String::new()
+        };
 
-    let (maps_original_text, maps_translated_text, names_original_text, names_translated_text) =
         if processing_mode == ProcessingMode::Append {
-            if maps_trans_output_path.exists() && names_trans_output_path.exists() {
-                (
-                    read_to_string(maps_output_path).unwrap(),
-                    read_to_string(maps_trans_output_path).unwrap(),
-                    read_to_string(names_output_path).unwrap(),
-                    read_to_string(names_trans_output_path).unwrap(),
-                )
+            if output_path.exists() {
+                for line in original_content.split('\n') {
+                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                    lines_map.insert(original, translated);
+                }
             } else {
                 println!("{file_is_not_parsed_msg}");
-                processing_mode = &ProcessingMode::Default;
-                (String::new(), String::new(), String::new(), String::new())
+                processing_mode = ProcessingMode::Default;
             }
-        } else {
-            (String::new(), String::new(), String::new(), String::new())
         };
 
-    if processing_mode == ProcessingMode::Append {
-        for (original, translated) in maps_original_text
-            .par_split('\n')
-            .collect::<Vec<_>>()
-            .into_iter()
-            .zip(maps_translated_text.par_split('\n').collect::<Vec<_>>())
-        {
-            maps_translation_map.insert(original, translated);
+        // 401 - dialogue lines
+        // 102 - dialogue choices array
+        // 356 - system lines (special texts)
+        // 324, 320 - i don't know what is it but it's some used in-game lines
+        const ALLOWED_CODES: [u16; 5] = [102, 320, 324, 356, 401];
+
+        let (display_name_label, events_label, pages_label, list_label, code_label, parameters_label) =
+            if engine_type == EngineType::New {
+                ("displayName", "events", "pages", "list", "code", "parameters")
+            } else {
+                (
+                    "__symbol__display_name",
+                    "__symbol__events",
+                    "__symbol__pages",
+                    "__symbol__list",
+                    "__symbol__code",
+                    "__symbol__parameters",
+                )
+            };
+
+        for (filename, obj) in obj_vec_iter {
+            let mut filename_comment: String = format!("<!-- {filename} -->");
+
+            if let Some(display_name) = obj[display_name_label].as_str() {
+                if !display_name.is_empty() {
+                    let mut display_name_string: String = display_name.to_owned();
+
+                    if romanize {
+                        display_name_string = romanize_string(display_name_string);
+                    }
+
+                    filename_comment.insert(filename_comment.len() - 3, ' ');
+                    filename_comment.insert_str(filename_comment.len() - 4, &display_name_string);
+                }
+            }
+
+            match maps_processing_mode {
+                MapsProcessingMode::Default => {
+                    lines_mut_ref.insert(filename_comment);
+
+                    if processing_mode == ProcessingMode::Append {
+                        lines_map.shift_insert(lines_ref.len() - 1, unsafe { lines_ref.last().unwrap_unchecked() }, "");
+                    }
+                }
+                MapsProcessingMode::Separate => {
+                    lines_vec.extend(lines_mut_ref.drain(..));
+                    lines_vec.push(filename_comment);
+
+                    if processing_mode == ProcessingMode::Append {
+                        lines_map.shift_insert(lines_ref.len() - 1, unsafe { lines_ref.last().unwrap_unchecked() }, "");
+                    }
+                }
+                _ => unreachable!(),
+            }
+
+            let events_arr: Vec<&Value> = if engine_type == EngineType::New {
+                obj[events_label].as_array().unwrap().iter().skip(1).collect()
+            } else {
+                obj[events_label]
+                    .as_object()
+                    .unwrap()
+                    .iter()
+                    .map(|(_, value)| value)
+                    .collect()
+            };
+
+            for event in events_arr {
+                if !event[pages_label].is_array() {
+                    continue;
+                }
+
+                for page in event[pages_label].as_array().unwrap() {
+                    parse_list(
+                        page[list_label].as_array().unwrap(),
+                        &ALLOWED_CODES,
+                        romanize,
+                        game_type,
+                        engine_type,
+                        processing_mode,
+                        (code_label, parameters_label),
+                        &lines,
+                        &mut lines_map,
+                    );
+                }
+            }
+
+            if logging {
+                println!("{file_parsed_msg} {filename}");
+            }
         }
 
-        for (original, translated) in names_original_text.split('\n').zip(names_translated_text.split('\n')) {
-            names_translation_map.insert(original, translated);
-        }
-    }
-
-    // 401 - dialogue lines
-    // 102 - dialogue choices array
-    // 356 - system lines (special texts)
-    // 324, 320 - i don't know what is it but it's some used in-game lines
-    const ALLOWED_CODES: [u16; 5] = [102, 320, 324, 356, 401];
-
-    let (display_name_label, events_label, pages_label, list_label, code_label, parameters_label) =
-        if engine_type == EngineType::New {
-            ("displayName", "events", "pages", "list", "code", "parameters")
-        } else {
-            (
-                "__symbol__display_name",
-                "__symbol__events",
-                "__symbol__pages",
-                "__symbol__list",
-                "__symbol__code",
-                "__symbol__parameters",
+        let mut output_content: String = if processing_mode == ProcessingMode::Append {
+            String::from_iter(
+                lines_map
+                    .into_iter()
+                    .map(|(original, translated)| format!("{original}{LINES_SEPARATOR}{translated}\n")),
             )
+        } else {
+            match maps_processing_mode {
+                MapsProcessingMode::Default => String::from_iter(
+                    lines
+                        .into_inner()
+                        .into_iter()
+                        .map(|line: String| line + LINES_SEPARATOR + "\n"),
+                ),
+                MapsProcessingMode::Separate => {
+                    String::from_iter(lines_vec.into_iter().map(|line: String| line + LINES_SEPARATOR + "\n"))
+                }
+                _ => unreachable!(),
+            }
         };
 
-    for (filename, obj) in maps_obj_vec {
-        let mut filename_comment: String = format!("<!-- {filename} -->");
+        output_content.pop();
 
-        if let Some(display_name) = obj[display_name_label].as_str() {
-            if !display_name.is_empty() {
-                let mut display_name_string: String = display_name.to_string();
+        write(output_path, output_content).unwrap();
+    } else {
+        let mut names_lines_vec: VecDeque<String> = VecDeque::new();
+        let mut lines_vec: Vec<(String, String)> = Vec::new();
+        let mut lines_pos: usize = 0;
 
-                if romanize {
-                    display_name_string = romanize_string(display_name_string);
-                }
-
-                names_lines_mut_ref.insert(display_name_string);
-                let string_ref: &str = unsafe { names_lines_ref.last().unwrap_unchecked() }.as_str();
-
-                filename_comment.insert(filename_comment.len() - 3, ' ');
-                filename_comment.insert_str(filename_comment.len() - 4, string_ref);
-
-                if processing_mode == ProcessingMode::Append && !names_translation_map.contains_key(string_ref) {
-                    names_translation_map.shift_insert(names_lines_ref.len() - 1, string_ref, "");
-                }
-            }
-        }
-
-        if separate_maps {
-            maps_lines_vec.extend(maps_lines_mut_ref.drain(..));
-            maps_lines_vec.push(filename_comment);
-
-            if processing_mode == ProcessingMode::Append {
-                maps_translation_map.shift_insert(
-                    maps_lines_ref.len() - 1,
-                    unsafe { maps_lines_ref.last().unwrap_unchecked() },
-                    "",
-                );
-            }
+        let original_content: String = if processing_mode == ProcessingMode::Append {
+            read_to_string(output_path).unwrap()
         } else {
-            maps_lines_mut_ref.insert(filename_comment);
-
-            if processing_mode == ProcessingMode::Append {
-                maps_translation_map.shift_insert(
-                    maps_lines_ref.len() - 1,
-                    unsafe { maps_lines_ref.last().unwrap_unchecked() },
-                    "",
-                );
-            }
-        }
-
-        let events_arr: Vec<&Value> = if engine_type == EngineType::New {
-            obj[events_label].as_array().unwrap().iter().skip(1).collect()
-        } else {
-            obj[events_label]
-                .as_object()
-                .unwrap()
-                .iter()
-                .map(|(_, value)| value)
-                .collect()
+            String::new()
         };
 
-        for event in events_arr {
-            if !event[pages_label].is_array() {
-                continue;
-            }
-
-            for page in event[pages_label].as_array().unwrap() {
-                parse_list(
-                    page[list_label].as_array().unwrap(),
-                    &ALLOWED_CODES,
-                    romanize,
-                    game_type,
-                    engine_type,
-                    processing_mode,
-                    (code_label, parameters_label),
-                    &maps_lines,
-                    &mut maps_translation_map,
-                );
-            }
-        }
-
-        if logging {
-            println!("{file_parsed_msg} {filename}.");
-        }
-    }
-
-    let (maps_original_content, maps_translated_content, names_original_content, names_translated_content) =
         if processing_mode == ProcessingMode::Append {
-            let maps_collected: (Vec<&str>, Vec<&str>) = maps_translation_map.into_iter().unzip();
-            let names_collected: (Vec<&str>, Vec<&str>) = names_translation_map.into_iter().unzip();
+            if output_path.exists() {
+                for line in original_content.split('\n') {
+                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
 
-            (
-                maps_collected.0.join("\n"),
-                maps_collected.1.join("\n"),
-                names_collected.0.join("\n"),
-                names_collected.1.join("\n"),
-            )
-        } else {
-            (
-                if separate_maps {
-                    maps_lines_vec.join("\n")
-                } else {
-                    maps_lines_ref.join("\n")
-                },
-                "\n".repeat(if separate_maps {
-                    maps_lines_vec.len().saturating_sub(1)
-                } else {
-                    maps_lines_ref.len().saturating_sub(1)
-                }),
-                names_lines_ref.join("\n"),
-                "\n".repeat(names_lines_ref.len().saturating_sub(1)),
-            )
+                    if original.starts_with("<!-- Map") {
+                        if original.len() > 20 {
+                            names_lines_vec.push_back(translated.to_owned());
+                        }
+
+                        continue;
+                    }
+
+                    lines_vec.push((original.to_owned(), translated.to_owned()));
+                }
+            } else {
+                println!("{file_is_not_parsed_msg}");
+                processing_mode = ProcessingMode::Default;
+            }
         };
 
-    write(maps_output_path, maps_original_content).unwrap();
-    write(maps_trans_output_path, maps_translated_content).unwrap();
-    write(names_output_path, names_original_content).unwrap();
-    write(names_trans_output_path, names_translated_content).unwrap();
+        // 401 - dialogue lines
+        // 102 - dialogue choices array
+        // 356 - system lines (special texts)
+        // 324, 320 - i don't know what is it but it's some used in-game lines
+        const ALLOWED_CODES: [u16; 5] = [102, 320, 324, 356, 401];
+
+        let (display_name_label, events_label, pages_label, list_label, code_label, parameters_label) =
+            if engine_type == EngineType::New {
+                ("displayName", "events", "pages", "list", "code", "parameters")
+            } else {
+                (
+                    "__symbol__display_name",
+                    "__symbol__events",
+                    "__symbol__pages",
+                    "__symbol__list",
+                    "__symbol__code",
+                    "__symbol__parameters",
+                )
+            };
+
+        for (filename, obj) in obj_vec_iter {
+            let mut filename_comment: String = format!("<!-- {filename} -->");
+
+            if let Some(display_name) = obj[display_name_label].as_str() {
+                if !display_name.is_empty() {
+                    let mut display_name_string: String = display_name.to_owned();
+
+                    if romanize {
+                        display_name_string = romanize_string(display_name_string);
+                    }
+
+                    filename_comment.insert(filename_comment.len() - 3, ' ');
+                    filename_comment.insert_str(filename_comment.len() - 4, &display_name_string);
+                }
+            }
+
+            let filename_comment_len: usize = filename_comment.len();
+            lines_vec.insert(
+                lines_pos,
+                (
+                    filename_comment,
+                    if filename_comment_len > 20 && names_lines_vec.front().is_some() {
+                        names_lines_vec.pop_front().unwrap()
+                    } else {
+                        String::new()
+                    },
+                ),
+            );
+            lines_pos += 1;
+
+            let events_arr: Vec<&Value> = if engine_type == EngineType::New {
+                obj[events_label].as_array().unwrap().iter().skip(1).collect()
+            } else {
+                obj[events_label]
+                    .as_object()
+                    .unwrap()
+                    .iter()
+                    .map(|(_, value)| value)
+                    .collect()
+            };
+
+            for event in events_arr {
+                if !event[pages_label].is_array() {
+                    continue;
+                }
+
+                for page in event[pages_label].as_array().unwrap() {
+                    let list: &Array = page[list_label].as_array().unwrap();
+                    let allowed_codes: &[u16] = &ALLOWED_CODES;
+                    let (code_label, parameters_label) = (code_label, parameters_label);
+                    let mut in_sequence: bool = false;
+                    let mut line: Vec<String> = Vec::with_capacity(8);
+
+                    for item in list {
+                        let code: u16 = item[code_label].as_u64().unwrap() as u16;
+
+                        if in_sequence && ![401, 405].contains(&code) {
+                            if !line.is_empty() {
+                                let mut joined: String = line.join("\n").trim().replace('\n', NEW_LINE);
+
+                                if romanize {
+                                    joined = romanize_string(joined);
+                                }
+
+                                let parsed: Option<String> =
+                                    parse_parameter(Code::Dialogue, &joined, game_type, engine_type);
+
+                                if let Some(parsed) = parsed {
+                                    if processing_mode == ProcessingMode::Append {
+                                        if let Some((o, _)) = lines_vec.get(lines_pos) {
+                                            if *o != parsed {
+                                                lines_vec.insert(lines_pos, (parsed, String::new()));
+                                            }
+                                        }
+                                    } else {
+                                        lines_vec.push((parsed, String::new()));
+                                    }
+
+                                    lines_pos += 1;
+                                }
+
+                                line.clear();
+                            }
+
+                            in_sequence = false;
+                        }
+
+                        if !allowed_codes.contains(&code) {
+                            continue;
+                        }
+
+                        let parameters: &Array = item[parameters_label].as_array().unwrap();
+
+                        match code {
+                            401 | 405 => {
+                                let parameter_string: String = parameters[0]
+                                    .as_str()
+                                    .map(str::to_owned)
+                                    .unwrap_or(match parameters[0].as_object() {
+                                        Some(obj) => get_object_data(obj),
+                                        None => String::new(),
+                                    })
+                                    .trim()
+                                    .to_owned();
+
+                                if !parameter_string.is_empty() {
+                                    in_sequence = true;
+                                    line.push(parameter_string);
+                                }
+                            }
+                            102 => {
+                                for i in 0..parameters[0].as_array().unwrap().len() {
+                                    let subparameter_string: String = parameters[0][i]
+                                        .as_str()
+                                        .map(str::to_owned)
+                                        .unwrap_or(match parameters[0][i].as_object() {
+                                            Some(obj) => get_object_data(obj),
+                                            None => String::new(),
+                                        })
+                                        .trim()
+                                        .to_owned();
+
+                                    if !subparameter_string.is_empty() {
+                                        let parsed: Option<String> =
+                                            parse_parameter(Code::Choice, &subparameter_string, game_type, engine_type);
+
+                                        if let Some(mut parsed) = parsed {
+                                            if romanize {
+                                                parsed = romanize_string(parsed);
+                                            }
+
+                                            if processing_mode == ProcessingMode::Append {
+                                                if let Some((o, _)) = lines_vec.get(lines_pos) {
+                                                    if *o != parsed {
+                                                        lines_vec.insert(lines_pos, (parsed, String::new()));
+                                                    }
+                                                }
+                                            } else {
+                                                lines_vec.push((parsed, String::new()));
+                                            }
+
+                                            lines_pos += 1;
+                                        }
+                                    }
+                                }
+                            }
+                            356 => {
+                                let parameter_string: String = parameters[0]
+                                    .as_str()
+                                    .map(str::to_owned)
+                                    .unwrap_or(match parameters[0].as_object() {
+                                        Some(obj) => get_object_data(obj),
+                                        None => String::new(),
+                                    })
+                                    .trim()
+                                    .to_owned();
+
+                                if !parameter_string.is_empty() {
+                                    let parsed: Option<String> =
+                                        parse_parameter(Code::System, &parameter_string, game_type, engine_type);
+
+                                    if let Some(mut parsed) = parsed {
+                                        if romanize {
+                                            parsed = romanize_string(parsed);
+                                        }
+
+                                        if processing_mode == ProcessingMode::Append {
+                                            if let Some((o, _)) = lines_vec.get(lines_pos) {
+                                                if *o != parsed {
+                                                    lines_vec.insert(lines_pos, (parsed, String::new()));
+                                                }
+                                            }
+                                        } else {
+                                            lines_vec.push((parsed, String::new()));
+                                        }
+
+                                        lines_pos += 1;
+                                    }
+                                }
+                            }
+                            320 | 324 => {
+                                let parameter_string: String = parameters[1]
+                                    .as_str()
+                                    .map(str::to_owned)
+                                    .unwrap_or(match parameters[1].as_object() {
+                                        Some(obj) => get_object_data(obj),
+                                        None => String::new(),
+                                    })
+                                    .trim()
+                                    .to_owned();
+
+                                if !parameter_string.is_empty() {
+                                    let parsed: Option<String> =
+                                        parse_parameter(Code::Misc, &parameter_string, game_type, engine_type);
+
+                                    if let Some(mut parsed) = parsed {
+                                        if romanize {
+                                            parsed = romanize_string(parsed);
+                                        }
+
+                                        if processing_mode == ProcessingMode::Append {
+                                            if let Some((o, _)) = lines_vec.get(lines_pos) {
+                                                if *o != parsed {
+                                                    lines_vec.insert(lines_pos, (parsed, String::new()));
+                                                }
+                                            }
+                                        } else {
+                                            lines_vec.push((parsed, String::new()));
+                                        }
+
+                                        lines_pos += 1;
+                                    }
+                                }
+                            }
+                            _ => unreachable!(),
+                        }
+                    }
+                }
+            }
+
+            if logging {
+                println!("{file_parsed_msg} {filename}");
+            }
+        }
+
+        let mut output_content: String =
+            String::from_iter(lines_vec.into_iter().map(|(o, t)| o + LINES_SEPARATOR + &t + "\n"));
+
+        output_content.pop();
+
+        write(output_path, output_content).unwrap();
+    }
 }
 
-// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads all other files of original_path and parses them into .txt files in output_path.
 /// # Parameters
 /// * `original_path` - path to directory than contains game files
@@ -709,43 +929,45 @@ pub fn read_other(
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    game_type: Option<&GameType>,
-    processing_mode: &ProcessingMode,
-    engine_type: &EngineType,
+    game_type: Option<GameType>,
+    processing_mode: ProcessingMode,
+    engine_type: EngineType,
     (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
-    let other_obj_arr_iter = read_dir(original_path)
-        .unwrap()
-        .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
-            Ok(entry) => {
-                let filename_os_string: OsString = entry.file_name();
-                let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
-                let (name, _) = filename.split_once('.').unwrap();
+    let obj_arr_iter =
+        read_dir(original_path)
+            .unwrap()
+            .filter_map(|entry: Result<DirEntry, std::io::Error>| match entry {
+                Ok(entry) => {
+                    let filename_os_string: OsString = entry.file_name();
+                    let filename: &str = unsafe { from_utf8_unchecked(filename_os_string.as_encoded_bytes()) };
+                    let (name, _) = filename.split_once('.').unwrap();
 
-                if !name.starts_with("Map")
-                    && !matches!(name, "Tilesets" | "Animations" | "System" | "Scripts")
-                    && filename.ends_with(unsafe { EXTENSION })
-                {
-                    if game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina) && name == "States"
+                    if !name.starts_with("Map")
+                        && !matches!(name, "Tilesets" | "Animations" | "System" | "Scripts")
+                        && filename.ends_with(unsafe { EXTENSION })
                     {
-                        return None;
-                    }
+                        if game_type.is_some_and(|game_type: GameType| game_type == GameType::Termina)
+                            && name == "States"
+                        {
+                            return None;
+                        }
 
-                    let json: Value = if engine_type == EngineType::New {
-                        from_str(&read_to_string(entry.path()).unwrap()).unwrap()
+                        let json: Value = if engine_type == EngineType::New {
+                            from_str(&read_to_string(entry.path()).unwrap()).unwrap()
+                        } else {
+                            load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
+                        };
+
+                        Some((filename.to_owned(), json))
                     } else {
-                        load(&read(entry.path()).unwrap(), None, Some("")).unwrap()
-                    };
-
-                    Some((filename.to_string(), json))
-                } else {
-                    None
+                        None
+                    }
                 }
-            }
-            Err(_) => None,
-        });
+                Err(_) => None,
+            });
 
-    let mut inner_processing_mode: &ProcessingMode = processing_mode;
+    let mut inner_processing_mode: ProcessingMode = processing_mode;
 
     // 401 - dialogue lines
     // 405 - credits lines
@@ -799,54 +1021,42 @@ pub fn read_other(
         )
     };
 
-    for (filename, obj_arr) in other_obj_arr_iter {
-        let other_processed_filename: String = filename[0..filename.rfind('.').unwrap()].to_lowercase();
+    for (filename, obj_arr) in obj_arr_iter {
+        let output_path: &Path = &output_path.join(filename[0..filename.rfind('.').unwrap()].to_lowercase() + ".txt");
 
-        let other_output_path: &Path = &output_path.join(other_processed_filename.clone() + ".txt");
-        let other_trans_output_path: &Path = &output_path.join(other_processed_filename + "_trans.txt");
-
-        if processing_mode == ProcessingMode::Default && other_trans_output_path.exists() {
-            println!("{} {file_already_parsed_msg}", other_trans_output_path.display());
+        if processing_mode == ProcessingMode::Default && output_path.exists() {
+            println!("{} {file_already_parsed_msg}", output_path.display());
             continue;
         }
 
-        let other_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
-        let other_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *other_lines.get() };
-        let other_lines_ref: &Xxh3IndexSet = unsafe { &*other_lines.get() };
+        let lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+        let lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *lines.get() };
+        let lines_ref: &Xxh3IndexSet = unsafe { &*lines.get() };
 
-        let mut other_translation_map: Xxh3IndexMap = IndexMap::default();
+        let mut lines_map: Xxh3IndexMap = IndexMap::default();
 
-        let (original_other_text, translated_other_text) = if processing_mode == ProcessingMode::Append {
-            if other_trans_output_path.exists() {
-                (
-                    read_to_string(other_output_path).unwrap(),
-                    read_to_string(other_trans_output_path).unwrap(),
-                )
-            } else {
-                println!("{file_is_not_parsed_msg}");
-                inner_processing_mode = &ProcessingMode::Default;
-                (String::new(), String::new())
-            }
+        let original_content: String = if processing_mode == ProcessingMode::Append {
+            read_to_string(output_path).unwrap()
         } else {
-            (String::new(), String::new())
+            String::new()
         };
 
         if processing_mode == ProcessingMode::Append {
-            for (original, translated) in original_other_text
-                .par_split('\n')
-                .collect::<Vec<_>>()
-                .into_iter()
-                .zip(translated_other_text.par_split('\n').collect::<Vec<_>>())
-            {
-                other_translation_map.insert(original, translated);
+            if output_path.exists() {
+                for line in original_content.par_split('\n').collect::<Vec<_>>() {
+                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                    lines_map.insert(original, translated);
+                }
+            } else {
+                println!("{file_is_not_parsed_msg}");
+                inner_processing_mode = ProcessingMode::Default;
             }
         }
 
         // Other files except CommonEvents and Troops have the structure that consists
         // of name, nickname, description and note
         if !filename.starts_with("Co") && !filename.starts_with("Tr") {
-            if game_type.is_some_and(|game_type: &GameType| game_type == GameType::Termina)
-                && filename.starts_with("It")
+            if game_type.is_some_and(|game_type: GameType| game_type == GameType::Termina) && filename.starts_with("It")
             {
                 for string in [
                     "<Menu Category: Items>",
@@ -854,7 +1064,7 @@ pub fn read_other(
                     "<Menu Category: Healing>",
                     "<Menu Category: Body bag>",
                 ] {
-                    other_lines_mut_ref.insert(string.to_string());
+                    lines_mut_ref.insert(string.to_owned());
                 }
             }
 
@@ -876,7 +1086,7 @@ pub fn read_other(
 
                         if !variable_str.is_empty() {
                             let parsed: Option<(String, bool)> = parse_variable(
-                                variable_str.to_string(),
+                                variable_str.to_owned(),
                                 &variable_type,
                                 &filename,
                                 game_type,
@@ -889,16 +1099,14 @@ pub fn read_other(
                                         continue;
                                     }
 
-                                    if let Some(last) = other_lines_mut_ref.pop() {
-                                        other_lines_mut_ref.insert(last.trim().to_string() + &parsed);
-                                        let string_ref: &str =
-                                            unsafe { other_lines_ref.last().unwrap_unchecked() }.as_str();
+                                    if let Some(last) = lines_mut_ref.pop() {
+                                        lines_mut_ref.insert(last.trim().to_owned() + &parsed);
+                                        let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
                                         // TODO: this shit rewrites the translation line but inserts RIGHT original line
                                         if inner_processing_mode == ProcessingMode::Append {
-                                            let (idx, _, value) =
-                                                other_translation_map.shift_remove_full(last.as_str()).unwrap();
-                                            other_translation_map.shift_insert(idx, string_ref, value);
+                                            let (idx, _, value) = lines_map.shift_remove_full(last.as_str()).unwrap();
+                                            lines_map.shift_insert(idx, string_ref, value);
                                         }
                                     }
                                     continue;
@@ -914,17 +1122,17 @@ pub fn read_other(
                                     .split('\n')
                                     .map(str::trim)
                                     .collect::<Vec<_>>()
-                                    .join(r"\#")
+                                    .join(NEW_LINE)
                                     .trim()
-                                    .to_string();
+                                    .to_owned();
 
-                                other_lines_mut_ref.insert(replaced);
-                                let string_ref: &str = unsafe { other_lines_ref.last().unwrap_unchecked() }.as_str();
+                                lines_mut_ref.insert(replaced);
+                                let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
                                 if inner_processing_mode == ProcessingMode::Append
-                                    && !other_translation_map.contains_key(string_ref)
+                                    && !lines_map.contains_key(string_ref)
                                 {
-                                    other_translation_map.shift_insert(other_lines_ref.len() - 1, string_ref, "");
+                                    lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
                                 }
                             } else if variable_type == Variable::Name {
                                 continue 'obj;
@@ -964,25 +1172,31 @@ pub fn read_other(
                         engine_type,
                         processing_mode,
                         (code_label, parameters_label),
-                        &other_lines,
-                        &mut other_translation_map,
+                        &lines,
+                        &mut lines_map,
                     );
                 }
             }
         }
 
-        let (original_content, translation_content) = if processing_mode == ProcessingMode::Append {
-            let collected: (Vec<&str>, Vec<&str>) = other_translation_map.into_iter().unzip();
-            (collected.0.join("\n"), collected.1.join("\n"))
+        let mut output_content: String = if processing_mode == ProcessingMode::Append {
+            String::from_iter(
+                lines_map
+                    .into_iter()
+                    .map(|(original, translated)| format!("{original}{LINES_SEPARATOR}{translated}\n")),
+            )
         } else {
-            (
-                other_lines_mut_ref.join("\n"),
-                "\n".repeat(other_lines_ref.len().saturating_sub(1)),
+            String::from_iter(
+                lines
+                    .into_inner()
+                    .into_iter()
+                    .map(|line: String| line + LINES_SEPARATOR + "\n"),
             )
         };
 
-        write(other_output_path, original_content).unwrap();
-        write(other_trans_output_path, translation_content).unwrap();
+        output_content.pop();
+
+        write(output_path, output_content).unwrap();
 
         if logging {
             println!("{file_parsed_msg} {filename}");
@@ -990,7 +1204,6 @@ pub fn read_other(
     }
 }
 
-// ! In current implementation, function performs extremely inefficient inserting of owned string to both hashmap and a hashset
 /// Reads System file of system_file_path and parses it into .txt file of output_path.
 /// # Parameters
 /// * `system_file_path` - path to directory than contains game files
@@ -1007,64 +1220,62 @@ pub fn read_system(
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    mut processing_mode: &ProcessingMode,
-    engine_type: &EngineType,
+    mut processing_mode: ProcessingMode,
+    engine_type: EngineType,
     (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
 ) {
-    let system_output_path: &Path = &output_path.join("system.txt");
-    let system_trans_output_path: &Path = &output_path.join("system_trans.txt");
+    let output_path: &Path = &output_path.join("system.txt");
 
-    if processing_mode == ProcessingMode::Default && system_trans_output_path.exists() {
-        println!("system_trans.txt {file_already_parsed_msg}");
+    if processing_mode == ProcessingMode::Default && output_path.exists() {
+        println!("system.txt {file_already_parsed_msg}");
         return;
     }
 
-    let system_obj: Value = if engine_type == EngineType::New {
+    let obj: Value = if engine_type == EngineType::New {
         from_str(&read_to_string(system_file_path).unwrap()).unwrap()
     } else {
         load(&read(system_file_path).unwrap(), None, Some("")).unwrap()
     };
 
-    let system_lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
-    let system_lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *system_lines.get() };
-    let system_lines_ref: &Xxh3IndexSet = unsafe { &*system_lines.get() };
+    let lines: UnsafeCell<Xxh3IndexSet> = UnsafeCell::new(IndexSet::default());
+    let lines_mut_ref: &mut Xxh3IndexSet = unsafe { &mut *lines.get() };
+    let lines_ref: &Xxh3IndexSet = unsafe { &*lines.get() };
 
-    let mut system_translation_map: Xxh3IndexMap = IndexMap::default();
+    let mut lines_map: Xxh3IndexMap = IndexMap::default();
 
-    let system_original_text: String = read_to_string(system_output_path).unwrap();
-    let system_translated_text: String = read_to_string(system_trans_output_path).unwrap();
+    let original_content: String = if processing_mode == ProcessingMode::Append {
+        read_to_string(output_path).unwrap()
+    } else {
+        String::new()
+    };
 
     if processing_mode == ProcessingMode::Append {
-        if system_trans_output_path.exists() {
-            for (original, translated) in system_original_text
-                .par_split('\n')
-                .collect::<Vec<_>>()
-                .into_iter()
-                .zip(system_translated_text.par_split('\n').collect::<Vec<_>>())
-            {
-                system_translation_map.insert(original, translated);
+        if output_path.exists() {
+            for line in original_content.par_split('\n').collect::<Vec<_>>() {
+                let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                lines_map.insert(original, translated);
             }
         } else {
             println!("{file_is_not_parsed_msg}");
-            processing_mode = &ProcessingMode::Default;
+            processing_mode = ProcessingMode::Default;
         }
     }
 
     if engine_type != EngineType::New {
-        let str: &str = system_obj["__symbol__currency_unit"].as_str().unwrap().trim();
+        let str: &str = obj["__symbol__currency_unit"].as_str().unwrap().trim();
 
         if !str.is_empty() {
-            let mut string: String = str.to_string();
+            let mut string: String = str.to_owned();
 
             if romanize {
                 string = romanize_string(string)
             }
 
-            system_lines_mut_ref.insert(string);
-            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+            lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
             }
         }
     }
@@ -1096,90 +1307,90 @@ pub fn read_system(
 
     // Armor types names
     // Normally it's system strings, but might be needed for some purposes
-    for string in system_obj[armor_types_label].as_array().unwrap() {
+    for string in obj[armor_types_label].as_array().unwrap() {
         let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
-            let mut string: String = str.to_string();
+            let mut string: String = str.to_owned();
 
             if romanize {
                 string = romanize_string(string)
             }
 
-            system_lines_mut_ref.insert(string);
-            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+            lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
             }
         }
     }
 
     // Element types names
     // Normally it's system strings, but might be needed for some purposes
-    for string in system_obj[elements_label].as_array().unwrap() {
+    for string in obj[elements_label].as_array().unwrap() {
         let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
-            let mut string: String = str.to_string();
+            let mut string: String = str.to_owned();
 
             if romanize {
                 string = romanize_string(string)
             }
 
-            system_lines_mut_ref.insert(string);
-            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+            lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
             }
         }
     }
 
     // Names of equipment slots
     if engine_type == EngineType::New {
-        for string in system_obj["equipTypes"].as_array().unwrap() {
+        for string in obj["equipTypes"].as_array().unwrap() {
             let str: &str = string.as_str().unwrap().trim();
 
             if !str.is_empty() {
-                let mut string: String = str.to_string();
+                let mut string: String = str.to_owned();
 
                 if romanize {
                     string = romanize_string(string)
                 }
 
-                system_lines_mut_ref.insert(string);
-                let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+                lines_mut_ref.insert(string);
+                let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-                if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                    system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                    lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
                 }
             }
         }
     }
 
     // Names of battle options
-    for string in system_obj[skill_types_label].as_array().unwrap() {
+    for string in obj[skill_types_label].as_array().unwrap() {
         let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
-            let mut string: String = str.to_string();
+            let mut string: String = str.to_owned();
 
             if romanize {
                 string = romanize_string(string)
             }
 
-            system_lines_mut_ref.insert(string);
-            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+            lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
             }
         }
     }
 
     // Game terms vocabulary
-    for (key, value) in system_obj[terms_label].as_object().unwrap() {
+    for (key, value) in obj[terms_label].as_object().unwrap() {
         if !key.starts_with("__symbol__") {
             continue;
         }
@@ -1190,18 +1401,17 @@ pub fn read_system(
                     str = str.trim();
 
                     if !str.is_empty() {
-                        let mut string: String = str.to_string();
+                        let mut string: String = str.to_owned();
 
                         if romanize {
                             string = romanize_string(string)
                         }
 
-                        system_lines_mut_ref.insert(string);
-                        let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+                        lines_mut_ref.insert(string);
+                        let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-                        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref)
-                        {
-                            system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                        if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                            lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
                         }
                     }
                 }
@@ -1215,17 +1425,17 @@ pub fn read_system(
                 let str: &str = message_string.as_str().unwrap().trim();
 
                 if !str.is_empty() {
-                    let mut string: String = str.to_string();
+                    let mut string: String = str.to_owned();
 
                     if romanize {
                         string = romanize_string(string)
                     }
 
-                    system_lines_mut_ref.insert(string);
-                    let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+                    lines_mut_ref.insert(string);
+                    let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-                    if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                        system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+                    if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                        lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
                     }
                 }
             }
@@ -1234,21 +1444,21 @@ pub fn read_system(
 
     // Weapon types names
     // Normally it's system strings, but might be needed for some purposes
-    for string in system_obj[weapon_types_label].as_array().unwrap() {
+    for string in obj[weapon_types_label].as_array().unwrap() {
         let str: &str = string.as_str().unwrap().trim();
 
         if !str.is_empty() {
-            let mut string: String = str.to_string();
+            let mut string: String = str.to_owned();
 
             if romanize {
                 string = romanize_string(string)
             }
 
-            system_lines_mut_ref.insert(string);
-            let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+            lines_mut_ref.insert(string);
+            let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-            if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-                system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+            if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+                lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
             }
         }
     }
@@ -1256,35 +1466,41 @@ pub fn read_system(
     // Game title, parsed just for fun
     // Translators may add something like "ELFISH TRANSLATION v1.0.0" to the title
     {
-        let mut game_title_string: String = system_obj[game_title_label].as_str().unwrap().trim().to_string();
+        let mut game_title_string: String = obj[game_title_label].as_str().unwrap().trim().to_owned();
 
         if romanize {
             game_title_string = romanize_string(game_title_string)
         }
 
-        system_lines_mut_ref.insert(game_title_string);
-        let string_ref: &str = unsafe { system_lines_ref.last().unwrap_unchecked() }.as_str();
+        lines_mut_ref.insert(game_title_string);
+        let string_ref: &str = unsafe { lines_ref.last().unwrap_unchecked() }.as_str();
 
-        if processing_mode == ProcessingMode::Append && !system_translation_map.contains_key(string_ref) {
-            system_translation_map.shift_insert(system_lines_ref.len() - 1, string_ref, "");
+        if processing_mode == ProcessingMode::Append && !lines_map.contains_key(string_ref) {
+            lines_map.shift_insert(lines_ref.len() - 1, string_ref, "");
         }
     }
 
-    let (original_content, translated_content) = if processing_mode == ProcessingMode::Append {
-        let collected: (Vec<&str>, Vec<&str>) = system_translation_map.into_iter().unzip();
-        (collected.0.join("\n"), collected.1.join("\n"))
+    let mut output_content: String = if processing_mode == ProcessingMode::Append {
+        String::from_iter(
+            lines_map
+                .into_iter()
+                .map(|(original, translated)| format!("{original}{LINES_SEPARATOR}{translated}\n")),
+        )
     } else {
-        (
-            system_lines_ref.join("\n"),
-            "\n".repeat(system_lines_ref.len().saturating_sub(1)),
+        String::from_iter(
+            lines
+                .into_inner()
+                .into_iter()
+                .map(|line: String| line + LINES_SEPARATOR + "\n"),
         )
     };
 
-    write(system_output_path, original_content).unwrap();
-    write(system_trans_output_path, translated_content).unwrap();
+    output_content.pop();
+
+    write(output_path, output_content).unwrap();
 
     if logging {
-        println!("{file_parsed_msg} {}.", system_file_path.display());
+        println!("{file_parsed_msg} {}", system_file_path.display());
     }
 }
 
@@ -1323,7 +1539,7 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         codes_content.push(code);
     }
 
-    let extracted_strings: IndexSet<String> = extract_strings(&codes_content.join(""), false).0;
+    let extracted_strings: Xxh3IndexSet = extract_strings(&codes_content.join(""), false).0;
 
     let regexes: [Regex; 11] = [
         unsafe { Regex::new(r"(Graphics|Data|Audio|Movies|System)\/.*\/?").unwrap_unchecked() },
@@ -1363,12 +1579,12 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         println!("{file_parsed_msg} {}", scripts_file_path.display());
     }
 
-    write(other_path.join("scripts.txt"), strings.join("\n")).unwrap();
-    write(
-        other_path.join("scripts_trans.txt"),
-        "\n".repeat(strings.len().saturating_sub(1)),
-    )
-    .unwrap();
+    let mut output_content: String =
+        String::from_iter(strings.into_iter().map(|line: String| line + LINES_SEPARATOR + "\n"));
+
+    output_content.pop();
+
+    write(other_path.join("scripts.txt"), output_content).unwrap();
 }
 
 // read_plugins is not implemented and will NEVER be, as plugins can differ from each other incredibly.
