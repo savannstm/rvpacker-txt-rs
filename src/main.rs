@@ -66,9 +66,9 @@ enum Variable {
 #[derive(PartialEq, Clone, Copy)]
 #[repr(u8)]
 enum MapsProcessingMode {
-    Default = 0,
-    Separate = 1,
-    Preserve = 2,
+    Default,
+    Separate,
+    Preserve,
 }
 
 struct Localization<'a> {
