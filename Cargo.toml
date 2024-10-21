@@ -1,6 +1,6 @@
 [package]
 name = "rvpacker-txt-rs"
-version = "3.0.0"
+version = "3.0.1"
 edition = "2021"
 
 [dependencies]
@@ -10,7 +10,7 @@ sys-locale = "0.3.1"
 clap = { version = "4.5.20", features = ["wrap_help"] }
 color-print = "0.3.6"
 xxhash-rust = { version = "0.8.12", features = ["xxh3"] }
-sonic-rs = "0.3.13"
+sonic-rs = "0.3.14"
 fastrand = "2.1.1"
 regex = "1.11.0"
 once_cell = "1.20.2"
