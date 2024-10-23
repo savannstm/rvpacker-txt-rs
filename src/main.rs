@@ -22,8 +22,8 @@ enum GameType {
     LisaRPG,
 }
 
-#[repr(u8)]
 #[derive(PartialEq, Clone, Copy)]
+#[repr(u8)]
 enum ProcessingMode {
     Force,
     Append,
@@ -1148,7 +1148,13 @@ fn main() {
             let mut translated_content: String;
             let mut original_filename: String = String::new();
 
-            for path in [maps_path, other_path, plugins_path] {
+            let dirs_array: &[PathBuf] = if engine_type == EngineType::New {
+                &[maps_path, other_path, plugins_path]
+            } else {
+                &[maps_path, other_path]
+            };
+
+            for path in dirs_array {
                 for entry in std::fs::read_dir(path).unwrap().flatten() {
                     if !entry.file_name().to_str().unwrap().contains("trans") {
                         original_content = read_to_string(entry.path()).unwrap();
