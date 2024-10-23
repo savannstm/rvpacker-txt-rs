@@ -677,6 +677,10 @@ pub fn write_maps(
                 }
             }
 
+            if hashmap.is_empty() {
+                return;
+            }
+
             // Skipping first element in array as it is null
             let mut events_arr: Vec<&mut Value> = if engine_type == EngineType::New {
                 obj[events_label]
