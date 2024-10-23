@@ -9,7 +9,7 @@ use flate2::{read::ZlibDecoder, write::ZlibEncoder, Compression};
 use marshal_rs::{dump, load, StringMode};
 use rayon::prelude::*;
 use regex::{Captures, Match};
-use sonic_rs::{from_str, from_value, json, prelude::*, to_string, Array, Object, Value};
+use sonic_rs::{from_str, from_value, json, prelude::*, to_string, to_vec, Array, Object, Value};
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     ffi::OsString,
@@ -722,7 +722,7 @@ pub fn write_maps(
             });
 
             let output_data: Vec<u8> = if engine_type == EngineType::New {
-                to_string(&obj).unwrap().into_bytes()
+                to_vec(&obj).unwrap()
             } else {
                 dump(obj, Some(""))
             };
@@ -1025,7 +1025,7 @@ pub fn write_maps(
             });
 
             let output_data: Vec<u8> = if engine_type == EngineType::New {
-                to_string(&obj).unwrap().into_bytes()
+                to_vec(&obj).unwrap()
             } else {
                 dump(obj, Some(""))
             };
@@ -1253,7 +1253,7 @@ pub fn write_other(
         }
 
         let output_data: Vec<u8> = if engine_type == EngineType::New {
-            to_string(&obj_arr).unwrap().into_bytes()
+            to_vec(&obj_arr).unwrap()
         } else {
             dump(obj_arr, Some(""))
         };
@@ -1502,7 +1502,7 @@ pub fn write_system(
     obj[game_title_label] = Value::from(&game_title);
 
     let output_data: Vec<u8> = if engine_type == EngineType::New {
-        to_string(&obj).unwrap().into_bytes()
+        to_vec(&obj).unwrap()
     } else {
         dump(obj, Some(""))
     };
