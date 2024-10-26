@@ -235,8 +235,7 @@ impl Localization<'_> {
             translation_dir_missing: r#"The "translation" folder in the input directory does not exist."#,
             file_written_msg: "Wrote file",
             file_parsed_msg: "Parsed file",
-            file_already_parsed_msg: "file already exists. If you want to forcefully re-read all files, use --force \
-                                      flag, or --append if you want append new text to already existing files.",
+            file_already_parsed_msg: "file already exists. If you want to forcefully re-read files or append new text, use --mode force or --mode append.",
             file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
             elapsed_time_msg: "Elapsed time:",
             force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the \
@@ -320,8 +319,7 @@ impl Localization<'_> {
             file_written_msg: "Записан файл",
             file_parsed_msg: "Распарсен файл",
             file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, \
-                                      используйте флаг --force, или --append если вы хотите добавить новый текст в \
-                                      файлы.",
+                                      или добавить новый текст, используйте --mode force или --mode append.",
             file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
             elapsed_time_msg: "Затраченное время:",
             force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, \
