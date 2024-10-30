@@ -129,6 +129,10 @@ struct Localization<'a> {
     game_ini_file_missing_msg: &'a str,
     enabling_maps_processing_mode_metadata_msg: &'a str,
 
+    could_not_split_line_msg: &'a str,
+    at_position_msg: &'a str,
+    could_not_replace_scripts_string: &'a str,
+
     // Misc
     possible_values: &'a str,
     example: &'a str,
@@ -251,6 +255,10 @@ impl Localization<'_> {
             game_ini_file_missing_msg: "Game.ini file not found.",
             enabling_maps_processing_mode_metadata_msg: "Setting maps_processing_mode value to  according to the metadata from previous read.",
 
+            could_not_split_line_msg: "Couldn't split line to original and translated part.\nThe line won't be written to the output file.",
+            at_position_msg: "At position:",
+            could_not_replace_scripts_string: "Couldn't replace string in scripts file.",
+
             // Misc
             possible_values: "Allowed values:",
             example: "Example:",
@@ -335,6 +343,10 @@ impl Localization<'_> {
                                                   существует.",
             game_ini_file_missing_msg: "Файл Game.ini не был обнаружен.",
             enabling_maps_processing_mode_metadata_msg: "Значение аргумента maps_processing_mode установлено на  в соответствии с метаданными из прошлого чтения.",
+
+            could_not_split_line_msg: "Не удалось разделить строку на оригинальную и переведённую части.\nСтрока не будет записана в выходной файл.",
+            at_position_msg: "Позиция:",
+            could_not_replace_scripts_string: "Не удалось заменить строку в файле скриптов.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
@@ -962,11 +974,7 @@ fn main() {
                     game_type,
                     engine_type,
                     processing_mode,
-                    (
-                        localization.file_parsed_msg,
-                        localization.file_already_parsed_msg,
-                        localization.file_is_not_parsed_msg,
-                    ),
+                    &localization,
                 );
             }
 
@@ -979,11 +987,7 @@ fn main() {
                     game_type,
                     processing_mode,
                     engine_type,
-                    (
-                        localization.file_parsed_msg,
-                        localization.file_already_parsed_msg,
-                        localization.file_is_not_parsed_msg,
-                    ),
+                    &localization,
                 );
             }
 
@@ -995,11 +999,7 @@ fn main() {
                     logging_flag,
                     processing_mode,
                     engine_type,
-                    (
-                        localization.file_parsed_msg,
-                        localization.file_already_parsed_msg,
-                        localization.file_is_not_parsed_msg,
-                    ),
+                    &localization,
                 );
             }
 
@@ -1009,7 +1009,7 @@ fn main() {
                     output_path,
                     romanize_flag,
                     logging_flag,
-                    localization.file_parsed_msg,
+                    &localization,
                 );
             }
         }
@@ -1085,7 +1085,7 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
-                    localization.file_written_msg,
+                    &localization,
                 );
             }
 
@@ -1098,7 +1098,7 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
-                    localization.file_written_msg,
+                    &localization,
                 );
             }
 
@@ -1110,7 +1110,7 @@ fn main() {
                     romanize_flag,
                     logging_flag,
                     engine_type,
-                    localization.file_written_msg,
+                    &localization,
                 );
             }
 
@@ -1122,7 +1122,7 @@ fn main() {
                     output_path,
                     &unsafe { plugins_output_path.unwrap_unchecked() },
                     logging_flag,
-                    localization.file_written_msg,
+                    &localization,
                 );
             }
 
@@ -1133,7 +1133,7 @@ fn main() {
                     data_output_path,
                     romanize_flag,
                     logging_flag,
-                    localization.file_written_msg,
+                    &localization,
                 )
             }
         }

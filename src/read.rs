@@ -1,8 +1,8 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, MapsProcessingMode, ProcessingMode,
-    Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LINES_SEPARATOR,
-    LISA_PREFIX_RE, NEW_LINE, STRING_IS_ONLY_SYMBOLS_RE,
+    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, Localization, MapsProcessingMode,
+    ProcessingMode, Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE,
+    LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, STRING_IS_ONLY_SYMBOLS_RE,
 };
 use encoding_rs::Encoding;
 use flate2::read::ZlibDecoder;
@@ -466,12 +466,12 @@ pub fn read_map(
     game_type: Option<GameType>,
     engine_type: EngineType,
     mut processing_mode: ProcessingMode,
-    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
+    localization: &Localization,
 ) {
     let output_path: &Path = &output_path.join("maps.txt");
 
     if processing_mode == ProcessingMode::Default && output_path.exists() {
-        println!("maps_trans.txt {file_already_parsed_msg}");
+        println!("maps_trans.txt {}", localization.file_already_parsed_msg);
         return;
     }
 
@@ -523,7 +523,7 @@ pub fn read_map(
                     lines_map.insert(original, translated);
                 }
             } else {
-                println!("{file_is_not_parsed_msg}");
+                println!("{}", localization.file_is_not_parsed_msg);
                 processing_mode = ProcessingMode::Default;
             }
         };
@@ -615,7 +615,7 @@ pub fn read_map(
             }
 
             if logging {
-                println!("{file_parsed_msg} {filename}");
+                println!("{} {filename}", localization.file_parsed_msg);
             }
         }
 
@@ -670,7 +670,7 @@ pub fn read_map(
                     lines_vec.push((original.to_owned(), translated.to_owned()));
                 }
             } else {
-                println!("{file_is_not_parsed_msg}");
+                println!("{}", localization.file_is_not_parsed_msg);
                 processing_mode = ProcessingMode::Default;
             }
         };
@@ -914,7 +914,7 @@ pub fn read_map(
             }
 
             if logging {
-                println!("{file_parsed_msg} {filename}");
+                println!("{} {filename}", localization.file_parsed_msg);
             }
         }
 
@@ -947,7 +947,7 @@ pub fn read_other(
     game_type: Option<GameType>,
     processing_mode: ProcessingMode,
     engine_type: EngineType,
-    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
+    localization: &Localization,
 ) {
     let obj_arr_iter =
         read_dir(original_path)
@@ -1040,7 +1040,7 @@ pub fn read_other(
         let output_path: &Path = &output_path.join(filename[0..filename.rfind('.').unwrap()].to_lowercase() + ".txt");
 
         if processing_mode == ProcessingMode::Default && output_path.exists() {
-            println!("{} {file_already_parsed_msg}", output_path.display());
+            println!("{} {}", localization.file_already_parsed_msg, output_path.display());
             continue;
         }
 
@@ -1063,7 +1063,7 @@ pub fn read_other(
                     lines_map.insert(original, translated);
                 }
             } else {
-                println!("{file_is_not_parsed_msg}");
+                println!("{}", localization.file_is_not_parsed_msg);
                 inner_processing_mode = ProcessingMode::Default;
             }
         }
@@ -1214,7 +1214,7 @@ pub fn read_other(
         write(output_path, output_content).unwrap();
 
         if logging {
-            println!("{file_parsed_msg} {filename}");
+            println!("{} {filename}", localization.file_parsed_msg);
         }
     }
 }
@@ -1237,12 +1237,12 @@ pub fn read_system(
     logging: bool,
     mut processing_mode: ProcessingMode,
     engine_type: EngineType,
-    (file_parsed_msg, file_already_parsed_msg, file_is_not_parsed_msg): (&str, &str, &str),
+    localization: &Localization,
 ) {
     let output_path: &Path = &output_path.join("system.txt");
 
     if processing_mode == ProcessingMode::Default && output_path.exists() {
-        println!("system.txt {file_already_parsed_msg}");
+        println!("system.txt {}", localization.file_already_parsed_msg);
         return;
     }
 
@@ -1271,7 +1271,7 @@ pub fn read_system(
                 lines_map.insert(original, translated);
             }
         } else {
-            println!("{file_is_not_parsed_msg}");
+            println!("{}", localization.file_is_not_parsed_msg);
             processing_mode = ProcessingMode::Default;
         }
     }
@@ -1515,11 +1515,17 @@ pub fn read_system(
     write(output_path, output_content).unwrap();
 
     if logging {
-        println!("{file_parsed_msg} {}", system_file_path.display());
+        println!("{} {}", localization.file_parsed_msg, system_file_path.display());
     }
 }
 
-pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool, logging: bool, file_parsed_msg: &str) {
+pub fn read_scripts(
+    scripts_file_path: &Path,
+    other_path: &Path,
+    romanize: bool,
+    logging: bool,
+    localization: &Localization,
+) {
     let mut strings: Vec<String> = Vec::new();
 
     let scripts_entries: Value = load(&read(scripts_file_path).unwrap(), Some(StringMode::Binary), None).unwrap();
@@ -1591,17 +1597,14 @@ pub fn read_scripts(scripts_file_path: &Path, other_path: &Path, romanize: bool,
         strings.push(extracted);
     }
 
-    if logging {
-        println!("{file_parsed_msg} {}", scripts_file_path.display());
-    }
-
     let mut output_content: String =
         String::from_iter(strings.into_iter().map(|line: String| line + LINES_SEPARATOR + "\n"));
 
     output_content.pop();
 
     write(other_path.join("scripts.txt"), output_content).unwrap();
-}
 
-// read_plugins is not implemented and will NEVER be, as plugins can differ from each other incredibly.
-// Change plugins.js with your own hands.
+    if logging {
+        println!("{} {}", localization.file_parsed_msg, scripts_file_path.display());
+    }
+}

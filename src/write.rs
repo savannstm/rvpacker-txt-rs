@@ -1,7 +1,7 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, MapsProcessingMode, Variable,
-    ENDS_WITH_IF_RE, EXTENSION, LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, _SELECT_WORDS_RE,
+    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, Localization, MapsProcessingMode,
+    Variable, ENDS_WITH_IF_RE, EXTENSION, LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, _SELECT_WORDS_RE,
 };
 use encoding_rs::Encoding;
 use fastrand::shuffle;
@@ -554,7 +554,6 @@ fn write_list(
 /// * `logging` - whether to log or not
 /// * `game_type` - game type for custom parsing
 /// * `engine_type` - engine type for right files processing
-/// * `file_written_msg` - message to log when file is written
 pub fn write_maps(
     maps_path: &Path,
     original_path: &Path,
@@ -564,7 +563,7 @@ pub fn write_maps(
     logging: bool,
     game_type: Option<GameType>,
     engine_type: EngineType,
-    file_written_msg: &str,
+    localization: &Localization,
 ) {
     if maps_processing_mode != MapsProcessingMode::Preserve {
         let maps_obj_iter =
@@ -603,29 +602,40 @@ pub fn write_maps(
             let mut vec: Vec<StringHashMap> = Vec::with_capacity(512);
             let mut hashmap: StringHashMap = HashMap::default();
 
-            for line in original_content.split('\n') {
+            for (i, line) in original_content.split('\n').enumerate() {
                 if line.starts_with("<!-- Map") {
-                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                    if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
+                        if original.len() > 20 {
+                            let map_name: &str = &original[17..original.len() - 4];
+                            names_lines_map.insert(map_name.trim().to_owned(), translated.trim().to_owned());
+                        }
 
-                    if original.len() > 20 {
-                        let map_name: &str = &original[17..original.len() - 4];
-                        names_lines_map.insert(map_name.trim().to_owned(), translated.trim().to_owned());
-                    }
-
-                    if maps_processing_mode == MapsProcessingMode::Separate {
-                        vec.push(take(&mut hashmap));
+                        if maps_processing_mode == MapsProcessingMode::Separate {
+                            vec.push(take(&mut hashmap));
+                        }
+                    } else {
+                        eprintln!(
+                            "{} {}\n{} {}",
+                            localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                        )
                     }
                 } else {
                     if line.starts_with("<!--") {
                         continue;
                     }
 
-                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                    if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
+                        let processed_original: String = original.replace(NEW_LINE, "\n").trim().to_owned().to_owned();
+                        let processed_translated: String =
+                            translated.replace(NEW_LINE, "\n").trim().to_owned().to_owned();
 
-                    let processed_original: String = original.replace(NEW_LINE, "\n").trim().to_owned().to_owned();
-                    let processed_translated: String = translated.replace(NEW_LINE, "\n").trim().to_owned().to_owned();
-
-                    hashmap.insert(processed_original, processed_translated);
+                        hashmap.insert(processed_original, processed_translated);
+                    } else {
+                        eprintln!(
+                            "{} {}\n{} {}",
+                            localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                        )
+                    }
                 }
             }
 
@@ -727,11 +737,11 @@ pub fn write_maps(
                 dump(obj, Some(""))
             };
 
-            if logging {
-                println!("{file_written_msg} {filename}");
-            }
+            write(output_path.join(&filename), output_data).unwrap();
 
-            write(output_path.join(filename), output_data).unwrap();
+            if logging {
+                println!("{} {filename}", localization.file_written_msg);
+            }
         });
     } else {
         let maps_obj_iter = read_dir(original_path)
@@ -1030,11 +1040,13 @@ pub fn write_maps(
                 dump(obj, Some(""))
             };
 
-            if logging {
-                println!("{file_written_msg} {filename}");
-            }
 
-            write(output_path.join(filename), output_data).unwrap();
+
+            write(output_path.join(&filename), output_data).unwrap();
+
+            if logging {
+                println!("{} {filename}", localization.file_written_msg);
+            }
         });
     }
 }
@@ -1048,7 +1060,6 @@ pub fn write_maps(
 /// * `logging` - whether to log or not
 /// * `game_type` - game type for custom parsing
 /// * `engine_type` - engine type for right files processing
-/// * `file_written_msg` - message to log when file is written
 pub fn write_other(
     other_path: &Path,
     original_path: &Path,
@@ -1057,7 +1068,7 @@ pub fn write_other(
     logging: bool,
     game_type: Option<GameType>,
     engine_type: EngineType,
-    file_written_msg: &str,
+    localization: &Localization,
 ) {
     let other_obj_arr_vec =
         read_dir(original_path)
@@ -1144,15 +1155,21 @@ pub fn write_other(
         let original_content: String = read_to_string(content_path).unwrap();
 
         let lines_map: StringHashMap =
-            HashMap::from_par_iter(original_content.par_split('\n').filter_map(|line: &str| {
+            HashMap::from_iter(original_content.split('\n').enumerate().filter_map(|(i, line)| {
                 if line.starts_with("<!--") {
                     None
-                } else {
-                    let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
+                } else if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
                     Some((
                         original.replace(r"\#", "\n").trim().to_owned(),
                         translated.replace(r"\#", "\n").trim().to_owned(),
                     ))
+                } else {
+                    eprintln!(
+                        "{} {}\n{} {}",
+                        localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                    );
+
+                    None
                 }
             }));
 
@@ -1258,11 +1275,11 @@ pub fn write_other(
             dump(obj_arr, Some(""))
         };
 
-        if logging {
-            println!("{file_written_msg} {filename}");
-        }
+        write(output_path.join(&filename), output_data).unwrap();
 
-        write(output_path.join(filename), output_data).unwrap();
+        if logging {
+            println!("{} {filename}", localization.file_written_msg);
+        }
     });
 }
 
@@ -1276,7 +1293,6 @@ pub fn write_other(
 /// * `romanize` - if files were read with romanize, this option will romanize original game text to compare with parsed
 /// * `logging` - whether to log or not
 /// * `engine_type` - engine type for right files processing
-/// * `file_written_msg` - message to log when file is written
 pub fn write_system(
     system_file_path: &Path,
     other_path: &Path,
@@ -1284,7 +1300,7 @@ pub fn write_system(
     romanize: bool,
     logging: bool,
     engine_type: EngineType,
-    file_written_msg: &str,
+    localization: &Localization,
 ) {
     let mut obj: Value = if engine_type == EngineType::New {
         from_str(&read_to_string(system_file_path).unwrap()).unwrap()
@@ -1294,14 +1310,21 @@ pub fn write_system(
 
     let original_content: String = read_to_string(other_path.join("system.txt")).unwrap();
 
-    let lines_map: StringHashMap = HashMap::from_par_iter(original_content.par_split('\n').filter_map(|line: &str| {
-        if line.starts_with("<!--") {
-            None
-        } else {
-            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
-            Some((original.trim().to_owned(), translated.trim().to_owned()))
-        }
-    }));
+    let lines_map: StringHashMap =
+        HashMap::from_iter(original_content.split('\n').enumerate().filter_map(|(i, line)| {
+            if line.starts_with("<!--") {
+                None
+            } else if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
+                Some((original.trim().to_owned(), translated.trim().to_owned()))
+            } else {
+                eprintln!(
+                    "{} {}\n{} {}",
+                    localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                );
+
+                None
+            }
+        }));
     let game_title: String = original_content.rsplit_once(LINES_SEPARATOR).unwrap().1.to_owned();
 
     let (armor_types_label, elements_label, skill_types_label, terms_label, weapon_types_label, game_title_label) =
@@ -1507,11 +1530,11 @@ pub fn write_system(
         dump(obj, Some(""))
     };
 
-    if logging {
-        println!("{file_written_msg} {}", system_file_path.display());
-    }
-
     write(output_path.join(system_file_path.file_name().unwrap()), output_data).unwrap();
+
+    if logging {
+        println!("{} {}", localization.file_written_msg, system_file_path.display());
+    }
 }
 
 /// Writes plugins.txt file back to its initial form. Currently works only if game_type is GameType::Termina.
@@ -1520,26 +1543,32 @@ pub fn write_system(
 /// * `plugins_path` - path to the plugins directory
 /// * `output_path` - path to the output directory
 /// * `logging` - whether to log or not
-/// * `file_written_msg` - message to log when file is written
 pub fn write_plugins(
     pluigns_file_path: &Path,
     plugins_path: &Path,
     output_path: &Path,
     logging: bool,
-    file_written_msg: &str,
+    localization: &Localization,
 ) {
     let mut obj_arr: Vec<Object> = from_str(&read_to_string(pluigns_file_path).unwrap()).unwrap();
 
     let original_content: String = read_to_string(plugins_path.join("plugins.txt")).unwrap();
 
-    let lines_map: StringHashMap = HashMap::from_iter(original_content.split('\n').filter_map(|line: &str| {
-        if line.starts_with("<!--") {
-            None
-        } else {
-            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
-            Some((original.trim().to_owned(), translated.trim().to_owned()))
-        }
-    }));
+    let lines_map: StringHashMap =
+        HashMap::from_iter(original_content.split('\n').enumerate().filter_map(|(i, line)| {
+            if line.starts_with("<!--") {
+                None
+            } else if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
+                Some((original.trim().to_owned(), translated.trim().to_owned()))
+            } else {
+                eprintln!(
+                    "{} {}\n{} {}",
+                    localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                );
+
+                None
+            }
+        }));
 
     obj_arr.par_iter_mut().for_each(|obj: &mut Object| {
         // For now, plugins writing only implemented for Fear & Hunger: Termina, so you should manually translate the plugins.js file if it's not Termina
@@ -1609,7 +1638,7 @@ pub fn write_plugins(
     .unwrap();
 
     if logging {
-        println!("{file_written_msg} plugins.js");
+        println!("{} plugins.js", localization.file_written_msg);
     }
 }
 
@@ -1619,7 +1648,7 @@ pub fn write_scripts(
     output_path: &Path,
     romanize: bool,
     logging: bool,
-    file_written_msg: &str,
+    localization: &Localization,
 ) {
     let mut script_entries: Value = load(&read(scripts_file_path).unwrap(), Some(StringMode::Binary), None).unwrap();
 
@@ -1628,13 +1657,19 @@ pub fn write_scripts(
     let lines_map: StringHashMap = {
         let mut hashmap: StringHashMap = HashMap::default();
 
-        for line in original_content.split('\n') {
+        for (i, line) in original_content.split('\n').enumerate() {
             if line.starts_with("<!--") {
                 continue;
             }
 
-            let (original, translated) = line.split_once(LINES_SEPARATOR).unwrap();
-            hashmap.insert(original.trim().to_owned(), translated.trim().to_owned());
+            if let Some((original, translated)) = line.split_once(LINES_SEPARATOR) {
+                hashmap.insert(original.trim().to_owned(), translated.trim().to_owned());
+            } else {
+                eprintln!(
+                    "{} {}\n{} {}",
+                    localization.could_not_split_line_msg, line, localization.at_position_msg, i
+                );
+            }
         }
 
         hashmap
@@ -1689,7 +1724,7 @@ pub fn write_scripts(
                     if before.is_some() && after.is_some() {
                         code.replace_range(index..index + string.len(), translated);
                     } else {
-                        eprintln!("Couldn't replace string: {}", string);
+                        eprintln!("{} {}", localization.could_not_replace_scripts_string, string);
                         return;
                     }
                 }
@@ -1708,13 +1743,13 @@ pub fn write_scripts(
             };
         });
 
-    if logging {
-        println!("{file_written_msg} {}", scripts_file_path.display());
-    }
-
     write(
         output_path.join(String::from("Scripts") + unsafe { EXTENSION }),
         dump(script_entries, None),
     )
     .unwrap();
+
+    if logging {
+        println!("{} {}", localization.file_written_msg, scripts_file_path.display());
+    }
 }
