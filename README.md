@@ -6,18 +6,18 @@
 
 This tool is designed to read RPG Maker game files into .txt files and write them back to their initial form.
 
-This tool inherits its name from the original [rvpacker](https://github.com/Syncsecure/rvpacker) tool, which was created for those versions of RPG Maker that did not use .json files, and parsed files into YAML.
+This tool inherits its name from the original `rvpacker` tool, which was created for those versions of RPG Maker that did not use .json files, and parsed files into YAML. Now, rvpacker's repository is deleted/privated and the page of the author of this repository is not available as well.
 
-The same deprecated tool, written in Ruby, can be found in [this repository](https://github.com/savannstm/rvpacker-txt).
+The same deprecated tool, written in Ruby, can be found in [rvpacker-txt repository](https://github.com/savannstm/rvpacker-txt).
 
-[A GUI](https://github.com/savannstm/rpgm-translation-gui) that allows comfortably edit parsed files (and it also automatically parses unparsed games when you select their folder) (and you also can easily write files back to their initial with a single button click).
+[A GUI](https://github.com/savannstm/rpgmtranslate) that allows comfortably edit parsed files (and it also automatically parses unparsed games when you select their folder) (and you also can easily write files back to their initial with a single button click).
 
 ## The format of output files
 
-`rvpacker-txt-rs` parses all the original text from the game's files, and inserts it on each new line of a text file. All line breaks (new lines, "\n") are replaced by "\\#" symbols.
-At the end of each original line, "<#>" is inserted. This is a delimiter after which translated text should start. Removing it or erasing one of its symbols will lead to crashes, or worse, undefined behavior. **So remember: your translated text goes after the <#> delimiter.**
+`rvpacker-txt-rs` parses all the original text from the game's files, and inserts it on each new line of a text file. All line breaks (new lines, `\n`) are replaced by `\#` symbols.
+At the end of each original line, `<#>` is inserted. This is a delimiter after which translated text should start. Removing it or erasing one of its symbols will lead to crashes, or worse, undefined behavior. **So remember: your translated text goes after the `<#>` delimiter.**
 
-For an example on how to properly translate the .txt files, refer to [My Fear & Hunger: 2 Termina Russian translation.](https://github.com/savannstm/fh2-termina-translation).
+For an example on how to properly translate the .txt files, refer to [My Fear & Hunger 2: Termina Russian translation](https://github.com/savannstm/fh2-termina-translation).
 Yeah, translation is Russian, but the point is to get how to properly translate this program's output files.
 
 ## Installation
