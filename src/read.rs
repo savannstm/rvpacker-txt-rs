@@ -1,8 +1,11 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, Localization, MapsProcessingMode,
-    ProcessingMode, Variable, ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE,
-    LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, STRING_IS_ONLY_SYMBOLS_RE,
+    functions::{extract_strings, get_object_data, romanize_string},
+    statics::{
+        ENDS_WITH_IF_RE, EXTENSION, INVALID_MULTILINE_VARIABLE_RE, INVALID_VARIABLE_RE, LINES_SEPARATOR,
+        LISA_PREFIX_RE, NEW_LINE, STRING_IS_ONLY_SYMBOLS_RE,
+    },
+    types::{Code, EngineType, GameType, Localization, MapsProcessingMode, ProcessingMode, Variable},
 };
 use encoding_rs::Encoding;
 use flate2::read::ZlibDecoder;

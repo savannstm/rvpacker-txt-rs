@@ -1,7 +1,8 @@
 #![allow(clippy::too_many_arguments)]
 use crate::{
-    extract_strings, get_object_data, romanize_string, Code, EngineType, GameType, Localization, MapsProcessingMode,
-    Variable, ENDS_WITH_IF_RE, EXTENSION, LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, _SELECT_WORDS_RE,
+    functions::{extract_strings, get_object_data, romanize_string},
+    statics::{ENDS_WITH_IF_RE, EXTENSION, LINES_SEPARATOR, LISA_PREFIX_RE, NEW_LINE, _SELECT_WORDS_RE},
+    types::{Code, EngineType, GameType, Localization, MapsProcessingMode, Variable},
 };
 use encoding_rs::Encoding;
 use fastrand::shuffle;
