@@ -96,6 +96,8 @@ pub_struct! {
         processing_mode_arg_desc: &'a str,
         maps_processing_mode_arg_desc: &'a str,
 
+        generate_json_arg_desc: &'a str,
+
         // Argument types
         mode_arg_type: &'a str,
         input_path_arg_type: &'a str,
@@ -219,6 +221,8 @@ impl Localization<'_> {
             processing_mode_arg_desc: "How to process files. default - Aborts processing if encounters already existing translation .txt files.\nappend - For example, if game you're translating updates, you can use this flag to append any new text to your existing files preserving lines order.\nforce - Force rewrites existing translation .txt files.",
             maps_processing_mode_arg_desc: "How to process maps.\ndefault - Ignore all previously encountered text duplicates\nseparate - For each new map, reset the set of previously encountered text duplicates\npreserve - Allow all text duplicates.",
 
+            generate_json_arg_desc: "Generates JSON representations of files of RPG Maker XP/VX/VXAce engines.",
+
             // Argument types
             mode_arg_type: "MODE",
             input_path_arg_type: "INPUT_PATH",
@@ -307,6 +311,8 @@ impl Localization<'_> {
 
             processing_mode_arg_desc: "Как обрабатывать файлы.\ndefault - Стандартный режим. Прекращает обработку, если .txt файлы перевода уже существуют.\nappend - Режим добавления. Например, если переводимая вами игра обновится, вы можете использовать этот аргумент чтобы добавить любой новый текст в существующие файлы, сохраняя порядок линий.\nforce - Принудительный режим. Принудительный режим перезаписывает существующие .txt файлы.",
             maps_processing_mode_arg_desc: "Как обрабатывать карты.\ndefault - Игнорировать дубликаты всего ранее встреченного текста.\nseparate - Для каждой новой карты, обновлять список ранее встреченного текста.\npreserve - Разрешить все дубликаты текста.",
+
+            generate_json_arg_desc: "Генерирует JSON репрезентации файлов движков RPG Maker XP/VX/VXAce.",
 
             mode_arg_type: "РЕЖИМ",
             input_path_arg_type: "ВХОДНОЙ_ПУТЬ",

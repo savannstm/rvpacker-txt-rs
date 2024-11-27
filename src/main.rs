@@ -216,6 +216,7 @@ fn main() {
     let generate_json_flag: Arg = Arg::new("generate-json")
         .short('g')
         .long("gen-json")
+        .help(localization.generate_json_arg_desc)
         .action(ArgAction::SetTrue);
 
     let read_subcommand: Command = Command::new("read")
