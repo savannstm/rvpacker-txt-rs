@@ -1040,7 +1040,7 @@ pub fn read_other(
         let output_path: &Path = &output_path.join(filename[0..filename.rfind('.').unwrap()].to_lowercase() + ".txt");
 
         if processing_mode == ProcessingMode::Default && output_path.exists() {
-            println!("{} {}", localization.file_already_parsed_msg, output_path.display());
+            println!("{} {}", output_path.display(), localization.file_already_parsed_msg);
             continue;
         }
 
