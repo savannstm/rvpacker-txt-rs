@@ -213,11 +213,16 @@ fn main() {
 
     let silent_flag: Arg = Arg::new("silent").long("silent").hide(true).action(ArgAction::SetTrue);
 
+    let generate_json_flag: Arg = Arg::new("generate-json")
+        .short('g')
+        .long("gen-json")
+        .action(ArgAction::SetTrue);
+
     let read_subcommand: Command = Command::new("read")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.read_command_desc)
-        .args([processing_mode_arg, silent_flag])
+        .args([processing_mode_arg, silent_flag, generate_json_flag])
         .arg(&help_flag);
 
     let write_subcommand: Command = Command::new("write")
@@ -408,6 +413,12 @@ fn main() {
 
             let silent_flag: bool = subcommand_matches.get_flag("silent");
 
+            let generate_json_flag: bool = if engine_type != EngineType::New {
+                subcommand_matches.get_flag("generate-json")
+            } else {
+                false
+            };
+
             if processing_mode == ProcessingMode::Force && !silent_flag {
                 let start: Instant = Instant::now();
                 println!("{}", localization.force_mode_warning);
@@ -423,6 +434,9 @@ fn main() {
             }
 
             create_dir_all(output_path).unwrap();
+            if generate_json_flag {
+                create_dir_all(root_dir.join("json")).unwrap();
+            }
 
             write(
                 metadata_file_path,
@@ -441,6 +455,7 @@ fn main() {
                     engine_type,
                     processing_mode,
                     &localization,
+                    generate_json_flag,
                 );
             }
 
@@ -454,6 +469,7 @@ fn main() {
                     processing_mode,
                     engine_type,
                     &localization,
+                    generate_json_flag,
                 );
             }
 
@@ -466,6 +482,7 @@ fn main() {
                     processing_mode,
                     engine_type,
                     &localization,
+                    generate_json_flag,
                 );
             }
 
@@ -476,6 +493,7 @@ fn main() {
                     romanize_flag,
                     logging_flag,
                     &localization,
+                    generate_json_flag,
                 );
             }
         }
