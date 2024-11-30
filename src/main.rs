@@ -1,15 +1,11 @@
-mod functions;
-mod read;
-mod statics;
-mod types;
-mod write;
+mod localization;
 
-use crate::{
-    functions::get_game_type,
-    statics::{EXTENSION, LINES_SEPARATOR},
-};
+use crate::localization::*;
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
+use regex::Regex;
+use rpgmad_lib::Decrypter;
+use rvpacker_lib::{read, statics::LINES_SEPARATOR, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
     fs::{create_dir_all, read_to_string, write},
@@ -20,7 +16,21 @@ use std::{
     time::Instant,
 };
 use sys_locale::get_locale;
-use types::*;
+
+pub fn get_game_type(game_title: String) -> Option<GameType> {
+    let lowercased: &str = &game_title.to_lowercase();
+
+    let termina_re: Regex = unsafe { Regex::new(r"\btermina\b").unwrap_unchecked() };
+    let lisarpg_re: Regex = unsafe { Regex::new(r"\blisa\b").unwrap_unchecked() };
+
+    if termina_re.is_match(lowercased) {
+        Some(GameType::Termina)
+    } else if lisarpg_re.is_match(lowercased) {
+        Some(GameType::LisaRPG)
+    } else {
+        None
+    }
+}
 
 fn main() {
     let mut start_time: Instant = Instant::now();
@@ -302,10 +312,6 @@ fn main() {
 
     if !original_path.exists() {
         original_path = &data_path;
-
-        if !original_path.exists() {
-            panic!("{}", localization.original_dir_missing)
-        }
     }
 
     let root_dir: &Path = if *output_dir.as_os_str() == *"./" {
@@ -329,40 +335,62 @@ fn main() {
             _ => unreachable!(),
         };
 
+    let processing_mode: ProcessingMode = match subcommand_matches
+        .get_one::<String>("processing-mode")
+        .unwrap()
+        .as_str()
+    {
+        "default" => ProcessingMode::Default,
+        "append" => ProcessingMode::Append,
+        "force" => ProcessingMode::Force,
+        _ => unreachable!(),
+    };
+
     let (engine_type, system_file_path, scripts_file_path): (EngineType, PathBuf, Option<PathBuf>) = {
+        let mut archive_path: PathBuf = input_dir.join("Game.rgss3a");
         let mut system_path: PathBuf = original_path.join("System.json");
+        let engine_type: EngineType;
+        let scripts_path: Option<PathBuf>;
 
         if system_path.exists() {
-            unsafe { EXTENSION = ".json" }
-            (EngineType::New, system_path, None)
+            engine_type = EngineType::New;
+            scripts_path = None;
         } else {
             system_path = original_path.join("System.rvdata2");
 
-            if system_path.exists() {
-                unsafe { EXTENSION = ".rvdata2" }
-                (
-                    EngineType::VXAce,
-                    system_path,
-                    Some(original_path.join("Scripts.rvdata2")),
-                )
+            if system_path.exists() || archive_path.exists() {
+                engine_type = EngineType::VXAce;
+                scripts_path = Some(original_path.join("Scripts.rvdata2"));
             } else {
                 system_path = original_path.join("System.rvdata");
+                archive_path = input_dir.join("Game.rgss2a");
 
-                if system_path.exists() {
-                    unsafe { EXTENSION = ".rvdata" }
-                    (EngineType::VX, system_path, Some(original_path.join("Scripts.rvdata")))
+                if system_path.exists() || archive_path.exists() {
+                    engine_type = EngineType::VX;
+                    scripts_path = Some(original_path.join("Scripts.rvdata"));
                 } else {
                     system_path = original_path.join("System.rxdata");
+                    archive_path = input_dir.join("Game.rgssad");
 
-                    if system_path.exists() {
-                        unsafe { EXTENSION = ".rxdata" }
-                        (EngineType::XP, system_path, Some(original_path.join("Scripts.rxdata")))
+                    if system_path.exists() || archive_path.exists() {
+                        engine_type = EngineType::XP;
+                        scripts_path = Some(original_path.join("Scripts.rxdata"));
                     } else {
                         panic!("{}", localization.could_not_determine_game_engine_msg)
                     }
                 }
             }
         }
+
+        if archive_path.exists() {
+            let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
+            let mut decrypter: Decrypter = Decrypter::new(bytes);
+            decrypter
+                .extract(input_dir, processing_mode == ProcessingMode::Force)
+                .unwrap();
+        }
+
+        (engine_type, system_path, scripts_path)
     };
 
     let mut game_type: Option<GameType> = if disable_custom_processing_flag {
@@ -400,17 +428,6 @@ fn main() {
     match subcommand {
         "read" => {
             use read::*;
-
-            let processing_mode: ProcessingMode = match subcommand_matches
-                .get_one::<String>("processing-mode")
-                .unwrap()
-                .as_str()
-            {
-                "default" => ProcessingMode::Default,
-                "append" => ProcessingMode::Append,
-                "force" => ProcessingMode::Force,
-                _ => unreachable!(),
-            };
 
             let silent_flag: bool = subcommand_matches.get_flag("silent");
 
@@ -455,7 +472,6 @@ fn main() {
                     game_type,
                     engine_type,
                     processing_mode,
-                    &localization,
                     generate_json_flag,
                 );
             }
@@ -469,7 +485,6 @@ fn main() {
                     game_type,
                     processing_mode,
                     engine_type,
-                    &localization,
                     generate_json_flag,
                 );
             }
@@ -482,7 +497,6 @@ fn main() {
                     logging_flag,
                     processing_mode,
                     engine_type,
-                    &localization,
                     generate_json_flag,
                 );
             }
@@ -493,7 +507,6 @@ fn main() {
                     output_path,
                     romanize_flag,
                     logging_flag,
-                    &localization,
                     generate_json_flag,
                 );
             }
@@ -570,7 +583,6 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
-                    &localization,
                 );
             }
 
@@ -583,7 +595,6 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
-                    &localization,
                 );
             }
 
@@ -595,7 +606,6 @@ fn main() {
                     romanize_flag,
                     logging_flag,
                     engine_type,
-                    &localization,
                 );
             }
 
@@ -607,7 +617,6 @@ fn main() {
                     output_path,
                     &unsafe { plugins_output_path.unwrap_unchecked() },
                     logging_flag,
-                    &localization,
                 );
             }
 
@@ -618,7 +627,7 @@ fn main() {
                     data_output_path,
                     romanize_flag,
                     logging_flag,
-                    &localization,
+                    engine_type,
                 )
             }
         }

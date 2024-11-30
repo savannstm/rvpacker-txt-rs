@@ -1,58 +1,8 @@
 use color_print::cstr;
 
-#[derive(PartialEq, Clone, Copy)]
-pub enum GameType {
-    Termina,
-    LisaRPG,
-}
-
-#[derive(PartialEq, Clone, Copy)]
-#[repr(u8)]
-pub enum ProcessingMode {
-    Force,
-    Append,
-    Default,
-}
-
-#[derive(PartialEq, Clone, Copy)]
-pub enum EngineType {
-    New,
-    VXAce,
-    VX,
-    XP,
-}
-
-#[derive(PartialEq)]
-pub enum Code {
-    Dialogue, // also goes for credit
-    Choice,
-    System,
-    Misc,
-}
-
 pub enum Language {
     English,
     Russian,
-}
-
-#[derive(PartialEq, Clone, Copy)]
-pub enum Variable {
-    Name,
-    Nickname,
-    Description,
-    Message1,
-    Message2,
-    Message3,
-    Message4,
-    Note,
-}
-
-#[derive(PartialEq, Clone, Copy)]
-#[repr(u8)]
-pub enum MapsProcessingMode {
-    Default,
-    Separate,
-    Preserve,
 }
 
 macro_rules! pub_struct {
@@ -108,12 +58,7 @@ pub_struct! {
         // Messages and warnings
         input_dir_missing: &'a str,
         output_dir_missing: &'a str,
-        original_dir_missing: &'a str,
         translation_dir_missing: &'a str,
-        file_written_msg: &'a str,
-        file_parsed_msg: &'a str,
-        file_already_parsed_msg: &'a str,
-        file_is_not_parsed_msg: &'a str,
         elapsed_time_msg: &'a str,
         force_mode_warning: &'a str,
         custom_processing_enabled_msg: &'a str,
@@ -124,10 +69,6 @@ pub_struct! {
         game_ini_file_missing_msg: &'a str,
         enabling_maps_processing_mode_metadata_msg: &'a str,
 
-        could_not_split_line_msg: &'a str,
-        at_position_msg: &'a str,
-        could_not_replace_scripts_string: &'a str,
-
         // Misc
         possible_values: &'a str,
         example: &'a str,
@@ -135,32 +76,6 @@ pub_struct! {
         when_reading: &'a str,
         when_writing: &'a str,
         aliases: &'a str,
-    }
-}
-
-pub trait EachLine {
-    fn each_line(&self) -> Vec<String>;
-}
-
-// Return a Vec of strings splitted by lines (inclusive), akin to each_line in Ruby
-impl EachLine for str {
-    fn each_line(&self) -> Vec<String> {
-        let mut result: Vec<String> = Vec::new();
-        let mut current_line: String = String::new();
-
-        for char in self.chars() {
-            current_line.push(char);
-
-            if char == '\n' {
-                result.push(std::mem::take(&mut current_line));
-            }
-        }
-
-        if !current_line.is_empty() {
-            result.push(std::mem::take(&mut current_line));
-        }
-
-        result
     }
 }
 
@@ -233,12 +148,8 @@ impl Localization<'_> {
             // Messages and warnings
             input_dir_missing: "Input directory does not exist.",
             output_dir_missing: "Output directory does not exist.",
-            original_dir_missing: r#"The "original" or "data" ("Data") folder in the input directory does not exist."#,
             translation_dir_missing: r#"The "translation" folder in the input directory does not exist."#,
-            file_written_msg: "Wrote file",
-            file_parsed_msg: "Parsed file",
-            file_already_parsed_msg: "file already exists. If you want to forcefully re-read files or append new text, use --mode force or --mode append.",
-            file_is_not_parsed_msg: "Files aren't already parsed. Continuing as if --append flag was omitted.",
+
             elapsed_time_msg: "Elapsed time:",
             force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the \
                                  folder, including _trans. Input 'Y' to continue.",
@@ -252,10 +163,6 @@ impl Localization<'_> {
                                                   inside your data/original directory.",
             game_ini_file_missing_msg: "Game.ini file not found.",
             enabling_maps_processing_mode_metadata_msg: "Setting maps_processing_mode value to  according to the metadata from previous read.",
-
-            could_not_split_line_msg: "Couldn't split line to original and translated part.\nThe line won't be written to the output file.",
-            at_position_msg: "At position:",
-            could_not_replace_scripts_string: "Couldn't replace string in scripts file.",
 
             // Misc
             possible_values: "Allowed values:",
@@ -322,13 +229,9 @@ impl Localization<'_> {
 
             input_dir_missing: "Входная директория не существует.",
             output_dir_missing: "Выходная директория не существует.",
-            original_dir_missing: r#"Папка "original" или "data" ("Data") входной директории не существует."#,
+
             translation_dir_missing: r#"Папка "translation" входной директории не существует."#,
-            file_written_msg: "Записан файл",
-            file_parsed_msg: "Распарсен файл",
-            file_already_parsed_msg: "уже существует. Если вы хотите принудительно перезаписать все файлы, \
-                                      или добавить новый текст, используйте --mode force или --mode append.",
-            file_is_not_parsed_msg: "Файлы ещё не распарсены. Продолжаем в режиме с выключенным флагом --append.",
+
             elapsed_time_msg: "Затраченное время:",
             force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, \
                                  включая _trans-файлы. Введите Y, чтобы продолжить.",
@@ -343,10 +246,6 @@ impl Localization<'_> {
                                                   существует.",
             game_ini_file_missing_msg: "Файл Game.ini не был обнаружен.",
             enabling_maps_processing_mode_metadata_msg: "Значение аргумента maps_processing_mode установлено на  в соответствии с метаданными из прошлого чтения.",
-
-            could_not_split_line_msg: "Не удалось разделить строку на оригинальную и переведённую части.\nСтрока не будет записана в выходной файл.",
-            at_position_msg: "Позиция:",
-            could_not_replace_scripts_string: "Не удалось заменить строку в файле скриптов.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",
