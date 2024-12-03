@@ -337,7 +337,7 @@ fn main() {
 
     let processing_mode: ProcessingMode = match subcommand_matches
         .get_one::<String>("processing-mode")
-        .unwrap()
+        .unwrap_or(&String::from("default"))
         .as_str()
     {
         "default" => ProcessingMode::Default,
