@@ -104,7 +104,7 @@ impl Localization<'_> {
 
             // Command descriptions
             read_command_desc: cstr!(
-                r#"<bold>Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output directory.</>"#
+                r#"<bold>Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output directory. If "Data" directory does not exist and there's an .rgss archive in the input directory, program automatically decrypts it.</>"#
             ),
             write_command_desc: cstr!(
                 r#"<bold>Writes translated files using original files from "original" or "data" ("Data") folders of input directory and writes results to "output" folder of output directory.</>"#
@@ -189,7 +189,7 @@ impl Localization<'_> {
             ),
 
             read_command_desc: cstr!(
-                r#"<bold>Парсит файлы из папки "original" или "data" ("Data") входной директории в папку "translation" выходной директории.</>"#
+                r#"<bold>Парсит файлы из папки "original" или "data" ("Data") входной директории в папку "translation" выходной директории. Если папка "Data" не существует, а во входной директории есть архив .rgss, программа автоматически расшифровывает его.</>"#
             ),
             write_command_desc: cstr!(
                 r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" ("Data") входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</>"#
