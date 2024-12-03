@@ -39,7 +39,8 @@ Usage: rvpacker-txt-rs COMMAND [OPTIONS]
 Commands:
   read
           Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output
-          directory.
+          directory. If "Data" directory does not exist and there's an .rgss archive in the input directory, program
+          automatically decrypts it.
   write
           Writes translated files using original files from "original" or "data" ("Data") folders of input directory and
           writes results to "output" folder of output directory.
