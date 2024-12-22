@@ -507,6 +507,7 @@ fn main() {
                     output_path,
                     romanize_flag,
                     logging_flag,
+                    processing_mode,
                     generate_json_flag,
                 );
             }
