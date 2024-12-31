@@ -12,6 +12,8 @@ The same deprecated tool, written in Ruby, can be found in [rvpacker-txt reposit
 
 [A GUI](https://github.com/savannstm/rpgmtranslate) that allows comfortably edit parsed files (and it also automatically parses unparsed games when you select their folder) (and you also can easily write files back to their initial with a single button click).
 
+An underlying library for this CLI can be found [here](https://github.com/savannstm/rvpacker-txt-rs-lib);
+
 ## The format of output files
 
 `rvpacker-txt-rs` parses all the original text from the game's files, and inserts it on each new line of a text file. All line breaks (new lines, `\n`) are replaced by `\#` symbols.
