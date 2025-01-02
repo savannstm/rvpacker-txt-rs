@@ -307,7 +307,7 @@ fn main() {
         panic!("{}", localization.output_dir_missing)
     }
 
-    let mut original_path: &Path = &input_dir.join("original");
+    let mut original_path: &PathBuf = &input_dir.join("original");
     let data_path: PathBuf = input_dir.join("data");
 
     if !original_path.exists() {
@@ -320,7 +320,7 @@ fn main() {
         output_dir
     };
 
-    let output_path: &Path = &root_dir.join("translation");
+    let output_path: &PathBuf = &root_dir.join("translation");
     let metadata_file_path: &Path = &output_path.join(".rvpacker-txt-rs-metadata.json");
 
     let logging_flag: bool = matches.get_flag("log");
