@@ -335,20 +335,9 @@ fn main() {
             _ => unreachable!(),
         };
 
-    let processing_mode: ProcessingMode = match subcommand_matches
-        .get_one::<String>("processing-mode")
-        .unwrap_or(&String::from("default"))
-        .as_str()
-    {
-        "default" => ProcessingMode::Default,
-        "append" => ProcessingMode::Append,
-        "force" => ProcessingMode::Force,
-        _ => unreachable!(),
-    };
-
-    let (engine_type, system_file_path, scripts_file_path): (EngineType, PathBuf, Option<PathBuf>) = {
-        let mut archive_path: PathBuf = input_dir.join("Game.rgss3a");
+    let (engine_type, system_file_path, archive_path, scripts_file_path) = {
         let mut system_path: PathBuf = original_path.join("System.json");
+        let mut archive_path: Option<PathBuf> = None;
         let engine_type: EngineType;
         let scripts_path: Option<PathBuf>;
 
@@ -357,22 +346,23 @@ fn main() {
             scripts_path = None;
         } else {
             system_path = original_path.join("System.rvdata2");
+            archive_path = Some(input_dir.join("Game.rgss3a"));
 
-            if system_path.exists() || archive_path.exists() {
+            if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
                 engine_type = EngineType::VXAce;
                 scripts_path = Some(original_path.join("Scripts.rvdata2"));
             } else {
                 system_path = original_path.join("System.rvdata");
-                archive_path = input_dir.join("Game.rgss2a");
+                archive_path = Some(input_dir.join("Game.rgss2a"));
 
-                if system_path.exists() || archive_path.exists() {
+                if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
                     engine_type = EngineType::VX;
                     scripts_path = Some(original_path.join("Scripts.rvdata"));
                 } else {
                     system_path = original_path.join("System.rxdata");
-                    archive_path = input_dir.join("Game.rgssad");
+                    archive_path = Some(input_dir.join("Game.rgssad"));
 
-                    if system_path.exists() || archive_path.exists() {
+                    if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
                         engine_type = EngineType::XP;
                         scripts_path = Some(original_path.join("Scripts.rxdata"));
                     } else {
@@ -382,15 +372,7 @@ fn main() {
             }
         }
 
-        if archive_path.exists() {
-            let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
-            let mut decrypter: Decrypter = Decrypter::new(bytes);
-            decrypter
-                .extract(input_dir, processing_mode == ProcessingMode::Force)
-                .unwrap();
-        }
-
-        (engine_type, system_path, scripts_path)
+        (engine_type, system_path, archive_path, scripts_path)
     };
 
     let mut game_type: Option<GameType> = if disable_custom_processing_flag {
@@ -428,6 +410,27 @@ fn main() {
     match subcommand {
         "read" => {
             use read::*;
+
+            let processing_mode: ProcessingMode = match subcommand_matches
+                .get_one::<String>("processing-mode")
+                .unwrap_or(&String::from("default"))
+                .as_str()
+            {
+                "default" => ProcessingMode::Default,
+                "append" => ProcessingMode::Append,
+                "force" => ProcessingMode::Force,
+                _ => unreachable!(),
+            };
+
+            if let Some(archive_path) = archive_path {
+                if archive_path.exists() {
+                    let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
+                    let mut decrypter: Decrypter = Decrypter::new(bytes);
+                    decrypter
+                        .extract(input_dir, processing_mode == ProcessingMode::Force)
+                        .unwrap();
+                }
+            }
 
             let silent_flag: bool = subcommand_matches.get_flag("silent");
 
