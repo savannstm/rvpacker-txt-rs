@@ -8,7 +8,7 @@ use rpgmad_lib::Decrypter;
 use rvpacker_lib::{read, statics::LINES_SEPARATOR, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
-    fs::{create_dir_all, read_to_string, write},
+    fs::{create_dir_all, read, read_to_string, write},
     io::stdin,
     mem::transmute,
     path::{Path, PathBuf},
@@ -16,6 +16,14 @@ use std::{
     time::Instant,
 };
 use sys_locale::get_locale;
+
+const ENCODINGS: [&encoding_rs::Encoding; 5] = [
+    encoding_rs::UTF_8,
+    encoding_rs::SHIFT_JIS,
+    encoding_rs::GB18030,
+    encoding_rs::WINDOWS_1252,
+    encoding_rs::WINDOWS_1251,
+];
 
 pub fn get_game_type(game_title: String) -> Option<GameType> {
     let lowercased: &str = &game_title.to_lowercase();
@@ -384,8 +392,23 @@ fn main() {
         } else {
             let ini_file_path: &Path = &input_dir.join("Game.ini");
 
-            if let Ok(ini_file_content) = read_to_string(ini_file_path) {
-                let title_line: &str = ini_file_content
+            if ini_file_path.exists() {
+                let ini_file_bytes = read(ini_file_path).unwrap();
+                let mut content: String = String::new();
+
+                for encoding in ENCODINGS {
+                    let (decoded, _, error) = encoding.decode(&ini_file_bytes);
+
+                    if !error {
+                        content = decoded.into_owned();
+                    }
+                }
+
+                if content.is_empty() {
+                    panic!();
+                }
+
+                let title_line: &str = content
                     .lines()
                     .find(|line: &&str| line.to_lowercase().starts_with("title"))
                     .unwrap();
