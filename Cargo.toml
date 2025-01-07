@@ -1,13 +1,14 @@
 [package]
 name = "rvpacker-txt-rs"
-version = "3.0.19"
+version = "3.0.20"
 edition = "2021"
 
 [dependencies]
 sys-locale = "0.3.2"
-clap = { version = "4.5.23", features = ["wrap_help"] }
+clap = { version = "4.5.24", features = ["wrap_help"] }
 color-print = "0.3.7"
 regex = "1.11.1"
 rpgmad-lib = { version = "1.0.1", features = ["rayon"] }
-rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "3.3.6" }
+rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "3.3.7" }
 sonic-rs = "0.3.17"
+encoding_rs = "0.8.35"
