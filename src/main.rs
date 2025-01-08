@@ -5,7 +5,7 @@ use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
 use regex::Regex;
 use rpgmad_lib::Decrypter;
-use rvpacker_lib::{read, statics::LINES_SEPARATOR, types::*, write};
+use rvpacker_lib::{read, read_to_string_without_bom, statics::LINES_SEPARATOR, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
     fs::{create_dir_all, read, read_to_string, write},
@@ -387,7 +387,7 @@ fn main() {
         None
     } else {
         let game_title: String = if engine_type == EngineType::New {
-            let system_obj: Object = from_str(&read_to_string(&system_file_path).unwrap()).unwrap();
+            let system_obj: Object = from_str(&read_to_string_without_bom(&system_file_path).unwrap()).unwrap();
             system_obj["gameTitle"].as_str().unwrap().to_owned()
         } else {
             let ini_file_path: &Path = &input_dir.join("Game.ini");
