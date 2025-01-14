@@ -120,7 +120,7 @@ impl Localization<'_> {
             output_dir_arg_read_desc: r#"Output directory, where a "translation" folder with translation .txt files will be created."#,
             output_dir_arg_write_desc: r#"Output directory, where an "output" folder with "data" ("Data") and/or "js" subfolders with game files with translated text from .txt files will be created."#,
 
-            disable_processing_arg_desc: "Skips processing specified files.",
+            disable_processing_arg_desc: "Skips processing specified files. plugins can be used interchangeably with scripts.",
 
             romanize_desc: r#"If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their roman equivalents (in this case, ''). This flag will automatically be used when writing if you parsed game text with it."#,
 
@@ -204,7 +204,7 @@ impl Localization<'_> {
             output_dir_arg_read_desc: r#"Выходная директория, где будет создана папка "translation" с .txt файлами перевода."#,
             output_dir_arg_write_desc: r#"Выходная директория, где будет создана папка "output" с подпапками "data" ("Data") и/или "js", содержащими игровые файлы с переведённым текстом из .txt файлов."#,
 
-            disable_processing_arg_desc: "Не обрабатывает указанные файлы.",
+            disable_processing_arg_desc: "Не обрабатывает указанные файлы. plugins может применятся взаимозаменяемо со scripts.",
 
             romanize_desc: r#"Если вы парсите текст из японской игры, содержащей символы вроде 「」, являющимися обычными японскими кавычками, программа автоматически заменяет эти символы на их европейские эквиваленты. (в данном случае, '')"#,
 

@@ -139,14 +139,14 @@ fn main() {
         .value_delimiter(',')
         .value_name(localization.disable_processing_arg_type)
         .help(cformat!(
-            "{}\n{} --disable-processing=maps,other,system\n<bold>[{} maps, other, system, plugins]\n[{} no]</>",
+            "{}\n{} --disable-processing=maps,other,system\n<bold>[{} maps, other, system, plugins, scripts]\n[{} no]</>",
             localization.disable_processing_arg_desc,
             localization.example,
             localization.possible_values,
             localization.aliases
         ))
         .global(true)
-        .value_parser(["maps", "other", "system", "plugins"])
+        .value_parser(["maps", "other", "system", "plugins", "scripts"])
         .display_order(3);
 
     let romanize_arg: Arg = Arg::new("romanize")
@@ -295,10 +295,11 @@ fn main() {
                         "maps" => flags.0 = true,
                         "other" => flags.1 = true,
                         "system" => flags.2 = true,
-                        "plugins" => flags.3 = true,
-                        _ => {}
+                        "plugins" | "scripts" => flags.3 = true,
+                        _ => unreachable!(),
                     }
                 }
+
                 flags
             })
             .unwrap_or((false, false, false, false));
