@@ -651,9 +651,7 @@ fn main() {
                 );
             }
 
-            if !disable_plugins_processing
-                && game_type.is_some_and(|game_type: GameType| game_type == GameType::Termina)
-            {
+            if !disable_plugins_processing {
                 if engine_type != EngineType::New {
                     write_scripts(
                         &unsafe { scripts_file_path.unwrap_unchecked() },
