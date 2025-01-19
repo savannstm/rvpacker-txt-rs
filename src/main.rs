@@ -532,7 +532,15 @@ fn main() {
             }
 
             if !disable_plugins_processing {
-                if engine_type != EngineType::New {
+                if engine_type == EngineType::New {
+                    read_plugins(
+                        &unsafe { plugins_file_path.unwrap_unchecked() },
+                        output_path,
+                        romanize_flag,
+                        logging_flag,
+                        processing_mode,
+                    )
+                } else {
                     read_scripts(
                         &unsafe { scripts_file_path.unwrap_unchecked() },
                         output_path,
@@ -541,15 +549,6 @@ fn main() {
                         processing_mode,
                         generate_json_flag,
                     );
-                } else {
-                    read_plugins(
-                        &unsafe { plugins_file_path.unwrap_unchecked() },
-                        output_path,
-                        romanize_flag,
-                        logging_flag,
-                        processing_mode,
-                        generate_json_flag,
-                    )
                 }
             }
         }
@@ -652,7 +651,15 @@ fn main() {
             }
 
             if !disable_plugins_processing {
-                if engine_type != EngineType::New {
+                if engine_type == EngineType::New {
+                    write_plugins(
+                        &unsafe { plugins_file_path.unwrap_unchecked() },
+                        output_path,
+                        &unsafe { plugins_output_path.unwrap_unchecked() },
+                        logging_flag,
+                        romanize_flag,
+                    );
+                } else {
                     write_scripts(
                         &unsafe { scripts_file_path.unwrap_unchecked() },
                         output_path,
@@ -661,14 +668,6 @@ fn main() {
                         logging_flag,
                         engine_type,
                     )
-                } else {
-                    write_plugins(
-                        &unsafe { plugins_file_path.unwrap_unchecked() },
-                        output_path,
-                        &unsafe { plugins_output_path.unwrap_unchecked() },
-                        logging_flag,
-                        romanize_flag,
-                    );
                 }
             }
         }
