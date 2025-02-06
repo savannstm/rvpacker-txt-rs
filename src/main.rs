@@ -3,7 +3,6 @@ mod localization;
 use crate::localization::*;
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
-use regex::Regex;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{read, read_to_string_without_bom, statics::LINES_SEPARATOR, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
@@ -28,12 +27,9 @@ const ENCODINGS: [&encoding_rs::Encoding; 5] = [
 pub fn get_game_type(game_title: String) -> Option<GameType> {
     let lowercased: &str = &game_title.to_lowercase();
 
-    let termina_re: Regex = unsafe { Regex::new(r"\btermina\b").unwrap_unchecked() };
-    let lisarpg_re: Regex = unsafe { Regex::new(r"\blisa\b").unwrap_unchecked() };
-
-    if termina_re.is_match(lowercased) {
+    if lowercased.contains(" termina ") {
         Some(GameType::Termina)
-    } else if lisarpg_re.is_match(lowercased) {
+    } else if lowercased.contains(" lisa ") {
         Some(GameType::LisaRPG)
     } else {
         None
