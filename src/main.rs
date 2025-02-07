@@ -27,9 +27,9 @@ const ENCODINGS: [&encoding_rs::Encoding; 5] = [
 pub fn get_game_type(game_title: String) -> Option<GameType> {
     let lowercased: &str = &game_title.to_lowercase();
 
-    if lowercased.contains(" termina ") {
+    if lowercased.contains("termina") {
         Some(GameType::Termina)
-    } else if lowercased.contains(" lisa ") {
+    } else if lowercased.contains("lisa") {
         Some(GameType::LisaRPG)
     } else {
         None
