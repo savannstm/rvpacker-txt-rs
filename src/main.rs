@@ -4,7 +4,7 @@ use crate::localization::*;
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
 use rpgmad_lib::Decrypter;
-use rvpacker_lib::{read, read_to_string_without_bom, statics::LINES_SEPARATOR, types::*, write};
+use rvpacker_lib::{json, purge, read, read_to_string_without_bom, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
     fs::{create_dir_all, read, read_to_string, write},
@@ -246,10 +246,16 @@ fn main() {
         .about(localization.write_command_desc)
         .arg(&help_flag);
 
-    let migrate_subcommand: Command = Command::new("migrate")
+    let purge_subcommand: Command = Command::new("purge")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
-        .about(localization.migrate_command_desc)
+        .about("")
+        .arg(&help_flag);
+
+    let generate_json_subcommand: Command = Command::new("json")
+        .disable_help_flag(true)
+        .help_template(localization.subcommand_help_template)
+        .about("")
         .arg(&help_flag);
 
     let cli: Command = Command::new("")
@@ -260,7 +266,12 @@ fn main() {
         .term_width(120)
         .about(localization.about_msg)
         .help_template(localization.help_template)
-        .subcommands([read_subcommand, write_subcommand, migrate_subcommand])
+        .subcommands([
+            read_subcommand,
+            write_subcommand,
+            purge_subcommand,
+            generate_json_subcommand,
+        ])
         .args([
             input_dir_arg,
             output_dir_arg,
@@ -300,13 +311,13 @@ fn main() {
             })
             .unwrap_or((false, false, false, false));
 
-    let input_dir: &Path = matches.get_one::<PathBuf>("input-dir").unwrap();
+    let input_dir: &PathBuf = matches.get_one::<PathBuf>("input-dir").unwrap();
 
     if !input_dir.exists() {
         panic!("{}", localization.input_dir_missing);
     }
 
-    let output_dir: &Path = matches.get_one::<PathBuf>("output-dir").unwrap();
+    let output_dir: &PathBuf = matches.get_one::<PathBuf>("output-dir").unwrap();
 
     if !output_dir.exists() {
         panic!("{}", localization.output_dir_missing)
@@ -319,14 +330,15 @@ fn main() {
         original_path = &data_path;
     }
 
-    let root_dir: &Path = if *output_dir.as_os_str() == *"./" {
+    let root_dir: &PathBuf = if *output_dir.as_os_str() == *"./" {
         input_dir
     } else {
         output_dir
     };
 
     let output_path: &PathBuf = &root_dir.join("translation");
-    let metadata_file_path: &Path = &output_path.join(".rvpacker-txt-rs-metadata.json");
+    let metadata_file_path: &Path = &output_path.join(".rvpacker-metadata");
+    let _ignore_file_path: &Path = &output_path.join(".rvpacker-ignore");
 
     let logging_flag: bool = matches.get_flag("log");
     let disable_custom_processing_flag: bool = matches.get_flag("disable-custom-processing");
@@ -430,20 +442,20 @@ fn main() {
         println!("{}", localization.custom_processing_enabled_msg);
     }
 
+    let processing_mode: ProcessingMode = match subcommand_matches
+        .get_one::<String>("processing-mode")
+        .unwrap_or(&String::from("default"))
+        .as_str()
+    {
+        "default" => ProcessingMode::Default,
+        "append" => ProcessingMode::Append,
+        "force" => ProcessingMode::Force,
+        _ => unreachable!(),
+    };
+
     match subcommand {
         "read" => {
             use read::*;
-
-            let processing_mode: ProcessingMode = match subcommand_matches
-                .get_one::<String>("processing-mode")
-                .unwrap_or(&String::from("default"))
-                .as_str()
-            {
-                "default" => ProcessingMode::Default,
-                "append" => ProcessingMode::Append,
-                "force" => ProcessingMode::Force,
-                _ => unreachable!(),
-            };
 
             if let Some(archive_path) = archive_path {
                 if archive_path.exists() {
@@ -456,12 +468,6 @@ fn main() {
             }
 
             let silent_flag: bool = subcommand_matches.get_flag("silent");
-
-            let generate_json_flag: bool = if engine_type != EngineType::New {
-                subcommand_matches.get_flag("generate-json")
-            } else {
-                false
-            };
 
             if processing_mode == ProcessingMode::Force && !silent_flag {
                 let start: Instant = Instant::now();
@@ -477,16 +483,44 @@ fn main() {
                 start_time -= start.elapsed();
             }
 
-            create_dir_all(output_path).unwrap();
-            if generate_json_flag {
-                create_dir_all(root_dir.join("json")).unwrap();
+            if metadata_file_path.exists() && processing_mode == ProcessingMode::Append {
+                let metadata: Object = from_str(&read_to_string(metadata_file_path).unwrap()).unwrap();
+                let maps_processing_mode_metadata: u8 =
+                    unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
+
+                if maps_processing_mode_metadata > 0 {
+                    let (before, after) = unsafe {
+                        localization
+                            .enabling_maps_processing_mode_metadata_msg
+                            .split_once("  ")
+                            .unwrap_unchecked()
+                    };
+
+                    maps_processing_mode_value =
+                        unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
+
+                    println!(
+                        "{} {} {}",
+                        before,
+                        match maps_processing_mode_value {
+                            MapsProcessingMode::Default => "default",
+                            MapsProcessingMode::Separate => "separate",
+                            MapsProcessingMode::Preserve => "preserve",
+                        },
+                        after
+                    );
+                }
             }
 
-            write(
+            create_dir_all(output_path).unwrap();
+
+            if processing_mode != ProcessingMode::Append {
+                write(
                 metadata_file_path,
                 to_string(&json!({"romanize": romanize_flag, "disableCustomProcessing": disable_custom_processing_flag, "mapsProcessingMode": maps_processing_mode_value as u8})).unwrap(),
             )
             .unwrap();
+            }
 
             if !disable_maps_processing {
                 read_map(
@@ -498,7 +532,6 @@ fn main() {
                     game_type,
                     engine_type,
                     processing_mode,
-                    generate_json_flag,
                 );
             }
 
@@ -511,7 +544,6 @@ fn main() {
                     game_type,
                     processing_mode,
                     engine_type,
-                    generate_json_flag,
                 );
             }
 
@@ -523,7 +555,6 @@ fn main() {
                     logging_flag,
                     processing_mode,
                     engine_type,
-                    generate_json_flag,
                 );
             }
 
@@ -543,7 +574,6 @@ fn main() {
                         romanize_flag,
                         logging_flag,
                         processing_mode,
-                        generate_json_flag,
                     );
                 }
             }
@@ -667,42 +697,59 @@ fn main() {
                 }
             }
         }
-        "migrate" => {
-            let maps_path: PathBuf = output_path.join("maps");
-            let other_path: PathBuf = output_path.join("other");
-            let plugins_path: PathBuf = output_path.join("plugins");
+        "purge" => {
+            use purge::*;
 
-            let mut original_content: String = String::new();
-            let mut translated_content: String;
-            let mut original_filename: String = String::new();
+            if !disable_maps_processing {
+                purge_map(
+                    original_path,
+                    output_path,
+                    maps_processing_mode_value,
+                    romanize_flag,
+                    logging_flag,
+                    game_type,
+                    engine_type,
+                );
+            }
 
-            let dirs_array: &[PathBuf] = if engine_type == EngineType::New {
-                &[maps_path, other_path, plugins_path]
-            } else {
-                &[maps_path, other_path]
-            };
+            if !disable_other_processing {
+                purge_other(
+                    original_path,
+                    output_path,
+                    romanize_flag,
+                    logging_flag,
+                    game_type,
+                    engine_type,
+                );
+            }
 
-            for path in dirs_array {
-                for entry in std::fs::read_dir(path).unwrap().flatten() {
-                    if !entry.file_name().to_str().unwrap().contains("trans") {
-                        original_content = read_to_string(entry.path()).unwrap();
-                        original_filename = entry.file_name().to_str().unwrap().to_owned();
-                    } else {
-                        translated_content = read_to_string(entry.path()).unwrap();
+            if !disable_system_processing {
+                purge_system(&system_file_path, output_path, romanize_flag, logging_flag, engine_type);
+            }
 
-                        let mut output_content: String = String::from_iter(
-                            original_content
-                                .split('\n')
-                                .zip(translated_content.split('\n'))
-                                .map(|(original, translated)| format!("{original}{LINES_SEPARATOR}{translated}\n")),
-                        );
-
-                        output_content.pop();
-
-                        write(output_path.join(original_filename.as_str()), output_content).unwrap();
-                    }
+            if !disable_plugins_processing {
+                if engine_type == EngineType::New {
+                    purge_plugins(
+                        &unsafe { plugins_file_path.unwrap_unchecked() },
+                        output_path,
+                        romanize_flag,
+                        logging_flag,
+                        processing_mode,
+                    )
+                } else {
+                    purge_scripts(
+                        &unsafe { scripts_file_path.unwrap_unchecked() },
+                        output_path,
+                        romanize_flag,
+                        logging_flag,
+                    );
                 }
             }
+        }
+        "json" => {
+            use json::*;
+
+            generate_json(original_path, root_dir, engine_type, processing_mode);
         }
         _ => unreachable!(),
     }
