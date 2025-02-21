@@ -23,7 +23,6 @@ pub_struct! {
         // Command descriptions
         read_command_desc: &'a str,
         write_command_desc: &'a str,
-        migrate_command_desc: &'a str,
 
         // Argument descriptions
         input_dir_arg_read_desc: &'a str,
@@ -109,9 +108,6 @@ impl Localization<'_> {
             write_command_desc: cstr!(
                 r#"<bold>Writes translated files using original files from "original" or "data" ("Data") folders of input directory and writes results to "output" folder of output directory.</>"#
             ),
-            migrate_command_desc: cstr!(
-                r#"<bold>Migrates v1/v2 projects to v3 format. Note: maps names are implemented differently in v3, so you should do read --append after migrate, and then insert translated maps names next to Mapxxx.json comments that contain an original map name.</>"#
-            ),
 
             // Argument descriptions
             input_dir_arg_read_desc: r#"Input directory, containing folder "original" or "data" ("Data") with original game files."#,
@@ -193,9 +189,6 @@ impl Localization<'_> {
             ),
             write_command_desc: cstr!(
                 r#"<bold>Записывает переведенные файлы, используя исходные файлы из папки "original" или "data" ("Data") входной директории, применяя текст из .txt файлов папки "translation", выводя результаты в папку "output" выходной директории.</>"#
-            ),
-            migrate_command_desc: cstr!(
-                r#"<bold>Переносит проекты версий v1/v2 в формат v3. Примечание: названия карт в версии 3 реализованы по-другому, поэтому вам следует выполнить read --append после переноса, а затем вставить переведенные названия карт рядом с комментариями Mapxxx.json, которые содержат оригинальное название карты.</>"#
             ),
 
             input_dir_arg_read_desc: r#"Входная директория, содержащая папку "original" или "data" ("Data") с оригинальными файлами игры."#,
