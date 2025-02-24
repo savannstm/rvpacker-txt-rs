@@ -7,7 +7,7 @@ use rpgmad_lib::Decrypter;
 use rvpacker_lib::{json, purge, read, read_to_string_without_bom, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
-    fs::{create_dir_all, read, read_to_string, write},
+    fs::{create_dir_all, read, read_to_string, remove_file, write},
     io::stdin,
     mem::transmute,
     path::{Path, PathBuf},
@@ -240,22 +240,34 @@ fn main() {
         .about(localization.write_command_desc)
         .arg(&help_flag);
 
+    // TODO: Conflicts with preserve maps processing mode
     let stat_flag: Arg = Arg::new("stat")
         .help(localization.stat_arg_desc)
-        .long("purge")
-        .short('p')
+        .long("stat")
+        .short('s')
         .action(ArgAction::SetTrue);
 
-    let leave_translation_flag: Arg = Arg::new("leave-translation")
+    let leave_filled_flag: Arg = Arg::new("leave-filled")
         .help(localization.leave_filled_flag_desc)
-        .long("leave-translation")
+        .long("leave-filled")
+        .action(ArgAction::SetTrue);
+
+    let purge_empty_flag: Arg = Arg::new("purge-empty")
+        .help(localization.purge_empty_flag_desc)
+        .long("purge-empty")
+        .action(ArgAction::SetTrue);
+
+    // TODO: Conflicts with preserve maps processing mode
+    let create_ignore_flag: Arg = Arg::new("create-ignore")
+        .help(localization.create_ignore_flag_desc)
+        .long("create-ignore")
         .action(ArgAction::SetTrue);
 
     let purge_subcommand: Command = Command::new("purge")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.purge_command_desc)
-        .args([stat_flag, leave_translation_flag])
+        .args([stat_flag, leave_filled_flag, purge_empty_flag, create_ignore_flag])
         .arg(&help_flag);
 
     let generate_json_subcommand: Command = Command::new("generate-json")
@@ -726,6 +738,15 @@ fn main() {
         "purge" => {
             use purge::*;
 
+            let stat: bool = subcommand_matches.get_flag("stat");
+            let purge_empty: bool = subcommand_matches.get_flag("purge-empty");
+            let leave_filled: bool = subcommand_matches.get_flag("leave-filled");
+            let create_ignore: bool = subcommand_matches.get_flag("create-ignore");
+
+            if stat && output_path.join("stat.txt").exists() {
+                remove_file(output_path.join("stat.txt")).unwrap();
+            }
+
             if metadata_file_path.exists() {
                 let metadata: Object =
                     unsafe { from_str(&read_to_string(metadata_file_path).unwrap()).unwrap_unchecked() };
@@ -779,6 +800,10 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
+                    stat,
+                    leave_filled,
+                    purge_empty,
+                    create_ignore,
                 );
             }
 
@@ -790,11 +815,25 @@ fn main() {
                     logging_flag,
                     game_type,
                     engine_type,
+                    stat,
+                    leave_filled,
+                    purge_empty,
+                    create_ignore,
                 );
             }
 
             if !disable_system_processing {
-                purge_system(&system_file_path, output_path, romanize_flag, logging_flag, engine_type);
+                purge_system(
+                    &system_file_path,
+                    output_path,
+                    romanize_flag,
+                    logging_flag,
+                    engine_type,
+                    stat,
+                    leave_filled,
+                    purge_empty,
+                    create_ignore,
+                );
             }
 
             if !disable_plugins_processing {
@@ -804,7 +843,10 @@ fn main() {
                         output_path,
                         romanize_flag,
                         logging_flag,
-                        processing_mode,
+                        stat,
+                        leave_filled,
+                        purge_empty,
+                        create_ignore,
                     )
                 } else {
                     purge_scripts(
@@ -812,6 +854,10 @@ fn main() {
                         output_path,
                         romanize_flag,
                         logging_flag,
+                        stat,
+                        leave_filled,
+                        purge_empty,
+                        create_ignore,
                     );
                 }
             }
@@ -826,7 +872,7 @@ fn main() {
                     generate_json(original_path, root_dir, engine_type, processing_mode);
                 }
                 "write-json" => {
-                    write_json();
+                    write_json(root_dir);
                 }
                 _ => unreachable!(),
             }
