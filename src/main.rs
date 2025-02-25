@@ -1,12 +1,11 @@
-mod localization;
-
 use crate::localization::*;
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
+use clap::{crate_version, value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{json, purge, read, read_to_string_without_bom, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
+    env,
     fs::{create_dir_all, read, read_to_string, remove_file, write},
     io::stdin,
     mem::transmute,
@@ -15,6 +14,8 @@ use std::{
     time::Instant,
 };
 use sys_locale::get_locale;
+
+mod localization;
 
 const ENCODINGS: [&encoding_rs::Encoding; 5] = [
     encoding_rs::UTF_8,
@@ -39,13 +40,18 @@ pub fn get_game_type(game_title: String) -> Option<GameType> {
 fn main() {
     let mut start_time: Instant = Instant::now();
 
-    let (language, subcommand) = {
+    let language: Language = {
         let preparse: Command = Command::new("preparse")
             .disable_help_flag(true)
             .disable_help_subcommand(true)
             .disable_version_flag(true)
             .ignore_errors(true)
-            .subcommands([Command::new("read"), Command::new("write")])
+            .subcommands([
+                Command::new("read"),
+                Command::new("write"),
+                Command::new("purge"),
+                Command::new("json").subcommands([Command::new("write-json"), Command::new("generate-json")]),
+            ])
             .args([Arg::new("language")
                 .short('l')
                 .long("language")
@@ -53,7 +59,6 @@ fn main() {
                 .value_parser(["ru", "en"])]);
         let preparse_matches: ArgMatches = preparse.get_matches();
 
-        let subcommand: Option<String> = preparse_matches.subcommand_name().map(str::to_owned);
         let language_arg: Option<&String> = preparse_matches.get_one::<String>("language");
 
         let language: String = language_arg.map(String::to_owned).unwrap_or_else(|| {
@@ -71,61 +76,30 @@ fn main() {
             _ => Language::English,
         };
 
-        (language, subcommand)
+        language
     };
 
     let localization: Localization = Localization::new(language);
-
-    let (input_dir_arg_desc, output_dir_arg_desc) = if let Some(subcommand) = subcommand {
-        match subcommand.as_str() {
-            "read" => (
-                localization.input_dir_arg_read_desc.to_owned(),
-                localization.output_dir_arg_read_desc.to_owned(),
-            ),
-            "write" => (
-                localization.input_dir_arg_write_desc.to_owned(),
-                localization.output_dir_arg_write_desc.to_owned(),
-            ),
-            _ => unreachable!(),
-        }
-    } else {
-        (
-            format!(
-                "{} {}\n{} {}",
-                localization.when_reading,
-                localization.input_dir_arg_read_desc,
-                localization.when_writing,
-                localization.input_dir_arg_write_desc
-            ),
-            format!(
-                "{} {}\n{} {}",
-                localization.when_reading,
-                localization.output_dir_arg_read_desc,
-                localization.when_writing,
-                localization.output_dir_arg_write_desc
-            ),
-        )
-    };
+    let cwd = env::current_dir().unwrap().into_os_string();
 
     let input_dir_arg: Arg = Arg::new("input-dir")
         .short('i')
         .long("input-dir")
         .global(true)
-        .help(input_dir_arg_desc)
+        .help(localization.input_dir_arg_desc)
         .value_name(localization.input_path_arg_type)
         .value_parser(value_parser!(PathBuf))
-        .default_value("./")
+        .default_value(cwd.clone())
         .hide_default_value(true)
         .display_order(0);
 
     let output_dir_arg: Arg = Arg::new("output-dir")
         .short('o')
         .long("output-dir")
-        .global(true)
-        .help(output_dir_arg_desc)
+        .help(localization.output_dir_arg_desc)
         .value_name(localization.output_path_arg_type)
         .value_parser(value_parser!(PathBuf))
-        .default_value("./")
+        .default_value(cwd.clone())
         .hide_default_value(true)
         .display_order(1);
 
@@ -222,25 +196,28 @@ fn main() {
         .value_name(localization.mode_arg_type)
         .hide_default_value(true)
         .value_parser(["default", "separate", "preserve"])
-        .default_value("default")
-        .global(true);
+        .default_value("default");
 
     let silent_flag: Arg = Arg::new("silent").long("silent").hide(true).action(ArgAction::SetTrue);
+
+    let ignore_flag: Arg = Arg::new("ignore")
+        .help(localization.ignore_flag_desc)
+        .long("ignore")
+        .action(ArgAction::SetTrue);
 
     let read_subcommand: Command = Command::new("read")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.read_command_desc)
-        .args([processing_mode_arg, silent_flag])
-        .arg(&help_flag);
+        .args([processing_mode_arg, silent_flag, ignore_flag])
+        .args([&output_dir_arg, &maps_processing_mode_arg, &help_flag]);
 
     let write_subcommand: Command = Command::new("write")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.write_command_desc)
-        .arg(&help_flag);
+        .args([&output_dir_arg, &maps_processing_mode_arg, &help_flag]);
 
-    // TODO: Conflicts with preserve maps processing mode
     let stat_flag: Arg = Arg::new("stat")
         .help(localization.stat_arg_desc)
         .long("stat")
@@ -257,7 +234,6 @@ fn main() {
         .long("purge-empty")
         .action(ArgAction::SetTrue);
 
-    // TODO: Conflicts with preserve maps processing mode
     let create_ignore_flag: Arg = Arg::new("create-ignore")
         .help(localization.create_ignore_flag_desc)
         .long("create-ignore")
@@ -272,9 +248,12 @@ fn main() {
 
     let generate_json_subcommand: Command = Command::new("generate-json")
         .about(localization.generate_json_command_desc)
+        .arg(&output_dir_arg)
         .disable_help_flag(true);
+
     let write_json_subcommand: Command = Command::new("write-json")
         .about(localization.write_json_command_desc)
+        .arg(&output_dir_arg)
         .disable_help_flag(true);
 
     let json_subcommand: Command = Command::new("json")
@@ -284,7 +263,14 @@ fn main() {
         .subcommands([generate_json_subcommand, write_json_subcommand])
         .arg(&help_flag);
 
+    let version_flag: Arg = Arg::new("version")
+        .short('v')
+        .long("version")
+        .action(ArgAction::Version)
+        .help(localization.version_flag_desc);
+
     let cli: Command = Command::new("")
+        .version(crate_version!())
         .disable_version_flag(true)
         .disable_help_subcommand(true)
         .disable_help_flag(true)
@@ -300,9 +286,9 @@ fn main() {
             romanize_arg,
             language_arg,
             disable_custom_processing_flag,
-            maps_processing_mode_arg,
             log_flag,
             help_flag,
+            version_flag,
         ])
         .hide_possible_values(true);
 
@@ -351,72 +337,54 @@ fn main() {
         original_path = &data_path;
     }
 
-    let root_dir: &PathBuf = if *output_dir.as_os_str() == *"./" {
-        input_dir
-    } else {
-        output_dir
-    };
-
-    let output_path: &PathBuf = &root_dir.join("translation");
+    let output_path: &PathBuf = &output_dir.join("translation");
     let metadata_file_path: &Path = &output_path.join(".rvpacker-metadata");
-
-    // TODO: Implement ignoring lines
-    let _ignore_file_path: &Path = &output_path.join(".rvpacker-ignore");
+    let ignore_file_path: &Path = &output_path.join(".rvpacker-ignore");
 
     let logging_flag: bool = matches.get_flag("log");
     let disable_custom_processing_flag: bool = matches.get_flag("disable-custom-processing");
     let mut romanize_flag: bool = matches.get_flag("romanize");
 
-    let mut maps_processing_mode_value: MapsProcessingMode =
-        match matches.get_one::<String>("maps-processing-mode").unwrap().as_str() {
-            "default" => MapsProcessingMode::Default,
-            "separate" => MapsProcessingMode::Separate,
-            "preserve" => MapsProcessingMode::Preserve,
-            _ => unreachable!(),
-        };
+    let mut maps_processing_mode_value: MapsProcessingMode = MapsProcessingMode::Default;
+    let maps_processing_mode_value_mut_ref =
+        unsafe { &mut *(&mut maps_processing_mode_value as *mut MapsProcessingMode) };
 
-    let (engine_type, system_file_path, archive_path, scripts_file_path, plugins_file_path) = {
-        let mut system_path: PathBuf = original_path.join("System.json");
-        let mut archive_path: Option<PathBuf> = None;
-        let engine_type: EngineType;
-        let scripts_path: Option<PathBuf>;
-        let plugins_path: Option<PathBuf>;
-
-        if system_path.exists() {
-            engine_type = EngineType::New;
-            scripts_path = None;
-            plugins_path = Some(root_dir.join("js/plugins.js"));
+    let (engine_type, system_file_path, archive_path, scripts_file_path, plugins_file_path) =
+        if original_path.join("System.json").exists() {
+            (
+                EngineType::New,
+                original_path.join("System.json"),
+                None,
+                None,
+                Some(input_dir.join("js/plugins.js")),
+            )
+        } else if original_path.join("System.rvdata2").exists() || input_dir.join("Game.rgss3a").exists() {
+            (
+                EngineType::VXAce,
+                original_path.join("System.rvdata2"),
+                Some(input_dir.join("Game.rgss3a")),
+                Some(original_path.join("Scripts.rvdata2")),
+                None,
+            )
+        } else if original_path.join("System.rvdata").exists() || input_dir.join("Game.rgss2a").exists() {
+            (
+                EngineType::VX,
+                original_path.join("System.rvdata"),
+                Some(input_dir.join("Game.rgss2a")),
+                Some(original_path.join("Scripts.rvdata")),
+                None,
+            )
+        } else if original_path.join("System.rxdata").exists() || input_dir.join("Game.rgssad").exists() {
+            (
+                EngineType::XP,
+                original_path.join("System.rxdata"),
+                Some(input_dir.join("Game.rgssad")),
+                Some(original_path.join("Scripts.rxdata")),
+                None,
+            )
         } else {
-            system_path = original_path.join("System.rvdata2");
-            archive_path = Some(input_dir.join("Game.rgss3a"));
-            plugins_path = None;
-
-            if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
-                engine_type = EngineType::VXAce;
-                scripts_path = Some(original_path.join("Scripts.rvdata2"));
-            } else {
-                system_path = original_path.join("System.rvdata");
-                archive_path = Some(input_dir.join("Game.rgss2a"));
-
-                if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
-                    engine_type = EngineType::VX;
-                    scripts_path = Some(original_path.join("Scripts.rvdata"));
-                } else {
-                    system_path = original_path.join("System.rxdata");
-                    archive_path = Some(input_dir.join("Game.rgssad"));
-
-                    if system_path.exists() || unsafe { archive_path.as_ref().unwrap_unchecked() }.exists() {
-                        engine_type = EngineType::XP;
-                        scripts_path = Some(original_path.join("Scripts.rxdata"));
-                    } else {
-                        panic!("{}", localization.could_not_determine_game_engine_msg)
-                    }
-                }
-            }
-        }
-
-        (engine_type, system_path, archive_path, scripts_path, plugins_path)
-    };
+            panic!("{}", localization.could_not_determine_game_engine_msg)
+        };
 
     let mut game_type: Option<GameType> = if disable_custom_processing_flag {
         None
@@ -428,7 +396,7 @@ fn main() {
             let ini_file_path: &Path = &input_dir.join("Game.ini");
 
             if ini_file_path.exists() {
-                let ini_file_bytes = read(ini_file_path).unwrap();
+                let ini_file_bytes: Vec<u8> = read(ini_file_path).unwrap();
                 let mut content: String = String::new();
 
                 for encoding in ENCODINGS {
@@ -440,7 +408,7 @@ fn main() {
                 }
 
                 if content.is_empty() {
-                    panic!();
+                    panic!("{}", localization.could_not_decrypt_ini_file_msg);
                 }
 
                 let title_line: &str = content
@@ -465,20 +433,74 @@ fn main() {
         println!("{}", localization.custom_processing_enabled_msg);
     }
 
-    let processing_mode: ProcessingMode = match subcommand_matches
-        .get_one::<String>("processing-mode")
-        .unwrap_or(&String::from("default"))
-        .as_str()
-    {
-        "default" => ProcessingMode::Default,
-        "append" => ProcessingMode::Append,
-        "force" => ProcessingMode::Force,
-        _ => unreachable!(),
+    let mut read_metadata = || {
+        let metadata: Object = unsafe { from_str(&read_to_string(metadata_file_path).unwrap()).unwrap_unchecked() };
+
+        let romanize_metadata: bool = unsafe { metadata["romanize"].as_bool().unwrap_unchecked() };
+        let disable_custom_processing_metadata: bool =
+            unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
+        let maps_processing_mode_metadata: u8 =
+            unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
+
+        if romanize_metadata {
+            println!("{}", localization.enabling_romanize_metadata_msg);
+            romanize_flag = romanize_metadata;
+        }
+
+        if disable_custom_processing_metadata && game_type.is_some() {
+            println!("{}", localization.disabling_custom_processing_metadata_msg);
+            game_type = None;
+        }
+
+        if maps_processing_mode_metadata > 0 {
+            maps_processing_mode_value = unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
+
+            let (before, after) = unsafe {
+                localization
+                    .enabling_maps_processing_mode_metadata_msg
+                    .split_once("  ")
+                    .unwrap_unchecked()
+            };
+
+            println!(
+                "{before} {maps_processing_mode} {after}",
+                maps_processing_mode = match maps_processing_mode_value {
+                    MapsProcessingMode::Default => "default",
+                    MapsProcessingMode::Separate => "separate",
+                    MapsProcessingMode::Preserve => "preserve",
+                },
+            );
+        }
     };
 
     match subcommand {
         "read" => {
             use read::*;
+
+            let processing_mode: ProcessingMode = match subcommand_matches
+                .get_one::<String>("processing-mode")
+                .unwrap_or(&String::from("default"))
+                .as_str()
+            {
+                "default" => ProcessingMode::Default,
+                "append" => ProcessingMode::Append,
+                "force" => ProcessingMode::Force,
+                _ => unreachable!(),
+            };
+
+            *maps_processing_mode_value_mut_ref = match subcommand_matches
+                .get_one::<String>("maps-processing-mode")
+                .unwrap()
+                .as_str()
+            {
+                "default" => MapsProcessingMode::Default,
+                "separate" => MapsProcessingMode::Separate,
+                "preserve" => MapsProcessingMode::Preserve,
+                _ => unreachable!(),
+            };
+
+            let silent_flag: bool = subcommand_matches.get_flag("silent");
+            let ignore_flag: bool = subcommand_matches.get_flag("ignore");
 
             if let Some(archive_path) = archive_path {
                 if archive_path.exists() {
@@ -489,8 +511,6 @@ fn main() {
                         .unwrap();
                 }
             }
-
-            let silent_flag: bool = subcommand_matches.get_flag("silent");
 
             if processing_mode == ProcessingMode::Force && !silent_flag {
                 let start: Instant = Instant::now();
@@ -507,47 +527,7 @@ fn main() {
             }
 
             if metadata_file_path.exists() && processing_mode == ProcessingMode::Append {
-                let metadata: Object =
-                    unsafe { from_str(&read_to_string(metadata_file_path).unwrap()).unwrap_unchecked() };
-
-                let romanize_metadata: bool = unsafe { metadata["romanize"].as_bool().unwrap_unchecked() };
-                let disable_custom_processing_metadata: bool =
-                    unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
-                let maps_processing_mode_metadata: u8 =
-                    unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
-
-                if romanize_metadata {
-                    println!("{}", localization.enabling_romanize_metadata_msg);
-                    romanize_flag = romanize_metadata;
-                }
-
-                if disable_custom_processing_metadata && game_type.is_some() {
-                    println!("{}", localization.disabling_custom_processing_metadata_msg);
-                    game_type = None;
-                }
-
-                if maps_processing_mode_metadata > 0 {
-                    let (before, after) = unsafe {
-                        localization
-                            .enabling_maps_processing_mode_metadata_msg
-                            .split_once("  ")
-                            .unwrap_unchecked()
-                    };
-
-                    maps_processing_mode_value =
-                        unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
-
-                    println!(
-                        "{} {} {}",
-                        before,
-                        match maps_processing_mode_value {
-                            MapsProcessingMode::Default => "default",
-                            MapsProcessingMode::Separate => "separate",
-                            MapsProcessingMode::Preserve => "preserve",
-                        },
-                        after
-                    );
-                }
+                read_metadata();
             }
 
             create_dir_all(output_path).unwrap();
@@ -558,6 +538,9 @@ fn main() {
                     to_string(&json!({"romanize": romanize_flag, "disableCustomProcessing": disable_custom_processing_flag, "mapsProcessingMode": maps_processing_mode_value as u8})).unwrap(),
                 )
                 .unwrap();
+            } else if ignore_flag && !ignore_file_path.exists() {
+                println!("{}", localization.ignore_file_does_not_exist_msg);
+                exit(0);
             }
 
             if !disable_maps_processing {
@@ -570,6 +553,7 @@ fn main() {
                     game_type,
                     engine_type,
                     processing_mode,
+                    ignore_flag,
                 );
             }
 
@@ -582,6 +566,7 @@ fn main() {
                     game_type,
                     processing_mode,
                     engine_type,
+                    ignore_flag,
                 );
             }
 
@@ -593,6 +578,7 @@ fn main() {
                     logging_flag,
                     processing_mode,
                     engine_type,
+                    ignore_flag,
                 );
             }
 
@@ -604,6 +590,7 @@ fn main() {
                         romanize_flag,
                         logging_flag,
                         processing_mode,
+                        ignore_flag,
                     )
                 } else {
                     read_scripts(
@@ -612,6 +599,7 @@ fn main() {
                         romanize_flag,
                         logging_flag,
                         processing_mode,
+                        ignore_flag,
                     );
                 }
             }
@@ -624,58 +612,18 @@ fn main() {
             }
 
             let (data_output_path, plugins_output_path) = if engine_type == EngineType::New {
-                let plugins_output_path: PathBuf = root_dir.join("output/js");
+                let plugins_output_path: PathBuf = output_dir.join("output/js");
                 create_dir_all(&plugins_output_path).unwrap();
 
-                (&root_dir.join("output/data"), Some(plugins_output_path))
+                (&output_dir.join("output/data"), Some(plugins_output_path))
             } else {
-                (&root_dir.join("output/Data"), None)
+                (&output_dir.join("output/Data"), None)
             };
 
             create_dir_all(data_output_path).unwrap();
 
             if metadata_file_path.exists() {
-                let metadata: Object =
-                    unsafe { from_str(&read_to_string(metadata_file_path).unwrap()).unwrap_unchecked() };
-
-                let romanize_metadata: bool = unsafe { metadata["romanize"].as_bool().unwrap_unchecked() };
-                let disable_custom_processing_metadata: bool =
-                    unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
-                let maps_processing_mode_metadata: u8 =
-                    unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
-
-                if romanize_metadata {
-                    println!("{}", localization.enabling_romanize_metadata_msg);
-                    romanize_flag = romanize_metadata;
-                }
-
-                if disable_custom_processing_metadata && game_type.is_some() {
-                    println!("{}", localization.disabling_custom_processing_metadata_msg);
-                    game_type = None;
-                }
-
-                if maps_processing_mode_metadata > 0 {
-                    let (before, after) = unsafe {
-                        localization
-                            .enabling_maps_processing_mode_metadata_msg
-                            .split_once("  ")
-                            .unwrap_unchecked()
-                    };
-
-                    maps_processing_mode_value =
-                        unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
-
-                    println!(
-                        "{} {} {}",
-                        before,
-                        match maps_processing_mode_value {
-                            MapsProcessingMode::Default => "default",
-                            MapsProcessingMode::Separate => "separate",
-                            MapsProcessingMode::Preserve => "preserve",
-                        },
-                        after
-                    );
-                }
+                read_metadata();
             }
 
             if !disable_maps_processing {
@@ -748,47 +696,12 @@ fn main() {
             }
 
             if metadata_file_path.exists() {
-                let metadata: Object =
-                    unsafe { from_str(&read_to_string(metadata_file_path).unwrap()).unwrap_unchecked() };
+                read_metadata();
+            }
 
-                let romanize_metadata: bool = unsafe { metadata["romanize"].as_bool().unwrap_unchecked() };
-                let disable_custom_processing_metadata: bool =
-                    unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
-                let maps_processing_mode_metadata: u8 =
-                    unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
-
-                if romanize_metadata {
-                    println!("{}", localization.enabling_romanize_metadata_msg);
-                    romanize_flag = romanize_metadata;
-                }
-
-                if disable_custom_processing_metadata && game_type.is_some() {
-                    println!("{}", localization.disabling_custom_processing_metadata_msg);
-                    game_type = None;
-                }
-
-                if maps_processing_mode_metadata > 0 {
-                    let (before, after) = unsafe {
-                        localization
-                            .enabling_maps_processing_mode_metadata_msg
-                            .split_once("  ")
-                            .unwrap_unchecked()
-                    };
-
-                    maps_processing_mode_value =
-                        unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
-
-                    println!(
-                        "{} {} {}",
-                        before,
-                        match maps_processing_mode_value {
-                            MapsProcessingMode::Default => "default",
-                            MapsProcessingMode::Separate => "separate",
-                            MapsProcessingMode::Preserve => "preserve",
-                        },
-                        after
-                    );
-                }
+            if maps_processing_mode_value == MapsProcessingMode::Preserve && (stat || create_ignore) {
+                println!("{}", localization.purge_args_incompatible_with_preserve_mode_msg);
+                exit(0);
             }
 
             if !disable_maps_processing {
@@ -866,13 +779,23 @@ fn main() {
             use json::*;
 
             let json_subcommand: &str = subcommand_matches.subcommand_name().unwrap();
+            let processing_mode: ProcessingMode = match subcommand_matches
+                .get_one::<String>("processing-mode")
+                .unwrap_or(&String::from("default"))
+                .as_str()
+            {
+                "default" => ProcessingMode::Default,
+                "append" => ProcessingMode::Append,
+                "force" => ProcessingMode::Force,
+                _ => unreachable!(),
+            };
 
             match json_subcommand {
                 "generate-json" => {
-                    generate_json(original_path, root_dir, engine_type, processing_mode);
+                    generate_json(original_path, input_dir, engine_type, processing_mode);
                 }
                 "write-json" => {
-                    write_json(root_dir);
+                    write_json(input_dir);
                 }
                 _ => unreachable!(),
             }
