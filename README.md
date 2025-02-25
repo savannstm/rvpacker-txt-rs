@@ -34,52 +34,42 @@ You can get help on usage by calling `rvpacker-txt-rs -h.`
 
 ```text
 This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them back to their initial
-form.
+form. The program will always use "original" or "data" directories for original files, and "translation" directory to
+operate with translation files. It will also decrypt any .rgss encrypted archive if it's present.
 
 Usage: rvpacker-txt-rs COMMAND [OPTIONS]
 
 Commands:
   read
-          Parses files from "original" or "data" ("Data") folders of input directory to "translation" folder of output
-          directory. If "Data" directory does not exist and there's an .rgss archive in the input directory, program
-          automatically decrypts it.
+          Parses game files, and decrypts .rgss archive if it's present.
   write
-          Writes translated files using original files from "original" or "data" ("Data") folders of input directory and
-          writes results to "output" folder of output directory.
-  migrate
-          Migrates v1/v2 projects to v3 format. Note: maps names are implemented differently in v3, so you should do
-          read --append after migrate, and then insert translated maps names next to Mapxxx.json comments that contain
-          an original map name.
+          Writes translated game files to the "output" directory.
+  purge
+          Purges lines from ".txt" translation files.
+  json
+          Provides the commands for JSON generation and writing.
 
 Options:
   -i, --input-dir <INPUT_PATH>
-          When reading: Input directory, containing folder "original" or "data" ("Data") with original game files.
-          When writing: Input directory, containing folder "original" or "data" ("Data") with original game files, and
-          folder "translation" with translation .txt files.
+          Input directory, containing game files.
   -o, --output-dir <OUTPUT_PATH>
-          When reading: Output directory, where a "translation" folder with translation .txt files will be created.
-          When writing: Output directory, where an "output" folder with "data" ("Data") and/or "js" subfolders with game
-          files with translated text from .txt files will be created.
+          Output directory to output files to.
       --disable-processing <FILES>
-          Skips processing specified files.
+          Skips processing specified files. plugins can be used interchangeably with scripts.
           Example: --disable-processing=maps,other,system
-          [Allowed values: maps, other, system, plugins]
+          [Allowed values: maps, other, system, plugins, scripts]
           [Aliases: no]
   -r, --romanize
           If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation
-          marks, it automatically replaces these symbols by their roman equivalents (in this case, ''). This flag will
-          automatically be used when writing if you parsed game text with it.
-      --maps-processing-mode <MODE>
-          How to process maps.
-          default - Ignore all previously encountered text duplicates
-          separate - For each new map, reset the set of previously encountered text duplicates
-          preserve - Allow all text duplicates.
-          [Allowed values: default, separate, preserve]
-          [Default value: default]
-          [Aliases: maps-mode]
+          marks, it automatically replaces these symbols by their roman equivalents (in this case, '').
+          This argument will automatically be set on write/read with --mode append/purge commands if you parsed game
+          text with it.
+  -v, --version
+          Show program's version.
       --disable-custom-processing
-          Disables built-in custom processing, implemented for some games. This flag will automatically be used when
-          writing if you parsed game text with it.
+          Disables built-in custom processing, implemented for some games.
+          This argument will automatically be set on write/read with --mode append/purge commands if you parsed game
+          text with it.
           [Aliases: no-custom]
   -l, --language <LANGUAGE>
           Sets the localization of the tool to the selected language.
@@ -96,8 +86,6 @@ Examples:
 `rvpacker-txt-rs read --input-dir "E:/Documents/RPGMakerGame"` parses the text of the game into the `translation` folder of the specified directory.
 
 `rvpacker-txt-rs write --input-dir "E:/Documents/RPGMakerGame"` will write the translation from the \_trans files of the `translation` folder to compatible files in the `output` folder.
-
-The tool does not parse text from a plugins.js file since it is very difficult to isolate the text displayed in the game from the plugins.
 
 ## License
 
