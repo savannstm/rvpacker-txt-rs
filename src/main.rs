@@ -598,6 +598,7 @@ fn main() {
                         output_path,
                         romanize_flag,
                         logging_flag,
+                        engine_type,
                         processing_mode,
                         ignore_flag,
                     );
@@ -704,6 +705,9 @@ fn main() {
                 exit(0);
             }
 
+            let mut ignore_map: IgnoreMap = IgnoreMap::default();
+            let mut stat_vec: Vec<(String, String)> = Vec::new();
+
             if !disable_maps_processing {
                 purge_map(
                     original_path,
@@ -717,6 +721,8 @@ fn main() {
                     leave_filled,
                     purge_empty,
                     create_ignore,
+                    &mut ignore_map,
+                    &mut stat_vec,
                 );
             }
 
@@ -732,6 +738,8 @@ fn main() {
                     leave_filled,
                     purge_empty,
                     create_ignore,
+                    &mut ignore_map,
+                    &mut stat_vec,
                 );
             }
 
@@ -746,6 +754,8 @@ fn main() {
                     leave_filled,
                     purge_empty,
                     create_ignore,
+                    &mut ignore_map,
+                    &mut stat_vec,
                 );
             }
 
@@ -760,6 +770,8 @@ fn main() {
                         leave_filled,
                         purge_empty,
                         create_ignore,
+                        &mut ignore_map,
+                        &mut stat_vec,
                     )
                 } else {
                     purge_scripts(
@@ -771,8 +783,18 @@ fn main() {
                         leave_filled,
                         purge_empty,
                         create_ignore,
+                        &mut ignore_map,
+                        &mut stat_vec,
                     );
                 }
+            }
+
+            if create_ignore {
+                write_ignore(ignore_map, output_path);
+            }
+
+            if stat {
+                write_stat(stat_vec, output_path);
             }
         }
         "json" => {
