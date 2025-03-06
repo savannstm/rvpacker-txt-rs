@@ -4,15 +4,14 @@
 
 ## General
 
-This tool is designed to read RPG Maker game files into .txt files and write them back to their initial form.
+This tool is designed to read RPG Maker game files into `.txt` files and write them back to their initial form.
 
-This tool inherits its name from the original `rvpacker` tool, which was created for those versions of RPG Maker that did not use .json files, and parsed files into YAML. Now, rvpacker's repository is deleted/privated and the page of the author of this repository is not available as well.
+This tool inherits its name from the original `rvpacker` tool, which was created for those versions of RPG Maker that did not use .json files, and parsed files into YAML. Now, `rvpacker`'s repository is deleted.
 
 The same deprecated tool, written in Ruby, can be found in [rvpacker-txt repository](https://github.com/savannstm/rvpacker-txt).
 
-[A GUI](https://github.com/savannstm/rpgmtranslate) that allows comfortably edit parsed files (and it also automatically parses unparsed games when you select their folder) (and you also can easily write files back to their initial with a single button click).
-
-An underlying library for this CLI can be found [here](https://github.com/savannstm/rvpacker-txt-rs-lib);
+There's [a GUI](https://github.com/savannstm/rpgmtranslate), that allows you comfortably edit files.
+An underlying library for this CLI can be found [here](https://github.com/savannstm/rvpacker-txt-rs-lib).
 
 ## The format of output files
 
@@ -20,13 +19,13 @@ An underlying library for this CLI can be found [here](https://github.com/savann
 At the end of each original line, `<#>` is inserted. This is a delimiter after which translated text should start. Removing it or erasing one of its symbols will lead to crashes, or worse, undefined behavior. **So remember: your translated text goes after the `<#>` delimiter.**
 
 For an example on how to properly translate the .txt files, refer to [My Fear & Hunger 2: Termina Russian translation](https://github.com/savannstm/fh2-termina-translation).
-Yeah, translation is Russian, but the point is to get how to properly translate this program's output files.
+Translation is Russian, but the point is to get how to properly translate this program's translation files.
 
 ## Installation
 
 You can download binary files in the Releases section.
 
-Files with the .exe extension are designed for Windows x64, while files without an extension are designed for Linux x64.
+Files with the `.exe` extension are designed for Windows x64, while files without an extension are designed for Linux x64.
 
 ## Usage
 
@@ -83,11 +82,10 @@ Options:
 
 Examples:
 
-`rvpacker-txt-rs read --input-dir "E:/Documents/RPGMakerGame"` parses the text of the game into the `translation` folder of the specified directory.
+`rvpacker-txt-rs read -i "E:/Documents/RPGMakerGame"` parses the text of the game into the `translation` folder of the specified directory.
 
-`rvpacker-txt-rs write --input-dir "E:/Documents/RPGMakerGame"` will write the translation from the \_trans files of the `translation` folder to compatible files in the `output` folder.
+`rvpacker-txt-rs write -i "E:/Documents/RPGMakerGame"` writes the translation from `.txt` files of the `translation` folder to RPG Maker files in the `output` folder.
 
 ## License
 
 The repository is licensed under [WTFPL](http://www.wtfpl.net/).
-This means that you can use and modify the program in any way. You can do what the fuck you want to.
