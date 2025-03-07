@@ -2,7 +2,7 @@ use crate::localization::*;
 use clap::{crate_version, value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
 use rpgmad_lib::Decrypter;
-use rvpacker_lib::{json, purge, read, read_to_string_without_bom, types::*, write};
+use rvpacker_lib::{json, parse_ignore, purge, read, read_to_string_without_bom, types::*, write};
 use sonic_rs::{from_str, json, prelude::*, to_string, Object};
 use std::{
     env,
@@ -706,6 +706,11 @@ fn main() {
             }
 
             let mut ignore_map: IgnoreMap = IgnoreMap::default();
+
+            if create_ignore && output_path.join(".rvpacker-ignore").exists() {
+                ignore_map = parse_ignore(output_path.join(".rvpacker-ignore"));
+            }
+
             let mut stat_vec: Vec<(String, String)> = Vec::new();
 
             if !disable_maps_processing {
