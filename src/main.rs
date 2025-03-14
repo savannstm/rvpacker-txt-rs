@@ -337,17 +337,16 @@ fn main() {
         original_path = &data_path;
     }
 
-    let output_path: &PathBuf = &output_dir.join("translation");
-    let metadata_file_path: &Path = &output_path.join(".rvpacker-metadata");
-    let ignore_file_path: &Path = &output_path.join(".rvpacker-ignore");
+    let translation_path: &PathBuf = &output_dir.join("translation");
+    let metadata_file_path: &Path = &translation_path.join(".rvpacker-metadata");
+    let ignore_file_path: &Path = &translation_path.join(".rvpacker-ignore");
 
-    let logging_flag: bool = matches.get_flag("log");
-    let disable_custom_processing_flag: bool = matches.get_flag("disable-custom-processing");
-    let mut romanize_flag: bool = matches.get_flag("romanize");
+    let logging: bool = matches.get_flag("log");
+    let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
+    let mut romanize: bool = matches.get_flag("romanize");
 
-    let mut maps_processing_mode_value: MapsProcessingMode = MapsProcessingMode::Default;
-    let maps_processing_mode_value_mut_ref =
-        unsafe { &mut *(&mut maps_processing_mode_value as *mut MapsProcessingMode) };
+    let mut maps_processing_mode: MapsProcessingMode = MapsProcessingMode::Default;
+    let maps_processing_mode_value_mut = unsafe { &mut *(&mut maps_processing_mode as *mut MapsProcessingMode) };
 
     let (engine_type, system_file_path, archive_path, scripts_file_path, plugins_file_path) =
         if original_path.join("System.json").exists() {
@@ -386,7 +385,7 @@ fn main() {
             panic!("{}", localization.could_not_determine_game_engine_msg)
         };
 
-    let mut game_type: Option<GameType> = if disable_custom_processing_flag {
+    let mut game_type: Option<GameType> = if disable_custom_processing {
         None
     } else {
         let game_title: String = if engine_type == EngineType::New {
@@ -444,7 +443,7 @@ fn main() {
 
         if romanize_metadata {
             println!("{}", localization.enabling_romanize_metadata_msg);
-            romanize_flag = romanize_metadata;
+            romanize = romanize_metadata;
         }
 
         if disable_custom_processing_metadata && game_type.is_some() {
@@ -453,7 +452,7 @@ fn main() {
         }
 
         if maps_processing_mode_metadata > 0 {
-            maps_processing_mode_value = unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
+            maps_processing_mode = unsafe { transmute::<u8, MapsProcessingMode>(maps_processing_mode_metadata) };
 
             let (before, after) = unsafe {
                 localization
@@ -464,7 +463,7 @@ fn main() {
 
             println!(
                 "{before} {maps_processing_mode} {after}",
-                maps_processing_mode = match maps_processing_mode_value {
+                maps_processing_mode = match maps_processing_mode {
                     MapsProcessingMode::Default => "default",
                     MapsProcessingMode::Separate => "separate",
                     MapsProcessingMode::Preserve => "preserve",
@@ -488,7 +487,7 @@ fn main() {
                 _ => unreachable!(),
             };
 
-            *maps_processing_mode_value_mut_ref = match subcommand_matches
+            *maps_processing_mode_value_mut = match subcommand_matches
                 .get_one::<String>("maps-processing-mode")
                 .unwrap()
                 .as_str()
@@ -500,7 +499,7 @@ fn main() {
             };
 
             let silent_flag: bool = subcommand_matches.get_flag("silent");
-            let ignore_flag: bool = subcommand_matches.get_flag("ignore");
+            let ignore: bool = subcommand_matches.get_flag("ignore");
 
             if let Some(archive_path) = archive_path {
                 if archive_path.exists() {
@@ -530,85 +529,71 @@ fn main() {
                 read_metadata();
             }
 
-            create_dir_all(output_path).unwrap();
+            create_dir_all(translation_path).unwrap();
 
             if processing_mode != ProcessingMode::Append {
                 write(
                     metadata_file_path,
-                    to_string(&json!({"romanize": romanize_flag, "disableCustomProcessing": disable_custom_processing_flag, "mapsProcessingMode": maps_processing_mode_value as u8})).unwrap(),
+                    to_string(&json!({"romanize": romanize, "disableCustomProcessing": disable_custom_processing, "mapsProcessingMode": maps_processing_mode as u8})).unwrap(),
                 )
                 .unwrap();
-            } else if ignore_flag && !ignore_file_path.exists() {
+            } else if ignore && !ignore_file_path.exists() {
                 println!("{}", localization.ignore_file_does_not_exist_msg);
                 exit(0);
             }
 
             if !disable_maps_processing {
-                read_map(
-                    original_path,
-                    output_path,
-                    maps_processing_mode_value,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    engine_type,
-                    processing_mode,
-                    ignore_flag,
-                );
+                MapReader::new(original_path, translation_path, engine_type)
+                    .romanize(romanize)
+                    .game_type(game_type)
+                    .processing_mode(processing_mode)
+                    .maps_processing_mode(maps_processing_mode)
+                    .logging(logging)
+                    .ignore(ignore)
+                    .read();
             }
 
             if !disable_other_processing {
-                read_other(
-                    original_path,
-                    output_path,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    processing_mode,
-                    engine_type,
-                    ignore_flag,
-                );
+                OtherReader::new(original_path, translation_path, engine_type)
+                    .romanize(romanize)
+                    .game_type(game_type)
+                    .processing_mode(processing_mode)
+                    .logging(logging)
+                    .ignore(ignore)
+                    .read();
             }
 
             if !disable_system_processing {
-                read_system(
-                    &system_file_path,
-                    output_path,
-                    romanize_flag,
-                    logging_flag,
-                    processing_mode,
-                    engine_type,
-                    ignore_flag,
-                );
+                SystemReader::new(&system_file_path, translation_path, engine_type)
+                    .romanize(romanize)
+                    .processing_mode(processing_mode)
+                    .logging(logging)
+                    .ignore(ignore)
+                    .read();
             }
 
             if !disable_plugins_processing {
                 if engine_type == EngineType::New {
-                    read_plugins(
-                        &unsafe { plugins_file_path.unwrap_unchecked() },
-                        output_path,
-                        romanize_flag,
-                        logging_flag,
-                        processing_mode,
-                        ignore_flag,
-                    )
+                    PluginReader::new(&plugins_file_path.unwrap(), translation_path)
+                        .romanize(romanize)
+                        .processing_mode(processing_mode)
+                        .logging(logging)
+                        .ignore(ignore)
+                        .read();
                 } else {
-                    read_scripts(
-                        &unsafe { scripts_file_path.unwrap_unchecked() },
-                        output_path,
-                        romanize_flag,
-                        logging_flag,
-                        engine_type,
-                        processing_mode,
-                        ignore_flag,
-                    );
+                    ScriptReader::new(&scripts_file_path.unwrap(), translation_path)
+                        .romanize(romanize)
+                        .processing_mode(processing_mode)
+                        .logging(logging)
+                        .ignore(ignore)
+                        .read();
                 }
             }
         }
         "write" => {
             use write::*;
 
-            if !output_path.exists() {
+            if !translation_path.exists() {
                 panic!("{}", localization.translation_dir_missing);
             }
 
@@ -628,59 +613,45 @@ fn main() {
             }
 
             if !disable_maps_processing {
-                write_maps(
-                    output_path,
-                    original_path,
-                    data_output_path,
-                    maps_processing_mode_value,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    engine_type,
-                );
+                MapWriter::new(original_path, translation_path, data_output_path, engine_type)
+                    .maps_processing_mode(maps_processing_mode)
+                    .romanize(romanize)
+                    .logging(logging)
+                    .game_type(game_type);
             }
 
             if !disable_other_processing {
-                write_other(
-                    output_path,
-                    original_path,
-                    data_output_path,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    engine_type,
-                );
+                OtherWriter::new(original_path, translation_path, data_output_path, engine_type)
+                    .romanize(romanize)
+                    .logging(logging)
+                    .game_type(game_type);
             }
 
             if !disable_system_processing {
-                write_system(
-                    &system_file_path,
-                    output_path,
-                    data_output_path,
-                    romanize_flag,
-                    logging_flag,
-                    engine_type,
-                );
+                SystemWriter::new(&system_file_path, translation_path, data_output_path, engine_type)
+                    .romanize(romanize)
+                    .logging(logging);
             }
 
             if !disable_plugins_processing {
                 if engine_type == EngineType::New {
-                    write_plugins(
-                        &unsafe { plugins_file_path.unwrap_unchecked() },
-                        output_path,
-                        &unsafe { plugins_output_path.unwrap_unchecked() },
-                        logging_flag,
-                        romanize_flag,
-                    );
-                } else {
-                    write_scripts(
-                        &unsafe { scripts_file_path.unwrap_unchecked() },
-                        output_path,
-                        data_output_path,
-                        romanize_flag,
-                        logging_flag,
+                    SystemWriter::new(
+                        &plugins_file_path.unwrap(),
+                        translation_path,
+                        &plugins_output_path.unwrap(),
                         engine_type,
                     )
+                    .romanize(romanize)
+                    .logging(logging);
+                } else {
+                    SystemWriter::new(
+                        &scripts_file_path.unwrap(),
+                        translation_path,
+                        data_output_path,
+                        engine_type,
+                    )
+                    .romanize(romanize)
+                    .logging(logging);
                 }
             }
         }
@@ -692,114 +663,91 @@ fn main() {
             let leave_filled: bool = subcommand_matches.get_flag("leave-filled");
             let create_ignore: bool = subcommand_matches.get_flag("create-ignore");
 
-            if stat && output_path.join("stat.txt").exists() {
-                remove_file(output_path.join("stat.txt")).unwrap();
+            if stat && translation_path.join("stat.txt").exists() {
+                remove_file(translation_path.join("stat.txt")).unwrap();
             }
 
             if metadata_file_path.exists() {
                 read_metadata();
             }
 
-            if maps_processing_mode_value == MapsProcessingMode::Preserve && (stat || create_ignore) {
+            if maps_processing_mode == MapsProcessingMode::Preserve && (stat || create_ignore) {
                 println!("{}", localization.purge_args_incompatible_with_preserve_mode_msg);
                 exit(0);
             }
 
             let mut ignore_map: IgnoreMap = IgnoreMap::default();
 
-            if create_ignore && output_path.join(".rvpacker-ignore").exists() {
-                ignore_map = parse_ignore(output_path.join(".rvpacker-ignore"));
+            if create_ignore && translation_path.join(".rvpacker-ignore").exists() {
+                ignore_map = parse_ignore(translation_path.join(".rvpacker-ignore"));
             }
 
             let mut stat_vec: Vec<(String, String)> = Vec::new();
 
             if !disable_maps_processing {
-                purge_map(
-                    original_path,
-                    output_path,
-                    maps_processing_mode_value,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    engine_type,
-                    stat,
-                    leave_filled,
-                    purge_empty,
-                    create_ignore,
-                    &mut ignore_map,
-                    &mut stat_vec,
-                );
+                MapPurger::new(original_path, translation_path, engine_type)
+                    .maps_processing_mode(maps_processing_mode)
+                    .romanize(romanize)
+                    .logging(logging)
+                    .game_type(game_type)
+                    .stat(stat)
+                    .leave_filled(leave_filled)
+                    .purge_empty(purge_empty)
+                    .create_ignore(create_ignore)
+                    .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 
             if !disable_other_processing {
-                purge_other(
-                    original_path,
-                    output_path,
-                    romanize_flag,
-                    logging_flag,
-                    game_type,
-                    engine_type,
-                    stat,
-                    leave_filled,
-                    purge_empty,
-                    create_ignore,
-                    &mut ignore_map,
-                    &mut stat_vec,
-                );
+                OtherPurger::new(original_path, translation_path, engine_type)
+                    .romanize(romanize)
+                    .logging(logging)
+                    .game_type(game_type)
+                    .stat(stat)
+                    .leave_filled(leave_filled)
+                    .purge_empty(purge_empty)
+                    .create_ignore(create_ignore)
+                    .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 
             if !disable_system_processing {
-                purge_system(
-                    &system_file_path,
-                    output_path,
-                    romanize_flag,
-                    logging_flag,
-                    engine_type,
-                    stat,
-                    leave_filled,
-                    purge_empty,
-                    create_ignore,
-                    &mut ignore_map,
-                    &mut stat_vec,
-                );
+                SystemPurger::new(&system_file_path, translation_path, engine_type)
+                    .romanize(romanize)
+                    .logging(logging)
+                    .stat(stat)
+                    .leave_filled(leave_filled)
+                    .purge_empty(purge_empty)
+                    .create_ignore(create_ignore)
+                    .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 
             if !disable_plugins_processing {
                 if engine_type == EngineType::New {
-                    purge_plugins(
-                        &unsafe { plugins_file_path.unwrap_unchecked() },
-                        output_path,
-                        romanize_flag,
-                        logging_flag,
-                        stat,
-                        leave_filled,
-                        purge_empty,
-                        create_ignore,
-                        &mut ignore_map,
-                        &mut stat_vec,
-                    )
+                    PluginPurger::new(&plugins_file_path.unwrap(), translation_path)
+                        .romanize(romanize)
+                        .logging(logging)
+                        .stat(stat)
+                        .leave_filled(leave_filled)
+                        .purge_empty(purge_empty)
+                        .create_ignore(create_ignore)
+                        .purge(Some(&mut ignore_map), Some(&mut stat_vec));
                 } else {
-                    purge_scripts(
-                        &unsafe { scripts_file_path.unwrap_unchecked() },
-                        output_path,
-                        romanize_flag,
-                        logging_flag,
-                        stat,
-                        leave_filled,
-                        purge_empty,
-                        create_ignore,
-                        &mut ignore_map,
-                        &mut stat_vec,
-                    );
+                    ScriptPurger::new(&scripts_file_path.unwrap(), translation_path)
+                        .romanize(romanize)
+                        .logging(logging)
+                        .stat(stat)
+                        .leave_filled(leave_filled)
+                        .purge_empty(purge_empty)
+                        .create_ignore(create_ignore)
+                        .purge(Some(&mut ignore_map), Some(&mut stat_vec));
                 }
             }
 
             if create_ignore {
-                write_ignore(ignore_map, output_path);
+                write_ignore(ignore_map, translation_path);
             }
 
             if stat {
-                write_stat(stat_vec, output_path);
+                write_stat(stat_vec, translation_path);
             }
         }
         "json" => {
