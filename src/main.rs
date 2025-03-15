@@ -91,7 +91,7 @@ fn main() {
         .value_parser(value_parser!(PathBuf))
         .default_value(cwd.clone())
         .hide_default_value(true)
-        .display_order(0);
+        .display_order(1);
 
     let output_dir_arg: Arg = Arg::new("output-dir")
         .short('o')
@@ -101,31 +101,7 @@ fn main() {
         .value_parser(value_parser!(PathBuf))
         .default_value(cwd.clone())
         .hide_default_value(true)
-        .display_order(1);
-
-    let disable_processing_arg: Arg = Arg::new("disable-processing")
-        .long("disable-processing")
-        .alias("no")
-        .value_delimiter(',')
-        .value_name(localization.disable_processing_arg_type)
-        .help(cformat!(
-            "{}\n{} --disable-processing=maps,other,system\n<bold>[{} maps, other, system, plugins, scripts]\n[{} no]</>",
-            localization.disable_processing_arg_desc,
-            localization.example,
-            localization.possible_values,
-            localization.aliases
-        ))
-        .global(true)
-        .value_parser(["maps", "other", "system", "plugins", "scripts"])
-        .display_order(3);
-
-    let romanize_arg: Arg = Arg::new("romanize")
-        .short('r')
-        .long("romanize")
-        .global(true)
-        .action(ArgAction::SetTrue)
-        .help(localization.romanize_desc)
-        .display_order(4);
+        .display_order(2);
 
     let processing_mode_arg: Arg = Arg::new("processing-mode")
         .short('p')
@@ -141,47 +117,8 @@ fn main() {
             localization.possible_values,
             localization.default_value,
             localization.aliases
-        ));
-
-    let disable_custom_processing_flag: Arg = Arg::new("disable-custom-processing")
-        .long("disable-custom-processing")
-        .alias("no-custom")
-        .action(ArgAction::SetTrue)
-        .global(true)
-        .help(cformat!(
-            "{}\n<bold>[{} no-custom]</>",
-            localization.disable_custom_processing_desc,
-            localization.aliases
         ))
-        .display_order(97);
-
-    let language_arg: Arg = Arg::new("language")
-        .short('l')
-        .long("language")
-        .value_name(localization.language_arg_type)
-        .global(true)
-        .help(cformat!(
-            "{}\n{} --language en<bold>\n[{} en, ru]</>",
-            localization.language_arg_desc,
-            localization.example,
-            localization.possible_values,
-        ))
-        .value_parser(["en", "ru"])
-        .display_order(98);
-
-    let log_flag: Arg = Arg::new("log")
-        .long("log")
-        .action(ArgAction::SetTrue)
-        .global(true)
-        .help(localization.log_arg_desc)
-        .display_order(99);
-
-    let help_flag: Arg = Arg::new("help")
-        .short('h')
-        .long("help")
-        .help(localization.help_arg_desc)
-        .action(ArgAction::Help)
-        .display_order(100);
+        .display_order(3);
 
     let maps_processing_mode_arg: Arg = Arg::new("maps-processing-mode")
         .long("maps-processing-mode")
@@ -196,55 +133,166 @@ fn main() {
         .value_name(localization.mode_arg_type)
         .hide_default_value(true)
         .value_parser(["default", "separate", "preserve"])
-        .default_value("default");
+        .default_value("default")
+        .display_order(4);
 
-    let silent_flag: Arg = Arg::new("silent").long("silent").hide(true).action(ArgAction::SetTrue);
+    let romanize_flag: Arg = Arg::new("romanize")
+        .short('r')
+        .long("romanize")
+        .global(true)
+        .action(ArgAction::SetTrue)
+        .help(localization.romanize_desc)
+        .display_order(5);
+
+    let trim_flag: Arg = Arg::new("trim")
+        .help(localization.trim_flag_desc)
+        .long("trim")
+        .action(ArgAction::SetTrue)
+        .display_order(6);
+
+    let sort_flag: Arg = Arg::new("sort")
+        .help(localization.sort_flag_desc)
+        .long("sort")
+        .action(ArgAction::SetTrue)
+        .display_order(7);
 
     let ignore_flag: Arg = Arg::new("ignore")
         .help(localization.ignore_flag_desc)
         .long("ignore")
-        .action(ArgAction::SetTrue);
-
-    let read_subcommand: Command = Command::new("read")
-        .disable_help_flag(true)
-        .help_template(localization.subcommand_help_template)
-        .about(localization.read_command_desc)
-        .args([processing_mode_arg, silent_flag, ignore_flag])
-        .args([&output_dir_arg, &maps_processing_mode_arg, &help_flag]);
-
-    let write_subcommand: Command = Command::new("write")
-        .disable_help_flag(true)
-        .help_template(localization.subcommand_help_template)
-        .about(localization.write_command_desc)
-        .args([&output_dir_arg, &maps_processing_mode_arg, &help_flag]);
+        .action(ArgAction::SetTrue)
+        .display_order(8);
 
     let stat_flag: Arg = Arg::new("stat")
         .help(localization.stat_arg_desc)
         .long("stat")
         .short('s')
-        .action(ArgAction::SetTrue);
+        .action(ArgAction::SetTrue)
+        .display_order(20);
 
     let leave_filled_flag: Arg = Arg::new("leave-filled")
         .help(localization.leave_filled_flag_desc)
         .long("leave-filled")
-        .action(ArgAction::SetTrue);
+        .action(ArgAction::SetTrue)
+        .display_order(21);
 
     let purge_empty_flag: Arg = Arg::new("purge-empty")
         .help(localization.purge_empty_flag_desc)
         .long("purge-empty")
-        .action(ArgAction::SetTrue);
+        .action(ArgAction::SetTrue)
+        .display_order(22);
 
     let create_ignore_flag: Arg = Arg::new("create-ignore")
         .help(localization.create_ignore_flag_desc)
         .long("create-ignore")
-        .action(ArgAction::SetTrue);
+        .action(ArgAction::SetTrue)
+        .display_order(23);
+
+    let disable_custom_processing_flag: Arg = Arg::new("disable-custom-processing")
+        .long("disable-custom-processing")
+        .alias("no-custom")
+        .action(ArgAction::SetTrue)
+        .global(true)
+        .help(cformat!(
+            "{}\n<bold>[{} no-custom]</>",
+            localization.disable_custom_processing_desc,
+            localization.aliases
+        ))
+        .display_order(93);
+
+    let disable_processing_arg: Arg = Arg::new("disable-processing")
+    .long("disable-processing")
+    .alias("no")
+    .value_delimiter(',')
+    .value_name(localization.disable_processing_arg_type)
+    .help(cformat!(
+        "{}\n{} --disable-processing=\"maps,other,system\"\n<bold>[{} maps, other, system, plugins, scripts]\n[{} no]</>",
+        localization.disable_processing_arg_desc,
+        localization.example,
+        localization.possible_values,
+        localization.aliases
+    ))
+    .global(true)
+    .value_parser(["maps", "other", "system", "plugins", "scripts"])
+    .display_order(94);
+
+    let language_arg: Arg = Arg::new("language")
+        .short('l')
+        .long("language")
+        .value_name(localization.language_arg_type)
+        .global(true)
+        .help(cformat!(
+            "{}\n{} --language en<bold>\n[{} en, ru]</>",
+            localization.language_arg_desc,
+            localization.example,
+            localization.possible_values,
+        ))
+        .value_parser(["en", "ru"])
+        .display_order(95);
+
+    let log_flag: Arg = Arg::new("log")
+        .long("log")
+        .action(ArgAction::SetTrue)
+        .global(true)
+        .help(localization.log_arg_desc)
+        .display_order(96);
+
+    let version_flag: Arg = Arg::new("version")
+        .short('v')
+        .long("version")
+        .action(ArgAction::Version)
+        .help(localization.version_flag_desc)
+        .display_order(98);
+
+    let help_flag: Arg = Arg::new("help")
+        .short('h')
+        .long("help")
+        .help(localization.help_arg_desc)
+        .action(ArgAction::Help)
+        .display_order(99);
+
+    let silent_flag: Arg = Arg::new("silent").long("silent").hide(true).action(ArgAction::SetTrue);
+
+    let read_subcommand: Command = Command::new("read")
+        .disable_help_flag(true)
+        .help_template(localization.subcommand_help_template)
+        .about(localization.read_command_desc)
+        .args([processing_mode_arg, silent_flag, ignore_flag, sort_flag])
+        .args([
+            &output_dir_arg,
+            &maps_processing_mode_arg,
+            &help_flag,
+            &trim_flag,
+            &romanize_flag,
+            &disable_custom_processing_flag,
+            &disable_processing_arg,
+        ]);
+
+    let write_subcommand: Command = Command::new("write")
+        .disable_help_flag(true)
+        .help_template(localization.subcommand_help_template)
+        .about(localization.write_command_desc)
+        .args([
+            &output_dir_arg,
+            &maps_processing_mode_arg,
+            &help_flag,
+            &trim_flag,
+            &romanize_flag,
+            &disable_custom_processing_flag,
+            &disable_processing_arg,
+        ]);
 
     let purge_subcommand: Command = Command::new("purge")
         .disable_help_flag(true)
         .help_template(localization.subcommand_help_template)
         .about(localization.purge_command_desc)
         .args([stat_flag, leave_filled_flag, purge_empty_flag, create_ignore_flag])
-        .arg(&help_flag);
+        .args([
+            &help_flag,
+            &trim_flag,
+            &romanize_flag,
+            &disable_custom_processing_flag,
+            &disable_processing_arg,
+        ]);
 
     let generate_json_subcommand: Command = Command::new("generate-json")
         .about(localization.generate_json_command_desc)
@@ -263,12 +311,6 @@ fn main() {
         .subcommands([generate_json_subcommand, write_json_subcommand])
         .arg(&help_flag);
 
-    let version_flag: Arg = Arg::new("version")
-        .short('v')
-        .long("version")
-        .action(ArgAction::Version)
-        .help(localization.version_flag_desc);
-
     let cli: Command = Command::new("")
         .version(crate_version!())
         .disable_version_flag(true)
@@ -282,10 +324,7 @@ fn main() {
         .args([
             input_dir_arg,
             output_dir_arg,
-            disable_processing_arg,
-            romanize_arg,
             language_arg,
-            disable_custom_processing_flag,
             log_flag,
             help_flag,
             version_flag,
@@ -344,6 +383,7 @@ fn main() {
     let logging: bool = matches.get_flag("log");
     let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
     let mut romanize: bool = matches.get_flag("romanize");
+    let mut trim: bool = matches.get_flag("trim");
 
     let mut maps_processing_mode: MapsProcessingMode = MapsProcessingMode::Default;
     let maps_processing_mode_value_mut = unsafe { &mut *(&mut maps_processing_mode as *mut MapsProcessingMode) };
@@ -440,6 +480,7 @@ fn main() {
             unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
         let maps_processing_mode_metadata: u8 =
             unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
+        let trim_metadata = metadata["trim"].as_bool().unwrap_or(true);
 
         if romanize_metadata {
             println!("{}", localization.enabling_romanize_metadata_msg);
@@ -449,6 +490,11 @@ fn main() {
         if disable_custom_processing_metadata && game_type.is_some() {
             println!("{}", localization.disabling_custom_processing_metadata_msg);
             game_type = None;
+        }
+
+        if trim_metadata {
+            println!("{}", localization.enabling_trim_metadata_msg);
+            trim = trim_metadata;
         }
 
         if maps_processing_mode_metadata > 0 {
@@ -498,8 +544,9 @@ fn main() {
                 _ => unreachable!(),
             };
 
-            let silent_flag: bool = subcommand_matches.get_flag("silent");
+            let silent: bool = subcommand_matches.get_flag("silent");
             let ignore: bool = subcommand_matches.get_flag("ignore");
+            let sort: bool = subcommand_matches.get_flag("sort");
 
             if let Some(archive_path) = archive_path {
                 if archive_path.exists() {
@@ -511,7 +558,7 @@ fn main() {
                 }
             }
 
-            if processing_mode == ProcessingMode::Force && !silent_flag {
+            if processing_mode == ProcessingMode::Force && !silent {
                 let start: Instant = Instant::now();
                 println!("{}", localization.force_mode_warning);
 
@@ -534,7 +581,7 @@ fn main() {
             if processing_mode != ProcessingMode::Append {
                 write(
                     metadata_file_path,
-                    to_string(&json!({"romanize": romanize, "disableCustomProcessing": disable_custom_processing, "mapsProcessingMode": maps_processing_mode as u8})).unwrap(),
+                    to_string(&json!({"romanize": romanize, "disableCustomProcessing": disable_custom_processing, "mapsProcessingMode": maps_processing_mode as u8, "trim": trim})).unwrap(),
                 )
                 .unwrap();
             } else if ignore && !ignore_file_path.exists() {
@@ -550,6 +597,8 @@ fn main() {
                     .maps_processing_mode(maps_processing_mode)
                     .logging(logging)
                     .ignore(ignore)
+                    .trim(trim)
+                    .sort(sort)
                     .read();
             }
 
@@ -560,6 +609,8 @@ fn main() {
                     .processing_mode(processing_mode)
                     .logging(logging)
                     .ignore(ignore)
+                    .trim(trim)
+                    .sort(sort)
                     .read();
             }
 
@@ -569,6 +620,8 @@ fn main() {
                     .processing_mode(processing_mode)
                     .logging(logging)
                     .ignore(ignore)
+                    .trim(trim)
+                    .sort(sort)
                     .read();
             }
 
@@ -579,6 +632,7 @@ fn main() {
                         .processing_mode(processing_mode)
                         .logging(logging)
                         .ignore(ignore)
+                        .sort(sort)
                         .read();
                 } else {
                     ScriptReader::new(&scripts_file_path.unwrap(), translation_path)
@@ -586,6 +640,7 @@ fn main() {
                         .processing_mode(processing_mode)
                         .logging(logging)
                         .ignore(ignore)
+                        .sort(sort)
                         .read();
                 }
             }
@@ -617,20 +672,25 @@ fn main() {
                     .maps_processing_mode(maps_processing_mode)
                     .romanize(romanize)
                     .logging(logging)
-                    .game_type(game_type);
+                    .game_type(game_type)
+                    .trim(trim)
+                    .write();
             }
 
             if !disable_other_processing {
                 OtherWriter::new(original_path, translation_path, data_output_path, engine_type)
                     .romanize(romanize)
                     .logging(logging)
-                    .game_type(game_type);
+                    .game_type(game_type)
+                    .trim(trim)
+                    .write();
             }
 
             if !disable_system_processing {
                 SystemWriter::new(&system_file_path, translation_path, data_output_path, engine_type)
                     .romanize(romanize)
-                    .logging(logging);
+                    .logging(logging)
+                    .write();
             }
 
             if !disable_plugins_processing {
@@ -642,7 +702,9 @@ fn main() {
                         engine_type,
                     )
                     .romanize(romanize)
-                    .logging(logging);
+                    .logging(logging)
+                    .trim(trim)
+                    .write();
                 } else {
                     SystemWriter::new(
                         &scripts_file_path.unwrap(),
@@ -651,7 +713,9 @@ fn main() {
                         engine_type,
                     )
                     .romanize(romanize)
-                    .logging(logging);
+                    .logging(logging)
+                    .trim(trim)
+                    .write();
                 }
             }
         }
@@ -694,6 +758,7 @@ fn main() {
                     .leave_filled(leave_filled)
                     .purge_empty(purge_empty)
                     .create_ignore(create_ignore)
+                    .trim(trim)
                     .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 
@@ -706,6 +771,7 @@ fn main() {
                     .leave_filled(leave_filled)
                     .purge_empty(purge_empty)
                     .create_ignore(create_ignore)
+                    .trim(trim)
                     .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 
@@ -717,6 +783,7 @@ fn main() {
                     .leave_filled(leave_filled)
                     .purge_empty(purge_empty)
                     .create_ignore(create_ignore)
+                    .trim(trim)
                     .purge(Some(&mut ignore_map), Some(&mut stat_vec));
             }
 

@@ -47,6 +47,9 @@ pub struct Localization<'a> {
     pub version_flag_desc: &'a str,
     pub ignore_flag_desc: &'a str,
 
+    pub trim_flag_desc: &'a str,
+    pub sort_flag_desc: &'a str,
+
     // Argument types
     pub mode_arg_type: &'a str,
     pub input_path_arg_type: &'a str,
@@ -63,6 +66,7 @@ pub struct Localization<'a> {
     pub custom_processing_enabled_msg: &'a str,
     pub enabling_romanize_metadata_msg: &'a str,
     pub disabling_custom_processing_metadata_msg: &'a str,
+    pub enabling_trim_metadata_msg: &'a str,
     pub no_subcommand_specified_msg: &'a str,
     pub could_not_determine_game_engine_msg: &'a str,
     pub game_ini_file_missing_msg: &'a str,
@@ -136,7 +140,10 @@ impl Localization<'_> {
             write_json_command_desc: cstr!(r#"<bold>Writes JSON representations of older engines' files from "json" directory back to original files.</>"#),
 
             version_flag_desc: "Show program's version.",
-            ignore_flag_desc: cstr!("Ignore entries from .rvpacker-ignore file. <bold>WORKS ONLY WITH --mode append!"),
+            ignore_flag_desc: cstr!("Ignore entries from .rvpacker-ignore file. <bold>WORKS ONLY WITH --mode append!</>"),
+
+            sort_flag_desc: cstr!("Sort the translation entries according to their order in game.\n<bold>WORKS ONLY WITH --mode append!</>"),
+            trim_flag_desc: cstr!("Remove the leading and trailing whitespace from extracted strings. <bold>COULD LEAD TO NON-WORKING WRITING OR INCORRECT DISPLAYING OF TEXT!</>"),
 
             // Argument types
             mode_arg_type: "MODE",
@@ -155,6 +162,7 @@ impl Localization<'_> {
             custom_processing_enabled_msg: "Custom processing for this game will be used. Use --disable-custom-processing to disable it.",
             enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
             disabling_custom_processing_metadata_msg: "Disabling custom processing according to the metadata from previous read.",
+            enabling_trim_metadata_msg: "Enabling trimming according to the metadata from previous read.",
             no_subcommand_specified_msg: "No command was specified. Call rvpacker-txt-rs -h for help.",
             could_not_determine_game_engine_msg: "Couldn't determine game engine. Check the existence of System file inside your data/original directory.",
             game_ini_file_missing_msg: "Game.ini file not found.",
@@ -219,6 +227,9 @@ impl Localization<'_> {
             version_flag_desc: "Отобразить версию программы.",
             ignore_flag_desc: cstr!("Игнорировать строки из файла .rvpacker-ignore. <bold>РАБОТАЕТ ТОЛЬКО ПРИ --mode append!</>"),
 
+            sort_flag_desc: cstr!("Отсортировать строки перевода в соответствии с их порядком в игре. <bold>РАБОТАЕТ ТОЛЬКО ПРИ --mode append!</>"),
+            trim_flag_desc: cstr!("Удалить лишние начальные и конечные пробелы из распарсенного текста. <bold>МОЖЕТ ПРИВЕСТИ К НЕРАБОЧЕЙ ИЛИ НЕКОРРЕКТНОЙ ЗАПИСИ ТЕКСТА!\nРАБОТАЕТ ТОЛЬКО ПРИ --mode append!</>"),
+
             mode_arg_type: "РЕЖИМ",
             input_path_arg_type: "ВХОДНОЙ_ПУТЬ",
             output_path_arg_type: "ВЫХОДНОЙ_ПУТЬ",
@@ -235,6 +246,7 @@ impl Localization<'_> {
             custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. Используйте --disable-custom-processing, чтобы отключить её.",
             enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста будет использована.",
             disabling_custom_processing_metadata_msg: "В соответсвии с метаданными из прошлого чтения, индивидуальная обработка текста будет выключена.",
+            enabling_trim_metadata_msg: "В соответствии с метаданными из прошлого чтения, удаление лишних пробелов будет включено.",
             no_subcommand_specified_msg: "Команда не была указана. Вызовите rvpacker-txt-rs -h для помощи.",
             could_not_determine_game_engine_msg: "Не удалось определить движок игры. Убедитесь, что файл System существует.",
             game_ini_file_missing_msg: "Файл Game.ini не был обнаружен.",
