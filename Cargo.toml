@@ -8,6 +8,6 @@ sys-locale = "0.3.2"
 clap = { version = "4.5.32", features = ["wrap_help", "string", "cargo"] }
 color-print = "0.3.7"
 rpgmad-lib = { version = "1.0.1", features = ["rayon"] }
-rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "5.0.0", features = ["serde"] }
+rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "5.1.1", features = ["serde"] }
 sonic-rs = "0.4.0"
 encoding_rs = "0.8.35"
