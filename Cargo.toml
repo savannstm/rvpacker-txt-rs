@@ -1,6 +1,6 @@
 [package]
 name = "rvpacker-txt-rs"
-version = "4.1.5"
+version = "4.2.0"
 edition = "2021"
 
 [dependencies]
