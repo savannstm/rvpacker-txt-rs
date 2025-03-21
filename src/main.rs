@@ -3,7 +3,7 @@ use clap::{crate_version, value_parser, Arg, ArgAction, ArgMatches, Command};
 use color_print::cformat;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{json, parse_ignore, purge, read, read_to_string_without_bom, types::*, write};
-use sonic_rs::{from_str, json, prelude::*, to_string, Object};
+use sonic_rs::{from_str, json, prelude::*, to_string, Object, Value};
 use std::{
     env,
     fs::{create_dir_all, read, read_to_string, remove_file, write},
@@ -383,7 +383,7 @@ fn main() {
     let logging: bool = matches.get_flag("log");
     let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
     let mut romanize: bool = matches.get_flag("romanize");
-    let mut trim: bool = matches.get_flag("trim");
+    let mut trim: bool = subcommand_matches.get_flag("trim");
 
     let mut maps_processing_mode: MapsProcessingMode = MapsProcessingMode::Default;
     let maps_processing_mode_value_mut = unsafe { &mut *(&mut maps_processing_mode as *mut MapsProcessingMode) };
@@ -480,7 +480,11 @@ fn main() {
             unsafe { metadata["disableCustomProcessing"].as_bool().unwrap_unchecked() };
         let maps_processing_mode_metadata: u8 =
             unsafe { metadata["mapsProcessingMode"].as_u64().unwrap_unchecked() as u8 };
-        let trim_metadata = metadata["trim"].as_bool().unwrap_or(true);
+        let trim_metadata: bool = metadata
+            .get(&"trim")
+            .unwrap_or(&Value::from(true))
+            .as_bool()
+            .unwrap_or(true);
 
         if romanize_metadata {
             println!("{}", localization.enabling_romanize_metadata_msg);
@@ -695,27 +699,19 @@ fn main() {
 
             if !disable_plugins_processing {
                 if engine_type == EngineType::New {
-                    SystemWriter::new(
+                    PluginWriter::new(
                         &plugins_file_path.unwrap(),
                         translation_path,
                         &plugins_output_path.unwrap(),
-                        engine_type,
                     )
                     .romanize(romanize)
                     .logging(logging)
-                    .trim(trim)
                     .write();
                 } else {
-                    SystemWriter::new(
-                        &scripts_file_path.unwrap(),
-                        translation_path,
-                        data_output_path,
-                        engine_type,
-                    )
-                    .romanize(romanize)
-                    .logging(logging)
-                    .trim(trim)
-                    .write();
+                    ScriptWriter::new(&scripts_file_path.unwrap(), translation_path, data_output_path)
+                        .romanize(romanize)
+                        .logging(logging)
+                        .write();
                 }
             }
         }
