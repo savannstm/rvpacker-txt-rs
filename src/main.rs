@@ -694,6 +694,7 @@ fn main() {
                 SystemWriter::new(&system_file_path, translation_path, data_output_path, engine_type)
                     .romanize(romanize)
                     .logging(logging)
+                    .trim(trim)
                     .write();
             }
 
@@ -837,6 +838,9 @@ fn main() {
                 }
                 _ => unreachable!(),
             }
+        }
+        "image" => {
+            todo!();
         }
         _ => unreachable!(),
     }
