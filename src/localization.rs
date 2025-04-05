@@ -50,12 +50,25 @@ pub struct Localization<'a> {
     pub trim_flag_desc: &'a str,
     pub sort_flag_desc: &'a str,
 
+    pub decrypt_command_desc: &'a str,
+    pub encrypt_command_desc: &'a str,
+    pub extract_key_command_desc: &'a str,
+
+    pub key_arg_desc: &'a str,
+    pub file_arg_desc: &'a str,
+    pub engine_arg_desc: &'a str,
+
+    pub asset_command_desc: &'a str,
+
     // Argument types
     pub mode_arg_type: &'a str,
     pub input_path_arg_type: &'a str,
     pub output_path_arg_type: &'a str,
     pub disable_processing_arg_type: &'a str,
     pub language_arg_type: &'a str,
+    pub key_arg_type: &'a str,
+    pub file_arg_type: &'a str,
+    pub engine_arg_type: &'a str,
 
     // Messages and warnings
     pub input_dir_missing: &'a str,
@@ -74,6 +87,7 @@ pub struct Localization<'a> {
     pub purge_args_incompatible_with_preserve_mode_msg: &'a str,
     pub ignore_file_does_not_exist_msg: &'a str,
     pub could_not_decrypt_ini_file_msg: &'a str,
+    pub engine_argument_required_msg: &'a str,
 
     // Misc
     pub possible_values: &'a str,
@@ -145,12 +159,25 @@ impl Localization<'_> {
             sort_flag_desc: cstr!("Sort the translation entries according to their order in game.\n<bold>WORKS ONLY WITH --mode append!</>"),
             trim_flag_desc: cstr!("Remove the leading and trailing whitespace from extracted strings. <bold>COULD LEAD TO NON-WORKING WRITING OR INCORRECT DISPLAYING OF TEXT!</>"),
 
+            decrypt_command_desc: "Decrypts encrypted assets.\n.rpgmvo/.ogg_ => .ogg\n.rpgmvp/.png_ => .png\n.rpgmvm/.m4a_ => .m4a",
+            encrypt_command_desc: "Encrypts .png/.ogg/m4a assets.\n.ogg => .rpgmvo/.ogg_\n.png => .rpgmvp/.png_\n.m4a => .rpgmvm/.m4a_",
+            extract_key_command_desc: "Extracts key from file, specified in --file argument.",
+
+            key_arg_desc: "Encryption key for encrypt/decrypt operations.",
+            file_arg_desc: "File path (for single file processing or key extraction).",
+            engine_arg_desc: r#"Game engine ("mv" or "mz")."#,
+
+            asset_command_desc: "Decrypt/encrypt RPG Maker MV/MZ audio and image assets.",
+
             // Argument types
             mode_arg_type: "MODE",
             input_path_arg_type: "INPUT_PATH",
             output_path_arg_type: "OUTPUT_PATH",
             disable_processing_arg_type: "FILES",
             language_arg_type: "LANGUAGE",
+            key_arg_type: "KEY",
+            file_arg_type: "INPUT_FILE",
+            engine_arg_type: "ENGINE",
 
             // Messages and warnings
             input_dir_missing: "Input directory does not exist.",
@@ -170,6 +197,7 @@ impl Localization<'_> {
             purge_args_incompatible_with_preserve_mode_msg: "--stat and --create-ignore arguments are incompatble with preserve maps processing mode.",
             ignore_file_does_not_exist_msg: ".rvpacker-ignore file does not exist. Aborting execution.",
             could_not_decrypt_ini_file_msg: "Couldn't decrypt Game.ini file. You can try to turn it UTF-8 yourself, after that everything will work.",
+            engine_argument_required_msg: "--engine argument is required.",
 
             // Misc
             possible_values: "Allowed values:",
@@ -230,11 +258,24 @@ impl Localization<'_> {
             sort_flag_desc: cstr!("Отсортировать строки перевода в соответствии с их порядком в игре. <bold>РАБОТАЕТ ТОЛЬКО ПРИ --mode append!</>"),
             trim_flag_desc: cstr!("Удалить лишние начальные и конечные пробелы из распарсенного текста. <bold>МОЖЕТ ПРИВЕСТИ К НЕРАБОЧЕЙ ИЛИ НЕКОРРЕКТНОЙ ЗАПИСИ ТЕКСТА!</>"),
 
+            decrypt_command_desc: "Расшифровывает зашифрованные ассеты.\n.rpgmvo/.ogg_ => .ogg\n.rpgmvp/.png_ => .png\n.rpgmvm/.m4a_ => .m4a",
+            encrypt_command_desc: "Зашифровывает ассеты .png/.ogg/m4a.\n.ogg => .rpgmvo/.ogg_\n.png => .rpgmvp/.png_\n.m4a => .rpgmvm/.m4a_",
+            extract_key_command_desc: "Достаёт ключ из файла, указанного в аргументе --file.",
+
+            key_arg_desc: "Ключ шифрования для команд encrypt/decrypt.",
+            file_arg_desc: "Путь к файлу (для обработки одного файла или доставания ключа).",
+            engine_arg_desc: r#"Движок игры ("mv" или "mz")"#,
+
+            asset_command_desc: "Decrypt/encrypt RPG Maker MV/MZ audio and image assets.",
+
             mode_arg_type: "РЕЖИМ",
             input_path_arg_type: "ВХОДНОЙ_ПУТЬ",
             output_path_arg_type: "ВЫХОДНОЙ_ПУТЬ",
             disable_processing_arg_type: "ИМЕНА_ФАЙЛОВ",
             language_arg_type: "ЯЗЫК",
+            key_arg_type: "КЛЮЧ",
+            file_arg_type: "ВХОДНОЙ_ФАЙЛ",
+            engine_arg_type: "ДВИЖОК",
 
             input_dir_missing: "Входная директория не существует.",
             output_dir_missing: "Выходная директория не существует.",
@@ -254,6 +295,7 @@ impl Localization<'_> {
             purge_args_incompatible_with_preserve_mode_msg: "Аргументы --stat и --create-ignore несовместимы с режимом обработки карт preserve.",
             ignore_file_does_not_exist_msg: "Файл .rvpacker-ignore не существует. Прерываем выполнение.",
             could_not_decrypt_ini_file_msg: "Не удалось расшифровать файл Game.ini. Вы можете вручную конвертировать его в UTF-8, после этого всё заработает.",
+            engine_argument_required_msg: "Аргумент --engine необходим.",
 
             possible_values: "Разрешённые значения:",
             example: "Пример:",

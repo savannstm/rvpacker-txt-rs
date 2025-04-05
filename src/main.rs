@@ -6,7 +6,7 @@ use rvpacker_lib::{json, parse_ignore, purge, read, read_to_string_without_bom, 
 use sonic_rs::{from_str, json, prelude::*, to_string, Object, Value};
 use std::{
     env,
-    fs::{create_dir_all, read, read_to_string, remove_file, write},
+    fs::{create_dir_all, read, read_dir, read_to_string, remove_file, write},
     io::stdin,
     mem::transmute,
     path::{Path, PathBuf},
@@ -80,7 +80,7 @@ fn main() {
     };
 
     let localization: Localization = Localization::new(language);
-    let cwd = env::current_dir().unwrap().into_os_string();
+    let cwd: std::ffi::OsString = env::current_dir().unwrap().into_os_string();
 
     let input_dir_arg: Arg = Arg::new("input-dir")
         .short('i')
@@ -311,6 +311,37 @@ fn main() {
         .subcommands([generate_json_subcommand, write_json_subcommand])
         .arg(&help_flag);
 
+    let key_arg: Arg = Arg::new("key")
+        .long("key")
+        .help(localization.key_arg_desc)
+        .value_name(localization.key_arg_type)
+        .global(true);
+
+    let file_arg: Arg = Arg::new("file")
+        .long("file")
+        .help(localization.file_arg_desc)
+        .value_name(localization.file_arg_type)
+        .value_parser(value_parser!(PathBuf))
+        .global(true);
+
+    let engine_arg: Arg = Arg::new("engine")
+        .long("engine")
+        .help(localization.engine_arg_desc)
+        .value_parser(["mv", "mz"])
+        .value_name(localization.engine_arg_type)
+        .global(true);
+
+    let decrypt_subcommand: Command = Command::new("decrypt").about(localization.decrypt_command_desc);
+    let encrypt_subcommand: Command = Command::new("encrypt").about(localization.encrypt_command_desc);
+    let extract_key_subcommand: Command = Command::new("extract-key").about(localization.extract_key_command_desc);
+
+    let asset_subcommand: Command = Command::new("asset")
+        .disable_help_flag(true)
+        .about(localization.asset_command_desc)
+        .subcommands([decrypt_subcommand, encrypt_subcommand, extract_key_subcommand])
+        .args([key_arg, file_arg, engine_arg])
+        .arg(&help_flag);
+
     let cli: Command = Command::new("")
         .version(crate_version!())
         .disable_version_flag(true)
@@ -320,7 +351,13 @@ fn main() {
         .term_width(120)
         .about(localization.about_msg)
         .help_template(localization.help_template)
-        .subcommands([read_subcommand, write_subcommand, purge_subcommand, json_subcommand])
+        .subcommands([
+            read_subcommand,
+            write_subcommand,
+            purge_subcommand,
+            json_subcommand,
+            asset_subcommand,
+        ])
         .args([
             input_dir_arg,
             output_dir_arg,
@@ -336,26 +373,6 @@ fn main() {
         println!("{}", localization.no_subcommand_specified_msg);
         exit(0);
     });
-
-    let (disable_maps_processing, disable_other_processing, disable_system_processing, disable_plugins_processing) =
-        matches
-            .get_many::<String>("disable-processing")
-            .map(|disable_processing_args| {
-                let mut flags = (false, false, false, false);
-
-                for disable_processing_of in disable_processing_args {
-                    match disable_processing_of.as_str() {
-                        "maps" => flags.0 = true,
-                        "other" => flags.1 = true,
-                        "system" => flags.2 = true,
-                        "plugins" | "scripts" => flags.3 = true,
-                        _ => unreachable!(),
-                    }
-                }
-
-                flags
-            })
-            .unwrap_or((false, false, false, false));
 
     let input_dir: &PathBuf = matches.get_one::<PathBuf>("input-dir").unwrap();
 
@@ -381,12 +398,10 @@ fn main() {
     let ignore_file_path: &Path = &translation_path.join(".rvpacker-ignore");
 
     let logging: bool = matches.get_flag("log");
-    let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
-    let mut romanize: bool = matches.get_flag("romanize");
-    let mut trim: bool = subcommand_matches.get_flag("trim");
 
     let mut maps_processing_mode: MapsProcessingMode = MapsProcessingMode::Default;
-    let maps_processing_mode_value_mut = unsafe { &mut *(&mut maps_processing_mode as *mut MapsProcessingMode) };
+    let maps_processing_mode_value_mut: &mut MapsProcessingMode =
+        unsafe { &mut *(&mut maps_processing_mode as *mut MapsProcessingMode) };
 
     let (engine_type, system_file_path, archive_path, scripts_file_path, plugins_file_path) =
         if original_path.join("System.json").exists() {
@@ -421,11 +436,21 @@ fn main() {
                 Some(original_path.join("Scripts.rxdata")),
                 None,
             )
+        } else if subcommand != "asset" {
+            panic!("{}", localization.could_not_determine_game_engine_msg);
         } else {
-            panic!("{}", localization.could_not_determine_game_engine_msg)
+            (
+                EngineType::New,
+                original_path.join("System.json"),
+                None,
+                None,
+                Some(input_dir.join("js/plugins.js")),
+            )
         };
 
-    let mut game_type: Option<GameType> = if disable_custom_processing {
+    let mut game_type: Option<GameType> = if subcommand == "asset"
+        || ["read", "write", "purge"].contains(&subcommand) && matches.get_flag("disable-custom-processing")
+    {
         None
     } else {
         let game_title: String = if engine_type == EngineType::New {
@@ -470,6 +495,58 @@ fn main() {
 
     if game_type.is_some() {
         println!("{}", localization.custom_processing_enabled_msg);
+    }
+
+    let (
+        mut disable_maps_processing,
+        mut disable_other_processing,
+        mut disable_system_processing,
+        mut disable_plugins_processing,
+    ) = (false, false, false, false);
+
+    let mut processing_mode: ProcessingMode = ProcessingMode::Default;
+    let mut trim: bool = false;
+    let mut romanize: bool = false;
+
+    if ["read", "write", "purge"].contains(&subcommand) {
+        romanize = matches.get_flag("romanize");
+        trim = subcommand_matches.get_flag("trim");
+        (
+            disable_maps_processing,
+            disable_other_processing,
+            disable_system_processing,
+            disable_plugins_processing,
+        ) = subcommand_matches
+            .get_many::<String>("disable-processing")
+            .map(|disable_processing_args| {
+                let mut flags = (false, false, false, false);
+
+                for disable_processing_of in disable_processing_args {
+                    match disable_processing_of.as_str() {
+                        "maps" => flags.0 = true,
+                        "other" => flags.1 = true,
+                        "system" => flags.2 = true,
+                        "plugins" | "scripts" => flags.3 = true,
+                        _ => unreachable!(),
+                    }
+                }
+
+                flags
+            })
+            .unwrap_or((false, false, false, false));
+    }
+
+    if ["read", "json"].contains(&subcommand) {
+        processing_mode = match subcommand_matches
+            .get_one::<String>("processing-mode")
+            .unwrap_or(&String::from("default"))
+            .as_str()
+        {
+            "default" => ProcessingMode::Default,
+            "append" => ProcessingMode::Append,
+            "force" => ProcessingMode::Force,
+            _ => unreachable!(),
+        }
     }
 
     let mut read_metadata = || {
@@ -526,17 +603,6 @@ fn main() {
         "read" => {
             use read::*;
 
-            let processing_mode: ProcessingMode = match subcommand_matches
-                .get_one::<String>("processing-mode")
-                .unwrap_or(&String::from("default"))
-                .as_str()
-            {
-                "default" => ProcessingMode::Default,
-                "append" => ProcessingMode::Append,
-                "force" => ProcessingMode::Force,
-                _ => unreachable!(),
-            };
-
             *maps_processing_mode_value_mut = match subcommand_matches
                 .get_one::<String>("maps-processing-mode")
                 .unwrap()
@@ -549,18 +615,6 @@ fn main() {
             };
 
             let silent: bool = subcommand_matches.get_flag("silent");
-            let ignore: bool = subcommand_matches.get_flag("ignore");
-            let sort: bool = subcommand_matches.get_flag("sort");
-
-            if let Some(archive_path) = archive_path {
-                if archive_path.exists() {
-                    let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
-                    let mut decrypter: Decrypter = Decrypter::new(bytes);
-                    decrypter
-                        .extract(input_dir, processing_mode == ProcessingMode::Force)
-                        .unwrap();
-                }
-            }
 
             if processing_mode == ProcessingMode::Force && !silent {
                 let start: Instant = Instant::now();
@@ -582,6 +636,9 @@ fn main() {
 
             create_dir_all(translation_path).unwrap();
 
+            let ignore: bool = subcommand_matches.get_flag("ignore");
+            let disable_custom_processing: bool = matches.get_flag("disable-custom-processing");
+
             if processing_mode != ProcessingMode::Append {
                 write(
                     metadata_file_path,
@@ -591,6 +648,18 @@ fn main() {
             } else if ignore && !ignore_file_path.exists() {
                 println!("{}", localization.ignore_file_does_not_exist_msg);
                 exit(0);
+            }
+
+            let sort: bool = subcommand_matches.get_flag("sort");
+
+            if let Some(archive_path) = archive_path {
+                if archive_path.exists() {
+                    let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
+                    let mut decrypter: Decrypter = Decrypter::new(bytes);
+                    decrypter
+                        .extract(input_dir, processing_mode == ProcessingMode::Force)
+                        .unwrap();
+                }
             }
 
             if !disable_maps_processing {
@@ -744,6 +813,7 @@ fn main() {
             }
 
             let mut stat_vec: Vec<(String, String)> = Vec::new();
+            let romanize: bool = matches.get_flag("romanize");
 
             if !disable_maps_processing {
                 MapPurger::new(original_path, translation_path, engine_type)
@@ -818,16 +888,6 @@ fn main() {
             use json::*;
 
             let json_subcommand: &str = subcommand_matches.subcommand_name().unwrap();
-            let processing_mode: ProcessingMode = match subcommand_matches
-                .get_one::<String>("processing-mode")
-                .unwrap_or(&String::from("default"))
-                .as_str()
-            {
-                "default" => ProcessingMode::Default,
-                "append" => ProcessingMode::Append,
-                "force" => ProcessingMode::Force,
-                _ => unreachable!(),
-            };
 
             match json_subcommand {
                 "generate-json" => {
@@ -839,8 +899,98 @@ fn main() {
                 _ => unreachable!(),
             }
         }
-        "image" => {
-            todo!();
+        "asset" => {
+            use asset_decrypter::*;
+
+            let image_matches: &str = subcommand_matches.subcommand_name().unwrap();
+
+            let key: Option<String> = subcommand_matches.get_one::<String>("key").cloned();
+            let file: Option<PathBuf> = subcommand_matches.get_one::<PathBuf>("file").cloned();
+            let engine: &str = subcommand_matches.get_one::<String>("engine").unwrap_or_else(|| {
+                eprintln!("{}", localization.engine_argument_required_msg);
+                exit(1);
+            });
+
+            let mut decrypter: Decrypter = if key.is_none() && matches!(image_matches, "encrypt") {
+                Decrypter::new(Some(String::from(DEFAULT_KEY)))
+            } else {
+                Decrypter::new(key)
+            };
+
+            match image_matches {
+                "extract-key" => {
+                    let file: PathBuf = file.unwrap_or_else(|| {
+                        eprintln!("--file argument is not specified.");
+                        exit(1);
+                    });
+                    let key: String = if file.extension().unwrap() == "json" {
+                        let content: String = read_to_string(&file).unwrap();
+                        let index: usize = content.rfind("encryptionKey").unwrap() + "encryptionKey\":".len();
+                        content[index..].trim().trim_matches('"')[..32].to_string()
+                    } else {
+                        let buf: Vec<u8> = read(&file).unwrap();
+                        decrypter.set_key_from_image(&buf);
+                        decrypter.key()
+                    };
+                    println!("Encryption key: {key}");
+                }
+
+                "decrypt" | "encrypt" => {
+                    let mut process_file = |file: &PathBuf| {
+                        let data: Vec<u8> = read(file).unwrap();
+                        let (processed, new_ext) = match image_matches {
+                            "decrypt" => {
+                                let decrypted: Vec<u8> = decrypter.decrypt(&data);
+                                let ext: &str = file.extension().unwrap().to_str().unwrap();
+                                let new_ext: &str = match ext {
+                                    "rpgmvp" | "png_" => "png",
+                                    "rpgmvo" | "ogg_" => "ogg",
+                                    "rpgmvm" | "m4a_" => "m4a",
+                                    _ => unreachable!(),
+                                };
+                                (decrypted, new_ext)
+                            }
+                            "encrypt" => {
+                                let encrypted: Vec<u8> = decrypter.encrypt(&data);
+                                let ext: &str = file.extension().unwrap().to_str().unwrap();
+                                let new_ext: &str = match (engine, ext) {
+                                    ("mv", "png") => "rpgmvp",
+                                    ("mv", "ogg") => "rpgmvo",
+                                    ("mv", "m4a") => "rpgmvm",
+                                    ("mz", "png") => "png_",
+                                    ("mz", "ogg") => "ogg_",
+                                    ("mz", "m4a") => "m4a_",
+                                    _ => unreachable!(),
+                                };
+                                (encrypted, new_ext)
+                            }
+                            _ => unreachable!(),
+                        };
+                        let output_file: PathBuf =
+                            output_dir.join(PathBuf::from(file.file_name().unwrap()).with_extension(new_ext));
+                        write(output_file, processed).unwrap();
+                    };
+
+                    if let Some(file) = &file {
+                        process_file(file);
+                    } else {
+                        let exts: &[&str] = match image_matches {
+                            "encrypt" => &["png", "ogg", "m4a"],
+                            "decrypt" => &["rpgmvp", "rpgmvo", "rpgmvm", "ogg_", "png_", "m4a_"],
+                            _ => unreachable!(),
+                        };
+                        for entry in read_dir(input_dir).unwrap().flatten() {
+                            let path: PathBuf = entry.path();
+                            if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                                if exts.contains(&ext) {
+                                    process_file(&path);
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
         }
         _ => unreachable!(),
     }
@@ -848,6 +998,6 @@ fn main() {
     println!(
         "{} {}",
         localization.elapsed_time_msg,
-        start_time.elapsed().as_secs_f64()
+        (start_time.elapsed().as_secs_f32() * 1000f32).round() / 1000f32
     );
 }
