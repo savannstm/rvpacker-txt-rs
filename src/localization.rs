@@ -184,7 +184,7 @@ impl Localization<'_> {
             output_dir_missing: "Output directory does not exist.",
             translation_dir_missing: r#"The "translation" folder in the input directory does not exist."#,
 
-            elapsed_time_msg: "Elapsed time:",
+            elapsed_time_msg: "Elapsed:",
             force_mode_warning: "WARNING! Force mode will forcefully rewrite all your translation files in the folder, including _trans. Input 'Y' to continue.",
             custom_processing_enabled_msg: "Custom processing for this game will be used. Use --disable-custom-processing to disable it.",
             enabling_romanize_metadata_msg: "Enabling romanize according to the metadata from previous read.",
@@ -282,7 +282,7 @@ impl Localization<'_> {
 
             translation_dir_missing: r#"Папка "translation" входной директории не существует."#,
 
-            elapsed_time_msg: "Затраченное время:",
+            elapsed_time_msg: "Затрачено:",
             force_mode_warning: "ПРЕДУПРЕЖДЕНИЕ! Принудительный режим полностью перепишет все ваши файлы перевода, включая _trans-файлы. Введите Y, чтобы продолжить.",
             custom_processing_enabled_msg: "Индивидуальная обработка текста будет использована для этой игры. Используйте --disable-custom-processing, чтобы отключить её.",
             enabling_romanize_metadata_msg: "В соответствии с метаданными из прошлого чтения, романизация текста будет использована.",
