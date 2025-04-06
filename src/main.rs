@@ -6,6 +6,7 @@ use rvpacker_lib::{json, parse_ignore, purge, read, read_to_string_without_bom, 
 use sonic_rs::{from_str, json, prelude::*, to_string, Object, Value};
 use std::{
     env,
+    ffi::OsString,
     fs::{create_dir_all, read, read_dir, read_to_string, remove_file, write},
     io::stdin,
     mem::transmute,
@@ -80,7 +81,7 @@ fn main() {
     };
 
     let localization: Localization = Localization::new(language);
-    let cwd: std::ffi::OsString = env::current_dir().unwrap().into_os_string();
+    let cwd: OsString = env::current_dir().unwrap().into_os_string();
 
     let input_dir_arg: Arg = Arg::new("input-dir")
         .short('i')
@@ -653,8 +654,8 @@ fn main() {
             let sort: bool = subcommand_matches.get_flag("sort");
 
             if let Some(archive_path) = archive_path {
-                if archive_path.exists() {
-                    let bytes: Vec<u8> = std::fs::read(archive_path).unwrap();
+                if archive_path.exists() && !system_file_path.exists() {
+                    let bytes: Vec<u8> = read(archive_path).unwrap();
                     let mut decrypter: Decrypter = Decrypter::new(bytes);
                     decrypter
                         .extract(input_dir, processing_mode == ProcessingMode::Force)
@@ -996,8 +997,8 @@ fn main() {
     }
 
     println!(
-        "{} {}",
+        "{} {:.2}s",
         localization.elapsed_time_msg,
-        (start_time.elapsed().as_secs_f32() * 1000f32).round() / 1000f32
+        start_time.elapsed().as_secs_f32()
     );
 }
