@@ -5,98 +5,95 @@ pub enum Language {
     Russian,
 }
 
-pub struct Localization<'a> {
+pub struct Localization {
     // About message and templates
-    pub about_msg: &'a str,
-    pub help_template: &'a str,
-    pub subcommand_help_template: &'a str,
-    pub json_help_template: &'a str,
+    pub about_msg: &'static str,
+    pub help_template: &'static str,
+    pub subcommand_help_template: &'static str,
+    pub json_help_template: &'static str,
 
     // Command descriptions
-    pub read_command_desc: &'a str,
-    pub write_command_desc: &'a str,
-    pub purge_command_desc: &'a str,
-    pub json_command_desc: &'a str,
+    pub read_command_desc: &'static str,
+    pub write_command_desc: &'static str,
+    pub purge_command_desc: &'static str,
+    pub json_command_desc: &'static str,
 
     // Argument descriptions
-    pub input_dir_arg_desc: &'a str,
-    pub output_dir_arg_desc: &'a str,
+    pub input_dir_arg_desc: &'static str,
+    pub output_dir_arg_desc: &'static str,
 
-    pub disable_processing_arg_desc: &'a str,
+    pub disable_processing_arg_desc: &'static str,
 
-    pub romanize_desc: &'a str,
+    pub romanize_desc: &'static str,
 
-    pub disable_custom_processing_desc: &'a str,
+    pub disable_custom_processing_desc: &'static str,
 
-    pub language_arg_desc: &'a str,
+    pub language_arg_desc: &'static str,
 
-    pub log_arg_desc: &'a str,
-    pub help_arg_desc: &'a str,
+    pub log_arg_desc: &'static str,
+    pub help_arg_desc: &'static str,
 
-    pub processing_mode_arg_desc: &'a str,
-    pub maps_processing_mode_arg_desc: &'a str,
+    pub read_mode_arg_desc: &'static str,
 
-    pub stat_arg_desc: &'a str,
-    pub leave_filled_flag_desc: &'a str,
-    pub purge_empty_flag_desc: &'a str,
-    pub create_ignore_flag_desc: &'a str,
+    pub stat_arg_desc: &'static str,
+    pub leave_filled_flag_desc: &'static str,
+    pub purge_empty_flag_desc: &'static str,
+    pub create_ignore_flag_desc: &'static str,
 
-    pub generate_json_command_desc: &'a str,
-    pub write_json_command_desc: &'a str,
+    pub generate_json_command_desc: &'static str,
+    pub write_json_command_desc: &'static str,
 
-    pub version_flag_desc: &'a str,
-    pub ignore_flag_desc: &'a str,
+    pub version_flag_desc: &'static str,
+    pub ignore_flag_desc: &'static str,
 
-    pub trim_flag_desc: &'a str,
-    pub sort_flag_desc: &'a str,
+    pub trim_flag_desc: &'static str,
+    pub sort_flag_desc: &'static str,
 
-    pub decrypt_command_desc: &'a str,
-    pub encrypt_command_desc: &'a str,
-    pub extract_key_command_desc: &'a str,
+    pub decrypt_command_desc: &'static str,
+    pub encrypt_command_desc: &'static str,
+    pub extract_key_command_desc: &'static str,
 
-    pub key_arg_desc: &'a str,
-    pub file_arg_desc: &'a str,
-    pub engine_arg_desc: &'a str,
+    pub key_arg_desc: &'static str,
+    pub file_arg_desc: &'static str,
+    pub engine_arg_desc: &'static str,
 
-    pub asset_command_desc: &'a str,
+    pub asset_command_desc: &'static str,
 
     // Argument types
-    pub mode_arg_type: &'a str,
-    pub input_path_arg_type: &'a str,
-    pub output_path_arg_type: &'a str,
-    pub disable_processing_arg_type: &'a str,
-    pub language_arg_type: &'a str,
-    pub key_arg_type: &'a str,
-    pub file_arg_type: &'a str,
-    pub engine_arg_type: &'a str,
+    pub mode_arg_type: &'static str,
+    pub input_path_arg_type: &'static str,
+    pub output_path_arg_type: &'static str,
+    pub disable_processing_arg_type: &'static str,
+    pub language_arg_type: &'static str,
+    pub key_arg_type: &'static str,
+    pub file_arg_type: &'static str,
+    pub engine_arg_type: &'static str,
 
     // Messages and warnings
-    pub input_dir_missing: &'a str,
-    pub output_dir_missing: &'a str,
-    pub translation_dir_missing: &'a str,
-    pub elapsed_time_msg: &'a str,
-    pub force_mode_warning: &'a str,
-    pub custom_processing_enabled_msg: &'a str,
-    pub enabling_romanize_metadata_msg: &'a str,
-    pub disabling_custom_processing_metadata_msg: &'a str,
-    pub enabling_trim_metadata_msg: &'a str,
-    pub no_subcommand_specified_msg: &'a str,
-    pub could_not_determine_game_engine_msg: &'a str,
-    pub game_ini_file_missing_msg: &'a str,
-    pub enabling_maps_processing_mode_metadata_msg: &'a str,
-    pub purge_args_incompatible_with_preserve_mode_msg: &'a str,
-    pub ignore_file_does_not_exist_msg: &'a str,
-    pub could_not_decrypt_ini_file_msg: &'a str,
-    pub engine_argument_required_msg: &'a str,
+    pub input_dir_missing: &'static str,
+    pub output_dir_missing: &'static str,
+    pub translation_dir_missing: &'static str,
+    pub elapsed_time_msg: &'static str,
+    pub force_mode_warning: &'static str,
+    pub custom_processing_enabled_msg: &'static str,
+    pub enabling_romanize_metadata_msg: &'static str,
+    pub disabling_custom_processing_metadata_msg: &'static str,
+    pub enabling_trim_metadata_msg: &'static str,
+    pub no_subcommand_specified_msg: &'static str,
+    pub could_not_determine_game_engine_msg: &'static str,
+    pub game_ini_file_missing_msg: &'static str,
+    pub ignore_file_does_not_exist_msg: &'static str,
+    pub could_not_decrypt_ini_file_msg: &'static str,
+    pub engine_argument_required_msg: &'static str,
 
     // Misc
-    pub possible_values: &'a str,
-    pub example: &'a str,
-    pub default_value: &'a str,
-    pub aliases: &'a str,
+    pub possible_values: &'static str,
+    pub example: &'static str,
+    pub default_value: &'static str,
+    pub aliases: &'static str,
 }
 
-impl Localization<'_> {
+impl Localization {
     pub const fn new(language: Language) -> Self {
         match language {
             Language::English => Self::init_en(),
@@ -105,7 +102,7 @@ impl Localization<'_> {
     }
 
     const fn init_en() -> Self {
-        Localization {
+        Self {
             // About message and templates
             about_msg: cstr!(
                 r#"<bold>This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them back to their initial form. The program will always use "original" or "data" directories for original files, and "translation" directory to operate with translation files. It will also decrypt any .rgss encrypted archive if it's present.</>"#
@@ -142,8 +139,7 @@ impl Localization<'_> {
             log_arg_desc: "Enables logging.",
             help_arg_desc: "Prints the program's help message or for the entered subcommand.",
 
-            processing_mode_arg_desc: "How to process files. default - Aborts processing if encounters already existing translation .txt files.\nappend - For example, if game you're translating updates, you can use this flag to append any new text to your existing files preserving lines order.\nforce - Force rewrites existing translation .txt files.",
-            maps_processing_mode_arg_desc: cstr!("How to process maps.\ndefault - Ignore all previously encountered text duplicates\nseparate - For each new map, reset the set of previously encountered text duplicates <bold>RECOMMENDED!</>\npreserve - Allow all text duplicates. <bold>NOT RECOMMENDED!</>\nThis argument will automatically be set on write/read with --mode append/purge commands if you parsed game text with it."),
+            read_mode_arg_desc: "How to process files. default - Aborts processing if encounters already existing translation .txt files.\nappend - For example, if game you're translating updates, you can use this flag to append any new text to your existing files preserving lines order.\nforce - Force rewrites existing translation .txt files.",
 
             stat_arg_desc: "Outputs unused lines to stat.txt file, leaving translation unchanged. Incompatible with preserve maps processing mode.",
             leave_filled_flag_desc: "Doesn't purge the lines, that have translation.",
@@ -193,8 +189,6 @@ impl Localization<'_> {
             no_subcommand_specified_msg: "No command was specified. Call rvpacker-txt-rs -h for help.",
             could_not_determine_game_engine_msg: "Couldn't determine game engine. Check the existence of System file inside your data/original directory.",
             game_ini_file_missing_msg: "Game.ini file not found.",
-            enabling_maps_processing_mode_metadata_msg: "Setting maps_processing_mode value to  according to the metadata from previous read.",
-            purge_args_incompatible_with_preserve_mode_msg: "--stat and --create-ignore arguments are incompatble with preserve maps processing mode.",
             ignore_file_does_not_exist_msg: ".rvpacker-ignore file does not exist. Aborting execution.",
             could_not_decrypt_ini_file_msg: "Couldn't decrypt Game.ini file. You can try to turn it UTF-8 yourself, after that everything will work.",
             engine_argument_required_msg: "--engine argument is required.",
@@ -208,7 +202,7 @@ impl Localization<'_> {
     }
 
     const fn init_ru() -> Self {
-        Localization {
+        Self {
             about_msg: cstr!(
                 r#"<bold>Инструмент, позволяющий парсить текст из файлов RPG Maker XP/VX/VXAce/MV/MZ игр в .txt файлы, а затем записывать их обратно в совместимые файлы. Программа всегда будет использовать директории "original" или "data" для хранения исходных файлов, а также директорию "translation" для работы с файлами перевода. Программа также расшифрует любой зашифрованный архив .rgss, если он присутствует.</>"#
             ),
@@ -241,8 +235,7 @@ impl Localization<'_> {
             log_arg_desc: "Включает логирование.",
             help_arg_desc: "Выводит справочную информацию по программе либо по введёной команде.",
 
-            processing_mode_arg_desc: "Как обрабатывать файлы.\ndefault - Стандартный режим. Прекращает обработку, если .txt файлы перевода уже существуют.\nappend - Режим добавления. Например, если переводимая вами игра обновится, вы можете использовать этот аргумент чтобы добавить любой новый текст в существующие файлы, сохраняя порядок линий.\nforce - Принудительный режим. Принудительный режим перезаписывает существующие .txt файлы.",
-            maps_processing_mode_arg_desc: "Как обрабатывать карты.\ndefault - Игнорировать дубликаты всего ранее встреченного текста.\nseparate - Для каждой новой карты, сбрасывать список ранее встреченного текста. <bold>РЕКОМЕНДУЕТСЯ!</>\npreserve - Разрешить все дубликаты текста. <bold>НЕ РЕКОМЕНДУЕТСЯ!</>\nЭтот аргумент будет автоматически установлен при командах write/read вместе с --mode append/purge, если текст игры был прочитан с его использованием.",
+            read_mode_arg_desc: "Как обрабатывать файлы.\ndefault - Стандартный режим. Прекращает обработку, если .txt файлы перевода уже существуют.\nappend - Режим добавления. Например, если переводимая вами игра обновится, вы можете использовать этот аргумент чтобы добавить любой новый текст в существующие файлы, сохраняя порядок линий.\nforce - Принудительный режим. Принудительный режим перезаписывает существующие .txt файлы.",
 
             stat_arg_desc: "Выводит неиспользуемые строки в файл stat.txt, не производя никаких изменений в файлах перевода.",
             leave_filled_flag_desc: "Удаляет только неиспользуемые строки без перевода.",
@@ -291,8 +284,6 @@ impl Localization<'_> {
             no_subcommand_specified_msg: "Команда не была указана. Вызовите rvpacker-txt-rs -h для помощи.",
             could_not_determine_game_engine_msg: "Не удалось определить движок игры. Убедитесь, что файл System существует.",
             game_ini_file_missing_msg: "Файл Game.ini не был обнаружен.",
-            enabling_maps_processing_mode_metadata_msg: "Значение аргумента maps_processing_mode установлено на  в соответствии с метаданными из прошлого чтения.",
-            purge_args_incompatible_with_preserve_mode_msg: "Аргументы --stat и --create-ignore несовместимы с режимом обработки карт preserve.",
             ignore_file_does_not_exist_msg: "Файл .rvpacker-ignore не существует. Прерываем выполнение.",
             could_not_decrypt_ini_file_msg: "Не удалось расшифровать файл Game.ini. Вы можете вручную конвертировать его в UTF-8, после этого всё заработает.",
             engine_argument_required_msg: "Аргумент --engine необходим.",
