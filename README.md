@@ -47,35 +47,22 @@ Commands:
           Purges lines from ".txt" translation files.
   json
           Provides the commands for JSON generation and writing.
+  asset
+          Decrypt/encrypt RPG Maker MV/MZ audio and image assets.
 
 Options:
   -i, --input-dir <INPUT_PATH>
           Input directory, containing game files.
   -o, --output-dir <OUTPUT_PATH>
           Output directory to output files to.
-      --disable-processing <FILES>
-          Skips processing specified files. plugins can be used interchangeably with scripts.
-          Example: --disable-processing=maps,other,system
-          [Allowed values: maps, other, system, plugins, scripts]
-          [Aliases: no]
-  -r, --romanize
-          If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation
-          marks, it automatically replaces these symbols by their roman equivalents (in this case, '').
-          This argument will automatically be set on write/read with --mode append/purge commands if you parsed game
-          text with it.
-  -v, --version
-          Show program's version.
-      --disable-custom-processing
-          Disables built-in custom processing, implemented for some games.
-          This argument will automatically be set on write/read with --mode append/purge commands if you parsed game
-          text with it.
-          [Aliases: no-custom]
   -l, --language <LANGUAGE>
           Sets the localization of the tool to the selected language.
           Example: --language en
           [Allowed values: en, ru]
       --log
           Enables logging.
+  -v, --version
+          Show program's version.
   -h, --help
           Prints the program's help message or for the entered subcommand.
 ```
