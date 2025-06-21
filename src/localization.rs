@@ -259,7 +259,7 @@ impl Localization {
             file_arg_desc: "Путь к файлу (для обработки одного файла или доставания ключа).",
             engine_arg_desc: r#"Движок игры ("mv" или "mz")"#,
 
-            asset_command_desc: "Decrypt/encrypt RPG Maker MV/MZ audio and image assets.",
+            asset_command_desc: "Расшифровывает/зашифровывает ассеты движков RPG Maker MV/MZ.",
 
             mode_arg_type: "РЕЖИМ",
             input_path_arg_type: "ВХОДНОЙ_ПУТЬ",
