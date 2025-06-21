@@ -337,6 +337,7 @@ fn setup_cli(localization: &Localization) -> Command {
 
     let cli: Command = Command::new("")
         .version(crate_version!())
+        .disable_version_flag(true)
         .disable_help_subcommand(true)
         .disable_help_flag(true)
         .next_line_help(true)
