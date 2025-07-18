@@ -140,16 +140,24 @@ impl Localization {
                 r#"<bold>Purges lines without translation from ".txt" translation files.</>"#
             ),
 
-            asset_command_desc: "<bold>Decrypt/encrypt RPG Maker MV/MZ audio and image assets.",
-            decrypt_command_desc: "<bold>Decrypts encrypted assets.\n\
+            asset_command_desc: cstr!(
+                "<bold>Decrypt/encrypt RPG Maker MV/MZ audio and image assets."
+            ),
+            decrypt_command_desc: cstr!(
+                "<bold>Decrypts encrypted assets.\n\
                                     .rpgmvo/.ogg_ => .ogg\n\
                                     .rpgmvp/.png_ => .png\n\
-                                    .rpgmvm/.m4a_ => .m4a",
-            encrypt_command_desc: "<bold>Encrypts .png/.ogg/m4a assets.\n\
+                                    .rpgmvm/.m4a_ => .m4a"
+            ),
+            encrypt_command_desc: cstr!(
+                "<bold>Encrypts .png/.ogg/m4a assets.\n\
                                     .ogg => .rpgmvo/.ogg_\n\
                                     .png => .rpgmvp/.png_\n\
-                                    .m4a => .rpgmvm/.m4a_",
-            extract_key_command_desc: "<bold>Extracts key from the file, specified in --file argument.",
+                                    .m4a => .rpgmvm/.m4a_"
+            ),
+            extract_key_command_desc: cstr!(
+                "<bold>Extracts key from the file, specified in --file argument."
+            ),
 
             json_command_desc: cstr!(
                 r#"<bold>Provides the commands for JSON generation and writing.</>"#
@@ -180,14 +188,9 @@ impl Localization {
             default - If encounters existing translation files, aborts read.\n\
             append - Appends any new text from the game to the translation files, if the text is not already present. Unused lines are removed from translation files, and the lines order is sorted.\n\
             force - Force rewrites existing translation files.",
-            trim_flag_desc: cstr!(
-                "Remove the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior."
-            ),
+            trim_flag_desc: "Remove the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior.",
             create_ignore_flag_desc: "Create an ignore file from purged lines, to prevent their further appearance when reading with append mode.",
-            ignore_flag_desc: cstr!(
-                "Ignore entries from .rvpacker-ignore file. Use with append mode."
-            ),
-
+            ignore_flag_desc: "Ignore entries from .rvpacker-ignore file. Use with append mode.",
             key_arg_desc: "Encryption key for encrypt/decrypt operations.",
             file_arg_desc: "File path (for single file processing or key extraction).",
             engine_arg_desc: r#"Game engine ("mv" or "mz")."#,
@@ -279,21 +282,31 @@ impl Localization {
             asset_command_desc: cstr!(
                 "<bold>Расшифровывает/зашифровывает ассеты движков RPG Maker MV/MZ."
             ),
-            decrypt_command_desc: "<bold>Расшифровывает зашифрованные ассеты.\n\
+            decrypt_command_desc: cstr!(
+                "<bold>Расшифровывает зашифрованные ассеты.\n\
             .rpgmvo/.ogg_ => .ogg\n\
             .rpgmvp/.png_ => .png\n\
-            .rpgmvm/.m4a_ => .m4a",
-            encrypt_command_desc: "<bold>Зашифровывает ассеты .png/.ogg/m4a.\n\
+            .rpgmvm/.m4a_ => .m4a"
+            ),
+            encrypt_command_desc: cstr!(
+                "<bold>Зашифровывает ассеты .png/.ogg/m4a.\n\
             .ogg => .rpgmvo/.ogg_\n\
             .png => .rpgmvp/.png_\n\
-            .m4a => .rpgmvm/.m4a_",
-            extract_key_command_desc: "<bold>Достаёт ключ из файла, указанного в аргументе --file.",
+            .m4a => .rpgmvm/.m4a_"
+            ),
+            extract_key_command_desc: cstr!(
+                "<bold>Достаёт ключ из файла, указанного в аргументе --file."
+            ),
 
             json_command_desc: cstr!(
                 r#"<bold>Предоставляет команды для генерации JSON файлов и их записи."#
             ),
-            generate_json_command_desc: r#"<bold>Генерирует JSON-репрезентации файлов старых движков в директории "json"."#,
-            write_json_command_desc: r#"<bold>Записывает JSON-репрезентации файлов старых движков из директории "json" обратно в исходные файлы."#,
+            generate_json_command_desc: cstr!(
+                r#"<bold>Генерирует JSON-репрезентации файлов старых движков в директории "json"."#
+            ),
+            write_json_command_desc: cstr!(
+                r#"<bold>Записывает JSON-репрезентации файлов старых движков из директории "json" обратно в исходные файлы."#
+            ),
 
             input_dir_arg_desc: r#"Входная директория, содержащая файлы игры."#,
             output_dir_arg_desc: r#"Выходная директория, в которую будут помещены выходные файлы."#,
