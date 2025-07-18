@@ -33,18 +33,18 @@ You can get help on usage by calling `rvpacker-txt-rs -h.`
 
 ```text
 This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to .txt files and write them back to their initial
-form. The program will always use "original" or "data" directories for original files, and "translation" directory to
-operate with translation files. It will also decrypt any .rgss encrypted archive if it's present.
+form. The program uses "original" or "data" directories for source files, and "translation" directory to operate with
+translation files. It will also decrypt any .rgss archive if it's present.
 
 Usage: rvpacker-txt-rs COMMAND [OPTIONS]
 
 Commands:
   read
-          Parses game files, and decrypts .rgss archive if it's present.
+          Parses game files to .txt format, and decrypts any .rgss archive if it's present.
   write
           Writes translated game files to the "output" directory.
   purge
-          Purges lines from ".txt" translation files.
+          Purges lines without translation from ".txt" translation files.
   json
           Provides the commands for JSON generation and writing.
   asset
@@ -59,12 +59,14 @@ Options:
           Sets the localization of the tool to the selected language.
           Example: --language en
           [Allowed values: en, ru]
-      --log
-          Enables logging.
-  -v, --version
-          Show program's version.
+  -v, --verbose
+          Outputs full informating about processed files.
+  -P, --progress
+          Enables real-time progress logging.
+  -V, --version
+          Show program version.
   -h, --help
-          Prints the program's help message or for the entered subcommand.
+          Prints the program help message or for the entered subcommand.
 ```
 
 Examples:
