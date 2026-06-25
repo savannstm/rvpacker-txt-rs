@@ -12,6 +12,7 @@ use clap::{
     crate_version, value_parser,
 };
 use clap_verbosity_flag::{InfoLevel, Verbosity};
+use gxhash::HashMap;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{
     BaseFlags, Mode, ProcessedData, PurgerBuilder, RPGMFileType,
@@ -34,7 +35,7 @@ use std::{
 use strum::VariantNames;
 use strum_macros::EnumIs;
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct SkipMaps(pub Vec<u16>);
 
 impl FromStr for SkipMaps {
@@ -73,7 +74,7 @@ impl FromStr for SkipMaps {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct SkipEvents(pub Vec<(RPGMFileType, Vec<u16>)>);
 
 impl FromStr for SkipEvents {
@@ -122,13 +123,13 @@ impl FromStr for SkipEvents {
     }
 }
 
-#[derive(Debug, Clone, Copy, ValueEnum)]
+#[derive(Clone, Copy, Debug, ValueEnum)]
 pub enum GenericType {
     JSON,
     Marshal,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct FFlags(pub FileFlags);
 
 impl FromStr for FFlags {
@@ -153,10 +154,10 @@ struct Metadata {
     disable_custom_processing: bool,
     trim: bool,
     duplicate_mode: DuplicateMode,
-    hashes: Option<Vec<u128>>,
+    hashes: Option<HashMap<String, u64>>,
 }
 
-#[derive(Debug, Args)]
+#[derive(Args, Debug)]
 #[allow(clippy::struct_excessive_bools)]
 struct SharedArgs {
     /// Defines how to read files.
@@ -237,7 +238,7 @@ struct SharedArgs {
     duplicate_mode: DuplicateMode,
 }
 
-#[derive(Debug, Args)]
+#[derive(Args, Debug)]
 struct ReadArgs {
     #[arg(short = 'S', long, hide = true, action = ArgAction::SetTrue)]
     silent: bool,
@@ -253,7 +254,7 @@ struct ReadArgs {
     shared: SharedArgs,
 }
 
-#[derive(Debug, Args)]
+#[derive(Args, Debug)]
 struct PurgeArgs {
     /// Creates an ignore file from purged lines, to prevent their further appearance when reading with `--mode append`
     #[arg(short, long, action = ArgAction::SetTrue, display_order = 23)]
@@ -263,7 +264,7 @@ struct PurgeArgs {
     shared: SharedArgs,
 }
 
-#[derive(Debug, Args)]
+#[derive(Args, Debug)]
 struct GenericArgs {
     /// Removes the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior
     #[arg(short, long, action = ArgAction::SetTrue, display_order = 6)]
@@ -297,7 +298,7 @@ enum JsonSubcommand {
     Write,
 }
 
-#[derive(Debug, Subcommand, EnumIs)]
+#[derive(Debug, EnumIs, Subcommand)]
 enum GenericSubcommand {
     Read {
         #[arg(
@@ -333,7 +334,7 @@ enum GenericSubcommand {
     },
 }
 
-#[derive(Debug, Subcommand, EnumIs)]
+#[derive(Debug, EnumIs, Subcommand)]
 enum Command {
     /// Parses game files to `.txt` format, and decrypts any `.rgss` archive if it's present
     Read(ReadArgs),
@@ -358,7 +359,7 @@ enum Command {
 }
 
 /// This tool allows to parse RPG Maker XP/VX/VXAce/MV/MZ games text to `.txt` files and write them back to their initial form. The program uses `data` or `Data` directories for source files, and `translation` directory to operate with translation files. It will also decrypt any `.rgss` archive if it's present.
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[command(version = crate_version!(), next_line_help = true, term_width = 120)]
 struct Cli {
     /// Input directory, containing game files
@@ -601,8 +602,9 @@ impl<'a> Processor<'a> {
         if let Some(archive_path) = &self.archive_path
             && !self.system_file_path.exists()
         {
-            let archive_data = read(archive_path)?;
-            let decrypted_files = Decrypter::new().decrypt(&archive_data)?;
+            let mut archive_data = read(archive_path)?;
+            let mut decrypter = Decrypter::new();
+            let decrypted_files = decrypter.decrypt(&mut archive_data)?;
 
             for file in decrypted_files {
                 let path = String::from_utf8_lossy(&file.path);
@@ -628,7 +630,7 @@ impl<'a> Processor<'a> {
             .game_type(game_type)
             .read_mode(read_mode)
             .duplicate_mode(duplicate_mode)
-            .hashes(hashes)
+            .hashes(hashes.into_iter())
             .skip_maps(skip_maps.0)
             .skip_events(skip_events.0)
             .map_events(map_events)
@@ -645,7 +647,7 @@ impl<'a> Processor<'a> {
             disable_custom_processing,
             trim,
             duplicate_mode,
-            hashes: Some(reader.hashes()),
+            hashes: Some(reader.hashes().collect()),
         };
 
         create_dir_all(&self.translation_path)?;
@@ -785,7 +787,11 @@ impl<'a> Processor<'a> {
                 base.flags.set(BaseFlags::Romanize, generic_args.romanize);
                 base.flags.set(BaseFlags::Trim, generic_args.trim);
 
-                (base, ReadMode::Default(false), generic_args.generic_type)
+                (
+                    base,
+                    ReadMode::Default { force: false },
+                    generic_args.generic_type,
+                )
             }
 
             GenericSubcommand::Purge {
@@ -795,7 +801,11 @@ impl<'a> Processor<'a> {
                 let mut base = GenericBase::new(Mode::Purge);
                 base.flags.set(BaseFlags::CreateIgnore, *create_ignore);
 
-                (base, ReadMode::Default(false), generic_args.generic_type)
+                (
+                    base,
+                    ReadMode::Default { force: false },
+                    generic_args.generic_type,
+                )
             }
         };
 
