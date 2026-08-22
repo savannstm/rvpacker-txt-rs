@@ -1,19 +1,18 @@
 [package]
 name = "rvpacker-txt-rs"
-version = "13.0.1"
+version = "15.0.0"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.102"
-clap = { version = "4.6.1", features = ["wrap_help", "cargo", "derive"] }
+anyhow = "1.0.104"
+clap = { version = "4.6.6", features = ["wrap_help", "cargo", "derive"] }
 clap-verbosity-flag = { version = "3.0.4", default-features = false, features = [
     "tracing",
 ] }
 gxhash = { version = "3.5.0", features = ["deterministic"] }
 rpgmad-lib = "5.0.0"
-rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "13.0.1" }
-serde = "1.0.228"
-serde_json = { version = "1.0.150", features = ["preserve_order"] }
+rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "15.0.0", path = "../rvpacker-txt-rs-lib" }
+serde = "1.0.229"
+serde_json = { version = "1.0.151", features = ["preserve_order"] }
 strum = { version = "0.28.0", features = ["strum_macros"] }
-strum_macros = "0.28.0"
 tracing-subscriber = "0.3.23"

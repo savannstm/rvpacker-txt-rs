@@ -7,7 +7,7 @@
 
 use anyhow::{Context, Result, bail};
 use clap::{
-    ArgAction, Args, Parser, Subcommand, ValueEnum,
+    ArgAction, Args, Parser, Subcommand,
     builder::{PossibleValuesParser, TypedValueParser},
     crate_version, value_parser,
 };
@@ -15,16 +15,14 @@ use clap_verbosity_flag::{InfoLevel, Verbosity};
 use gxhash::HashMap;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{
-    BaseFlags, Mode, ProcessedData, PurgerBuilder, RPGMFileType,
-    RVPACKER_IGNORE_FILE, RVPACKER_METADATA_FILE, ReaderBuilder, WriterBuilder,
-    core::parse_ignore,
-    generic, get_ini_title, get_system_title, json,
-    types::{DuplicateMode, EngineType, FileFlags, GameType, ReadMode},
+    BaseFlags, Mode, Processor, RPGMFileType, RVPACKER_IGNORE_FILE,
+    RVPACKER_METADATA_FILE, get_ini_title, json,
+    types::{DuplicateMode, EngineType, FileFlags},
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
 use std::{
-    fs::{create_dir_all, read, read_dir, read_to_string, write},
+    fs::{create_dir_all, read, read_to_string, write},
     io::stdin,
     mem::take,
     path::{Path, PathBuf},
@@ -33,7 +31,6 @@ use std::{
     time::Instant,
 };
 use strum::VariantNames;
-use strum_macros::EnumIs;
 
 #[derive(Clone, Debug)]
 pub struct SkipMaps(pub Vec<u16>);
@@ -123,12 +120,6 @@ impl FromStr for SkipEvents {
     }
 }
 
-#[derive(Clone, Copy, Debug, ValueEnum)]
-pub enum GenericType {
-    JSON,
-    Marshal,
-}
-
 #[derive(Clone, Copy, Debug)]
 pub struct FFlags(pub FileFlags);
 
@@ -150,8 +141,6 @@ impl FromStr for FFlags {
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Metadata {
-    romanize: bool,
-    disable_custom_processing: bool,
     trim: bool,
     duplicate_mode: DuplicateMode,
     hashes: Option<HashMap<String, u64>>,
@@ -171,24 +160,13 @@ struct SharedArgs {
         default_value = "default",
         value_name = "MODE",
         display_order = 3,
-        value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| ReadMode::from_str(&s).unwrap())
+        value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| Mode::from_str(&s).unwrap())
     )]
-    read_mode: ReadMode,
+    read_mode: Mode,
 
     /// Removes the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior
     #[arg(short, long, action = ArgAction::SetTrue, display_order = 6)]
     trim: bool,
-
-    /// If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their western equivalents (in this case, '').
-    /// Will be automatically set if it was used in read
-    #[arg(short = 'R', long, action = ArgAction::SetTrue, display_order = 5)]
-    romanize: bool,
-
-    /// Disables built-in custom processing, implemented for some games.
-    /// Right now, implemented for the following titles: LISA: The Painful and its derivatives, Fear & Hunger 2: Termina.
-    /// Will be automatically set if it was used in read.
-    #[arg(short = 'D', long, alias = "no-custom", action = ArgAction::SetTrue, display_order = 93)]
-    disable_custom_processing: bool,
 
     /// Skips processing specified files, separated by comma. `plugins` can be used interchangeably with `scripts`
     #[arg(
@@ -264,21 +242,6 @@ struct PurgeArgs {
     shared: SharedArgs,
 }
 
-#[derive(Args, Debug)]
-struct GenericArgs {
-    /// Removes the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior
-    #[arg(short, long, action = ArgAction::SetTrue, display_order = 6)]
-    trim: bool,
-
-    /// If you parsing text from a Japanese game, that contains symbols like 「」, which are just the Japanese quotation marks, it automatically replaces these symbols by their western equivalents (in this case, '').
-    /// Will be automatically set if it was used in read
-    #[arg(short = 'R', long, action = ArgAction::SetTrue, display_order = 5)]
-    romanize: bool,
-
-    #[arg(short, long, value_parser = value_parser!(GenericType), required = true)]
-    generic_type: GenericType,
-}
-
 #[derive(Debug, Subcommand)]
 enum JsonSubcommand {
     /// Generates JSON representations of older engines' files in `json` directory
@@ -289,52 +252,16 @@ enum JsonSubcommand {
             alias = "mode",
             default_value = "default",
             value_name = "MODE",
-            value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| ReadMode::from_str(&s).unwrap())
+            value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| Mode::from_str(&s).unwrap())
         )]
-        read_mode: ReadMode,
+        read_mode: Mode,
     },
 
     /// Writes JSON representations of older engines' files from `json` directory back to original files
     Write,
 }
 
-#[derive(Debug, EnumIs, Subcommand)]
-enum GenericSubcommand {
-    Read {
-        #[arg(
-            short,
-            long,
-            alias = "mode",
-            default_value = "default",
-            value_name = "MODE",
-            value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| ReadMode::from_str(&s).unwrap())
-        )]
-        read_mode: ReadMode,
-
-        /// Ignore entries from `.rvpacker-ignore` file.
-        #[arg(short = 'I', long, action = ArgAction::SetTrue, requires_if("append", "read_mode"), requires_if("force-append", "read_mode"))]
-        ignore: bool,
-
-        #[command(flatten)]
-        generic_args: GenericArgs,
-    },
-
-    Write {
-        #[command(flatten)]
-        generic_args: GenericArgs,
-    },
-
-    Purge {
-        /// Creates an ignore file from purged lines, to prevent their further appearance when reading with `--mode append`
-        #[arg(short, long, action = ArgAction::SetTrue, display_order = 23)]
-        create_ignore: bool,
-
-        #[command(flatten)]
-        generic_args: GenericArgs,
-    },
-}
-
-#[derive(Debug, EnumIs, Subcommand)]
+#[derive(Debug, Subcommand)]
 enum Command {
     /// Parses game files to `.txt` format, and decrypts any `.rgss` archive if it's present
     Read(ReadArgs),
@@ -344,12 +271,6 @@ enum Command {
 
     /// Purges lines without translation from translation files
     Purge(PurgeArgs),
-
-    /// Provides `read`, `write` and `purge` subcommands for processing generic JSON/Marshal files
-    Generic {
-        #[command(subcommand)]
-        subcommand: GenericSubcommand,
-    },
 
     /// Provides the commands for JSON generation and writing
     Json {
@@ -387,26 +308,7 @@ fn parse_metadata(metadata_file_path: &Path) -> Result<Option<Metadata>> {
     Ok(Some(metadata))
 }
 
-fn get_game_type(
-    game_title: &str,
-    disable_custom_processing: bool,
-) -> GameType {
-    if disable_custom_processing {
-        GameType::None
-    } else {
-        let lowercased = game_title.to_lowercase();
-
-        if lowercased.contains("termina") {
-            GameType::Termina
-        } else if lowercased.contains("lisa") {
-            GameType::LisaRPG
-        } else {
-            GameType::None
-        }
-    }
-}
-
-struct Processor<'a> {
+struct Session<'a> {
     engine_type: EngineType,
 
     input_dir: PathBuf,
@@ -424,12 +326,12 @@ struct Processor<'a> {
     start_time: &'a mut Instant,
 }
 
-impl<'a> Processor<'a> {
+impl<'a> Session<'a> {
     pub fn new(
         cli: &mut Cli,
         start_time: &'a mut Instant,
     ) -> Result<Self, anyhow::Error> {
-        let mut input_dir = take(&mut cli.input_dir);
+        let input_dir = take(&mut cli.input_dir);
 
         if !input_dir.exists() {
             bail!("Input directory does not exist.");
@@ -442,74 +344,55 @@ impl<'a> Processor<'a> {
             bail!("Output directory does not exist.");
         }
 
-        let source_path = if !cli.command.is_generic() {
-            ["data", "Data"]
-                .into_iter()
-                .find_map(|dir| {
-                    let path = input_dir.join(dir);
-
-                    if path.exists() {
-                        return Some(path);
-                    }
-
-                    None
-                })
-                .context("Could not found `data`/`Data` directory.")?
-        } else {
-            take(&mut input_dir)
-        };
+        let source_path = ["data", "Data"]
+            .into_iter()
+            .map(|dir| input_dir.join(dir))
+            .find(|path| path.exists())
+            .context("Could not find `data`/`Data` directory.")?;
 
         let translation_path = output_dir.join("translation");
         let metadata_file_path = translation_path.join(RVPACKER_METADATA_FILE);
         let ignore_file_path = translation_path.join(RVPACKER_IGNORE_FILE);
 
-        let (engine_type, system_file_path, archive_path, ini_file_path) =
-            if !cli.command.is_generic() {
-                let type_paths = [
-                    (EngineType::New, source_path.join("System.json"), None),
-                    (
-                        EngineType::VXAce,
-                        source_path.join("System.rvdata2"),
-                        Some(input_dir.join("Game.rgss3a")),
-                    ),
-                    (
-                        EngineType::VX,
-                        source_path.join("System.rvdata"),
-                        Some(input_dir.join("Game.rgss2a")),
-                    ),
-                    (
-                        EngineType::XP,
-                        source_path.join("System.rxdata"),
-                        Some(input_dir.join("Game.rgssad")),
-                    ),
-                ];
+        let type_paths = [
+            (EngineType::New, source_path.join("System.json"), None),
+            (
+                EngineType::VXAce,
+                source_path.join("System.rvdata2"),
+                Some(input_dir.join("Game.rgss3a")),
+            ),
+            (
+                EngineType::VX,
+                source_path.join("System.rvdata"),
+                Some(input_dir.join("Game.rgss2a")),
+            ),
+            (
+                EngineType::XP,
+                source_path.join("System.rxdata"),
+                Some(input_dir.join("Game.rgssad")),
+            ),
+        ];
 
-                let Some((engine_type, system_file_path, archive_path)) =
-                    type_paths.into_iter().find_map(
-                        |(engine_type, system_file_path, archive_path)| {
-                            if !system_file_path.exists()
-                                && archive_path
-                                    .as_ref()
-                                    .is_none_or(|path| !path.exists())
-                            {
-                                return None;
-                            }
+        let Some((engine_type, system_file_path, archive_path)) = type_paths
+            .into_iter()
+            .find_map(|(engine_type, system_file_path, archive_path)| {
+                if !system_file_path.exists()
+                    && archive_path.as_ref().is_none_or(|path| !path.exists())
+                {
+                    return None;
+                }
 
-                            Some((engine_type, system_file_path, archive_path))
-                        },
-                    )
-                else {
-                    bail!(
-                        "Couldn't determine game engine. Check the existence of `System` file inside `data`/`Data` directory, or `.rgss` archive."
-                    );
-                };
+                Some((engine_type, system_file_path, archive_path))
+            })
+        else {
+            bail!(
+                "Couldn't determine game engine. Check the existence of \
+                 `System` file inside `data`/`Data` directory, or `.rgss` \
+                 archive."
+            );
+        };
 
-                let ini_file_path = input_dir.join("Game.ini");
-
-                (engine_type, system_file_path, archive_path, ini_file_path)
-            } else {
-                Default::default()
-            };
+        let ini_file_path = input_dir.join("Game.ini");
 
         Ok(Self {
             engine_type,
@@ -526,15 +409,32 @@ impl<'a> Processor<'a> {
         })
     }
 
-    fn get_game_title(&self) -> Result<String> {
-        Ok(if self.engine_type.is_new() {
-            get_system_title(&read_to_string(&self.system_file_path)?)?
-        } else {
-            String::from_utf8_lossy(&get_ini_title(&read(
-                &self.ini_file_path,
-            )?)?)
-            .into_owned()
-        })
+    /// The title from `Game.ini`, decoded as UTF-8 on a best-effort basis.
+    ///
+    /// `Processor::game_title` overrides whatever the system file itself
+    /// carries; XP, VX and VX Ace games often leave that field blank and keep
+    /// their real title only in `Game.ini`. A missing or unreadable
+    /// `Game.ini` is not fatal - the system file's own field, empty or not,
+    /// is still a reasonable fallback - so this only warns.
+    fn ini_game_title(&self) -> String {
+        if self.engine_type.is_new() {
+            return String::new();
+        }
+
+        let title = read(&self.ini_file_path)
+            .map_err(anyhow::Error::from)
+            .and_then(|content| Ok(get_ini_title(&content)?));
+
+        match title {
+            Ok(title) => String::from_utf8_lossy(&title).into_owned(),
+            Err(err) => {
+                eprintln!(
+                    "warning: {}: {err}",
+                    self.ini_file_path.display()
+                );
+                String::new()
+            }
+        }
     }
 
     pub fn execute_read(
@@ -544,10 +444,8 @@ impl<'a> Processor<'a> {
         let SharedArgs {
             skip_files,
             read_mode,
-            mut romanize,
             mut trim,
             mut duplicate_mode,
-            mut disable_custom_processing,
             skip_maps,
             skip_events,
             map_events,
@@ -558,29 +456,29 @@ impl<'a> Processor<'a> {
         let ignore = args.ignore;
         let skip_obsolete = args.skip_obsolete;
 
-        let game_title = self.get_game_title()?;
-        let game_type = get_game_type(&game_title, disable_custom_processing);
+        let Mode::Read { append, force } = read_mode else {
+            unreachable!("the read-mode parser only accepts `Read` variants")
+        };
 
         let mut hashes = None;
 
-        if read_mode.is_append()
+        if append
             && let Some(metadata) = parse_metadata(&self.metadata_file_path)?
         {
             Metadata {
-                romanize,
                 trim,
                 duplicate_mode,
-                disable_custom_processing,
                 hashes,
             } = metadata;
         }
 
         let hashes = hashes.unwrap_or_default();
 
-        if read_mode.is_force() && !silent {
+        if force && !silent {
             let start = Instant::now();
             println!(
-                "WARNING! Force mode will forcefully rewrite all your translation files. Input 'Y' to continue."
+                "WARNING! Force mode will forcefully rewrite all your \
+                 translation files. Input 'Y' to continue."
             );
 
             let mut buf = String::with_capacity(4);
@@ -593,7 +491,7 @@ impl<'a> Processor<'a> {
             *self.start_time -= start.elapsed();
         }
 
-        if read_mode.is_append() && ignore && !self.ignore_file_path.exists() {
+        if append && ignore && !self.ignore_file_path.exists() {
             bail!(
                 "`.rvpacker-ignore` file does not exist. Aborting execution."
             );
@@ -607,7 +505,7 @@ impl<'a> Processor<'a> {
             let decrypted_files = decrypter.decrypt(&mut archive_data)?;
 
             for file in decrypted_files {
-                let path = String::from_utf8_lossy(&file.path);
+                let path = String::from_utf8_lossy(file.path);
                 let output_file_path = self.input_dir.join(path.as_ref());
 
                 if let Some(parent) = output_file_path.parent() {
@@ -619,35 +517,33 @@ impl<'a> Processor<'a> {
         }
 
         let mut flags = BaseFlags::empty();
-        flags.set(BaseFlags::Romanize, romanize);
         flags.set(BaseFlags::Ignore, ignore);
         flags.set(BaseFlags::Trim, trim);
         flags.set(BaseFlags::SkipObsolete, skip_obsolete);
 
-        let mut reader = ReaderBuilder::new()
-            .with_files(file_flags)
-            .with_flags(flags)
-            .game_type(game_type)
-            .read_mode(read_mode)
-            .duplicate_mode(duplicate_mode)
-            .hashes(hashes.into_iter())
-            .skip_maps(skip_maps.0)
-            .skip_events(skip_events.0)
-            .map_events(map_events)
-            .build();
+        let mut processor = Processor {
+            mode: read_mode,
+            file_flags,
+            flags,
+            duplicate_mode,
+            game_title: self.ini_game_title(),
+            hashes,
+            skip_maps: skip_maps.0,
+            skip_events: skip_events.0,
+            map_events,
+        };
 
-        reader.read(
+        processor.process(
+            self.engine_type,
             &self.source_path,
             &self.translation_path,
-            self.engine_type,
+            None,
         )?;
 
         let metadata = Metadata {
-            romanize,
-            disable_custom_processing,
             trim,
             duplicate_mode,
-            hashes: Some(reader.hashes().collect()),
+            hashes: Some(processor.hashes),
         };
 
         create_dir_all(&self.translation_path)?;
@@ -659,16 +555,15 @@ impl<'a> Processor<'a> {
     pub fn execute_write(&self, args: SharedArgs) -> Result<(), anyhow::Error> {
         if !self.translation_path.exists() {
             bail!(
-                "`translation` directory in the input directory does not exist."
+                "`translation` directory in the input directory does not \
+                 exist."
             );
         }
 
         let SharedArgs {
             skip_files,
-            mut romanize,
             mut trim,
             mut duplicate_mode,
-            mut disable_custom_processing,
             skip_maps,
             skip_events,
             ..
@@ -678,36 +573,31 @@ impl<'a> Processor<'a> {
 
         if let Some(metadata) = parse_metadata(&self.metadata_file_path)? {
             Metadata {
-                romanize,
                 trim,
                 duplicate_mode,
-                disable_custom_processing,
                 hashes: _,
             } = metadata;
         }
 
-        let game_title = self.get_game_title()?;
-
-        let game_type = get_game_type(&game_title, disable_custom_processing);
-
         let mut flags = BaseFlags::empty();
-        flags.set(BaseFlags::Romanize, romanize);
         flags.set(BaseFlags::Trim, trim);
 
-        WriterBuilder::new()
-            .with_files(file_flags)
-            .with_flags(flags)
-            .game_type(game_type)
-            .duplicate_mode(duplicate_mode)
-            .skip_maps(skip_maps.0)
-            .skip_events(skip_events.0)
-            .build()
-            .write(
-                &self.source_path,
-                &self.translation_path,
-                &self.output_dir.join("output"),
-                self.engine_type,
-            )?;
+        let mut processor = Processor {
+            mode: Mode::Write,
+            file_flags,
+            flags,
+            duplicate_mode,
+            skip_maps: skip_maps.0,
+            skip_events: skip_events.0,
+            ..Default::default()
+        };
+
+        processor.process(
+            self.engine_type,
+            &self.source_path,
+            &self.translation_path,
+            Some(&self.output_dir.join("output")),
+        )?;
 
         Ok(())
     }
@@ -715,10 +605,8 @@ impl<'a> Processor<'a> {
     pub fn execute_purge(&self, args: PurgeArgs) -> Result<(), anyhow::Error> {
         let SharedArgs {
             skip_files,
-            mut romanize,
             mut trim,
             mut duplicate_mode,
-            mut disable_custom_processing,
             skip_maps,
             skip_events,
             ..
@@ -729,187 +617,32 @@ impl<'a> Processor<'a> {
 
         if let Some(metadata) = parse_metadata(&self.metadata_file_path)? {
             Metadata {
-                romanize,
                 trim,
                 duplicate_mode,
-                disable_custom_processing,
                 hashes: _,
             } = metadata;
         }
 
-        let game_title = self.get_game_title()?;
-        let game_type = get_game_type(&game_title, disable_custom_processing);
-
-        let mut flags: BaseFlags = BaseFlags::empty();
-        flags.set(BaseFlags::Romanize, romanize);
+        let mut flags = BaseFlags::empty();
         flags.set(BaseFlags::Trim, trim);
         flags.set(BaseFlags::CreateIgnore, create_ignore);
 
-        PurgerBuilder::new()
-            .with_files(file_flags)
-            .with_flags(flags)
-            .game_type(game_type)
-            .duplicate_mode(duplicate_mode)
-            .skip_maps(skip_maps.0)
-            .skip_events(skip_events.0)
-            .build()
-            .purge(
-                &self.source_path,
-                &self.translation_path,
-                self.engine_type,
-            )?;
-
-        Ok(())
-    }
-
-    pub fn execute_generic(
-        &self,
-        subcommand: &GenericSubcommand,
-    ) -> Result<(), anyhow::Error> {
-        use generic::GenericBase;
-
-        let (mut base, read_mode, generic_type) = match subcommand {
-            GenericSubcommand::Read {
-                read_mode,
-                ignore,
-                generic_args,
-            } => {
-                let mut base = GenericBase::new(Mode::Read(*read_mode));
-                base.flags.set(BaseFlags::Romanize, generic_args.romanize);
-                base.flags.set(BaseFlags::Trim, generic_args.trim);
-                base.flags.set(BaseFlags::Ignore, *ignore);
-
-                (base, *read_mode, generic_args.generic_type)
-            }
-
-            GenericSubcommand::Write { generic_args } => {
-                let mut base = GenericBase::new(Mode::Write);
-                base.flags.set(BaseFlags::Romanize, generic_args.romanize);
-                base.flags.set(BaseFlags::Trim, generic_args.trim);
-
-                (
-                    base,
-                    ReadMode::Default { force: false },
-                    generic_args.generic_type,
-                )
-            }
-
-            GenericSubcommand::Purge {
-                create_ignore,
-                generic_args,
-            } => {
-                let mut base = GenericBase::new(Mode::Purge);
-                base.flags.set(BaseFlags::CreateIgnore, *create_ignore);
-
-                (
-                    base,
-                    ReadMode::Default { force: false },
-                    generic_args.generic_type,
-                )
-            }
+        let mut processor = Processor {
+            mode: Mode::Purge,
+            file_flags,
+            flags,
+            duplicate_mode,
+            skip_maps: skip_maps.0,
+            skip_events: skip_events.0,
+            ..Default::default()
         };
 
-        let mut ignore_file_path = PathBuf::new();
-
-        if base
-            .flags
-            .intersects(BaseFlags::CreateIgnore | BaseFlags::Ignore)
-        {
-            ignore_file_path = self.translation_path.join(RVPACKER_IGNORE_FILE);
-
-            let ignore_file_content = read_to_string(&ignore_file_path);
-
-            match ignore_file_content {
-                Ok(content) => {
-                    base.ignore_map = parse_ignore(
-                        &content,
-                        DuplicateMode::Remove,
-                        base.mode.is_read(),
-                    );
-                }
-
-                err if base.flags.contains(BaseFlags::Ignore) => {
-                    err?;
-                }
-
-                _ => {}
-            }
-        }
-
-        if subcommand.is_read() {
-            create_dir_all(&self.translation_path)?;
-        }
-
-        for file in read_dir(&self.input_dir)?.flatten() {
-            let path = file.path();
-            let filename = file.file_name().into_string().unwrap();
-
-            let translation_path = self.translation_path.join(
-                Path::new(&filename.to_lowercase()).with_extension("txt"),
-            );
-            let mut translation = None;
-
-            if read_mode.is_append() {
-                translation = Some(read_to_string(&translation_path)?);
-            }
-
-            let processed = match generic_type {
-                GenericType::JSON => {
-                    println!("{}", path.display());
-                    let content = read_to_string(&path)?;
-
-                    base.process_json(
-                        &content,
-                        &filename,
-                        translation.as_deref(),
-                    )?
-                }
-                GenericType::Marshal => {
-                    let content = read(&path)?;
-
-                    base.process_marshal(
-                        &content,
-                        &filename,
-                        translation.as_deref(),
-                    )?
-                }
-            };
-
-            match processed {
-                ProcessedData::RPGMData(d) => {
-                    write(path, d)?;
-                }
-                ProcessedData::TranslationData(d) => {
-                    write(translation_path, d)?;
-                }
-            }
-        }
-
-        if base.flags.contains(BaseFlags::CreateIgnore) {
-            use std::fmt::Write;
-
-            let contents: String = take(&mut base.ignore_map).into_iter().fold(
-                String::new(),
-                |mut output, (file, lines)| {
-                    let _ = write!(
-                        output,
-                        "{}\n{}",
-                        file,
-                        lines
-                            .into_iter()
-                            .map(|mut x| {
-                                x.push('\n');
-                                x
-                            })
-                            .collect::<String>()
-                    );
-
-                    output
-                },
-            );
-
-            write(&ignore_file_path, contents)?;
-        }
+        processor.process(
+            self.engine_type,
+            &self.source_path,
+            &self.translation_path,
+            None,
+        )?;
 
         Ok(())
     }
@@ -925,7 +658,9 @@ impl<'a> Processor<'a> {
 
         match subcommand {
             JsonSubcommand::Generate { read_mode } => {
-                generate(&self.source_path, &json_path, read_mode.is_force())?;
+                let force =
+                    matches!(read_mode, Mode::Read { force: true, .. });
+                generate(&self.source_path, &json_path, force)?;
             }
             JsonSubcommand::Write => {
                 write(json_path, json_output_path, self.engine_type)?;
@@ -950,16 +685,13 @@ fn main() -> Result<()> {
         .with_max_level(cli.verbosity)
         .init();
 
-    let mut processor = Processor::new(&mut cli, &mut start_time)?;
+    let mut session = Session::new(&mut cli, &mut start_time)?;
 
     match cli.command {
-        Command::Read(args) => processor.execute_read(args)?,
-        Command::Write(args) => processor.execute_write(args)?,
-        Command::Purge(args) => processor.execute_purge(args)?,
-        Command::Generic { subcommand } => {
-            processor.execute_generic(&subcommand)?
-        }
-        Command::Json { subcommand } => processor.execute_json(&subcommand)?,
+        Command::Read(args) => session.execute_read(args)?,
+        Command::Write(args) => session.execute_write(args)?,
+        Command::Purge(args) => session.execute_purge(args)?,
+        Command::Json { subcommand } => session.execute_json(&subcommand)?,
     }
 
     println!("Elapsed: {:.2}s", start_time.elapsed().as_secs_f32());
