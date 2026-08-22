@@ -7,11 +7,12 @@
 
 use anyhow::{Context, Result, bail};
 use clap::{
-    ArgAction, Args, Parser, Subcommand,
+    ArgAction, Args, Parser, Subcommand, ValueEnum,
     builder::{PossibleValuesParser, TypedValueParser},
     crate_version, value_parser,
 };
 use clap_verbosity_flag::{InfoLevel, Verbosity};
+use encoding_rs::{Encoding, GB18030, SHIFT_JIS, UTF_8, WINDOWS_1252};
 use gxhash::HashMap;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{
@@ -138,6 +139,35 @@ impl FromStr for FFlags {
     }
 }
 
+/// Encodings `Game.ini` is plausibly saved in.
+///
+/// The file predates UTF-8 becoming the default on Windows, so its title is
+/// not necessarily - and for a Japanese or Chinese game, probably isn't -
+/// valid UTF-8. There is no way to detect the encoding from the bytes alone,
+/// so the user has to say which one it is.
+#[derive(Clone, Copy, Debug, ValueEnum)]
+enum IniEncoding {
+    #[value(name = "utf-8")]
+    Utf8,
+    #[value(name = "shift-jis")]
+    ShiftJis,
+    #[value(name = "gb18030")]
+    Gb18030,
+    #[value(name = "windows-1252")]
+    Windows1252,
+}
+
+impl IniEncoding {
+    fn as_encoding(self) -> &'static Encoding {
+        match self {
+            Self::Utf8 => UTF_8,
+            Self::ShiftJis => SHIFT_JIS,
+            Self::Gb18030 => GB18030,
+            Self::Windows1252 => WINDOWS_1252,
+        }
+    }
+}
+
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Metadata {
@@ -227,6 +257,19 @@ struct ReadArgs {
 
     #[arg(long, alias = "so", action = ArgAction::SetTrue, requires_if("append", "read_mode"), requires_if("force-append", "read_mode"))]
     skip_obsolete: bool,
+
+    /// Decodes `Game.ini`'s title with the given encoding and prints it,
+    /// without reading anything else. XP/VX/VX Ace only. Use this to find
+    /// the right encoding before passing it to `--game-ini-encoding`.
+    #[arg(long, value_name = "ENCODING")]
+    parse_game_ini: Option<IniEncoding>,
+
+    /// Encoding to decode `Game.ini`'s title with, for XP/VX/VX Ace. This
+    /// overrides whatever the system file's own title field carries.
+    /// Left unset, the title is not touched at all - guessing wrong would
+    /// silently corrupt it.
+    #[arg(long, value_name = "ENCODING")]
+    game_ini_encoding: Option<IniEncoding>,
 
     #[command(flatten)]
     shared: SharedArgs,
@@ -409,15 +452,31 @@ impl<'a> Session<'a> {
         })
     }
 
-    /// The title from `Game.ini`, decoded as UTF-8 on a best-effort basis.
+    /// The title from `Game.ini`, decoded with `encoding`, or the empty
+    /// string if `encoding` is unset.
     ///
     /// `Processor::game_title` overrides whatever the system file itself
     /// carries; XP, VX and VX Ace games often leave that field blank and keep
-    /// their real title only in `Game.ini`. A missing or unreadable
-    /// `Game.ini` is not fatal - the system file's own field, empty or not,
-    /// is still a reasonable fallback - so this only warns.
-    fn ini_game_title(&self) -> String {
+    /// their real title only in `Game.ini`. But the file predates UTF-8
+    /// becoming the platform default, so there is no safe encoding to guess:
+    /// decoding a Shift-JIS title as UTF-8 does not error, it just produces
+    /// garbage. The caller has to say which encoding to use; without one,
+    /// this leaves the title alone rather than risk corrupting it.
+    ///
+    /// A missing or unreadable `Game.ini`, or an encoding that produces
+    /// replacement characters, is not fatal - the system file's own title
+    /// field, empty or not, is still a reasonable fallback - so this only
+    /// warns.
+    fn ini_game_title(&self, encoding: Option<IniEncoding>) -> String {
+        let Some(encoding) = encoding else {
+            return String::new();
+        };
+
         if self.engine_type.is_new() {
+            eprintln!(
+                "warning: --game-ini-encoding has no effect on MV/MZ, which \
+                 carries its title in `System.json`"
+            );
             return String::new();
         }
 
@@ -426,7 +485,22 @@ impl<'a> Session<'a> {
             .and_then(|content| Ok(get_ini_title(&content)?));
 
         match title {
-            Ok(title) => String::from_utf8_lossy(&title).into_owned(),
+            Ok(title) => {
+                let (title, _, had_errors) =
+                    encoding.as_encoding().decode(&title);
+
+                if had_errors {
+                    eprintln!(
+                        "warning: {}: decoding the title as {} produced \
+                         replacement characters - this is probably not the \
+                         right encoding",
+                        self.ini_file_path.display(),
+                        encoding.as_encoding().name()
+                    );
+                }
+
+                title.into_owned()
+            }
             Err(err) => {
                 eprintln!(
                     "warning: {}: {err}",
@@ -437,10 +511,46 @@ impl<'a> Session<'a> {
         }
     }
 
+    /// Decodes `Game.ini`'s title with `encoding` and prints it, for
+    /// `--parse-game-ini`. Reads nothing else.
+    fn print_ini_title(&self, encoding: IniEncoding) -> Result<(), anyhow::Error> {
+        if self.engine_type.is_new() {
+            bail!(
+                "`--parse-game-ini` only applies to XP/VX/VX Ace; MV/MZ \
+                 keep their title in `System.json`."
+            );
+        }
+
+        let content = read(&self.ini_file_path)
+            .with_context(|| self.ini_file_path.display().to_string())?;
+        let title_bytes = get_ini_title(&content)?;
+        let (title, _, had_errors) = encoding.as_encoding().decode(&title_bytes);
+
+        println!("{title}");
+
+        if had_errors {
+            eprintln!(
+                "warning: decoding produced replacement characters - this is \
+                 probably not the right encoding"
+            );
+        }
+
+        Ok(())
+    }
+
     pub fn execute_read(
         &mut self,
         args: ReadArgs,
     ) -> Result<(), anyhow::Error> {
+        if let Some(encoding) = args.parse_game_ini {
+            return self.print_ini_title(encoding);
+        }
+
+        let silent = args.silent;
+        let ignore = args.ignore;
+        let skip_obsolete = args.skip_obsolete;
+        let game_ini_encoding = args.game_ini_encoding;
+
         let SharedArgs {
             skip_files,
             read_mode,
@@ -452,9 +562,6 @@ impl<'a> Session<'a> {
         } = args.shared;
 
         let file_flags = FileFlags::all() & !skip_files.0;
-        let silent = args.silent;
-        let ignore = args.ignore;
-        let skip_obsolete = args.skip_obsolete;
 
         let Mode::Read { append, force } = read_mode else {
             unreachable!("the read-mode parser only accepts `Read` variants")
@@ -526,7 +633,7 @@ impl<'a> Session<'a> {
             file_flags,
             flags,
             duplicate_mode,
-            game_title: self.ini_game_title(),
+            game_title: self.ini_game_title(game_ini_encoding),
             hashes,
             skip_maps: skip_maps.0,
             skip_events: skip_events.0,

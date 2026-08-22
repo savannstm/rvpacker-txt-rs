@@ -9,6 +9,7 @@ clap = { version = "4.6.6", features = ["wrap_help", "cargo", "derive"] }
 clap-verbosity-flag = { version = "3.0.4", default-features = false, features = [
     "tracing",
 ] }
+encoding_rs = "0.8.35"
 gxhash = { version = "3.5.0", features = ["deterministic"] }
 rpgmad-lib = "5.0.0"
 rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "15.0.0", path = "../rvpacker-txt-rs-lib" }
