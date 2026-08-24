@@ -16,11 +16,11 @@ use encoding_rs::{Encoding, GB18030, SHIFT_JIS, UTF_8, WINDOWS_1252};
 use gxhash::HashMap;
 use rpgmad_lib::Decrypter;
 use rvpacker_lib::{
-    BaseFlags, Mode, Processor, RPGMFileType, RVPACKER_IGNORE_FILE,
-    RVPACKER_METADATA_FILE, get_ini_title, json,
+    BaseFlags, Mode, Processor, RPGMFileType, RVPACKER_IGNORE_FILE, RVPACKER_METADATA_FILE, get_ini_title, json,
+    set_comment_prefix, set_line_break, set_line_separator,
     types::{DuplicateMode, EngineType, FileFlags},
 };
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer, ser::SerializeMap};
 use serde_json::{from_str, to_string};
 use std::{
     fs::{create_dir_all, read, read_to_string, write},
@@ -44,17 +44,15 @@ impl FromStr for SkipMaps {
 
         for part in s.split(',').map(str::trim).filter(|s| !s.is_empty()) {
             if let Some((a, b)) = part.split_once('-') {
-                let start = a.parse::<u16>().map_err(|e| {
-                    format!("Invalid start of range `{a}`: {e}")
-                })?;
+                let start = a
+                    .parse::<u16>()
+                    .map_err(|e| format!("Invalid start of range `{a}`: {e}"))?;
                 let end = b
                     .parse::<u16>()
                     .map_err(|e| format!("Invalid end of range `{b}`: {e}"))?;
 
                 if start > end {
-                    return Err(format!(
-                        "Range `{part}` is reversed (start > end)"
-                    ));
+                    return Err(format!("Range `{part}` is reversed (start > end)"));
                 }
 
                 for v in start..=end {
@@ -90,26 +88,24 @@ impl FromStr for SkipEvents {
 
             for part in parts.split(',') {
                 if let Some((a, b)) = part.split_once('-') {
-                    let start = a.parse::<u16>().map_err(|e| {
-                        format!("Invalid start of range `{a}`: {e}")
-                    })?;
-                    let end = b.parse::<u16>().map_err(|e| {
-                        format!("Invalid end of range `{b}`: {e}")
-                    })?;
+                    let start = a
+                        .parse::<u16>()
+                        .map_err(|e| format!("Invalid start of range `{a}`: {e}"))?;
+                    let end = b
+                        .parse::<u16>()
+                        .map_err(|e| format!("Invalid end of range `{b}`: {e}"))?;
 
                     if start > end {
-                        return Err(format!(
-                            "Range `{part}` is reversed (start > end)"
-                        ));
+                        return Err(format!("Range `{part}` is reversed (start > end)"));
                     }
 
                     for v in start..=end {
                         indices.push(v);
                     }
                 } else {
-                    let v = part.parse::<u16>().map_err(|e| {
-                        format!("Invalid integer `{part}`: {e}")
-                    })?;
+                    let v = part
+                        .parse::<u16>()
+                        .map_err(|e| format!("Invalid integer `{part}`: {e}"))?;
                     indices.push(v);
                 }
             }
@@ -171,9 +167,48 @@ impl IniEncoding {
 #[derive(Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct Metadata {
-    trim: bool,
     duplicate_mode: DuplicateMode,
+    line_separator: Option<String>,
+    line_break: Option<String>,
+    comment_prefix: Option<String>,
+    #[serde(serialize_with = "serialize_sorted_hashes")]
     hashes: Option<HashMap<String, u64>>,
+}
+
+fn serialize_sorted_hashes<S>(hashes: &Option<HashMap<String, u64>>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match hashes {
+        Some(map) => {
+            let mut entries: Vec<(&String, &u64)> = map.iter().collect();
+            entries.sort_by(|a, b| a.0.cmp(b.0));
+            let mut m = serializer.serialize_map(Some(entries.len()))?;
+            for (k, v) in entries {
+                m.serialize_entry(k, v)?;
+            }
+            m.end()
+        }
+        None => serializer.serialize_none(),
+    }
+}
+
+fn apply_format_overrides(
+    line_separator: Option<&String>,
+    line_break: Option<&String>,
+    comment_prefix: Option<&String>,
+) {
+    if let Some(separator) = line_separator {
+        set_line_separator(Box::leak(separator.clone().into_boxed_str()));
+    }
+
+    if let Some(line_break) = line_break {
+        set_line_break(Box::leak(line_break.clone().into_boxed_str()));
+    }
+
+    if let Some(prefix) = comment_prefix {
+        set_comment_prefix(Box::leak(prefix.clone().into_boxed_str()));
+    }
 }
 
 #[derive(Args, Debug)]
@@ -193,10 +228,6 @@ struct SharedArgs {
         value_parser = PossibleValuesParser::new(["default", "append", "force", "force-append"]).map(|s| Mode::from_str(&s).unwrap())
     )]
     read_mode: Mode,
-
-    /// Removes the leading and trailing whitespace from extracted strings. Don't use this option unless you know that trimming the text won't cause any incorrect behavior
-    #[arg(short, long, action = ArgAction::SetTrue, display_order = 6)]
-    trim: bool,
 
     /// Skips processing specified files, separated by comma. `plugins` can be used interchangeably with `scripts`
     #[arg(
@@ -231,10 +262,13 @@ struct SharedArgs {
     )]
     skip_events: SkipEvents,
 
+    /// Parse information about map events for the map files.
+    /// This will give you more info about where the text of the event happens.
     #[arg(short, long, alias = "me", action = ArgAction::SetTrue)]
     map_events: bool,
 
-    /// Controls how to handle duplicates in text
+    /// Controls how to handle duplicates in text.
+    /// A value already recorded in `.rvpacker-metadata` takes precedence over this.
     #[arg(
         short,
         long,
@@ -334,6 +368,25 @@ struct Cli {
     #[arg(short, long, global = true, value_name = "OUTPUT_PATH", value_parser = value_parser!(PathBuf), display_order = 2)]
     output_dir: Option<PathBuf>,
 
+    /// Separator between the source and translation columns of a translation line.
+    /// Defaults to the library's own default (`<#>`). On `append`/`write`/`purge`, a
+    /// value already recorded in `.rvpacker-metadata` takes precedence over this.
+    #[arg(long, global = true, value_name = "SEPARATOR", display_order = 4)]
+    line_separator: Option<String>,
+
+    /// Marker that source/translation line breaks are normalized to in translation files.
+    /// Defaults to the library's own default (`\#`). On `append`/`write`/`purge`, a value
+    /// already recorded in `.rvpacker-metadata` takes precedence over this.
+    #[arg(long, global = true, value_name = "BREAK", display_order = 5)]
+    line_break: Option<String>,
+
+    /// Prefix marking a line in translation files as a comment (`ID`, `NAME`, ignore
+    /// entries, etc). Defaults to the library's own default (`<!>`). On
+    /// `append`/`write`/`purge`, a value already recorded in `.rvpacker-metadata` takes
+    /// precedence over this.
+    #[arg(long, global = true, value_name = "PREFIX", display_order = 6)]
+    comment_prefix: Option<String>,
+
     #[command(subcommand)]
     command: Command,
 
@@ -366,22 +419,22 @@ struct Session<'a> {
     archive_path: Option<PathBuf>,
     output_dir: PathBuf,
 
+    line_separator: Option<String>,
+    line_break: Option<String>,
+    comment_prefix: Option<String>,
+
     start_time: &'a mut Instant,
 }
 
 impl<'a> Session<'a> {
-    pub fn new(
-        cli: &mut Cli,
-        start_time: &'a mut Instant,
-    ) -> Result<Self, anyhow::Error> {
+    pub fn new(cli: &mut Cli, start_time: &'a mut Instant) -> Result<Self, anyhow::Error> {
         let input_dir = take(&mut cli.input_dir);
 
         if !input_dir.exists() {
             bail!("Input directory does not exist.");
         }
 
-        let output_dir =
-            take(&mut cli.output_dir).unwrap_or_else(|| input_dir.clone());
+        let output_dir = take(&mut cli.output_dir).unwrap_or_else(|| input_dir.clone());
 
         if !output_dir.exists() {
             bail!("Output directory does not exist.");
@@ -398,7 +451,7 @@ impl<'a> Session<'a> {
         let ignore_file_path = translation_path.join(RVPACKER_IGNORE_FILE);
 
         let type_paths = [
-            (EngineType::New, source_path.join("System.json"), None),
+            (EngineType::MVMZ, source_path.join("System.json"), None),
             (
                 EngineType::VXAce,
                 source_path.join("System.rvdata2"),
@@ -416,26 +469,28 @@ impl<'a> Session<'a> {
             ),
         ];
 
-        let Some((engine_type, system_file_path, archive_path)) = type_paths
-            .into_iter()
-            .find_map(|(engine_type, system_file_path, archive_path)| {
-                if !system_file_path.exists()
-                    && archive_path.as_ref().is_none_or(|path| !path.exists())
-                {
-                    return None;
-                }
+        let Some((engine_type, system_file_path, archive_path)) =
+            type_paths
+                .into_iter()
+                .find_map(|(engine_type, system_file_path, archive_path)| {
+                    if !system_file_path.exists() && archive_path.as_ref().is_none_or(|path| !path.exists()) {
+                        return None;
+                    }
 
-                Some((engine_type, system_file_path, archive_path))
-            })
+                    Some((engine_type, system_file_path, archive_path))
+                })
         else {
             bail!(
-                "Couldn't determine game engine. Check the existence of \
-                 `System` file inside `data`/`Data` directory, or `.rgss` \
-                 archive."
+                "Couldn't determine game engine. Check the existence of `System` file inside `data`/`Data` directory, \
+                 or `.rgss` archive."
             );
         };
 
         let ini_file_path = input_dir.join("Game.ini");
+
+        let line_separator = take(&mut cli.line_separator);
+        let line_break = take(&mut cli.line_break);
+        let comment_prefix = take(&mut cli.comment_prefix);
 
         Ok(Self {
             engine_type,
@@ -448,35 +503,20 @@ impl<'a> Session<'a> {
             ignore_file_path,
             archive_path,
             output_dir,
+            line_separator,
+            line_break,
+            comment_prefix,
             start_time,
         })
     }
 
-    /// The title from `Game.ini`, decoded with `encoding`, or the empty
-    /// string if `encoding` is unset.
-    ///
-    /// `Processor::game_title` overrides whatever the system file itself
-    /// carries; XP, VX and VX Ace games often leave that field blank and keep
-    /// their real title only in `Game.ini`. But the file predates UTF-8
-    /// becoming the platform default, so there is no safe encoding to guess:
-    /// decoding a Shift-JIS title as UTF-8 does not error, it just produces
-    /// garbage. The caller has to say which encoding to use; without one,
-    /// this leaves the title alone rather than risk corrupting it.
-    ///
-    /// A missing or unreadable `Game.ini`, or an encoding that produces
-    /// replacement characters, is not fatal - the system file's own title
-    /// field, empty or not, is still a reasonable fallback - so this only
-    /// warns.
     fn ini_game_title(&self, encoding: Option<IniEncoding>) -> String {
         let Some(encoding) = encoding else {
             return String::new();
         };
 
-        if self.engine_type.is_new() {
-            eprintln!(
-                "warning: --game-ini-encoding has no effect on MV/MZ, which \
-                 carries its title in `System.json`"
-            );
+        if self.engine_type.is_mvmz() {
+            eprintln!("warning: --game-ini-encoding has no effect on MV/MZ, which carries its title in `System.json`");
             return String::new();
         }
 
@@ -486,14 +526,12 @@ impl<'a> Session<'a> {
 
         match title {
             Ok(title) => {
-                let (title, _, had_errors) =
-                    encoding.as_encoding().decode(&title);
+                let (title, _, had_errors) = encoding.as_encoding().decode(&title);
 
                 if had_errors {
                     eprintln!(
-                        "warning: {}: decoding the title as {} produced \
-                         replacement characters - this is probably not the \
-                         right encoding",
+                        "warning: {}: decoding the title as {} produced replacement characters - this is probably not \
+                         the right encoding",
                         self.ini_file_path.display(),
                         encoding.as_encoding().name()
                     );
@@ -502,10 +540,7 @@ impl<'a> Session<'a> {
                 title.into_owned()
             }
             Err(err) => {
-                eprintln!(
-                    "warning: {}: {err}",
-                    self.ini_file_path.display()
-                );
+                eprintln!("warning: {}: {err}", self.ini_file_path.display());
                 String::new()
             }
         }
@@ -514,34 +549,24 @@ impl<'a> Session<'a> {
     /// Decodes `Game.ini`'s title with `encoding` and prints it, for
     /// `--parse-game-ini`. Reads nothing else.
     fn print_ini_title(&self, encoding: IniEncoding) -> Result<(), anyhow::Error> {
-        if self.engine_type.is_new() {
-            bail!(
-                "`--parse-game-ini` only applies to XP/VX/VX Ace; MV/MZ \
-                 keep their title in `System.json`."
-            );
+        if self.engine_type.is_mvmz() {
+            bail!("`--parse-game-ini` only applies to XP/VX/VX Ace; MV/MZ keep their title in `System.json`.");
         }
 
-        let content = read(&self.ini_file_path)
-            .with_context(|| self.ini_file_path.display().to_string())?;
+        let content = read(&self.ini_file_path).with_context(|| self.ini_file_path.display().to_string())?;
         let title_bytes = get_ini_title(&content)?;
         let (title, _, had_errors) = encoding.as_encoding().decode(&title_bytes);
 
         println!("{title}");
 
         if had_errors {
-            eprintln!(
-                "warning: decoding produced replacement characters - this is \
-                 probably not the right encoding"
-            );
+            eprintln!("warning: decoding produced replacement characters - this is probably not the right encoding");
         }
 
         Ok(())
     }
 
-    pub fn execute_read(
-        &mut self,
-        args: ReadArgs,
-    ) -> Result<(), anyhow::Error> {
+    pub fn execute_read(&mut self, args: ReadArgs) -> Result<(), anyhow::Error> {
         if let Some(encoding) = args.parse_game_ini {
             return self.print_ini_title(encoding);
         }
@@ -554,7 +579,6 @@ impl<'a> Session<'a> {
         let SharedArgs {
             skip_files,
             read_mode,
-            mut trim,
             mut duplicate_mode,
             skip_maps,
             skip_events,
@@ -568,25 +592,27 @@ impl<'a> Session<'a> {
         };
 
         let mut hashes = None;
+        let mut line_separator = self.line_separator.clone();
+        let mut line_break = self.line_break.clone();
+        let mut comment_prefix = self.comment_prefix.clone();
 
-        if append
-            && let Some(metadata) = parse_metadata(&self.metadata_file_path)?
-        {
+        if append && let Some(metadata) = parse_metadata(&self.metadata_file_path)? {
             Metadata {
-                trim,
                 duplicate_mode,
+                line_separator,
+                line_break,
+                comment_prefix,
                 hashes,
             } = metadata;
         }
+
+        apply_format_overrides(line_separator.as_ref(), line_break.as_ref(), comment_prefix.as_ref());
 
         let hashes = hashes.unwrap_or_default();
 
         if force && !silent {
             let start = Instant::now();
-            println!(
-                "WARNING! Force mode will forcefully rewrite all your \
-                 translation files. Input 'Y' to continue."
-            );
+            println!("WARNING! Force mode will forcefully rewrite all your translation files. Input 'Y' to continue.");
 
             let mut buf = String::with_capacity(4);
             stdin().read_line(&mut buf)?;
@@ -599,9 +625,7 @@ impl<'a> Session<'a> {
         }
 
         if append && ignore && !self.ignore_file_path.exists() {
-            bail!(
-                "`.rvpacker-ignore` file does not exist. Aborting execution."
-            );
+            bail!("`.rvpacker-ignore` file does not exist. Aborting execution.");
         }
 
         if let Some(archive_path) = &self.archive_path
@@ -625,7 +649,6 @@ impl<'a> Session<'a> {
 
         let mut flags = BaseFlags::empty();
         flags.set(BaseFlags::Ignore, ignore);
-        flags.set(BaseFlags::Trim, trim);
         flags.set(BaseFlags::SkipObsolete, skip_obsolete);
 
         let mut processor = Processor {
@@ -640,16 +663,13 @@ impl<'a> Session<'a> {
             map_events,
         };
 
-        processor.process(
-            self.engine_type,
-            &self.source_path,
-            &self.translation_path,
-            None,
-        )?;
+        processor.process(self.engine_type, &self.source_path, &self.translation_path, None)?;
 
         let metadata = Metadata {
-            trim,
             duplicate_mode,
+            line_separator,
+            line_break,
+            comment_prefix,
             hashes: Some(processor.hashes),
         };
 
@@ -661,15 +681,11 @@ impl<'a> Session<'a> {
 
     pub fn execute_write(&self, args: SharedArgs) -> Result<(), anyhow::Error> {
         if !self.translation_path.exists() {
-            bail!(
-                "`translation` directory in the input directory does not \
-                 exist."
-            );
+            bail!("`translation` directory in the input directory does not exist.");
         }
 
         let SharedArgs {
             skip_files,
-            mut trim,
             mut duplicate_mode,
             skip_maps,
             skip_events,
@@ -678,21 +694,26 @@ impl<'a> Session<'a> {
 
         let file_flags = FileFlags::all() & !skip_files.0;
 
+        let mut line_separator = self.line_separator.clone();
+        let mut line_break = self.line_break.clone();
+        let mut comment_prefix = self.comment_prefix.clone();
+
         if let Some(metadata) = parse_metadata(&self.metadata_file_path)? {
             Metadata {
-                trim,
                 duplicate_mode,
+                line_separator,
+                line_break,
+                comment_prefix,
                 hashes: _,
             } = metadata;
         }
 
-        let mut flags = BaseFlags::empty();
-        flags.set(BaseFlags::Trim, trim);
+        apply_format_overrides(line_separator.as_ref(), line_break.as_ref(), comment_prefix.as_ref());
 
         let mut processor = Processor {
             mode: Mode::Write,
             file_flags,
-            flags,
+            flags: BaseFlags::empty(),
             duplicate_mode,
             skip_maps: skip_maps.0,
             skip_events: skip_events.0,
@@ -712,7 +733,6 @@ impl<'a> Session<'a> {
     pub fn execute_purge(&self, args: PurgeArgs) -> Result<(), anyhow::Error> {
         let SharedArgs {
             skip_files,
-            mut trim,
             mut duplicate_mode,
             skip_maps,
             skip_events,
@@ -722,16 +742,23 @@ impl<'a> Session<'a> {
         let file_flags = FileFlags::all() & !skip_files.0;
         let create_ignore = args.create_ignore;
 
+        let mut line_separator = self.line_separator.clone();
+        let mut line_break = self.line_break.clone();
+        let mut comment_prefix = self.comment_prefix.clone();
+
         if let Some(metadata) = parse_metadata(&self.metadata_file_path)? {
             Metadata {
-                trim,
                 duplicate_mode,
+                line_separator,
+                line_break,
+                comment_prefix,
                 hashes: _,
             } = metadata;
         }
 
+        apply_format_overrides(line_separator.as_ref(), line_break.as_ref(), comment_prefix.as_ref());
+
         let mut flags = BaseFlags::empty();
-        flags.set(BaseFlags::Trim, trim);
         flags.set(BaseFlags::CreateIgnore, create_ignore);
 
         let mut processor = Processor {
@@ -744,29 +771,26 @@ impl<'a> Session<'a> {
             ..Default::default()
         };
 
-        processor.process(
-            self.engine_type,
-            &self.source_path,
-            &self.translation_path,
-            None,
-        )?;
+        processor.process(self.engine_type, &self.source_path, &self.translation_path, None)?;
 
         Ok(())
     }
 
-    pub fn execute_json(
-        &self,
-        subcommand: &JsonSubcommand,
-    ) -> Result<(), anyhow::Error> {
+    pub fn execute_json(&self, subcommand: &JsonSubcommand) -> Result<(), anyhow::Error> {
         use json::{generate, write};
+
+        apply_format_overrides(
+            self.line_separator.as_ref(),
+            self.line_break.as_ref(),
+            self.comment_prefix.as_ref(),
+        );
 
         let json_path = self.input_dir.join("json");
         let json_output_path = self.input_dir.join("json-output");
 
         match subcommand {
             JsonSubcommand::Generate { read_mode } => {
-                let force =
-                    matches!(read_mode, Mode::Read { force: true, .. });
+                let force = matches!(read_mode, Mode::Read { force: true, .. });
                 generate(&self.source_path, &json_path, force)?;
             }
             JsonSubcommand::Write => {
