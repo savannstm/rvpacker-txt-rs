@@ -12,7 +12,7 @@ clap-verbosity-flag = { version = "3.0.4", default-features = false, features = 
 encoding_rs = "0.8.35"
 gxhash = { version = "3.5.0", features = ["deterministic"] }
 rpgmad-lib = "5.0.0"
-rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "15.0.0", path = "../rvpacker-txt-rs-lib" }
+rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "15.0.0" }
 serde = "1.0.229"
 serde_json = { version = "1.0.151", features = ["preserve_order"] }
 strum = { version = "0.28.0", features = ["strum_macros"] }
