@@ -179,7 +179,7 @@ impl FromStr for FFlags {
 /// which record their encoding anywhere in the file.
 ///
 /// There is no way to detect any of these from the bytes alone, so the user
-/// has to say which one it is - see `--read-encoding`/`--probe-game-ini`.
+/// has to say which one it is - see `--read-encoding`/`--probe-ini-title`.
 #[derive(Clone, Copy, Debug, ValueEnum)]
 enum TextEncoding {
     #[value(name = "utf-8")]
@@ -392,7 +392,7 @@ struct ReadArgs {
     /// given encoding and prints it, without reading anything else. Use this
     /// to find the right encoding before passing it to `--read-encoding`.
     #[arg(long, value_name = "ENCODING")]
-    probe_game_ini: Option<TextEncoding>,
+    probe_ini_title: Option<TextEncoding>,
 
     /// Whether to parse the game's title out of `Game.ini`/`RPG_RT.ini` at
     /// all. Left unset, neither file is touched. When set, the title is
@@ -400,7 +400,7 @@ struct ReadArgs {
     /// own title field carries. Guessing the wrong encoding would silently
     /// corrupt it, so this stays opt-in.
     #[arg(long, action = ArgAction::SetTrue)]
-    use_game_ini: bool,
+    use_ini_title: bool,
 
     #[command(flatten)]
     shared: SharedArgs,
@@ -494,7 +494,7 @@ struct Cli {
     /// source line to look it up in the translation file needs the same
     /// decoding that produced that `.txt` in the first place.
     ///
-    /// Tip: `--probe-game-ini`/`--use-game-ini` can help find the right value
+    /// Tip: `--probe-ini-title`/`--use-ini-title` can help find the right value
     /// - `Game.ini`'s/`RPG_RT.ini`'s title is the one field in that file that
     /// can carry non-ASCII bytes, and when it does, it was written by RPG
     /// Maker's editor in the original developer's own codepage - the same
@@ -703,13 +703,13 @@ impl<'a> Session<'a> {
         }
     }
 
-    fn ini_game_title(&self, use_game_ini: bool, encoding: Option<&'static Encoding>) -> String {
-        if !use_game_ini {
+    fn ini_game_title(&self, use_ini_title: bool, encoding: Option<&'static Encoding>) -> String {
+        if !use_ini_title {
             return String::new();
         }
 
         let Some(encoding) = encoding else {
-            eprintln!("warning: --use-game-ini has no effect without --read-encoding, which decodes the title");
+            eprintln!("warning: --use-ini-title has no effect without --read-encoding, which decodes the title");
             return String::new();
         };
 
@@ -735,7 +735,7 @@ impl<'a> Session<'a> {
     }
 
     /// Decodes `Game.ini`'s (or, if absent, `RPG_RT.ini`'s) title with
-    /// `encoding` and prints it, for `--probe-game-ini`. Reads nothing else.
+    /// `encoding` and prints it, for `--probe-ini-title`. Reads nothing else.
     fn print_ini_title(&self, encoding: TextEncoding) -> Result<(), anyhow::Error> {
         let title_bytes = self.read_ini_title()?;
         let (title, _, had_errors) = encoding.as_encoding().decode(&title_bytes);
@@ -750,14 +750,14 @@ impl<'a> Session<'a> {
     }
 
     pub fn execute_read(&mut self, args: ReadArgs) -> Result<(), anyhow::Error> {
-        if let Some(encoding) = args.probe_game_ini {
+        if let Some(encoding) = args.probe_ini_title {
             return self.print_ini_title(encoding);
         }
 
         let silent = args.silent;
         let ignore = args.ignore;
         let skip_obsolete = args.skip_obsolete;
-        let use_game_ini = args.use_game_ini;
+        let use_ini_title = args.use_ini_title;
 
         let SharedArgs {
             skip_files,
@@ -843,7 +843,7 @@ impl<'a> Session<'a> {
             file_flags,
             flags,
             duplicate_mode,
-            game_title: self.ini_game_title(use_game_ini, resolved_read_encoding),
+            game_title: self.ini_game_title(use_ini_title, resolved_read_encoding),
             hashes,
             skip_maps: skip_maps.0,
             skip_events: skip_events
