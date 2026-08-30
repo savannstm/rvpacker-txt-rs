@@ -2,7 +2,7 @@
 
 [README на русском](./README-ru.md)
 
-A command-line tool that extracts the translatable text from RPG Maker XP/VX/VX Ace/MV/MZ game files into plain `.txt` files, and writes translated `.txt` files back into the game's original format. It also decrypts `.rgss` archives on the fly when it finds one.
+A command-line tool that extracts the translatable text from RPG Maker 2000/2003/XP/VX/VX Ace/MV/MZ game files into plain `.txt` files, and writes translated `.txt` files back into the game's original format. It also decrypts `.rgss` archives on the fly when it finds one.
 
 It's built on top of [rvpacker-txt-rs-lib](https://github.com/RPG-Maker-Translation-Tools/rvpacker-txt-rs-lib) - reach for that crate instead if you're building your own tool rather than using this CLI directly.
 
@@ -28,7 +28,21 @@ cargo install --path .
 
 Point `--input-dir` (`-i`, defaults to `./`) at a folder containing either a `data`/`Data` directory (XP/VX/VX Ace) or the MV/MZ equivalent, plus `Game.ini` and any `.rgss` archive for the older engines. The engine is detected automatically from whichever `System.*`/archive combination is present - there's nothing to select manually.
 
+RPG Maker 2000/2003 projects don't have a `data`/`Data` directory at all - `RPG_RT.ldb`, `RPG_RT.lmt` and every `MapNNNN.lmu` sit directly in the input directory, and that's what's checked for first. There's no `Scripts`/plugin equivalent for it, and no `.rgss` archive to decrypt.
+
 `read` writes `.txt` files into `<output-dir>/translation`; `write` reads them back and writes the game's files into `<output-dir>/output`. `--output-dir` (`-o`) defaults to the input directory, so translation and output both live alongside the game unless you say otherwise.
+
+### Text encoding
+
+Reading the game's own text and writing a translation back are two independent decisions, controlled by two separate flags - `--read-encoding` and `--write-encoding`. Reusing one codepage for both (or assuming UTF-8 always works) risks silently corrupting a translation - see below.
+
+**`--read-encoding`.** RPG Maker 2000/2003 files, and XP/VX's `Scripts.*`, carry no encoding of their own at all - left unset, the tool guesses from a fixed list of common codepages (UTF-8, Shift-JIS, GB18030, Windows-1252, Windows-1251), keeping the first one that decodes cleanly. Pass `--read-encoding` if you already know the game's codepage, rather than trusting the guess. VX Ace is different: its data format tags most strings with their real encoding already, so `--read-encoding` there only matters for the rare string that declares one this tool doesn't recognize.
+
+`--use-game-ini`/`--parse-game-ini` can help find that codepage in the first place: `Game.ini`'s (or, if absent, `RPG_RT.ini`'s) title is the one field in that file that can carry non-ASCII bytes, and when it does, RPG Maker's editor wrote them in whatever codepage the original developer's machine used - the same codepage the rest of the game's text is in. Use `--parse-game-ini <ENCODING>` on its own first to try candidates and see which one decodes into sensible text, before committing to it with `--read-encoding` and passing `--use-game-ini` (which decodes the title with `--read-encoding` and writes it into the system file's title field).
+
+**`--write-encoding` defaults to unset, which always writes UTF-8 - leave it that way unless you know you need otherwise.** A translation is not generally representable in the source game's own codepage (Japanese `Shift-JIS` has no Cyrillic to translate a Russian translation into, for instance), and forcing the wrong one doesn't fail loudly - an unmappable character gets silently replaced with a literal `&#1055;`-style numeric reference spliced into the output. Only set `--write-encoding` when the target engine build has no Unicode-aware text renderer to fall back on - true of RPG Maker 2000/2003, XP and VX, which render through the OS's legacy ANSI codepage rather than decoding UTF-8 - _and_ the translation's own script fits inside the codepage you choose. Whoever runs the translated game then also needs their system (or a locale-emulation tool) set to that same codepage; on Windows 10 1903+, checking "Beta: Use Unicode UTF-8 for worldwide language support" under Region settings makes the default UTF-8 output work for these engines too, without any of this. VX Ace is Unicode-native, so its UTF-8 default just works regardless.
+
+Both flags accept the common Windows codepages: `utf-8`, `shift-jis`, `gb18030`, `euc-kr` (UHC/CP949), `big5`, and `windows-1250` through `windows-1258`. Whichever value is used on `read` is recorded in `.rvpacker-metadata`, so later `append`/`write`/`purge` runs pick both back up automatically without repeating the flags.
 
 ### Translation file format
 
@@ -81,7 +95,7 @@ rvpacker-txt-rs purge -i "C:/Game"
 
 ### `json`
 
-Converts XP/VX/VX Ace's binary data files to and from JSON, independent of the translation workflow above.
+Converts XP/VX/VX Ace's binary data files to and from JSON, independent of the translation workflow above. Not available for RPG Maker 2000/2003 or MV/MZ.
 
 ```bash
 rvpacker-txt-rs json generate -i "C:/Game"   # writes C:/Game/json/*.json (and Scripts.rb)
@@ -95,6 +109,8 @@ These apply to every command:
 - `-i, --input-dir <PATH>` - defaults to `./`.
 - `-o, --output-dir <PATH>` - defaults to the input directory.
 - `--line-separator <SEPARATOR>`, `--line-break <BREAK>`, `--comment-prefix <PREFIX>` - override the library's translation-file format defaults (`<#>`, `\#`, `<!>`). See [`.rvpacker-metadata` and `.rvpacker-ignore`](#rvpacker-metadata-and-rvpacker-ignore) for how these interact with later runs.
+- `--read-encoding <ENCODING>` - forces decoding of the game's own text to a specific codepage instead of guessing it. See [Text encoding](#text-encoding).
+- `--write-encoding <ENCODING>` - forces encoding of translated text to a specific codepage instead of always writing UTF-8. Independent of `--read-encoding` - see [Text encoding](#text-encoding).
 - `-v`/`-q` - increase/decrease log verbosity.
 
 ## Support
