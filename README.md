@@ -95,12 +95,25 @@ rvpacker-txt-rs purge -i "C:/Game"
 
 ### `json`
 
-Converts XP/VX/VX Ace's binary data files to and from JSON, independent of the translation workflow above. Not available for RPG Maker 2000/2003 or MV/MZ.
+Converts binary data files to and from JSON, independent of the translation workflow above. Covers XP/VX/VX Ace's Marshal-based files as well as RPG Maker 2000/2003's `RPG_RT.ldb`/`RPG_RT.lmt`/`MapNNNN.lmu` LCF files - not available for MV/MZ, which already stores its data as JSON.
 
 ```bash
 rvpacker-txt-rs json generate -i "C:/Game"   # writes C:/Game/json/*.json (and Scripts.rb)
 rvpacker-txt-rs json write -i "C:/Game"      # reads C:/Game/json back into C:/Game/json-output
 ```
+
+For RPG Maker 2000/2003, each file's JSON keeps its original extension ahead of the added `.json` (`RPG_RT.ldb.json`, `RPG_RT.lmt.json`, `MapNNNN.lmu.json`) rather than being flattened into `C:/Game/json`'s usual one-`.json`-per-source-file naming - `RPG_RT.ldb` and `RPG_RT.lmt` share a stem and would otherwise collide.
+
+### `serde`
+
+Exports the `translation/*.txt` files `read` produces to a structured format for editing in external tools (spreadsheets, XML/YAML-aware editors), and imports them back. Supports JSON, CSV, XML, XLSX and YAML.
+
+```bash
+rvpacker-txt-rs serde export json -i "C:/Game"   # writes C:/Game/translation/*.txt to C:/Game/serde/*.json
+rvpacker-txt-rs serde import json -i "C:/Game"   # reads C:/Game/serde/*.json back into C:/Game/translation/*.txt
+```
+
+`export` reads every `.txt` file in `translation` and writes a same-named file with the target format's extension into `<output-dir>/serde`; `import` does the reverse, overwriting the matching `.txt` file for every file of the target format's extension found there. JSON and YAML represent each `.txt` line as a tagged `{"type": "comment", "text": ...}`/`{"type": "translation", "source": ..., "translations": [...]}` entry; CSV and XLSX share one flat `type, source, translation_count, translation_1..N` row layout; XML wraps the same data in `<comment>`/`<entry><source>/<translations>` elements. See the library's [`serde` module](https://github.com/RPG-Maker-Translation-Tools/rvpacker-txt-rs-lib/blob/main/src/serde.rs) for the exact schemas.
 
 ### Global options
 

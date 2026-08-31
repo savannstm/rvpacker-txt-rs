@@ -1,6 +1,6 @@
 [package]
 name = "rvpacker-txt-rs"
-version = "16.1.0"
+version = "16.2.0"
 edition = "2024"
 
 [dependencies]
@@ -12,7 +12,12 @@ clap-verbosity-flag = { version = "3.0.4", default-features = false, features = 
 encoding_rs = "0.8.35"
 gxhash = { version = "3.5.0", features = ["deterministic"] }
 rpgmad-lib = "5.0.1"
-rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "16.1.0" }
+rvpacker-lib = { package = "rvpacker-txt-rs-lib", version = "16.2.0", features = [
+    "serde-csv",
+    "serde-xml",
+    "serde-xlsx",
+    "serde-yaml",
+] }
 serde = "1.0.229"
 serde_json = { version = "1.0.151", features = ["preserve_order"] }
 strum = { version = "0.28.0", features = ["strum_macros"] }

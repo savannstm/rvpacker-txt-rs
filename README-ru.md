@@ -93,12 +93,25 @@ rvpacker-txt-rs purge -i "C:/Game"
 
 ### `json`
 
-Конвертирует бинарные данные RPG Maker XP/VX/VX Ace в и из JSON, независимо от файлов перевода. Недоступно для RPG Maker 2000/2003 и MV/MZ.
+Конвертирует бинарные файлы данных в и из JSON, независимо от файлов перевода. Охватывает Marshal-файлы XP/VX/VX Ace, а также LCF-файлы `RPG_RT.ldb`/`RPG_RT.lmt`/`MapNNNN.lmu` RPG Maker 2000/2003 - недоступно для MV/MZ, которые уже хранят данные в формате JSON.
 
 ```bash
 rvpacker-txt-rs json generate -i "C:/Game"   # записывает C:/Game/json/*.json (и Scripts.rb)
 rvpacker-txt-rs json write -i "C:/Game"      # записывает C:/Game/json обратно в C:/Game/json-output
 ```
+
+Для RPG Maker 2000/2003 JSON каждого файла сохраняет исходное расширение перед добавленным `.json` (`RPG_RT.ldb.json`, `RPG_RT.lmt.json`, `MapNNNN.lmu.json`), а не сводится к обычной для `C:/Game/json` схеме "один `.json` на исходный файл" - `RPG_RT.ldb` и `RPG_RT.lmt` имеют одинаковое имя без расширения и иначе конфликтовали бы.
+
+### `serde`
+
+Экспортирует файлы `translation/*.txt`, созданные `read`, в структурированный формат для редактирования во внешних инструментах (таблицы, редакторы с поддержкой XML/YAML), и импортирует их обратно. Поддерживает JSON, CSV, XML, XLSX и YAML.
+
+```bash
+rvpacker-txt-rs serde export json -i "C:/Game"   # записывает C:/Game/translation/*.txt в C:/Game/serde/*.json
+rvpacker-txt-rs serde import json -i "C:/Game"   # считывает C:/Game/serde/*.json обратно в C:/Game/translation/*.txt
+```
+
+`export` читает каждый `.txt` файл в `translation` и записывает одноимённый файл с расширением целевого формата в `<output-dir>/serde`; `import` делает обратное, перезаписывая соответствующий `.txt` файл для каждого найденного там файла с расширением целевого формата. JSON и YAML представляют каждую строку `.txt` как размеченную запись `{"type": "comment", "text": ...}`/`{"type": "translation", "source": ..., "translations": [...]}`; CSV и XLSX используют одну плоскую строку вида `type, source, translation_count, translation_1..N`; XML оборачивает те же данные в элементы `<comment>`/`<entry><source>/<translations>`. Точные схемы см. в [модуле `serde`](https://github.com/RPG-Maker-Translation-Tools/rvpacker-txt-rs-lib/blob/main/src/serde.rs) библиотеки.
 
 ### Глобальные опции
 

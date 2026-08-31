@@ -5,7 +5,7 @@
 #![allow(clippy::cast_sign_loss)]
 #![allow(clippy::deref_addrof)]
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, anyhow, bail};
 use clap::{
     ArgAction, Args, Parser, Subcommand, ValueEnum,
     builder::{PossibleValuesParser, TypedValueParser},
@@ -21,12 +21,16 @@ use rpgmad_lib::Decrypter;
 use rvpacker_lib::{
     BaseFlags, Mode, Processor, RPGMFileType, RVPACKER_IGNORE_FILE, RVPACKER_METADATA_FILE, get_ini_title,
     get_ini_title_rm2k, json, set_comment_prefix, set_line_break, set_line_separator,
+    serde::{
+        export_csv, export_json, export_xlsx, export_xml, export_yaml, import_csv, import_json, import_xlsx,
+        import_xml, import_yaml,
+    },
     types::{DuplicateMode, EngineType, FileFlags},
 };
 use serde::{Deserialize, Serialize, Serializer, ser::SerializeMap};
 use serde_json::{from_str, to_string};
 use std::{
-    fs::{create_dir_all, read, read_to_string, write},
+    fs::{create_dir_all, read, read_dir, read_to_string, write},
     io::stdin,
     mem::take,
     path::{Path, PathBuf},
@@ -435,6 +439,44 @@ enum JsonSubcommand {
     Write,
 }
 
+/// A structured format translation `.txt` files can be exported to/imported from - see [`SerdeSubcommand`].
+#[derive(Clone, Copy, Debug, ValueEnum)]
+enum SerdeFormat {
+    Json,
+    Csv,
+    Xml,
+    Xlsx,
+    Yaml,
+}
+
+impl SerdeFormat {
+    fn extension(self) -> &'static str {
+        match self {
+            Self::Json => "json",
+            Self::Csv => "csv",
+            Self::Xml => "xml",
+            Self::Xlsx => "xlsx",
+            Self::Yaml => "yaml",
+        }
+    }
+}
+
+#[derive(Debug, Subcommand)]
+enum SerdeSubcommand {
+    /// Exports translation `.txt` files to a structured format, for editing in external tools (spreadsheet
+    /// editors, XML/YAML-aware editors, ...)
+    Export {
+        /// Format to export the translation files to
+        format: SerdeFormat,
+    },
+
+    /// Imports a structured format created with `serde export` back into translation `.txt` files
+    Import {
+        /// Format to import the translation files from
+        format: SerdeFormat,
+    },
+}
+
 #[derive(Debug, Subcommand)]
 enum Command {
     /// Parses game files to `.txt` format, and decrypts any `.rgss` archive if it's present
@@ -450,6 +492,13 @@ enum Command {
     Json {
         #[command(subcommand)]
         subcommand: JsonSubcommand,
+    },
+
+    /// Provides the commands for exporting/importing translation files to/from structured formats
+    /// (JSON, CSV, XML, XLSX, YAML)
+    Serde {
+        #[command(subcommand)]
+        subcommand: SerdeSubcommand,
     },
 }
 
@@ -988,14 +1037,7 @@ impl<'a> Session<'a> {
     }
 
     pub fn execute_json(&self, subcommand: &JsonSubcommand) -> Result<(), anyhow::Error> {
-        use json::{generate, write};
-
-        if self.engine_type == EngineType::RM2K {
-            bail!(
-                "`json` only applies to XP/VX/VX Ace's Marshal-based files; RPG Maker 2000/2003's \
-                 `.ldb`/`.lmt`/`.lmu` files aren't supported by it."
-            );
-        }
+        use json::{generate, generate_rm2k, write, write_rm2k};
 
         apply_format_overrides(
             self.line_separator.as_ref(),
@@ -1006,6 +1048,20 @@ impl<'a> Session<'a> {
         let json_path = self.input_dir.join("json");
         let json_output_path = self.input_dir.join("json-output");
 
+        if self.engine_type == EngineType::RM2K {
+            match subcommand {
+                JsonSubcommand::Generate { read_mode } => {
+                    let force = matches!(read_mode, Mode::Read { force: true, .. });
+                    generate_rm2k(&self.source_path, &json_path, force)?;
+                }
+                JsonSubcommand::Write => {
+                    write_rm2k(json_path, json_output_path)?;
+                }
+            }
+
+            return Ok(());
+        }
+
         match subcommand {
             JsonSubcommand::Generate { read_mode } => {
                 let force = matches!(read_mode, Mode::Read { force: true, .. });
@@ -1013,6 +1069,82 @@ impl<'a> Session<'a> {
             }
             JsonSubcommand::Write => {
                 write(json_path, json_output_path, self.engine_type)?;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Directory that holds files exported by `serde export`/read back by `serde import` -
+    /// mirrors the `json`/`json-output` convention [`Session::execute_json`] uses.
+    fn serde_dir(&self) -> PathBuf {
+        self.output_dir.join("serde")
+    }
+
+    pub fn execute_serde(&self, subcommand: &SerdeSubcommand) -> Result<(), anyhow::Error> {
+        if !self.translation_path.exists() {
+            bail!("`translation` directory in the input directory does not exist.");
+        }
+
+        let serde_path = self.serde_dir();
+
+        match subcommand {
+            SerdeSubcommand::Export { format } => {
+                create_dir_all(&serde_path)?;
+
+                for entry in read_dir(&self.translation_path)?.flatten() {
+                    let path = entry.path();
+
+                    if path.extension().and_then(|ext| ext.to_str()) != Some("txt") {
+                        continue;
+                    }
+
+                    let stem = path.file_stem().unwrap().to_string_lossy();
+                    let output_path = serde_path.join(format!("{stem}.{}", format.extension()));
+                    let content = read_to_string(&path).with_context(|| path.display().to_string())?;
+
+                    match format {
+                        SerdeFormat::Json => write(&output_path, export_json(&content).map_err(|e| anyhow!("{e}"))?)?,
+                        SerdeFormat::Csv => write(&output_path, export_csv(&content).map_err(|e| anyhow!("{e}"))?)?,
+                        SerdeFormat::Xml => write(&output_path, export_xml(&content).map_err(|e| anyhow!("{e}"))?)?,
+                        SerdeFormat::Xlsx => {
+                            write(&output_path, export_xlsx(&content).map_err(|e| anyhow!("{e}"))?)?;
+                        }
+                        SerdeFormat::Yaml => write(&output_path, export_yaml(&content).map_err(|e| anyhow!("{e}"))?)?,
+                    }
+
+                    println!("{}: Successfully exported.", output_path.display());
+                }
+            }
+            SerdeSubcommand::Import { format } => {
+                if !serde_path.exists() {
+                    bail!(
+                        "`{}` directory does not exist. Run `serde export` first.",
+                        serde_path.display()
+                    );
+                }
+
+                for entry in read_dir(&serde_path)?.flatten() {
+                    let path = entry.path();
+
+                    if path.extension().and_then(|ext| ext.to_str()) != Some(format.extension()) {
+                        continue;
+                    }
+
+                    let stem = path.file_stem().unwrap().to_string_lossy();
+                    let output_path = self.translation_path.join(format!("{stem}.txt"));
+
+                    let content = match format {
+                        SerdeFormat::Json => import_json(&read_to_string(&path)?).map_err(|e| anyhow!("{e}"))?,
+                        SerdeFormat::Csv => import_csv(&read_to_string(&path)?).map_err(|e| anyhow!("{e}"))?,
+                        SerdeFormat::Xml => import_xml(&read_to_string(&path)?).map_err(|e| anyhow!("{e}"))?,
+                        SerdeFormat::Xlsx => import_xlsx(&read(&path)?).map_err(|e| anyhow!("{e}"))?,
+                        SerdeFormat::Yaml => import_yaml(&read_to_string(&path)?).map_err(|e| anyhow!("{e}"))?,
+                    };
+
+                    write(&output_path, content).with_context(|| output_path.display().to_string())?;
+                    println!("{}: Successfully imported.", output_path.display());
+                }
             }
         }
 
@@ -1041,6 +1173,7 @@ fn main() -> Result<()> {
         Command::Write(args) => session.execute_write(args)?,
         Command::Purge(args) => session.execute_purge(args)?,
         Command::Json { subcommand } => session.execute_json(&subcommand)?,
+        Command::Serde { subcommand } => session.execute_serde(&subcommand)?,
     }
 
     println!("Elapsed: {:.2}s", start_time.elapsed().as_secs_f32());
